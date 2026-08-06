@@ -9,6 +9,7 @@ from django.urls import path
 from django.views.generic import RedirectView, TemplateView
 from taller.views.country_aware_auth import country_aware_login
 
+from taller.views_extra.bienvenida import bienvenida_pe
 from taller.views_extra.signup_redirects import signup_redirect
 
 app_name = "taller_peru"
@@ -23,11 +24,7 @@ urlpatterns = [
         name="dashboard_peru",
     ),
     # Página de bienvenida / onboarding Perú
-    path(
-        "bienvenida/",
-        TemplateView.as_view(template_name="pe/es/onboarding/bienvenida.html"),
-        name="bienvenida_peru",
-    ),
+    path("bienvenida/", bienvenida_pe, name="bienvenida_peru"),
     # Página de pago de suscripción Perú (cuando esté lista)
     path(
         "suscripcion/pago/",

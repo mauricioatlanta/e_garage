@@ -10,6 +10,7 @@ from django.views.generic import RedirectView, TemplateView
 
 from taller.vehiculos import views_country_aware as views_vehiculos
 from taller.views.country_aware_auth import country_aware_login
+from taller.views_extra.bienvenida import bienvenida_ve
 from taller.views_extra.signup_redirects import signup_redirect
 
 app_name = "taller_venezuela"
@@ -26,11 +27,7 @@ urlpatterns = [
         name="dashboard_venezuela",
     ),
     # Página de bienvenida / onboarding Venezuela
-    path(
-        "bienvenida/",
-        TemplateView.as_view(template_name="ve/es/onboarding/bienvenida.html"),
-        name="bienvenida_venezuela",
-    ),
+    path("bienvenida/", bienvenida_ve, name="bienvenida_venezuela"),
     # Página de pago de suscripción Venezuela (cuando esté lista)
     path(
         "suscripcion/pago/",

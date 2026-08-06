@@ -32,8 +32,8 @@ _DEFAULT_LANG_BY_CC = {
 def _country_from_login_request(request):
     """
     Determina el país para /accounts/login/ sin prefijo.
-    Orden: next (path del next) → from= → sesión (us/usa) → default CL.
-    No forzar siempre CL: si la sesión indica USA, enviar a /us/.../accounts/login/.
+    Orden: next (path del next) → from= → default CL.
+    No usar sesión: genera el bug de mostrar login USA a usuarios CL con sesión obsoleta.
     """
     next_url = (request.GET.get("next") or "").strip()
     if next_url.startswith("/") and len(next_url) >= 4 and next_url[3] == "/":
@@ -46,12 +46,6 @@ def _country_from_login_request(request):
         return from_param
     if from_param in ("usa",):
         return "us"
-
-    session_country = (request.session.get("country") or "").strip().lower()
-    if session_country in ("us", "usa"):
-        return "us"
-    if session_country in ("cl",):
-        return "cl"
 
     return "cl"
 

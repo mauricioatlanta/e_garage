@@ -7,22 +7,13 @@ Compatibilidad: /br/es/... redirige a /br/pt/...
 
 from django.shortcuts import redirect
 from django.urls import path
-from django.utils import translation
-from django.views.generic import RedirectView, TemplateView
+from django.views.generic import RedirectView
 
 from taller.views.country_aware_auth import country_aware_login
+from taller.views_extra.bienvenida import bienvenida_br_pt
 from taller.views_extra.signup_redirects import signup_redirect
 
 app_name = "taller_brasil"
-
-
-class BrasilPTTemplateView(TemplateView):
-    template_name = "br/pt/onboarding/bienvenida.html"
-
-    def dispatch(self, request, *args, **kwargs):
-        translation.activate("pt-br")
-        request.LANGUAGE_CODE = "pt-br"
-        return super().dispatch(request, *args, **kwargs)
 
 
 urlpatterns = [
@@ -31,11 +22,7 @@ urlpatterns = [
     # /br/pt/ → /br/pt/bienvenida/ (entrypoint del funnel BR)
     path("pt/", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),
     # --- PORTUGUÉS (principal) ---
-    path(
-        "pt/bienvenida/",
-        BrasilPTTemplateView.as_view(),
-        name="bienvenida_pt",
-    ),
+    path("pt/bienvenida/", bienvenida_br_pt, name="bienvenida_pt"),
     path(
         "pt/accounts/signup/",
         lambda r: signup_redirect(r, "br"),

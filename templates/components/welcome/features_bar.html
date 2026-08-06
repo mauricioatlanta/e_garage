@@ -1,0 +1,20 @@
+{% load static %}
+<section class="py-20 px-4">
+  <div class="container mx-auto max-w-6xl">
+    <h2 class="font-futuristic text-4xl md:text-5xl text-center mb-14 futuristic-glow" data-aos="fade-up">
+      {{ features_title }}
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {% for f in features %}
+      <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+        <div class="feature-icon">{{ f.icon }}</div>
+        <h3 class="text-xl font-bold mb-3" style="color:var(--c1);">{{ f.title }}</h3>
+        <p style="color:#d0d0d0;font-size:1rem;line-height:1.6;">{{ f.body }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% if features_footer %}
+    <p class="text-center mt-6" style="color:#9ca3af;font-size:0.82rem;">{{ features_footer }}</p>
+    {% endif %}
+  </div>
+</section>
