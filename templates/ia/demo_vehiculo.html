@@ -1,5 +1,5 @@
-{% load country_url %}
 {% extends 'base.html' %}
+{% load country_url %}
 
 {% block title %}🚗 Demo IA Vehicular{% endblock %}
 
@@ -434,10 +434,10 @@
 
     <!-- Botones de Acción -->
     <div class="action-buttons">
-        <a href="{% country_url 'ia:sugerencias_basicas' %}" class="btn-demo">
+        <a href="../../" class="btn-demo">
             🤖 Probar IA Completa
         </a>
-        <a href="{% url 'onboarding:onboarding_paso' %}?paso=2" class="btn-demo btn-secondary">
+        <a href="../../../paso/?paso=2" class="btn-demo btn-secondary">
             ➡️ Continuar Onboarding
         </a>
     </div>
