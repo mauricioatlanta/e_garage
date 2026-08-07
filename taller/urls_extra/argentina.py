@@ -18,6 +18,7 @@ def argentina_home(request):
 
 
 from taller.views_extra.bienvenida import bienvenida_ar
+from taller.views.landing_views import hub_argentina
 from taller.views_extra.views import dashboard_suscripciones
 from taller.views_extra.company_settings_views import company_settings_view
 from taller.views_extra.dashboard_empresa import (
@@ -42,7 +43,7 @@ app_name = "argentina"
 
 urlpatterns = [
     # Vista de inicio para /ar/es/ - redirige a la página principal de Argentina
-    path("", argentina_home, name="argentina_home"),
+    path("", hub_argentina, name="argentina_home"),
     # URLs principales de taller (configuración, settings, etc.)
     path("dashboard/", dashboard, name="dashboard"),
     path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),

@@ -11,12 +11,13 @@ from taller.views.country_aware_auth import country_aware_login
 
 from taller.views_extra.bienvenida import bienvenida_pe
 from taller.views_extra.signup_redirects import signup_redirect
+from taller.views.landing_views import hub_peru
 
 app_name = "taller_peru"
 
 urlpatterns = [
     # Redirigir raíz a bienvenida
-    path("", RedirectView.as_view(url="/pe/es/bienvenida/", permanent=False), name="peru_home"),
+    path("", hub_peru, name="peru_home"),
     # Dashboard principal de Perú
     path(
         "dashboard/",

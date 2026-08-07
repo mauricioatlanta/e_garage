@@ -2,143 +2,499 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}eGarage Repuestos — Software para Casas de Repuestos Automotrices{% endblock %}
-{% block meta_description %}Inventario multi-bodega, catálogo por referencia OEM, punto de venta y tienda en línea para tu casa de repuestos. Prueba gratis 30 días.{% endblock %}
+{% block title %}eGarage — Software para Casas de Repuestos · Chile{% endblock %}
+{% block meta_description %}Tu catálogo de repuestos en línea, inventario al día y pedidos desde el taller — sin llamadas de consulta. Para casas de repuestos en Chile. Prueba gratis 30 días, sin tarjeta.{% endblock %}
 {% block canonical_path %}/casas-de-repuestos/{% endblock %}
-{% block og_title %}eGarage Repuestos — Inventario, ventas y catálogo para casas de repuestos{% endblock %}
-{% block og_description %}La plataforma de gestión para distribuidores y casas de repuestos automotrices. Catálogo OEM, inventario y ventas integrados.{% endblock %}
+{% block og_title %}¿Cuántas ventas perdiste hoy antes de llegar al mostrador?{% endblock %}
+{% block og_description %}Con eGarage, el catálogo responde solo. El mecánico busca, encuentra y pide desde el taller. Tú recibes la notificación. Sin llamadas de consulta.{% endblock %}
 
 {% block extra_head %}
 <style>
-  .card-glow-l:hover { box-shadow: 0 0 30px rgba(163, 230, 53, 0.15), 0 25px 50px -12px rgba(0,0,0,0.5); }
+  /* FAQ accordion: ocultar triángulo nativo del summary */
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  /* Rotación del indicador cuando el details está abierto */
+  details[open] summary .faq-indicator { transform: rotate(45deg); }
+  .faq-indicator { transition: transform 0.2s ease; display: inline-block; }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- Hero -->
-<section class="px-6 py-20 text-center max-w-5xl mx-auto animate-in">
-  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime-500/10 border border-lime-500/30 text-lime-400 text-xs font-semibold mb-6 font-orbitron tracking-widest">
-    🏪 eGarage · Casas de Repuestos
+<!-- ================================================================ -->
+<!-- BLOQUE 1 — HERO                                                   -->
+<!-- ================================================================ -->
+<section class="px-6 pt-16 pb-20 max-w-4xl mx-auto text-center animate-in">
+
+  <!-- Badge de rubro -->
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime-500/10 border border-lime-500/30 text-lime-400 text-xs font-semibold mb-8 font-orbitron tracking-widest">
+    🏪 Para casas de repuestos
   </div>
+
+  <!-- Setup — la situación que el dueño reconoce -->
+  <p class="text-slate-400 text-lg sm:text-xl mb-5 leading-relaxed">
+    El mecánico llama.<br>
+    "¿Tiene el filtro para un Hilux 2019?"<br>
+    Buscas. Tres minutos. Vuelves. Ya llamó a otro.
+  </p>
+
+  <!-- H1 — la pregunta que duele -->
   <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight glow-lime">
-    Tu casa de repuestos.<br>
-    <span class="text-lime-400">Con el catálogo que merece.</span>
+    ¿Cuántas ventas perdiste hoy<br class="hidden sm:block"> antes de llegar al mostrador?
   </h1>
-  <p class="text-xl text-slate-200 max-w-2xl mx-auto mb-10">
-    Inventario multi-bodega, catálogo por referencia OEM, punto de venta y tienda en línea — todo integrado para que pases más tiempo vendiendo y menos buscando en carpetas.
+
+  <!-- Subheadline — la respuesta -->
+  <p class="text-xl text-slate-200 max-w-2xl mx-auto mb-10 leading-relaxed">
+    Con eGarage, el catálogo responde solo.<br>
+    El mecánico busca, encuentra y pide desde el taller.<br>
+    Tú recibes la notificación. Sin llamadas de consulta.
   </p>
-  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-    <a href="{% url 'account_signup' %}" class="px-8 py-4 rounded-xl bg-lime-600 text-slate-950 font-bold text-lg hover:bg-lime-500 transition-all shadow-lg shadow-lime-500/20 font-orbitron">
-      Prueba gratis 30 días →
+
+  <!-- CTAs -->
+  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+    <a href="{% url 'account_signup' %}?rubro=CASA_REPUESTOS"
+       class="px-8 py-4 rounded-xl bg-lime-500 text-slate-950 font-bold text-lg hover:bg-lime-400 transition-all shadow-lg shadow-lime-500/30 font-orbitron">
+      Publica tu catálogo gratis →
     </a>
-    <a href="{% url 'account_login' %}" class="px-8 py-4 rounded-xl border border-slate-500 text-slate-200 hover:border-lime-500/50 hover:text-lime-300 transition-all text-lg">
-      Ya tengo cuenta
+    <a href="#como-funciona"
+       class="px-8 py-4 rounded-xl border border-slate-500 text-slate-200 hover:border-lime-500/50 hover:text-lime-300 transition-all text-lg">
+      Ver cómo funciona →
     </a>
   </div>
-  <p class="text-slate-400 text-sm">Sin tarjeta de crédito · Cancela cuando quieras</p>
-</section>
+  <p class="text-slate-500 text-sm">Sin tarjeta de crédito · Cancela cuando quieras</p>
 
-<!-- Problema que resuelve -->
-<section class="px-6 py-10 max-w-3xl mx-auto animate-in delay-1">
-  <div class="bg-slate-800/50 border border-lime-500/20 rounded-2xl p-8 text-center">
-    <p class="text-slate-200 leading-relaxed">
-      En una casa de repuestos, el mayor problema no es vender — es <span class="text-lime-300 font-semibold">saber qué tienes, dónde está y a cuánto lo vendes</span>. Con eGarage, tu catálogo siempre está al día, en mostrador y en línea al mismo tiempo.
-    </p>
+  <div class="landing-media mt-12 border-lime-500/20">
+    <img
+      src="{% static 'img/welcome/scenes/repuestos.webp' %}"
+      alt=""
+      loading="eager"
+      decoding="async">
+    <div class="landing-media-caption">
+      Inventario visible, catálogo disponible y pedidos entrando sin llamadas.
+    </div>
   </div>
+
 </section>
 
-<!-- Features -->
-<section class="px-6 py-16 max-w-6xl mx-auto">
-  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12 animate-in">Lo que necesita tu casa de repuestos</h2>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-    <div class="animate-in delay-1 bg-slate-800/60 border border-lime-500/25 rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">📚</div>
-      <h3 class="font-orbitron text-lime-300 font-bold mb-3">Catálogo por referencia OEM</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Cada repuesto con su código OEM, marca alternativa, precio y compatibilidad por modelo y año. Búsqueda instantánea en el mostrador.</p>
+<!-- ================================================================ -->
+<!-- BLOQUE 2 — PROBLEMA                                              -->
+<!-- ================================================================ -->
+<section class="px-6 py-20 max-w-5xl mx-auto animate-in delay-1">
+
+  <h2 class="font-orbitron text-2xl font-bold text-center text-slate-300 mb-12">
+    ¿Esto te suena familiar?
+  </h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+    <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
+      <div class="text-2xl mb-3">📞</div>
+      <h3 class="text-white font-bold mb-2 text-sm">"Cada consulta por teléfono me toma 5 minutos que no cobro."</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">
+        El cliente llama, buscas físicamente en la bodega, vuelves al teléfono. Si la pieza no está, el cliente ya llamó al siguiente. Si está, tardaste 5 minutos respondiendo algo que podría haberse resuelto solo.
+      </p>
     </div>
 
-    <div class="animate-in delay-2 bg-slate-800/60 border border-lime-500/25 rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">📦</div>
-      <h3 class="font-orbitron text-lime-300 font-bold mb-3">Inventario multi-bodega</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Controla stock en bodega, mostrador y despacho. Alertas automáticas cuando un repuesto llega al mínimo. Nunca más queda sin decirte.</p>
+    <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
+      <div class="text-2xl mb-3">📦</div>
+      <h3 class="text-white font-bold mb-2 text-sm">"No sé exactamente lo que tengo en cada estante."</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">
+        Hay referencias que se agotan sin que nadie lo note hasta que llega el cliente y no están. Hay otras que llevan dos años sin moverse. El inventario es un estimado, no una certeza.
+      </p>
     </div>
 
-    <div class="animate-in delay-3 bg-slate-800/60 border border-lime-500/25 rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">🛒</div>
-      <h3 class="font-orbitron text-lime-300 font-bold mb-3">Punto de venta rápido</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Vende en el mostrador con lector de código de barras o búsqueda por referencia. Genera boleta o factura en segundos. Cierra la venta y actualiza el stock automáticamente.</p>
+    <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
+      <div class="text-2xl mb-3">💰</div>
+      <h3 class="text-white font-bold mb-2 text-sm">"Los precios cambian y sigo vendiendo al precio viejo."</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">
+        El proveedor actualizó sus precios. Tú actualizaste algunos. El margen se comprime en silencio, referencia por referencia, sin que nadie tenga cómo saberlo hasta que es tarde.
+      </p>
     </div>
 
-    <div class="animate-in delay-1 bg-slate-800/60 border border-lime-500/25 rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">🌐</div>
-      <h3 class="font-orbitron text-lime-300 font-bold mb-3">Tienda en línea</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Tu catálogo disponible como página web. Los clientes consultan disponibilidad y precio antes de llamar — y puedes recibir pedidos en línea.</p>
-    </div>
-
-    <div class="animate-in delay-2 bg-slate-800/60 border border-lime-500/25 rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">💰</div>
-      <h3 class="font-orbitron text-lime-300 font-bold mb-3">Listas de precio</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Define precios diferenciados para mayorista, minorista y distribuidores. Aplica descuentos por cliente o por volumen. Cada cliente ve su precio correcto.</p>
-    </div>
-
-    <div class="animate-in delay-3 bg-slate-800/60 border border-lime-500/25 rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">🔗</div>
-      <h3 class="font-orbitron text-lime-300 font-bold mb-3">Integrado con talleres</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Un taller mecánico en eGarage puede cotizarte repuestos directamente desde su orden de trabajo. El circuito taller–casa de repuestos sin llamadas ni papeles.</p>
-    </div>
-
-    <div class="animate-in delay-1 bg-slate-800/60 border border-lime-500/25 rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">📊</div>
-      <h3 class="font-orbitron text-lime-300 font-bold mb-3">Reportes de ventas</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Los repuestos más vendidos, los clientes que más compran, las bodegas con más rotación. Decide tus próximas compras con datos reales.</p>
-    </div>
-
-    <div class="animate-in delay-2 bg-slate-800/60 border border-lime-500/25 rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">🚚</div>
-      <h3 class="font-orbitron text-lime-300 font-bold mb-3">Gestión de proveedores</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Registra tus proveedores, los precios de costo por proveedor y el historial de compras. Compara precios y optimiza tus márgenes.</p>
-    </div>
-
-    <div class="animate-in delay-3 bg-slate-800/60 border border-lime-500/25 rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">🧾</div>
-      <h3 class="font-orbitron text-lime-300 font-bold mb-3">Documentos fiscales</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Boletas, facturas y guías de despacho. IVA (Chile), IGV (Perú), tax por estado (USA). El sistema calcula según tu mercado, sin configuración manual.</p>
+    <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
+      <div class="text-2xl mb-3">📱</div>
+      <h3 class="text-white font-bold mb-2 text-sm">"Mis clientes de taller quieren ver lo que tengo sin llamarme."</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">
+        El mecánico moderno revisa el catálogo desde el teléfono mientras trabaja. Si no puede hacerlo así, llama a la casa de repuestos que sí tiene el catálogo en línea. No a la tuya.
+      </p>
     </div>
 
   </div>
 </section>
 
-<!-- CTA beta -->
-<section class="px-6 py-16 max-w-2xl mx-auto text-center animate-in delay-2">
-  <div class="bg-slate-800/50 border border-lime-500/30 rounded-2xl p-10">
-    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-700/80 border border-lime-500/30 text-lime-400 text-sm mb-6">
-      <span class="w-2 h-2 rounded-full bg-lime-500 animate-pulse"></span>
-      Módulo en desarrollo activo — acceso beta disponible hoy
+
+<!-- ================================================================ -->
+<!-- BLOQUE 3 — CASO REAL                                             -->
+<!-- ================================================================ -->
+<section class="px-6 py-16 max-w-4xl mx-auto animate-in delay-2">
+
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12">
+    Lo que cambia en 60 días
+  </h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+
+    <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-6">
+      <div class="text-slate-500 text-xs font-orbitron tracking-widest mb-4 uppercase">Antes — Repuestos Castillo · Concepción</div>
+      <p class="text-slate-300 text-sm leading-relaxed">
+        2 vendedores. 2.200 referencias activas. 40-60 consultas telefónicas al día. Sin catálogo online. El dueño y su vendedor pasaban una parte importante del día respondiendo "¿Tiene el filtro del Tucson 2018?" Había 180 referencias con precios desactualizados que nadie había notado.
+      </p>
     </div>
-    <h2 class="font-orbitron text-2xl font-black text-lime-300 mb-4">Únete a los primeros</h2>
-    <p class="text-slate-300 mb-6 leading-relaxed">
-      eGarage Repuestos está creciendo junto a sus primeros clientes. Regístrate hoy y da forma al producto con tu feedback directo.
-    </p>
-    <a href="{% url 'account_signup' %}" class="inline-block px-8 py-4 rounded-xl bg-lime-600 text-slate-950 font-black text-lg hover:bg-lime-500 transition-all font-orbitron shadow-lg shadow-lime-500/20">
-      Crear cuenta gratis →
+
+    <div class="bg-lime-950/30 border border-lime-500/20 rounded-2xl p-6">
+      <div class="text-lime-400 text-xs font-orbitron tracking-widest mb-4 uppercase">Después — 60 días con eGarage</div>
+      <p class="text-slate-200 text-sm leading-relaxed">
+        El 35% de las consultas se resuelven solas en el catálogo online sin que nadie tenga que atender el teléfono. Las llamadas que reciben son para confirmar despacho, no para preguntar disponibilidad. Dos talleres que antes llamaban de vez en cuando hacen pedido semanal programado desde el catálogo.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Métricas -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+
+    <div class="bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="font-orbitron text-3xl font-black text-lime-400 mb-2">35%</div>
+      <div class="text-slate-400 text-xs leading-relaxed">de consultas resueltas sin una llamada — directamente en el catálogo</div>
+    </div>
+
+    <div class="bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="font-orbitron text-3xl font-black text-lime-400 mb-2">20 min</div>
+      <div class="text-slate-400 text-xs leading-relaxed">para corregir 180 referencias con precio viejo de una sola vez</div>
+    </div>
+
+    <div class="bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="font-orbitron text-3xl font-black text-lime-400 mb-2">+2 talleres</div>
+      <div class="text-slate-400 text-xs leading-relaxed">con pedido semanal programado desde el catálogo, sin intermediarios</div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- BLOQUE 4 — BENEFICIOS                                            -->
+<!-- ================================================================ -->
+<section class="px-6 py-16 max-w-3xl mx-auto animate-in delay-1">
+
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12">
+    Lo que cambia para tu casa de repuestos
+  </h2>
+
+  <div class="space-y-3">
+
+    <div class="flex items-start gap-4 bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="text-lime-400 text-lg mt-0.5 shrink-0 font-bold">✓</div>
+      <div>
+        <div class="text-white font-semibold mb-1 text-sm">Tu catálogo trabaja cuando tú no estás.</div>
+        <div class="text-slate-400 text-xs leading-relaxed">El pedido de las 11 pm llega sin que nadie tenga que estar presente. El mecánico que busca de noche también puede pedir de noche.</div>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-4 bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="text-lime-400 text-lg mt-0.5 shrink-0 font-bold">✓</div>
+      <div>
+        <div class="text-white font-semibold mb-1 text-sm">El mecánico que puede revisar tu catálogo te compra sin llamarte.</div>
+        <div class="text-slate-400 text-xs leading-relaxed">El pedido es la opción de menor fricción. Los que no pueden revisar sin llamarte, llaman a quien sí lo tiene en línea.</div>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-4 bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="text-lime-400 text-lg mt-0.5 shrink-0 font-bold">✓</div>
+      <div>
+        <div class="text-white font-semibold mb-1 text-sm">Nunca más te toma por sorpresa un stock en cero.</div>
+        <div class="text-slate-400 text-xs leading-relaxed">El sistema avisa cuando una referencia llega al mínimo — antes de que llegue el cliente. El pedido al proveedor sale antes de que el problema ocurra.</div>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-4 bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="text-lime-400 text-lg mt-0.5 shrink-0 font-bold">✓</div>
+      <div>
+        <div class="text-white font-semibold mb-1 text-sm">El precio se actualiza una vez y se aplica en todos lados.</div>
+        <div class="text-slate-400 text-xs leading-relaxed">Catálogo online, mostrador y proformas reflejan el mismo precio desde el momento en que lo cambias. Sin descuadres, sin márgenes que se comprimen solos.</div>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-4 bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="text-lime-400 text-lg mt-0.5 shrink-0 font-bold">✓</div>
+      <div>
+        <div class="text-white font-semibold mb-1 text-sm">Cada pedido construye el historial del cliente.</div>
+        <div class="text-slate-400 text-xs leading-relaxed">Sabes quién compra qué, con qué frecuencia, y qué podría necesitar pronto. La relación con el taller habitual no depende de tu memoria.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- BLOQUE 5 — CAPTURAS / FLUJO                                      -->
+<!-- ================================================================ -->
+<section id="como-funciona" class="px-6 py-20 max-w-5xl mx-auto animate-in delay-2">
+
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-16">
+    Así funciona en tu casa de repuestos
+  </h2>
+
+  <div class="space-y-20">
+
+    <!-- Paso 1 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div>
+        <div class="text-lime-400 text-xs font-orbitron tracking-widest mb-3 uppercase">Paso 1</div>
+        <h3 class="text-white text-xl font-bold mb-3">El inventario entra al sistema.</h3>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          Desde Excel si ya lo tienes — la importación toma minutos. O referencia por referencia.
+          Foto, precio, stock, compatibilidad por modelo. Las que más mueves, primero.
+          El resto puede esperar. El negocio no para mientras cargas.
+        </p>
+      </div>
+      <div class="rounded-2xl border border-slate-700/40 bg-slate-800/30 flex flex-col items-center justify-center gap-3 text-slate-600 text-xs text-center p-8"
+           style="min-height: 260px;">
+        <div class="text-2xl">📷</div>
+        <p class="max-w-xs leading-relaxed">
+          [Captura: ingreso de referencia — Código OEM: 58101-4H000 · Kit de frenos delanteros Hyundai i30 · $42.000 CLP · Stock: 8 unidades · Compatibilidad: Hyundai i30 2015-2022]
+        </p>
+      </div>
+    </div>
+
+    <!-- Paso 2 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div class="order-2 md:order-1 rounded-2xl border border-slate-700/40 bg-slate-800/30 flex flex-col items-center justify-center gap-3 text-slate-600 text-xs text-center p-8"
+           style="min-height: 260px;">
+        <div class="text-2xl">📷</div>
+        <p class="max-w-xs leading-relaxed">
+          [Captura desde celular: búsqueda "filtro aceite Hyundai Tucson" — 3 resultados con foto, precio y stock visible, botón "Pedir" visible en cada resultado]
+        </p>
+      </div>
+      <div class="order-1 md:order-2">
+        <div class="text-lime-400 text-xs font-orbitron tracking-widest mb-3 uppercase">Paso 2</div>
+        <h3 class="text-white text-xl font-bold mb-3">El mecánico busca solo.</h3>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          El catálogo queda publicado en tu página. El mecánico busca por número de parte,
+          marca o modelo. Ve disponibilidad y precio. Hace el pedido directamente desde el teléfono.
+          Sin llamarte.
+        </p>
+      </div>
+    </div>
+
+    <!-- Paso 3 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div>
+        <div class="text-lime-400 text-xs font-orbitron tracking-widest mb-3 uppercase">Paso 3</div>
+        <h3 class="text-white text-xl font-bold mb-3">La venta ocurre sin que estés.</h3>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          Recibes la notificación con todo el detalle. El stock ya se descontó.
+          Solo tienes que preparar el pedido. La venta ya ocurrió.
+        </p>
+      </div>
+      <div class="rounded-2xl border border-slate-700/40 bg-slate-800/30 flex flex-col items-center justify-center gap-3 text-slate-600 text-xs text-center p-8"
+           style="min-height: 260px;">
+        <div class="text-2xl">📷</div>
+        <p class="max-w-xs leading-relaxed">
+          [Captura: notificación celular — 11:47 pm · José Manríquez · Taller El Motor · Concepción · Kit de frenos Hyundai i30 2018 — Ref. 58101-4H000 · $42.000 CLP · 1 u. · Estado: Pendiente preparación]
+        </p>
+      </div>
+    </div>
+
+    <!-- Paso 4 — cierre del loop narrativo -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div class="order-2 md:order-1 rounded-2xl border border-lime-500/20 bg-slate-800/30 overflow-hidden relative"
+           style="min-height: 260px;">
+        <div class="w-full h-full flex flex-col items-center justify-center gap-3 text-slate-600 text-xs text-center p-8"
+             style="min-height: 260px;">
+          <div class="text-2xl">📷</div>
+          <p class="max-w-xs leading-relaxed">
+            [Captura: punto de venta mostrador — Kit de frenos Hyundai i30 · 1 u. · $42.000 · Stock actualizado: 7 unidades · Historial: José Manríquez — 4 pedidos este mes]
+          </p>
+        </div>
+        <!-- Caption del Narrative Engine -->
+        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-950/90 to-transparent px-6 py-5">
+          <p class="font-orbitron text-lime-300 text-sm font-bold">Los que buscan hoy tienen que encontrarte.</p>
+        </div>
+      </div>
+      <div class="order-1 md:order-2">
+        <div class="text-lime-400 text-xs font-orbitron tracking-widest mb-3 uppercase">Paso 4</div>
+        <h3 class="text-white text-xl font-bold mb-3">Un solo inventario — en línea y presencial.</h3>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          El cliente que viene al mostrador también pasa por el sistema. El stock es uno solo —
+          la venta presencial descuenta el mismo inventario que el pedido online.
+          Sin dos hojas de cálculo. Sin descuadres.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- BLOQUE 6 — TESTIMONIO                                            -->
+<!-- ================================================================ -->
+<section class="px-6 py-16 max-w-3xl mx-auto animate-in delay-1">
+
+  <div class="bg-slate-800/40 border border-lime-500/15 rounded-2xl p-8">
+    <div class="text-lime-400 text-5xl mb-4 leading-none font-serif" style="line-height: 1;">"</div>
+    <blockquote class="text-slate-200 text-lg leading-relaxed mb-6 italic">
+      Antes llegaba el lunes y tenía 40 mensajes de WhatsApp preguntando si tenía esto o aquello.
+      Ahora tengo la mitad. Los que quedan son los pedidos confirmados.
+      El catálogo filtró para mí.
+    </blockquote>
+    <div class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-full bg-lime-500/20 border border-lime-500/40 flex items-center justify-center text-lime-400 font-orbitron font-bold text-sm shrink-0">
+        RC
+      </div>
+      <div>
+        <div class="text-white font-semibold text-sm">Roberto Castillo</div>
+        <div class="text-slate-400 text-xs">Repuestos Castillo · Concepción · 2 vendedores</div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ================================================================ -->
+<!-- BLOQUE 7 — CTA INTERMEDIO                                        -->
+<!-- ================================================================ -->
+<section class="px-6 py-16 max-w-3xl mx-auto text-center animate-in delay-2">
+  <h2 class="font-orbitron text-2xl font-black text-white mb-3">¿Listo para poner tu catálogo en línea?</h2>
+  <p class="text-slate-400 mb-8">30 días gratis · Sin tarjeta · Sin importar cuántas referencias tengas</p>
+  <a href="{% url 'account_signup' %}?rubro=CASA_REPUESTOS"
+     class="inline-block px-10 py-5 rounded-xl bg-lime-500 text-slate-950 font-black text-xl hover:bg-lime-400 transition-all shadow-xl shadow-lime-500/30 font-orbitron">
+    Publica tu catálogo gratis →
+  </a>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- BLOQUE 8 — FAQ                                                   -->
+<!-- ================================================================ -->
+<section class="px-6 py-16 max-w-3xl mx-auto animate-in delay-1">
+
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12">Preguntas frecuentes</h2>
+
+  <div class="space-y-3">
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿Necesito saber de tecnología para usar eGarage?
+        <span class="faq-indicator text-lime-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        No. Si sabes escribir en WhatsApp, sabes usar eGarage. Cargar una referencia al catálogo toma menos de 2 minutos — sin manual, sin capacitación formal.
+      </div>
+    </details>
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿Puedo importar mi inventario desde Excel?
+        <span class="faq-indicator text-lime-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        Sí. Si ya tienes tu inventario en una planilla, el catálogo puede estar listo en un día. El sistema importa directamente desde Excel: código, nombre, precio, stock. Si no tienes planilla, empiezas con las referencias que más mueves y vas completando. El negocio no para mientras cargas.
+      </div>
+    </details>
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿El catálogo es público o la competencia puede ver mis precios?
+        <span class="faq-indicator text-lime-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        El catálogo puede ser público o privado — lo controlas tú. Opción 1: cualquiera puede ver precios. Opción 2: solo los clientes que tú registres pueden acceder. Si prefieres que la competencia no vea tu lista, el acceso queda restringido a tus clientes habituales.
+      </div>
+    </details>
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿Puedo tener precios diferentes para cada tipo de cliente?
+        <span class="faq-indicator text-lime-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        Sí. Lista pública, lista para talleres habituales, lista para distribuidores. Cada cliente ve su precio. Las actualizaciones se aplican globalmente — cambias el precio una vez y se refleja en todos lados para ese tipo de cliente.
+      </div>
+    </details>
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿Funciona si vendo tanto en mostrador como por pedido online?
+        <span class="faq-indicator text-lime-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        Sí, y ese es el punto. El inventario es uno solo — la venta presencial y el pedido online descuentan el mismo stock. No hay dos sistemas, no hay dos planillas, no hay descuadres.
+      </div>
+    </details>
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿Qué pasa con mis datos si decido no continuar?
+        <span class="faq-indicator text-lime-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        Tus datos son tuyos. Puedes exportar el catálogo completo en cualquier momento — referencias, precios, historial de pedidos. No hay cláusula de retención.
+      </div>
+    </details>
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿Funciona en Chile?
+        <span class="faq-indicator text-lime-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        Sí. eGarage está adaptado para Chile: precios en CLP, vocabulario del rubro local (bodega, repuesto, pedido, despacho), factibilidad de integración con sistema de facturación SII. El soporte opera en español y en zona horaria de Santiago.
+      </div>
+    </details>
+
+  </div>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- BLOQUE 9 — CTA FINAL                                             -->
+<!-- ================================================================ -->
+<section class="px-6 py-24 text-center animate-in delay-2">
+
+  <h2 class="font-orbitron text-3xl sm:text-4xl font-black text-white mb-4 leading-tight">
+    El mecánico que busca tu repuesto esta noche...<br>
+    <span class="text-lime-400">¿encuentra tu catálogo o el de otro?</span>
+  </h2>
+  <p class="text-slate-400 mb-8">30 días gratis · Sin tarjeta · Sin instalación</p>
+
+  <a href="{% url 'account_signup' %}?rubro=CASA_REPUESTOS"
+     class="inline-block px-12 py-5 rounded-xl bg-lime-500 text-slate-950 font-black text-xl hover:bg-lime-400 transition-all shadow-xl shadow-lime-500/30 font-orbitron mb-6">
+    Publica tu catálogo gratis →
+  </a>
+
+  <p class="text-slate-500 text-sm mb-12">Sin compromisos · Cancela cuando quieras · Soporte en español</p>
+
+  <!-- Hub de Soluciones -->
+  <p class="text-slate-600 text-xs uppercase tracking-widest mb-6">También puede interesarte</p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto text-left">
+
+    <a href="{% url 'landing_talleres' %}"
+       class="flex items-center gap-4 px-5 py-4 rounded-xl bg-slate-800/50 border border-cyan-500/15 hover:border-cyan-500/40 hover:bg-slate-800/80 transition-all group">
+      <span class="text-2xl shrink-0" aria-hidden="true">🔧</span>
+      <div class="min-w-0">
+        <p class="text-slate-200 font-semibold text-sm group-hover:text-cyan-300 transition-colors">Taller Mecánico</p>
+        <p class="text-slate-500 text-xs truncate">Historial de vehículos y órdenes de trabajo.</p>
+      </div>
+      <span class="text-cyan-500/60 group-hover:text-cyan-400 ml-auto shrink-0 transition-colors">→</span>
     </a>
-    <p class="mt-4 text-slate-400 text-sm">Sin compromiso. Sin tarjeta de crédito.</p>
-  </div>
-</section>
 
-<!-- Cross-links -->
-<section class="px-6 py-12 text-center animate-in delay-3">
-  <p class="text-slate-400 text-sm">
-    ¿Tienes un taller mecánico? →
-    <a href="{% url 'landing_talleres' %}" class="text-cyan-400 hover:text-cyan-300">eGarage Talleres</a>
-    &nbsp;·&nbsp;
-    ¿Tienes una desarmaduria? →
-    <a href="{% url 'landing_desarmadurias' %}" class="text-fuchsia-400 hover:text-fuchsia-300">eGarage Desarmadurias</a>
-    &nbsp;·&nbsp;
-    <a href="/" class="text-slate-300 hover:text-white">Ver todas las soluciones</a>
-  </p>
+    <a href="{% url 'landing_desarmadurias' %}"
+       class="flex items-center gap-4 px-5 py-4 rounded-xl bg-slate-800/50 border border-fuchsia-500/15 hover:border-fuchsia-500/40 hover:bg-slate-800/80 transition-all group">
+      <span class="text-2xl shrink-0" aria-hidden="true">🔩</span>
+      <div class="min-w-0">
+        <p class="text-slate-200 font-semibold text-sm group-hover:text-fuchsia-300 transition-colors">Desarmaduría</p>
+        <p class="text-slate-500 text-xs truncate">Kiosko de piezas y precio inteligente.</p>
+      </div>
+      <span class="text-fuchsia-500/60 group-hover:text-fuchsia-400 ml-auto shrink-0 transition-colors">→</span>
+    </a>
+
+  </div>
+
 </section>
 
 {% endblock %}
