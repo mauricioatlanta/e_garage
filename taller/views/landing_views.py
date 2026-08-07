@@ -1,6 +1,8 @@
+from django.http import Http404, HttpResponsePermanentRedirect
 from django.shortcuts import render
 
 from commerce.views.catalog import catalog_home
+from taller.country.engine import URL_SLUG_TO_VERTICAL, get_hub_landing_urls, get_landing_context
 from taller.country.hub import COUNTRY_HUB
 
 
@@ -10,8 +12,9 @@ def landing_home(request):
     return render(request, "public/gateway.html")
 
 
-def render_country_hub(request, country):
-    ctx = COUNTRY_HUB[country]
+def render_country_hub(request, country_key):
+    ctx = dict(COUNTRY_HUB[country_key])
+    ctx["landing_urls"] = get_hub_landing_urls(country_key)
     return render(request, "public/hub_country.html", ctx)
 
 
@@ -31,45 +34,69 @@ def hub_mexico(request):
     return render_country_hub(request, "mx")
 
 
+def hub_ecuador(request):
+    return render_country_hub(request, "ec")
+
+
+def hub_venezuela(request):
+    return render_country_hub(request, "ve")
+
+
+def hub_brasil(request):
+    return render_country_hub(request, "br")
+
+
 def hub_usa_en(request):
-    ctx = COUNTRY_HUB["us"].copy()
-    ctx["language"] = "en"
-    return render(request, "public/hub_country.html", ctx)
+    return render_country_hub(request, "us_en")
 
 
 def hub_usa_es(request):
-    ctx = COUNTRY_HUB["us"].copy()
-    ctx["language"] = "es"
-    return render(request, "public/hub_country.html", ctx)
+    return render_country_hub(request, "us_es")
 
+
+def landing_vertical(request, country_key: str, url_slug: str):
+    """
+    Unified country-aware landing view.
+    URL: /<country_key>/<url_slug>/   e.g. /cl/talleres/ or /ar/gomeria/
+    For US: /us/en/<slug>/ and /us/es/<slug>/ are routed here with country_key=us_en/us_es.
+    """
+    vertical_key = URL_SLUG_TO_VERTICAL.get(url_slug)
+    if not vertical_key or country_key not in COUNTRY_HUB:
+        raise Http404
+
+    ctx = get_landing_context(country_key, vertical_key)
+    return render(request, "public/landing_vertical.html", ctx)
+
+
+# ── Legacy country-agnostic routes — 301 to Chile equivalents ───────────────
 
 def landing_talleres(request):
-    return render(request, "public/landing_talleres.html")
+    return HttpResponsePermanentRedirect("/cl/talleres/")
 
 
 def landing_desarmadurias(request):
-    return render(request, "public/landing_desarmadurias.html")
+    return HttpResponsePermanentRedirect("/cl/desarmadurias/")
 
 
 def landing_repuestos(request):
-    return render(request, "public/landing_repuestos.html")
+    return HttpResponsePermanentRedirect("/cl/repuestos/")
 
 
 def landing_carwash(request):
-    return render(request, "public/landing_carwash.html")
+    return HttpResponsePermanentRedirect("/cl/lavado/")
 
 
 def landing_vulcanizacion(request):
-    return render(request, "public/landing_vulcanizacion.html")
+    return HttpResponsePermanentRedirect("/cl/vulcanizaciones/")
 
 
 def landing_workshop(request):
-    return render(request, "public/landing_talleres.html")
+    return HttpResponsePermanentRedirect("/cl/talleres/")
 
 
 def landing_salvage(request):
-    return render(request, "public/landing_salvage.html")
+    return HttpResponsePermanentRedirect("/cl/desarmadurias/")
 
 
 def landing_parts(request):
-    return render(request, "public/landing_repuestos.html")
+    return HttpResponsePermanentRedirect("/cl/repuestos/")
