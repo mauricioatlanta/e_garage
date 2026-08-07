@@ -1,0 +1,232 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>First Victory Index — eGarage Staff</title>
+  <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Exo 2', 'Inter', sans-serif; }
+    .font-orbitron { font-family: 'Orbitron', monospace; }
+  </style>
+</head>
+<body class="min-h-screen" style="background: linear-gradient(135deg, #060e1e 0%, #0f1e38 50%, #080e20 100%); color: #f8fafc;">
+
+  <!-- Topbar -->
+  <nav class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage" class="h-7 w-auto">
+      <span class="text-slate-500 text-sm">/</span>
+      <span class="font-orbitron text-xs text-lime-400 tracking-widest">STAFF</span>
+      <span class="text-slate-500 text-sm">/</span>
+      <span class="text-slate-300 text-sm font-semibold">First Victory</span>
+    </div>
+    <div class="flex items-center gap-2 text-xs">
+      <a href="?period=7d" class="px-3 py-1.5 rounded-lg border transition-all {% if period == '7d' %}border-lime-500/60 bg-lime-500/10 text-lime-300{% else %}border-slate-700 text-slate-400 hover:border-slate-500{% endif %}">7 días</a>
+      <a href="?period=30d" class="px-3 py-1.5 rounded-lg border transition-all {% if period == '30d' %}border-lime-500/60 bg-lime-500/10 text-lime-300{% else %}border-slate-700 text-slate-400 hover:border-slate-500{% endif %}">30 días</a>
+      <a href="?period=all" class="px-3 py-1.5 rounded-lg border transition-all {% if period == 'all' %}border-lime-500/60 bg-lime-500/10 text-lime-300{% else %}border-slate-700 text-slate-400 hover:border-slate-500{% endif %}">Todo</a>
+    </div>
+  </nav>
+
+  <main class="px-6 py-10 max-w-6xl mx-auto space-y-10">
+
+    <!-- Header + FVI grande -->
+    <div class="flex flex-col sm:flex-row sm:items-end gap-6">
+      <div class="flex-1">
+        <p class="text-slate-500 text-xs font-orbitron tracking-widest uppercase mb-2">{{ period_label }}</p>
+        <h1 class="font-orbitron text-2xl font-black text-white">First Victory Index</h1>
+        <p class="text-slate-400 text-sm mt-1">% de empresas que logran su primera acción de valor</p>
+      </div>
+      <!-- FVI número grande -->
+      <div class="text-right">
+        <div class="font-orbitron text-7xl font-black leading-none {% if stats.fvi_pct >= 60 %}text-lime-400{% elif stats.fvi_pct >= 35 %}text-amber-400{% else %}text-red-400{% endif %}"
+             style="text-shadow: 0 0 30px currentColor;">
+          {{ stats.fvi_pct }}%
+        </div>
+        <div class="text-slate-500 text-xs mt-1 font-orbitron tracking-widest">FVI</div>
+      </div>
+    </div>
+
+    <!-- Panel 1 — Embudo -->
+    <section>
+      <h2 class="text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-4">Panel 1 — Activación</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+
+        <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 text-center">
+          <div class="font-orbitron text-3xl font-black text-white mb-1">{{ stats.total }}</div>
+          <div class="text-slate-400 text-xs">Signups</div>
+          <div class="text-slate-600 text-xs mt-1">{{ period_label }}</div>
+        </div>
+
+        <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 text-center relative">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 text-slate-600 text-xs">↓</div>
+          <div class="font-orbitron text-3xl font-black text-sky-400 mb-1">{{ stats.confirmed }}</div>
+          <div class="text-slate-400 text-xs">Email confirmado</div>
+          <div class="text-sky-600 text-xs mt-1 font-semibold">{{ stats.confirmed_pct }}% del total</div>
+        </div>
+
+        <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 text-center relative">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 text-slate-600 text-xs">↓</div>
+          <div class="font-orbitron text-3xl font-black text-lime-400 mb-1">{{ stats.victorias }}</div>
+          <div class="text-slate-400 text-xs">Primera Victoria</div>
+          <div class="text-lime-600 text-xs mt-1 font-semibold">{{ stats.victorias_pct }}% de confirmados</div>
+        </div>
+
+        <div class="bg-slate-800/50 border border-red-500/20 rounded-xl p-5 text-center relative">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 text-slate-600 text-xs">↓</div>
+          <div class="font-orbitron text-3xl font-black text-red-400 mb-1">{{ stats.sin_victoria }}</div>
+          <div class="text-slate-400 text-xs">Sin Primera Victoria</div>
+          <div class="text-red-700 text-xs mt-1">Confirmados · sin acción</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Panel 2 — Por rubro -->
+    <section>
+      <h2 class="text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-4">Panel 2 — Por rubro</h2>
+      {% if stats.rubro_stats %}
+      <div class="overflow-x-auto rounded-xl border border-slate-700/50">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-700/50 bg-slate-800/30">
+              <th class="text-left px-5 py-3 text-slate-400 font-semibold text-xs uppercase tracking-wider">Rubro</th>
+              <th class="text-right px-5 py-3 text-slate-400 font-semibold text-xs uppercase tracking-wider">Signups</th>
+              <th class="text-right px-5 py-3 text-slate-400 font-semibold text-xs uppercase tracking-wider">Confirmados</th>
+              <th class="text-right px-5 py-3 text-slate-400 font-semibold text-xs uppercase tracking-wider">Primera Victoria</th>
+              <th class="text-right px-5 py-3 text-slate-400 font-semibold text-xs uppercase tracking-wider">FVI</th>
+              <th class="text-right px-5 py-3 text-slate-400 font-semibold text-xs uppercase tracking-wider">Mediana</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rs in stats.rubro_stats %}
+            <tr class="border-b border-slate-800/60 hover:bg-slate-800/20 transition-colors">
+              <td class="px-5 py-4 text-white font-semibold">{{ rs.label }}</td>
+              <td class="px-5 py-4 text-right text-slate-300">{{ rs.signups }}</td>
+              <td class="px-5 py-4 text-right text-sky-400">{{ rs.confirmados }}</td>
+              <td class="px-5 py-4 text-right text-lime-400 font-bold">{{ rs.victorias }}</td>
+              <td class="px-5 py-4 text-right">
+                <span class="font-orbitron font-bold {% if rs.conversion_pct >= 60 %}text-lime-400{% elif rs.conversion_pct >= 35 %}text-amber-400{% else %}text-red-400{% endif %}">
+                  {{ rs.conversion_pct }}%
+                </span>
+              </td>
+              <td class="px-5 py-4 text-right text-slate-400">{{ rs.mediana_fmt }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-slate-600 text-sm">Sin datos para el período seleccionado.</p>
+      {% endif %}
+    </section>
+
+    <!-- Panel 3 — Tiempo hasta la Primera Victoria -->
+    <section>
+      <h2 class="text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-4">Panel 3 — Tiempo hasta la Primera Victoria</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {% for rs in stats.rubro_stats %}
+        {% if rs.victorias > 0 %}
+        <div class="bg-slate-800/40 border border-slate-700/40 rounded-xl p-5">
+          <div class="text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-3">{{ rs.label }}</div>
+          <div class="font-orbitron text-2xl font-black text-lime-400 mb-1">{{ rs.mediana_fmt }}</div>
+          <div class="text-slate-500 text-xs">mediana · {{ rs.victorias }} empresa{% if rs.victorias != 1 %}s{% endif %}</div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% if not stats.victorias %}
+        <div class="col-span-3 text-slate-600 text-sm">Sin Primeras Victorias registradas aún.</div>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- Panel 4 — Empresas bloqueadas -->
+    <section>
+      <h2 class="text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-4">Panel 4 — Bloqueadas (+24h sin avance)</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Sin email confirmado -->
+        <div>
+          <p class="text-slate-400 text-xs mb-3">Sin email confirmado <span class="text-red-400 font-bold">({{ unconfirmed|length }})</span></p>
+          {% if unconfirmed %}
+          <div class="space-y-2">
+            {% for r in unconfirmed %}
+            <div class="bg-slate-800/30 border border-red-500/15 rounded-lg px-4 py-2.5 flex items-center justify-between gap-4">
+              <div>
+                <span class="text-slate-300 text-sm font-semibold">{{ r.empresa.nombre_taller }}</span>
+                <span class="text-slate-600 text-xs ml-2">{{ r.rubro }}</span>
+              </div>
+              <span class="text-slate-500 text-xs shrink-0">{{ r.fecha_inicio|date:"d/m" }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="text-slate-600 text-xs">Ninguna.</p>
+          {% endif %}
+        </div>
+
+        <!-- Con email pero sin victoria -->
+        <div>
+          <p class="text-slate-400 text-xs mb-3">Email ok · Sin Primera Victoria <span class="text-amber-400 font-bold">({{ stalled|length }})</span></p>
+          {% if stalled %}
+          <div class="space-y-2">
+            {% for r in stalled %}
+            <div class="bg-slate-800/30 border border-amber-500/15 rounded-lg px-4 py-2.5 flex items-center justify-between gap-4">
+              <div>
+                <span class="text-slate-300 text-sm font-semibold">{{ r.empresa.nombre_taller }}</span>
+                <span class="text-slate-600 text-xs ml-2">{{ r.rubro }}</span>
+              </div>
+              <span class="text-slate-500 text-xs shrink-0">{{ r.fecha_inicio|date:"d/m" }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="text-slate-600 text-xs">Ninguna.</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <!-- Separador visual: Conversión Pública vs Activación -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-800">
+
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-6">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+          <span class="text-slate-500 text-xs font-orbitron tracking-widest uppercase">Conversión Pública</span>
+          <span class="text-xs text-slate-700 ml-auto">No disponible aún</span>
+        </div>
+        <div class="space-y-1 text-slate-700 text-xs">
+          <div>Visitantes ↓</div>
+          <div>CTA click ↓</div>
+          <div>Signup iniciado</div>
+        </div>
+        <p class="text-slate-700 text-xs mt-4 italic">Requiere EventoFunnel — pendiente.</p>
+      </div>
+
+      <div class="bg-lime-950/20 border border-lime-500/15 rounded-xl p-6">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-2 h-2 rounded-full bg-lime-500 animate-pulse"></span>
+          <span class="text-lime-400 text-xs font-orbitron tracking-widest uppercase">Activación</span>
+          <span class="text-xs text-lime-700 ml-auto">Disponible desde hoy</span>
+        </div>
+        <div class="space-y-1 text-slate-400 text-xs">
+          <div>Signup ↓</div>
+          <div>Email confirmado ↓</div>
+          <div class="text-lime-400 font-semibold">Primera Victoria ← FVI</div>
+        </div>
+        <p class="text-lime-700 text-xs mt-4 font-semibold">FVI = {{ stats.victorias }} / {{ stats.total }} empresas</p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="px-6 py-4 mt-8 border-t border-slate-800 text-center">
+    <p class="text-slate-700 text-xs font-orbitron tracking-widest">eGarage STAFF · First Victory Dashboard · Solo acceso staff</p>
+  </footer>
+
+</body>
+</html>
