@@ -10,7 +10,7 @@ from django.urls import path
 from django.views.generic import RedirectView
 
 from taller.views.country_aware_auth import country_aware_login
-from taller.views_extra.bienvenida import bienvenida_br_pt
+from taller.views_extra.bienvenida import bienvenida_br_pt, bienvenida_br_es
 from taller.views_extra.signup_redirects import signup_redirect
 
 app_name = "taller_brasil"
@@ -49,7 +49,7 @@ urlpatterns = [
         lambda r: redirect("/br/pt/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="account_login_short",
     ),
-    # --- ESPAÑOL (legacy) → redirige a PT ---
-    path("es/", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),
-    path("es/bienvenida/", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),
+    # --- ESPAÑOL ---
+    path("es/", RedirectView.as_view(url="/br/es/bienvenida/", permanent=False)),
+    path("es/bienvenida/", bienvenida_br_es, name="bienvenida_es"),
 ]
