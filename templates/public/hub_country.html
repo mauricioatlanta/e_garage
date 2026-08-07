@@ -216,62 +216,62 @@
     <!-- Rubro cards -->
     <div class="hub-grid" role="list">
 
-      <a href="{% url 'landing_talleres' %}" class="hub-card" role="listitem">
+      <a href="{{ landing_urls.workshop|default:'/talleres/' }}" class="hub-card" role="listitem">
         <img class="hub-card-image"
              src="{% static 'img/welcome/scenes/taller.webp' %}"
-             alt="{{ workshop_name|default:'Taller Mecánico' }}">
+             alt="{{ workshop_name }}">
         <span class="hub-card-icon" aria-hidden="true">🔧</span>
-        <span class="hub-card-name">{{ workshop_name|default:'Taller Mecánico' }}</span>
+        <span class="hub-card-name">{{ workshop_name }}</span>
       </a>
 
-      <a href="{% url 'landing_desarmadurias' %}" class="hub-card" role="listitem">
+      <a href="{{ landing_urls.salvage|default:'/desarmadurias/' }}" class="hub-card" role="listitem">
         <img class="hub-card-image"
              src="{% static 'img/welcome/scenes/desarme.webp' %}"
-             alt="{{ salvage_name|default:'Desarmaduría' }}">
+             alt="{{ salvage_name }}">
         <span class="hub-card-icon" aria-hidden="true">🔩</span>
-        <span class="hub-card-name">{{ salvage_name|default:'Desarmaduría' }}</span>
+        <span class="hub-card-name">{{ salvage_name }}</span>
       </a>
 
-      <a href="{% url 'landing_repuestos' %}" class="hub-card" role="listitem">
+      <a href="{{ landing_urls.parts|default:'/casas-de-repuestos/' }}" class="hub-card" role="listitem">
         <img class="hub-card-image"
              src="{% static 'img/welcome/scenes/repuestos.webp' %}"
-             alt="{{ parts_name|default:'Casa de Repuestos' }}">
+             alt="{{ parts_name }}">
         <span class="hub-card-icon" aria-hidden="true">🏪</span>
-        <span class="hub-card-name">{{ parts_name|default:'Casa de Repuestos' }}</span>
+        <span class="hub-card-name">{{ parts_name }}</span>
       </a>
 
-      <a href="{% url 'landing_vulcanizacion' %}" class="hub-card" role="listitem">
+      <a href="{{ landing_urls.tire|default:'/vulcanizaciones/' }}" class="hub-card" role="listitem">
         <img class="hub-card-image"
              src="{% static 'img/welcome/scenes/taller.webp' %}"
-             alt="Vulcanización">
+             alt="{{ tire_name }}">
         <span class="hub-card-icon" aria-hidden="true">🛞</span>
-        <span class="hub-card-name">Vulcanización</span>
+        <span class="hub-card-name">{{ tire_name }}</span>
       </a>
 
-      <a href="{% url 'landing_carwash' %}" class="hub-card" role="listitem">
+      <a href="{{ landing_urls.carwash|default:'/carwash/' }}" class="hub-card" role="listitem">
         <img class="hub-card-image"
              src="{% static 'img/welcome/scenes/carwash.webp' %}"
-             alt="Car Wash">
+             alt="{{ carwash_name }}">
         <span class="hub-card-icon" aria-hidden="true">💧</span>
-        <span class="hub-card-name">Car Wash</span>
+        <span class="hub-card-name">{{ carwash_name }}</span>
       </a>
 
-      <div class="hub-card-soon" role="listitem" aria-label="Hojalatería y Pintura — próximamente">
-        <span class="hub-badge-soon">Pronto</span>
+      <div class="hub-card-soon" role="listitem" aria-label="{{ bodyshop_name }}">
+        <span class="hub-badge-soon">{{ soon_label }}</span>
         <span class="hub-card-icon" aria-hidden="true">🎨</span>
-        <span class="hub-card-name">Hojalatería y Pintura</span>
+        <span class="hub-card-name">{{ bodyshop_name }}</span>
       </div>
 
-      <div class="hub-card-soon" role="listitem" aria-label="Electricidad Automotriz — próximamente">
-        <span class="hub-badge-soon">Pronto</span>
+      <div class="hub-card-soon" role="listitem" aria-label="{{ electric_name }}">
+        <span class="hub-badge-soon">{{ soon_label }}</span>
         <span class="hub-card-icon" aria-hidden="true">⚡</span>
-        <span class="hub-card-name">Electricidad Automotriz</span>
+        <span class="hub-card-name">{{ electric_name }}</span>
       </div>
 
-      <div class="hub-card-soon" role="listitem" aria-label="Flotas — próximamente">
-        <span class="hub-badge-soon">Pronto</span>
+      <div class="hub-card-soon" role="listitem" aria-label="{{ fleet_name }}">
+        <span class="hub-badge-soon">{{ soon_label }}</span>
         <span class="hub-card-icon" aria-hidden="true">🚛</span>
-        <span class="hub-card-name">Flotas</span>
+        <span class="hub-card-name">{{ fleet_name }}</span>
       </div>
 
     </div><!-- /hub-grid -->

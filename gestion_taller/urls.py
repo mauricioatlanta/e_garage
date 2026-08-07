@@ -135,6 +135,9 @@ from taller.views.landing_views import (
     hub_usa_es,
     hub_mexico,
     hub_peru,
+    hub_ecuador,
+    hub_venezuela,
+    hub_brasil,
     landing_home,
     landing_talleres,
     landing_desarmadurias,
@@ -144,6 +147,7 @@ from taller.views.landing_views import (
     landing_workshop,
     landing_salvage,
     landing_parts,
+    landing_vertical,
 )
 
 # gestion_taller/urls.py — archivo raíz de URLs con migración a países
@@ -541,11 +545,15 @@ urlpatterns = [
         "co/es/",
         include(("taller.urls_extra.colombia", "colombia"), namespace="colombia"),
     ),
+    # 🇪🇨 Ecuador — Hub raíz
+    path("ec/", hub_ecuador, name="ec_home"),
     # 🇪🇨 Ecuador - Español
     path(
         "ec/es/",
         include(("taller.urls_extra.ecuador", "ecuador"), namespace="ecuador"),
     ),
+    # 🇻🇪 Venezuela — Hub raíz
+    path("ve/", hub_venezuela, name="ve_home"),
     # 🇻🇪 Venezuela - Español
     path(
         "ve/es/",
@@ -558,7 +566,11 @@ urlpatterns = [
         "mx/es/",
         include(("taller.urls_extra.mexico", "mexico"), namespace="mexico"),
     ),
-    # 🇧🇷 Brasil - Portugués (SOLO pt, /br/es/ redirige a /br/pt/)
+    # 🇧🇷 Brasil — Hub raíz
+    path("br/", hub_brasil, name="br_home"),
+    # 🇧🇷 Brasil - Portugués operativo.
+    # Se mantiene el prefijo histórico /br/pt/* para no romper login,
+    # signup, dashboard, password reset ni enlaces existentes.
     path(
         "br/",
         include(("taller.urls_extra.brasil", "brasil"), namespace="brasil"),
@@ -850,6 +862,14 @@ urlpatterns = [
             url="/us/en/documentos/api/obtener-numero-documento/", permanent=False
         ),
     ),
+    # 🌎 Country-specific landings — International Content Engine
+    # Keep these catch-all public routes near the end so specific application
+    # routes (e.g. /accounts/login/) always take precedence.
+    # Pattern: /<country_key>/<url_slug>/  e.g. /cl/talleres/ /ar/repuestos/
+    path("<str:country_key>/<str:url_slug>/", landing_vertical, name="landing_vertical"),
+    # USA uses /us/en/ and /us/es/ prefixes.
+    path("us/en/<str:url_slug>/", lambda r, url_slug: landing_vertical(r, "us_en", url_slug), name="landing_vertical_us_en"),
+    path("us/es/<str:url_slug>/", lambda r, url_slug: landing_vertical(r, "us_es", url_slug), name="landing_vertical_us_es"),
     path("", include(("taller.taller_main_urls", "taller"), namespace="taller")),
 ]
 

@@ -1,0 +1,311 @@
+{% extends "public/base_landing.html" %}
+{% load static %}
+
+{% block title %}{{ seo_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block canonical_path %}{{ canonical_path }}{% endblock %}
+{% block og_title %}{{ og_title }}{% endblock %}
+{% block og_description %}{{ og_description }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  details[open] summary .faq-indicator { transform: rotate(45deg); }
+  .faq-indicator { transition: transform 0.2s ease; display: inline-block; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ================================================================ -->
+<!-- HERO                                                               -->
+<!-- ================================================================ -->
+<section class="px-6 pt-16 pb-20 max-w-4xl mx-auto text-center animate-in">
+
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full {{ tw.badge_bg }} border {{ tw.badge_border }} {{ tw.badge_text }} text-xs font-semibold mb-8 font-orbitron tracking-widest">
+    {{ hero_badge }}
+  </div>
+
+  {% if hero_setup %}
+  <p class="text-slate-400 text-lg sm:text-xl mb-5 leading-relaxed" style="white-space:pre-line;">{{ hero_setup }}</p>
+  {% endif %}
+
+  <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight {{ tw.glow_class }}">
+    {{ hero_h1 }}
+  </h1>
+
+  <p class="text-xl text-slate-200 max-w-2xl mx-auto mb-10 leading-relaxed">
+    {{ hero_subheadline }}
+  </p>
+
+  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+    <a href="{% url 'account_signup' %}?rubro={{ rubro_key }}"
+       class="px-8 py-4 rounded-xl {{ tw.btn_bg }} {{ tw.btn_text }} font-bold text-lg {{ tw.btn_hover }} transition-all shadow-lg {{ tw.btn_shadow }} font-orbitron">
+      {{ hero_cta_primary }}
+    </a>
+    {% if hero_cta_secondary %}
+    <a href="#como-funciona"
+       class="px-8 py-4 rounded-xl border border-slate-500 text-slate-200 hover:border-slate-400 hover:text-white transition-all text-lg">
+      {{ hero_cta_secondary }}
+    </a>
+    {% endif %}
+  </div>
+  <p class="text-slate-500 text-sm">
+    {% if language == "en" %}No credit card · Cancel anytime{% elif language == "pt" %}Sem cartão de crédito · Cancele quando quiser{% else %}Sin tarjeta de crédito · Cancela cuando quieras{% endif %}
+  </p>
+
+  <div class="landing-media mt-12 {{ tw.media_border }}">
+    <img src="{% static scene_image %}"
+         alt="{{ hero_badge }}"
+         loading="eager" decoding="async">
+    {% if hero_caption %}
+    <div class="landing-media-caption">{{ hero_caption }}</div>
+    {% endif %}
+  </div>
+
+</section>
+
+
+<!-- ================================================================ -->
+<!-- PROBLEMS                                                           -->
+<!-- ================================================================ -->
+{% if problems %}
+<section class="px-6 py-20 max-w-5xl mx-auto animate-in delay-1">
+
+  {% if problems_heading %}
+  <h2 class="font-orbitron text-2xl font-bold text-center text-slate-300 mb-12">{{ problems_heading }}</h2>
+  {% endif %}
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    {% for p in problems %}
+    <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
+      <div class="text-2xl mb-3">{{ p.icon }}</div>
+      <h3 class="text-white font-bold mb-2 text-sm">{{ p.heading }}</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">{{ p.body }}</p>
+    </div>
+    {% endfor %}
+  </div>
+
+</section>
+{% endif %}
+
+
+<!-- ================================================================ -->
+<!-- CASE STUDY                                                         -->
+<!-- ================================================================ -->
+{% if case_study %}
+<section class="px-6 py-16 max-w-4xl mx-auto animate-in delay-2">
+
+  {% if case_heading %}
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12">{{ case_heading }}</h2>
+  {% endif %}
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+    <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-6">
+      <div class="text-slate-500 text-xs font-orbitron tracking-widest mb-4 uppercase">
+        {% if language == "en" %}Before —{% elif language == "pt" %}Antes —{% else %}Antes —{% endif %}
+        {{ case_study.before_label }}
+      </div>
+      <p class="text-slate-300 text-sm leading-relaxed">{{ case_study.before_text }}</p>
+    </div>
+    <div class="{{ tw.after_bg }} border {{ tw.after_border }} rounded-2xl p-6">
+      <div class="{{ tw.after_label }} text-xs font-orbitron tracking-widest mb-4 uppercase">
+        {{ case_study.after_label }}
+      </div>
+      <p class="text-slate-200 text-sm leading-relaxed">{{ case_study.after_text }}</p>
+    </div>
+  </div>
+
+  {% if case_study.metrics %}
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+    {% for m in case_study.metrics %}
+    <div class="bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="font-orbitron text-3xl font-black {{ tw.metric_text }} mb-2">{{ m.value }}</div>
+      <div class="text-slate-400 text-xs leading-relaxed">{{ m.label }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</section>
+{% endif %}
+
+
+<!-- ================================================================ -->
+<!-- BENEFITS                                                           -->
+<!-- ================================================================ -->
+{% if benefits %}
+<section class="px-6 py-16 max-w-3xl mx-auto animate-in delay-1">
+
+  {% if benefits_heading %}
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12">{{ benefits_heading }}</h2>
+  {% endif %}
+
+  <div class="space-y-3">
+    {% for b in benefits %}
+    <div class="flex items-start gap-4 bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="{{ tw.check_color }} text-lg mt-0.5 shrink-0 font-bold">✓</div>
+      <div>
+        <div class="text-white font-semibold mb-1 text-sm">{{ b.heading }}</div>
+        <div class="text-slate-400 text-xs leading-relaxed">{{ b.body }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+</section>
+{% endif %}
+
+
+<!-- ================================================================ -->
+<!-- HOW IT WORKS                                                       -->
+<!-- ================================================================ -->
+{% if steps %}
+<section id="como-funciona" class="px-6 py-20 max-w-5xl mx-auto animate-in delay-2">
+
+  {% if steps_heading %}
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-16">{{ steps_heading }}</h2>
+  {% endif %}
+
+  <div class="space-y-20">
+    {% for step in steps %}
+
+    {% if forloop.counter|divisibleby:2 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div class="order-2 md:order-1 rounded-2xl border border-slate-700/40 bg-slate-800/30 flex flex-col items-center justify-center gap-3 text-slate-600 text-xs text-center p-8{% if step.caption %} overflow-hidden relative{% endif %}" style="min-height:260px;">
+        <div class="text-2xl">📷</div>
+        <p class="max-w-xs leading-relaxed">{{ step.heading }}</p>
+        {% if step.caption %}
+        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-950/90 to-transparent px-6 py-5">
+          <p class="font-orbitron {{ tw.step_label }} text-sm font-bold">{{ step.caption }}</p>
+        </div>
+        {% endif %}
+      </div>
+      <div class="order-1 md:order-2">
+        <div class="{{ tw.step_label }} text-xs font-orbitron tracking-widest mb-3 uppercase">{{ step.label }}</div>
+        <h3 class="text-white text-xl font-bold mb-3">{{ step.heading }}</h3>
+        <p class="text-slate-300 text-sm leading-relaxed">{{ step.body }}</p>
+      </div>
+    </div>
+    {% else %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div>
+        <div class="{{ tw.step_label }} text-xs font-orbitron tracking-widest mb-3 uppercase">{{ step.label }}</div>
+        <h3 class="text-white text-xl font-bold mb-3">{{ step.heading }}</h3>
+        <p class="text-slate-300 text-sm leading-relaxed">{{ step.body }}</p>
+      </div>
+      <div class="rounded-2xl border border-slate-700/40 bg-slate-800/30 flex flex-col items-center justify-center gap-3 text-slate-600 text-xs text-center p-8" style="min-height:260px;">
+        <div class="text-2xl">📷</div>
+        <p class="max-w-xs leading-relaxed">{{ step.heading }}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    {% endfor %}
+  </div>
+
+</section>
+{% endif %}
+
+
+<!-- ================================================================ -->
+<!-- TESTIMONIAL                                                        -->
+<!-- ================================================================ -->
+{% if testimonial %}
+<section class="px-6 py-16 max-w-3xl mx-auto animate-in delay-1">
+
+  <div class="bg-slate-800/40 border {{ tw.testimonial_border }} rounded-2xl p-8">
+    <div class="{{ tw.quote_color }} text-5xl mb-4 leading-none font-serif" style="line-height:1;">"</div>
+    <blockquote class="text-slate-200 text-lg leading-relaxed mb-6 italic">
+      {{ testimonial.quote }}
+    </blockquote>
+    <div class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-full {{ tw.badge_bg }} border {{ tw.badge_border }} flex items-center justify-center {{ tw.badge_text }} font-orbitron font-bold text-sm shrink-0">
+        {{ testimonial.initials }}
+      </div>
+      <div>
+        <div class="text-white font-semibold text-sm">{{ testimonial.name }}</div>
+        <div class="text-slate-400 text-xs">{{ testimonial.source }}</div>
+      </div>
+    </div>
+  </div>
+
+</section>
+{% endif %}
+
+
+<!-- ================================================================ -->
+<!-- MID CTA                                                            -->
+<!-- ================================================================ -->
+<section class="px-6 py-16 max-w-3xl mx-auto text-center animate-in delay-2">
+  <h2 class="font-orbitron text-2xl font-black text-white mb-3">{{ cta_mid_heading }}</h2>
+  <p class="text-slate-400 mb-8">{{ cta_mid_subtext }}</p>
+  <a href="{% url 'account_signup' %}?rubro={{ rubro_key }}"
+     class="inline-block px-10 py-5 rounded-xl {{ tw.btn_bg }} {{ tw.btn_text }} font-black text-xl {{ tw.btn_hover }} transition-all shadow-xl {{ tw.btn_shadow }} font-orbitron">
+    {{ cta_button_primary }}
+  </a>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- FAQ                                                                -->
+<!-- ================================================================ -->
+{% if faqs %}
+<section class="px-6 py-16 max-w-3xl mx-auto animate-in delay-1">
+
+  {% if faq_heading %}
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12">{{ faq_heading }}</h2>
+  {% endif %}
+
+  <div class="space-y-3">
+
+    {% for faq in faqs %}
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        {{ faq.q }}
+        <span class="faq-indicator {{ tw.badge_text }} text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        {{ faq.a }}
+      </div>
+    </details>
+    {% endfor %}
+
+    {% if faq_country_q %}
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        {{ faq_country_q }}
+        <span class="faq-indicator {{ tw.badge_text }} text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        {{ faq_country_a }}
+      </div>
+    </details>
+    {% endif %}
+
+  </div>
+</section>
+{% endif %}
+
+
+<!-- ================================================================ -->
+<!-- FINAL CTA                                                          -->
+<!-- ================================================================ -->
+<section class="px-6 py-24 text-center animate-in delay-2">
+
+  <h2 class="font-orbitron text-3xl sm:text-4xl font-black text-white mb-4 leading-tight" style="white-space:pre-line;">
+    {{ cta_final_heading }}
+  </h2>
+  <p class="text-slate-400 mb-8">{{ cta_final_subtext }}</p>
+
+  <a href="{% url 'account_signup' %}?rubro={{ rubro_key }}"
+     class="inline-block px-12 py-5 rounded-xl {{ tw.btn_bg }} {{ tw.btn_text }} font-black text-xl {{ tw.btn_hover }} transition-all shadow-xl {{ tw.btn_shadow }} font-orbitron mb-6">
+    {{ cta_final_button }}
+  </a>
+
+  <p class="text-slate-500 text-sm mb-12">{{ cta_final_note }}</p>
+
+</section>
+
+{% endblock %}
