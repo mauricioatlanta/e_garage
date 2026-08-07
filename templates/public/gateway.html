@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eGarage</title>
+  <meta name="description" content="eGarage — Software de gestión para negocios automotrices en Latinoamérica y Estados Unidos.">
+  <link rel="canonical" href="https://egarage.cl/">
+  <meta property="og:title" content="eGarage">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="{% static 'images/egarage_icon_512x512.png' %}">
+  <link rel="icon" type="image/png" href="{% static 'images/egarage_icon_192x192.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'images/egarage_icon_192x192.png' %}">
+  <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Exo 2', sans-serif; background: #060e1e; }
+    .font-orbitron { font-family: 'Orbitron', monospace; }
+
+    /* Hero */
+    .gw-hero {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background-image: url("{% static 'img/welcome/scenes/taller.webp' %}");
+      background-size: cover;
+      background-position: center 30%;
+      padding: 2rem 1.25rem;
+    }
+    .gw-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(6, 14, 30, 0.78) 0%,
+        rgba(6, 14, 30, 0.68) 40%,
+        rgba(6, 14, 30, 0.88) 100%
+      );
+    }
+    .gw-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    /* Logo */
+    .gw-logo{
+      height:8rem;
+      width:auto;
+      filter:drop-shadow(0 0 22px rgba(0,245,255,.60));
+      margin-bottom:.5rem;
+    }
+
+    @media (max-width:768px){
+      .gw-logo{
+        height:6.5rem;
+      }
+    }
+
+    /* Location line */
+    .gw-question {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(203, 213, 225, 0.85);
+      font-size: 0.875rem;
+      letter-spacing: 0.08em;
+    }
+    .gw-question svg { flex-shrink: 0; color: #22d3ee; }
+
+    /* Cards grid */
+    .gw-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.875rem;
+      width: 100%;
+    }
+    @media (min-width: 560px) {
+      .gw-cards { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* Individual card */
+    .gw-card {
+      background: rgba(15, 30, 56, 0.72);
+      border: 1px solid rgba(0, 245, 255, 0.12);
+      border-radius: 1rem;
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.625rem;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .gw-card:hover {
+      border-color: rgba(0, 245, 255, 0.4);
+      background: rgba(15, 30, 56, 0.88);
+      transform: translateY(-2px);
+    }
+    .gw-flag { font-size: 2.25rem; line-height: 1; }
+    .gw-country {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #f1f5f9;
+      text-align: center;
+    }
+    .gw-enter {
+      margin-top: 0.25rem;
+      display: inline-block;
+      padding: 0.45rem 1rem;
+      border-radius: 0.5rem;
+      background: rgba(0, 245, 255, 0.1);
+      border: 1px solid rgba(0, 245, 255, 0.3);
+      color: #67e8f9;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .gw-card:hover .gw-enter {
+      background: rgba(0, 245, 255, 0.18);
+      border-color: rgba(0, 245, 255, 0.5);
+    }
+
+    /* USA card */
+    .gw-card-usa { position: relative; }
+
+    /* Language toggle */
+    .gw-lang-toggle {
+      display: flex;
+      gap: 0.25rem;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 0.5rem;
+      padding: 0.2rem;
+    }
+    .gw-lang-btn {
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.375rem;
+      border: none;
+      background: transparent;
+      color: rgba(148, 163, 184, 0.8);
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: 'Exo 2', sans-serif;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      letter-spacing: 0.05em;
+      /* min-size for touch */
+      min-width: 2.75rem;
+      min-height: 2rem;
+    }
+    .gw-lang-btn.active {
+      background: rgba(0, 245, 255, 0.2);
+      color: #22d3ee;
+    }
+    .gw-lang-btn:focus-visible {
+      outline: 2px solid #22d3ee;
+      outline-offset: 2px;
+    }
+
+    /* Fade-in animation */
+    @keyframes gw-fade-up {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .gw-logo    { animation: gw-fade-up 0.5s ease-out both; }
+    .gw-question{ animation: gw-fade-up 0.5s 0.1s ease-out both; }
+    .gw-cards   { animation: gw-fade-up 0.5s 0.2s ease-out both; }
+  </style>
+</head>
+<body>
+
+<div class="gw-hero">
+  <div class="gw-overlay"></div>
+
+  <div class="gw-content">
+
+    <!-- Logo -->
+    <img src="{% static 'img/logo_egarage.png' %}?v=2"
+         alt="eGarage"
+         class="gw-logo">
+
+    <!-- Location line -->
+    <p class="gw-question">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+      </svg>
+      ¿Desde qué país nos visitas?
+    </p>
+
+    <!-- Country cards -->
+    <div class="gw-cards" role="list">
+
+      <!-- Chile -->
+      <a href="/cl/" class="gw-card" role="listitem" aria-label="Entrar a eGarage Chile">
+        <span class="gw-flag" aria-hidden="true">🇨🇱</span>
+        <span class="gw-country">Chile</span>
+        <span class="gw-enter">Entrar →</span>
+      </a>
+
+      <!-- USA — card con toggle idioma -->
+      <div class="gw-card gw-card-usa" role="listitem">
+        <span class="gw-flag" aria-hidden="true">🇺🇸</span>
+        <span class="gw-country">United States</span>
+        <div class="gw-lang-toggle" role="group" aria-label="Select language">
+          <button id="usa-btn-en"
+                  class="gw-lang-btn"
+                  onclick="setUsaLang('en')"
+                  aria-pressed="false">EN</button>
+          <button id="usa-btn-es"
+                  class="gw-lang-btn"
+                  onclick="setUsaLang('es')"
+                  aria-pressed="false">ES</button>
+        </div>
+        <a id="usa-cta" href="/us/en/" class="gw-enter">Enter →</a>
+      </div>
+
+      <!-- México -->
+      <a href="/mx/" class="gw-card" role="listitem" aria-label="Entrar a eGarage México">
+        <span class="gw-flag" aria-hidden="true">🇲🇽</span>
+        <span class="gw-country">México</span>
+        <span class="gw-enter">Entrar →</span>
+      </a>
+
+      <!-- Argentina -->
+      <a href="/ar/" class="gw-card" role="listitem" aria-label="Entrar a eGarage Argentina">
+        <span class="gw-flag" aria-hidden="true">🇦🇷</span>
+        <span class="gw-country">Argentina</span>
+        <span class="gw-enter">Entrar →</span>
+      </a>
+
+      <!-- Perú -->
+      <a href="/pe/" class="gw-card" role="listitem" aria-label="Entrar a eGarage Perú">
+        <span class="gw-flag" aria-hidden="true">🇵🇪</span>
+        <span class="gw-country">Perú</span>
+        <span class="gw-enter">Entrar →</span>
+      </a>
+
+    </div><!-- /gw-cards -->
+
+  </div><!-- /gw-content -->
+</div><!-- /gw-hero -->
+
+<script>
+  function setUsaLang(lang) {
+    var cta = document.getElementById('usa-cta');
+    var btnEn = document.getElementById('usa-btn-en');
+    var btnEs = document.getElementById('usa-btn-es');
+
+    cta.href = '/us/' + lang + '/';
+    cta.textContent = lang === 'en' ? 'Enter →' : 'Entrar →';
+
+    btnEn.classList.toggle('active', lang === 'en');
+    btnEs.classList.toggle('active', lang === 'es');
+    btnEn.setAttribute('aria-pressed', lang === 'en' ? 'true' : 'false');
+    btnEs.setAttribute('aria-pressed', lang === 'es' ? 'true' : 'false');
+
+    try { localStorage.setItem('egarage-usa-lang', lang); } catch(e) {}
+  }
+
+  (function init() {
+    var saved = null;
+    try { saved = localStorage.getItem('egarage-usa-lang'); } catch(e) {}
+    var lang;
+    if (saved === 'en' || saved === 'es') {
+      lang = saved;
+    } else {
+      var nav = (navigator.language || navigator.userLanguage || 'es').toLowerCase();
+      lang = nav.startsWith('en') ? 'en' : 'es';
+    }
+    setUsaLang(lang);
+  })();
+</script>
+
+</body>
+</html>

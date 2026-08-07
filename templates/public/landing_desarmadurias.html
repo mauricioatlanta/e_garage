@@ -55,11 +55,22 @@
        class="wa-pulse px-8 py-4 rounded-xl bg-green-600 text-white font-bold text-lg hover:bg-green-500 transition-all shadow-lg shadow-green-500/30 font-orbitron flex items-center gap-2 justify-center">
       💬 WhatsApp — Probar gratis
     </a>
-    <a href="{% url 'account_signup' %}" class="px-8 py-4 rounded-xl bg-fuchsia-600 text-white font-bold text-lg hover:bg-fuchsia-500 transition-all shadow-lg shadow-fuchsia-500/30 font-orbitron">
+    <a href="{% url 'account_signup' %}?rubro=DESARMADURIA" class="px-8 py-4 rounded-xl bg-fuchsia-600 text-white font-bold text-lg hover:bg-fuchsia-500 transition-all shadow-lg shadow-fuchsia-500/30 font-orbitron">
       Crear cuenta gratis →
     </a>
   </div>
   <p class="text-slate-400 text-sm">Sin tarjeta de crédito · Sin cobrar por ingresar inventario · Cancela cuando quieras</p>
+  <div class="landing-media mt-12 border-fuchsia-500/20">
+    <img
+      src="{% static 'img/welcome/scenes/desarme.webp' %}"
+      alt=""
+      loading="eager"
+      decoding="async">
+    <div class="landing-media-caption">
+      Del vehículo al inventario: cada pieza identificada, publicada y lista para vender.
+    </div>
+  </div>
+
 </section>
 
 <!-- Dolor real -->
@@ -306,20 +317,36 @@
        class="wa-pulse px-10 py-5 rounded-xl bg-green-600 text-white font-black text-xl hover:bg-green-500 transition-all shadow-xl shadow-green-500/30 font-orbitron flex items-center gap-3 justify-center">
       💬 Hablar por WhatsApp
     </a>
-    <a href="{% url 'account_signup' %}" class="px-10 py-5 rounded-xl bg-fuchsia-600 text-white font-black text-xl hover:bg-fuchsia-500 transition-all shadow-xl shadow-fuchsia-500/30 font-orbitron">
+    <a href="{% url 'account_signup' %}?rubro=DESARMADURIA" class="px-10 py-5 rounded-xl bg-fuchsia-600 text-white font-black text-xl hover:bg-fuchsia-500 transition-all shadow-xl shadow-fuchsia-500/30 font-orbitron">
       Crear cuenta gratis →
     </a>
   </div>
 
-  <p class="mt-4 text-slate-400 text-sm">
-    ¿Tienes taller mecánico? →
-    <a href="{% url 'landing_talleres' %}" class="text-cyan-400 hover:text-cyan-300">eGarage Talleres</a>
-    &nbsp;·&nbsp;
-    ¿Casa de repuestos? →
-    <a href="{% url 'landing_repuestos' %}" class="text-lime-400 hover:text-lime-300">eGarage Repuestos</a>
-    &nbsp;·&nbsp;
-    <a href="/" class="text-slate-300 hover:text-white">Ver todas las soluciones</a>
-  </p>
+  <!-- Hub de Soluciones -->
+  <p class="text-slate-600 text-xs uppercase tracking-widest mt-12 mb-6">También puede interesarte</p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto text-left">
+
+    <a href="{% url 'landing_talleres' %}"
+       class="flex items-center gap-4 px-5 py-4 rounded-xl bg-slate-800/50 border border-cyan-500/15 hover:border-cyan-500/40 hover:bg-slate-800/80 transition-all group">
+      <span class="text-2xl shrink-0" aria-hidden="true">🔧</span>
+      <div class="min-w-0">
+        <p class="text-slate-200 font-semibold text-sm group-hover:text-cyan-300 transition-colors">Taller Mecánico</p>
+        <p class="text-slate-500 text-xs truncate">Historial de vehículos y órdenes de trabajo.</p>
+      </div>
+      <span class="text-cyan-500/60 group-hover:text-cyan-400 ml-auto shrink-0 transition-colors">→</span>
+    </a>
+
+    <a href="{% url 'landing_repuestos' %}"
+       class="flex items-center gap-4 px-5 py-4 rounded-xl bg-slate-800/50 border border-lime-500/15 hover:border-lime-500/40 hover:bg-slate-800/80 transition-all group">
+      <span class="text-2xl shrink-0" aria-hidden="true">🏪</span>
+      <div class="min-w-0">
+        <p class="text-slate-200 font-semibold text-sm group-hover:text-lime-300 transition-colors">Casa de Repuestos</p>
+        <p class="text-slate-500 text-xs truncate">Stock, pedidos y proveedores unificados.</p>
+      </div>
+      <span class="text-lime-500/60 group-hover:text-lime-400 ml-auto shrink-0 transition-colors">→</span>
+    </a>
+
+  </div>
 </section>
 
 {% endblock %}

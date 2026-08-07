@@ -42,6 +42,8 @@ from taller.views_extra.chile_password_reset import (
     ChilePasswordResetView,
 )
 from taller.views_extra.custom_signup import CustomSignupView
+from taller.views_extra.primer_paso import primer_paso_chile
+from taller.views_extra.first_victory_dashboard import first_victory_dashboard
 
 # Configuración de logging para este módulo
 logger = logging.getLogger(__name__)
@@ -77,12 +79,10 @@ urlpatterns = [
     path(
         "configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"
     ),  # Configuración técnicos
-    # Página de bienvenida alternativa (ruta estándar)
-    path(
-        "bienvenida/",
-        TemplateView.as_view(template_name="cl/es/onboarding/bienvenida.html"),
-        name="bienvenida_chile_alt",
-    ),
+    # Primer Paso — onboarding contextual por rubro (reemplaza la bienvenida de marketing)
+    path("bienvenida/", primer_paso_chile, name="bienvenida_chile_alt"),
+    # Staff — First Victory Dashboard
+    path("staff/first-victory/", first_victory_dashboard, name="staff_first_victory"),
     # Login y password (allauth) bajo /cl/es/accounts/ para conservar país e idioma.
     # EXCEPCIÓN histórica: accounts/login/ aquí (no redirect) para evitar ERR_TOO_MANY_REDIRECTS.
     path("accounts/login/", country_aware_login, name="account_login"),

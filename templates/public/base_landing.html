@@ -17,7 +17,85 @@
   <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Exo 2', 'Inter', sans-serif; }
+    html, body {
+      background:#060e1e;
+      color:#f8fafc;
+    }
+    body {
+      font-family:'Exo 2','Inter',sans-serif;
+    }
+
+    main {
+      color:#f8fafc;
+    }
+
+    main h1,
+    main h2,
+    main h3,
+    main h4 {
+      color:#ffffff;
+    }
+
+    .landing-media {
+      position:relative;
+      width:100%;
+      overflow:hidden;
+      border-radius:1.5rem;
+      min-height:320px;
+      border:1px solid rgba(255,255,255,.14);
+      background:#020617;
+      box-shadow:
+        0 30px 80px rgba(0,0,0,.45),
+        0 0 40px rgba(34,211,238,.08);
+    }
+
+    .landing-media img {
+      display:block;
+      width:100%;
+      height:100%;
+      min-height:320px;
+      max-height:580px;
+      object-fit:cover;
+      transition:transform .7s ease;
+    }
+
+    .landing-media:hover img {
+      transform:scale(1.025);
+    }
+
+    .landing-media::after {
+      content:'';
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(
+          to top,
+          rgba(2,6,23,.50) 0%,
+          rgba(2,6,23,.08) 48%,
+          rgba(2,6,23,.18) 100%
+        );
+    }
+
+    .landing-media-caption {
+      position:absolute;
+      z-index:2;
+      left:1.25rem;
+      right:1.25rem;
+      bottom:1.15rem;
+      color:#f8fafc;
+      font-size:.8rem;
+      font-weight:600;
+      letter-spacing:.02em;
+      text-shadow:0 2px 8px rgba(0,0,0,.85);
+    }
+
+    @media (max-width:640px) {
+      .landing-media,
+      .landing-media img {
+        min-height:230px;
+      }
+    }
     .font-orbitron { font-family: 'Orbitron', monospace; }
     .glow-cyan { text-shadow: 0 0 20px rgba(0, 245, 255, 0.6); }
     .glow-fuchsia { text-shadow: 0 0 20px rgba(217, 70, 239, 0.6); }
@@ -39,7 +117,7 @@
   <!-- Nav bar mínima -->
   <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between bg-slate-950/80 backdrop-blur border-b border-cyan-500/10">
     <a href="/" class="flex items-center gap-3">
-      <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage" class="h-8 w-auto" style="filter: drop-shadow(0 0 8px rgba(0,245,255,0.5));">
+      <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage" class="h-12 sm:h-14 w-auto" style="filter: drop-shadow(0 0 8px rgba(0,245,255,0.5));">
       <span class="font-orbitron text-cyan-300 text-sm font-bold hidden sm:block">eGarage</span>
     </a>
     <div class="flex items-center gap-3">
@@ -60,7 +138,7 @@
       <a href="/" class="hover:text-slate-400">Inicio</a> ·
       <a href="{% url 'landing_talleres' %}" class="hover:text-cyan-400">Talleres</a> ·
       <a href="{% url 'landing_desarmadurias' %}" class="hover:text-fuchsia-400">Desarmadurias</a> ·
-      <a href="{% url 'landing_repuestos' %}" class="hover:text-lime-400">Repuestos</a> ·
+      <a href="{% url 'landing_repuestos' %}" class="hover:text-lime-400">{{ ui_labels.parts }}</a> ·
       <a href="{% url 'landing_carwash' %}" class="hover:text-sky-400">Car Wash</a> ·
       <a href="{% url 'landing_vulcanizacion' %}" class="hover:text-amber-400">Vulcanización</a>
     </p>

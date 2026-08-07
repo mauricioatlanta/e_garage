@@ -130,6 +130,11 @@ from taller.views_extra.views_suscripciones import (
     suspension,
 )
 from taller.views.landing_views import (
+    hub_chile,
+    hub_usa_en,
+    hub_usa_es,
+    hub_mexico,
+    hub_peru,
     landing_home,
     landing_talleres,
     landing_desarmadurias,
@@ -353,12 +358,6 @@ urlpatterns = [
         ),
         name="contacto_ventas",
     ),
-    # Páginas de bienvenida por país
-    path(
-        "bienvenida/cl/",
-        TemplateView.as_view(template_name="taller/bienvenida_chile.html"),
-        name="bienvenida_chile",
-    ),
     # Login personalizado con contexto de país
     path("accounts/login/", country_aware_login, name="account_login"),
     # Signup personalizado con CustomSignupView (ANTES de allauth.urls para que tenga prioridad)
@@ -508,7 +507,10 @@ urlpatterns = [
     #     "us/en/desarme/",
     #     include(("taller.urls_desarme", "desarme"), namespace="us_en_desarme"),
     # ),
-    # 🇺🇸 USA - Montes reales para /us/en/ y /us/es/ (ANTES de us/ y de RedirectViews)
+    # 🇺🇸 USA — Hub raíz por idioma (ANTES de los includes para que haga first-match)
+    path("us/en/", hub_usa_en, name="us_en_home"),
+    path("us/es/", hub_usa_es, name="us_es_home"),
+    # 🇺🇸 USA - Montes reales para /us/en/<path>/ y /us/es/<path>/
     path(
         "us/en/",
         include(("taller.urls", "taller"), namespace="us_en"),
@@ -527,6 +529,8 @@ urlpatterns = [
         "cl/es/",
         include(("taller.urls_extra.chile", "chile"), namespace="chile"),
     ),
+    # 🇵🇪 Perú — Hub raíz (redirige a bienvenida)
+    path("pe/", hub_peru, name="pe_home"),
     # 🇵🇪 Perú - Español
     path(
         "pe/es/",
@@ -547,6 +551,8 @@ urlpatterns = [
         "ve/es/",
         include(("taller.urls_extra.venezuela", "venezuela"), namespace="venezuela"),
     ),
+    # 🇲🇽 México — Hub raíz
+    path("mx/", hub_mexico, name="mx_home"),
     # 🇲🇽 México - Español
     path(
         "mx/es/",
@@ -634,23 +640,11 @@ urlpatterns = [
         RedirectView.as_view(url="/cl/es/centro-operaciones-espacial/", permanent=False),
         name="cl_centro_operaciones_redirect",
     ),
-    # Redirigir /cl/ a /cl/es/bienvenida/
+    # Chile Hub público — selector de rubro
     path(
         "cl/",
-        RedirectView.as_view(url="/cl/es/bienvenida/", permanent=False),
-        name="cl_home_welcome",
-    ),
-    # Página de bienvenida para Argentina - /ar/ directamente
-    path(
-        "ar/",
-        TemplateView.as_view(template_name="landing_inicio.html"),
-        name="ar_home_welcome",
-    ),
-    # Página de bienvenida para Uruguay - /uy/ directamente
-    path(
-        "uy/",
-        TemplateView.as_view(template_name="landing_inicio.html"),
-        name="uy_home_welcome",
+        hub_chile,
+        name="cl_home",
     ),
     # Redirect cl/ to cl/es/ preserving the rest of the path - DESHABILITADO - Causa bucles infinitos
     # path(

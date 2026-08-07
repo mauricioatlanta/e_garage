@@ -2,143 +2,499 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}eGarage Talleres — Software para Talleres Mecánicos en Latinoamérica{% endblock %}
-{% block meta_description %}Presupuestos digitales, órdenes de trabajo, inventario de repuestos e historial de clientes para tu taller mecánico. Prueba gratis 30 días, sin tarjeta.{% endblock %}
+{% block title %}eGarage — Software para Talleres Mecánicos · Chile{% endblock %}
+{% block meta_description %}Historial de vehículos, órdenes de trabajo, inventario de repuestos y presupuestos por WhatsApp. Para talleres mecánicos en Chile. Prueba gratis 30 días, sin tarjeta.{% endblock %}
 {% block canonical_path %}/talleres/{% endblock %}
-{% block og_title %}eGarage Talleres — Software pensado para talleres mecánicos{% endblock %}
-{% block og_description %}Gestiona tu taller con presupuestos digitales, órdenes de trabajo, inventario y seguimiento de clientes. Sin papeles, sin complicaciones.{% endblock %}
+{% block og_title %}¿Recuerdas exactamente qué se le hizo a ese auto? Con eGarage, lo ves en 8 segundos.{% endblock %}
+{% block og_description %}El sistema que usa el mecánico que sabe exactamente qué se le hizo a cada auto — sin buscar en cuadernos ni en WhatsApp.{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* FAQ accordion: ocultar triángulo nativo del summary */
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  /* Rotación del indicador cuando el details está abierto */
+  details[open] summary .faq-indicator { transform: rotate(45deg); }
+  .faq-indicator { transition: transform 0.2s ease; display: inline-block; }
+</style>
+{% endblock %}
 
 {% block content %}
 
-<!-- Hero -->
-<section class="px-6 py-20 text-center max-w-5xl mx-auto animate-in">
-  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold mb-6 font-orbitron tracking-widest">
-    ⚙️ eGarage · Talleres Mecánicos
+<!-- ================================================================ -->
+<!-- BLOQUE 1 — HERO                                                   -->
+<!-- ================================================================ -->
+<section class="px-6 pt-16 pb-20 max-w-4xl mx-auto text-center animate-in">
+
+  <!-- Badge de rubro -->
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold mb-8 font-orbitron tracking-widest">
+    ⚙️ Para talleres mecánicos
   </div>
-  <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight glow-cyan">
-    Tu taller mecánico.<br>
-    <span class="text-cyan-400">Sin papeles.</span>
-  </h1>
-  <p class="text-xl text-slate-200 max-w-2xl mx-auto mb-10">
-    Presupuestos, órdenes de trabajo, inventario de repuestos y seguimiento de clientes — todo en una plataforma diseñada para talleres mecánicos en Latinoamérica.
+
+  <!-- Setup — la situación que el dueño reconoce -->
+  <p class="text-slate-400 text-lg sm:text-xl mb-5 leading-relaxed">
+    Hace seis meses reparaste el escape de un cliente.<br>
+    Hoy volvió reclamando garantía.
   </p>
-  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-    <a href="{% url 'account_signup' %}" class="px-8 py-4 rounded-xl bg-cyan-500 text-slate-950 font-bold text-lg hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/30 font-orbitron">
+
+  <!-- H1 — la pregunta que duele -->
+  <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight glow-cyan">
+    ¿Recuerdas exactamente<br class="hidden sm:block"> qué ocurrió?
+  </h1>
+
+  <!-- Subheadline — la respuesta -->
+  <p class="text-xl text-slate-200 max-w-2xl mx-auto mb-10 leading-relaxed">
+    Con eGarage lo ves en 8 segundos: quién lo atendió, qué se hizo, qué repuesto se usó, cuánto pagó el cliente.
+    Sin buscar en cuadernos. Sin llamar al mecánico que ya no trabaja ahí.
+  </p>
+
+  <!-- CTAs -->
+  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+    <a href="{% url 'account_signup' %}?rubro=TALLER_MECANICO"
+       class="px-8 py-4 rounded-xl bg-cyan-500 text-slate-950 font-bold text-lg hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/30 font-orbitron">
       Prueba gratis 30 días →
     </a>
-    <a href="{% url 'account_login' %}" class="px-8 py-4 rounded-xl border border-slate-500 text-slate-200 hover:border-cyan-500/50 hover:text-cyan-300 transition-all text-lg">
-      Ya tengo cuenta
+    <a href="#como-funciona"
+       class="px-8 py-4 rounded-xl border border-slate-500 text-slate-200 hover:border-cyan-500/50 hover:text-cyan-300 transition-all text-lg">
+      Ver cómo funciona →
     </a>
   </div>
-  <p class="text-slate-400 text-sm">Sin tarjeta de crédito · Cancela cuando quieras</p>
-</section>
+  <p class="text-slate-500 text-sm">Sin tarjeta de crédito · Cancela cuando quieras</p>
 
-<!-- Problema que resuelve -->
-<section class="px-6 py-10 max-w-3xl mx-auto animate-in delay-1">
-  <div class="bg-slate-800/50 border border-cyan-500/20 rounded-2xl p-8 text-center">
-    <p class="text-slate-200 leading-relaxed">
-      En la mayoría de los talleres, el presupuesto sale en un papel, la orden de trabajo en otro, el inventario está en Excel y el historial del cliente no existe.
-      Con eGarage, <span class="text-cyan-300 font-semibold">todo eso desaparece en un día</span>.
-    </p>
+  <div class="landing-media mt-12 border-cyan-500/20">
+    <img
+      src="{% static 'img/welcome/scenes/taller.webp' %}"
+      alt=""
+      loading="eager"
+      decoding="async">
+    <div class="landing-media-caption">
+      Tu taller, tus clientes y el historial de cada vehículo en un solo lugar.
+    </div>
   </div>
+
 </section>
 
-<!-- Features -->
-<section class="px-6 py-16 max-w-6xl mx-auto">
-  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12 animate-in">Lo que necesita tu taller, en un solo lugar</h2>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-    <div class="animate-in delay-1 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">📄</div>
-      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Presupuestos en segundos</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Crea el presupuesto mientras el cliente está en el taller. Agrega mano de obra y repuestos, calcula el IVA automáticamente y envíalo por WhatsApp.</p>
+<!-- ================================================================ -->
+<!-- BLOQUE 2 — PROBLEMA                                              -->
+<!-- ================================================================ -->
+<section class="px-6 py-20 max-w-5xl mx-auto animate-in delay-1">
+
+  <h2 class="font-orbitron text-2xl font-bold text-center text-slate-300 mb-12">
+    ¿Esto te suena familiar?
+  </h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+    <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
+      <div class="text-2xl mb-3">📓</div>
+      <h3 class="text-white font-bold mb-2 text-sm">"Se me van los trabajos que no cobré."</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">
+        El cliente lleva el auto, pasa algo menor que no se registra, y cuando vuelve tres meses después con un problema relacionado, no hay historia. Se le hace el trabajo de nuevo. Gratis.
+      </p>
     </div>
 
-    <div class="animate-in delay-2 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">🔧</div>
-      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Órdenes de trabajo</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Convierte el presupuesto aprobado en orden de trabajo con un clic. Asigna técnico, registra los repuestos usados y cierra la OT cuando esté listo.</p>
+    <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
+      <div class="text-2xl mb-3">💰</div>
+      <h3 class="text-white font-bold mb-2 text-sm">"No sé cuánto gané este mes."</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">
+        Al final del día cuento la plata en la caja y eso es lo que hay. No sé si los repuestos que compré dieron ganancia. No sé qué mecánico genera más trabajo. Estimo. Y la estimación siempre me juega en contra.
+      </p>
     </div>
 
-    <div class="animate-in delay-3 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">📦</div>
-      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Inventario de repuestos</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Controla tu stock en bodega. Cada vez que usas un repuesto en una OT, el inventario se descuenta solo. Alertas automáticas al llegar al mínimo.</p>
+    <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
+      <div class="text-2xl mb-3">🧾</div>
+      <h3 class="text-white font-bold mb-2 text-sm">"El cliente no entiende por qué cobra lo que cobra."</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">
+        Sin un presupuesto formal, compara mentalmente con el concesionario y siente que paga demasiado — aunque pague menos. Sin documento, todo es negociable. Y en esa negociación siempre pierde el taller.
+      </p>
     </div>
 
-    <div class="animate-in delay-1 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">🚗</div>
-      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Ficha por vehículo</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Marca, modelo, año, VIN, kilometraje, fotos. Historial completo de todos los servicios realizados. El siguiente mecánico sabe exactamente qué se hizo antes.</p>
-    </div>
-
-    <div class="animate-in delay-2 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">👥</div>
-      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Historial de clientes</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Cada cliente tiene su ficha con todos sus vehículos, visitas y documentos. ¿Cuándo fue la última vez que trajo el Ford Ranger? Lo ves en dos segundos.</p>
-    </div>
-
-    <div class="animate-in delay-3 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">💬</div>
-      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Aviso por WhatsApp</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Cuando el vehículo está listo, notifica al cliente por WhatsApp directamente desde la OT. Sin llamadas, sin "¿está el auto de Juan?", sin confusión.</p>
-    </div>
-
-    <div class="animate-in delay-1 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">📊</div>
-      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Reportes del taller</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Ventas del mes, servicios más frecuentes, productividad por técnico, repuestos más usados. Toma decisiones con datos reales, no con intuición.</p>
-    </div>
-
-    <div class="animate-in delay-2 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">🧾</div>
-      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">IVA e impuestos</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">IVA 19% en Chile, IGV 18% en Perú, tax por estado en USA. El sistema calcula automáticamente según el país del taller. Sin configuración manual.</p>
-    </div>
-
-    <div class="animate-in delay-3 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">👨‍🔧</div>
-      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Gestión de técnicos</h3>
-      <p class="text-slate-300 text-sm leading-relaxed">Asigna órdenes de trabajo por técnico. Ve qué está haciendo cada uno en este momento. Mide eficiencia y cierra el mes con números claros.</p>
+    <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
+      <div class="text-2xl mb-3">📦</div>
+      <h3 class="text-white font-bold mb-2 text-sm">"Los repuestos se pierden sin que nadie lo sepa."</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">
+        Compré un filtro para el auto de un cliente. El mecánico lo usó en otro. Cuando el primero llegó, hubo que comprar otro. Ese costo no se registró. No se cobró. Y así todos los meses.
+      </p>
     </div>
 
   </div>
 </section>
 
-<!-- Multi-país -->
-<section class="px-6 py-12 max-w-3xl mx-auto text-center animate-in delay-2">
-  <div class="bg-slate-800/50 border border-slate-600/50 rounded-2xl p-8">
-    <h2 class="font-orbitron text-slate-200 text-lg font-bold mb-3">Tu taller, en cualquier país</h2>
-    <p class="text-slate-300 text-sm mb-4">Con soporte fiscal para Chile, Perú, USA y más países de Latinoamérica. El sistema se adapta a tu mercado.</p>
-    <div class="flex flex-wrap justify-center gap-2 text-xl">
-      <span title="Chile">🇨🇱</span>
-      <span title="Argentina">🇦🇷</span>
-      <span title="Uruguay">🇺🇾</span>
-      <span title="México">🇲🇽</span>
-      <span title="Perú">🇵🇪</span>
-      <span title="Venezuela">🇻🇪</span>
-      <span title="Brasil">🇧🇷</span>
-      <span title="USA">🇺🇸</span>
+
+<!-- ================================================================ -->
+<!-- BLOQUE 3 — CASO REAL                                             -->
+<!-- ================================================================ -->
+<section class="px-6 py-16 max-w-4xl mx-auto animate-in delay-2">
+
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12">
+    Lo que cambia en 90 días
+  </h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+
+    <div class="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-6">
+      <div class="text-slate-500 text-xs font-orbitron tracking-widest mb-4 uppercase">Antes — Taller Don Carlos · Rancagua</div>
+      <p class="text-slate-300 text-sm leading-relaxed">
+        4 mecánicos. Control en cuaderno y WhatsApp. 12 vehículos por semana. Al final del mes, el dueño estima cuánto ganó. Pierde entre 2 y 4 trabajos sin facturar por mes — repuestos usados en el auto equivocado, trabajos menores no cobrados, presupuestos que nadie siguió.
+      </p>
     </div>
+
+    <div class="bg-cyan-950/30 border border-cyan-500/20 rounded-2xl p-6">
+      <div class="text-cyan-400 text-xs font-orbitron tracking-widest mb-4 uppercase">Después — 3 meses con eGarage</div>
+      <p class="text-slate-200 text-sm leading-relaxed">
+        Cero trabajos sin registro. El resumen del mes está en el teléfono. Los clientes reciben el presupuesto por WhatsApp y aprueban el mismo día. El historial de cualquier vehículo aparece en 8 segundos — con fotos, repuestos y el nombre del mecánico que lo atendió.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Métricas -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+
+    <div class="bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="font-orbitron text-3xl font-black text-cyan-400 mb-2">$180.000</div>
+      <div class="text-slate-400 text-xs leading-relaxed">CLP/mes recuperados en trabajos que antes no se facturaban</div>
+    </div>
+
+    <div class="bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="font-orbitron text-3xl font-black text-cyan-400 mb-2">68%</div>
+      <div class="text-slate-400 text-xs leading-relaxed">de presupuestos aprobados el mismo día de enviarse por WhatsApp</div>
+    </div>
+
+    <div class="bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="font-orbitron text-3xl font-black text-cyan-400 mb-2">0</div>
+      <div class="text-slate-400 text-xs leading-relaxed">conflictos de precio desde que el cliente firma el presupuesto digital</div>
+    </div>
+
   </div>
 </section>
 
-<!-- CTA final -->
-<section class="px-6 py-20 text-center animate-in delay-3">
-  <h2 class="font-orbitron text-3xl font-black text-white mb-4">¿Listo para digitalizar tu taller?</h2>
-  <p class="text-slate-300 mb-8">30 días gratis. Sin tarjeta de crédito. Sin compromiso.</p>
-  <a href="{% url 'account_signup' %}" class="px-10 py-5 rounded-xl bg-cyan-500 text-slate-950 font-black text-xl hover:bg-cyan-400 transition-all shadow-xl shadow-cyan-500/30 font-orbitron">
-    Crear cuenta gratis →
+
+<!-- ================================================================ -->
+<!-- BLOQUE 4 — BENEFICIOS                                            -->
+<!-- ================================================================ -->
+<section class="px-6 py-16 max-w-3xl mx-auto animate-in delay-1">
+
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12">
+    Lo que cambia para tu taller
+  </h2>
+
+  <div class="space-y-3">
+
+    <div class="flex items-start gap-4 bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="text-cyan-400 text-lg mt-0.5 shrink-0 font-bold">✓</div>
+      <div>
+        <div class="text-white font-semibold mb-1 text-sm">Nunca más pierdes un trabajo sin cobrar.</div>
+        <div class="text-slate-400 text-xs leading-relaxed">Cada orden queda registrada desde que entra el auto hasta que sale — con quién la hizo, qué repuestos usó, y cuánto se cobró.</div>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-4 bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="text-cyan-400 text-lg mt-0.5 shrink-0 font-bold">✓</div>
+      <div>
+        <div class="text-white font-semibold mb-1 text-sm">El cliente sabe lo que pagó y por qué.</div>
+        <div class="text-slate-400 text-xs leading-relaxed">Presupuesto formal, historial visible, documento al retirar. El cliente que entiende lo que pagó vuelve. El que recibió el trabajo de boca, va a buscar otro taller.</div>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-4 bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="text-cyan-400 text-lg mt-0.5 shrink-0 font-bold">✓</div>
+      <div>
+        <div class="text-white font-semibold mb-1 text-sm">Sabes cuánto ganaste, no cuánto crees que ganaste.</div>
+        <div class="text-slate-400 text-xs leading-relaxed">Margen por trabajo, costo de repuesto, rendimiento por mecánico. Sin calculadora. Sin estimación.</div>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-4 bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="text-cyan-400 text-lg mt-0.5 shrink-0 font-bold">✓</div>
+      <div>
+        <div class="text-white font-semibold mb-1 text-sm">El repuesto que compraste se cobra en el trabajo correcto.</div>
+        <div class="text-slate-400 text-xs leading-relaxed">Inventario vinculado a la orden. Cuando el mecánico usa un repuesto, el stock baja. No más fugas sin registro.</div>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-4 bg-slate-800/30 border border-slate-700/30 rounded-xl p-5">
+      <div class="text-cyan-400 text-lg mt-0.5 shrink-0 font-bold">✓</div>
+      <div>
+        <div class="text-white font-semibold mb-1 text-sm">Tu taller funciona aunque no estés.</div>
+        <div class="text-slate-400 text-xs leading-relaxed">El mecánico abre la orden, el sistema lleva el control. Revisas el estado de los trabajos desde el celular a las 10 de la noche — sin llamar a nadie.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- BLOQUE 5 — CAPTURAS / FLUJO                                      -->
+<!-- ================================================================ -->
+<section id="como-funciona" class="px-6 py-20 max-w-5xl mx-auto animate-in delay-2">
+
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-16">
+    Así funciona en tu taller
+  </h2>
+
+  <div class="space-y-20">
+
+    <!-- Paso 1 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div>
+        <div class="text-cyan-400 text-xs font-orbitron tracking-widest mb-3 uppercase">Paso 1</div>
+        <h3 class="text-white text-xl font-bold mb-3">El auto llega. La orden empieza.</h3>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          Ingresas la patente. El sistema muestra si ese auto ya estuvo antes. Escribes el problema,
+          tomás fotos del estado con el celular. Todo queda vinculado a esa visita.
+          Treinta segundos.
+        </p>
+      </div>
+      <div class="rounded-2xl border border-slate-700/40 bg-slate-800/30 flex flex-col items-center justify-center gap-3 text-slate-600 text-xs text-center p-8"
+           style="min-height: 260px;">
+        <div class="text-2xl">📷</div>
+        <p class="max-w-xs leading-relaxed">
+          [Captura: ingreso de vehículo — patente AB·1234, cliente Luis González, 3 fotos adjuntas incluyendo rayón copiloto]
+        </p>
+      </div>
+    </div>
+
+    <!-- Paso 2 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div class="order-2 md:order-1 rounded-2xl border border-slate-700/40 bg-slate-800/30 flex flex-col items-center justify-center gap-3 text-slate-600 text-xs text-center p-8"
+           style="min-height: 260px;">
+        <div class="text-2xl">📷</div>
+        <p class="max-w-xs leading-relaxed">
+          [Captura: orden activa — repuestos "desde inventario", observación técnica del mecánico visible]
+        </p>
+      </div>
+      <div class="order-1 md:order-2">
+        <div class="text-cyan-400 text-xs font-orbitron tracking-widest mb-3 uppercase">Paso 2</div>
+        <h3 class="text-white text-xl font-bold mb-3">El mecánico trabaja. El inventario se actualiza solo.</h3>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          Asignás el técnico. Agregás los repuestos desde el inventario. El cliente recibe el link
+          de seguimiento por WhatsApp. Si el mecánico detecta algo adicional, lo registra con su
+          observación — y el cliente queda informado y firmó haber sido avisado.
+        </p>
+      </div>
+    </div>
+
+    <!-- Paso 3 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div>
+        <div class="text-cyan-400 text-xs font-orbitron tracking-widest mb-3 uppercase">Paso 3</div>
+        <h3 class="text-white text-xl font-bold mb-3">El cliente aprueba desde el teléfono.</h3>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          El presupuesto llega al WhatsApp del cliente con todos los detalles — trabajos, repuestos,
+          total en CLP, observaciones del mecánico. Lo aprueba desde ahí. Sin volver al taller.
+          Sin llamadas. Queda registrado quién aprobó y a qué hora.
+        </p>
+      </div>
+      <div class="rounded-2xl border border-slate-700/40 bg-slate-800/30 flex flex-col items-center justify-center gap-3 text-slate-600 text-xs text-center p-8"
+           style="min-height: 260px;">
+        <div class="text-2xl">📷</div>
+        <p class="max-w-xs leading-relaxed">
+          [Captura desde el teléfono del cliente: presupuesto con total $72.233 CLP, botón "Aprobar presupuesto"]
+        </p>
+      </div>
+    </div>
+
+    <!-- Paso 4 — el cierre del loop narrativo -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div class="order-2 md:order-1 rounded-2xl border border-cyan-500/20 bg-slate-800/30 overflow-hidden relative"
+           style="min-height: 260px;">
+        <div class="w-full h-full flex flex-col items-center justify-center gap-3 text-slate-600 text-xs text-center p-8"
+             style="min-height: 260px;">
+          <div class="text-2xl">📷</div>
+          <p class="max-w-xs leading-relaxed">
+            [Captura: historial Toyota Hilux AB·1234 — 3 visitas, incluyendo cambio de escape del 23/06/2025]
+          </p>
+        </div>
+        <!-- Caption "Nunca más discutas con tu memoria" -->
+        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-950/90 to-transparent px-6 py-5">
+          <p class="font-orbitron text-cyan-300 text-sm font-bold">Nunca más discutas con tu memoria.</p>
+        </div>
+      </div>
+      <div class="order-1 md:order-2">
+        <div class="text-cyan-400 text-xs font-orbitron tracking-widest mb-3 uppercase">Paso 4</div>
+        <h3 class="text-white text-xl font-bold mb-3">El historial del vehículo queda para siempre.</h3>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          El trabajo está listo. El cliente firma. El historial queda actualizado — la próxima vez
+          que esa patente llegue a tu taller, en 8 segundos sabes todo lo que se le hizo, cuándo,
+          con qué repuesto, y qué observaciones dejó el mecánico. Incluyendo la del reclamo de hoy.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- BLOQUE 6 — TESTIMONIO                                            -->
+<!-- ================================================================ -->
+<section class="px-6 py-16 max-w-3xl mx-auto animate-in delay-1">
+
+  <div class="bg-slate-800/40 border border-cyan-500/15 rounded-2xl p-8">
+    <div class="text-cyan-400 text-5xl mb-4 leading-none font-serif" style="line-height: 1;">"</div>
+    <blockquote class="text-slate-200 text-lg leading-relaxed mb-6 italic">
+      Antes tardaba una hora buscando en WhatsApp qué se le había hecho al auto del cliente.
+      A veces no encontraba nada y tenía que llamar al mecánico que ya no trabajaba ahí.
+      Con eGarage veo todo en 10 segundos: quién lo atendió, qué se hizo, qué repuesto se usó.
+      No parece gran cosa. Pero en un mes me cambió cómo manejo el taller.
+    </blockquote>
+    <div class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-full bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 font-orbitron font-bold text-sm shrink-0">
+        CM
+      </div>
+      <div>
+        <div class="text-white font-semibold text-sm">Carlos Muñoz</div>
+        <div class="text-slate-400 text-xs">Taller AutoExpress · Rancagua · 4 mecánicos</div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ================================================================ -->
+<!-- BLOQUE 7 — CTA INTERMEDIO                                        -->
+<!-- ================================================================ -->
+<section class="px-6 py-16 max-w-3xl mx-auto text-center animate-in delay-2">
+  <h2 class="font-orbitron text-2xl font-black text-white mb-3">¿Listo para organizar tu taller?</h2>
+  <p class="text-slate-400 mb-8">30 días gratis · Sin tarjeta de crédito · Cancela cuando quieras</p>
+  <a href="{% url 'account_signup' %}?rubro=TALLER_MECANICO"
+     class="inline-block px-10 py-5 rounded-xl bg-cyan-500 text-slate-950 font-black text-xl hover:bg-cyan-400 transition-all shadow-xl shadow-cyan-500/30 font-orbitron">
+    Prueba gratis 30 días →
   </a>
-  <p class="mt-8 text-slate-400 text-sm">
-    ¿Tienes una desarmaduria? →
-    <a href="{% url 'landing_desarmadurias' %}" class="text-fuchsia-400 hover:text-fuchsia-300">eGarage Desarmadurias</a>
-    &nbsp;·&nbsp;
-    ¿Casa de repuestos? →
-    <a href="{% url 'landing_repuestos' %}" class="text-lime-400 hover:text-lime-300">eGarage Repuestos</a>
-    &nbsp;·&nbsp;
-    <a href="/" class="text-slate-300 hover:text-white">Ver todas las soluciones</a>
-  </p>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- BLOQUE 8 — FAQ                                                   -->
+<!-- ================================================================ -->
+<section class="px-6 py-16 max-w-3xl mx-auto animate-in delay-1">
+
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12">Preguntas frecuentes</h2>
+
+  <div class="space-y-3">
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿Necesito saber de tecnología para usar eGarage?
+        <span class="faq-indicator text-cyan-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        No. Si sabes escribir en WhatsApp, sabes usar eGarage. El equipo aprende a crear una orden de trabajo en menos de 20 minutos — sin manual, sin capacitación formal.
+      </div>
+    </details>
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿El mecánico tiene que usar el sistema?
+        <span class="faq-indicator text-cyan-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        El mecánico ve las órdenes que le están asignadas y puede actualizar el estado del trabajo desde el celular. Cuando ve que puede revisar sus propias órdenes sin preguntarle nada al jefe, lo adopta solo.
+      </div>
+    </details>
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿Funciona sin internet?
+        <span class="faq-indicator text-cyan-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        Requiere conexión para sincronizar datos. Funciona con señal básica de celular — la misma que necesita WhatsApp. Si tu taller tiene suficiente señal para mandar un mensaje, tiene suficiente señal para usar eGarage.
+      </div>
+    </details>
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿Cuánto tiempo toma empezar?
+        <span class="faq-indicator text-cyan-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        El primer día podés crear tu primer vehículo y tu primera orden de trabajo en menos de una hora. No hay configuración compleja. No hay semanas de implementación. Abrís la cuenta y empezás.
+      </div>
+    </details>
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿Qué pasa con mis datos si decido no continuar?
+        <span class="faq-indicator text-cyan-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        Tus datos son tuyos. Podés exportarlos en cualquier momento — la lista de clientes, los vehículos, el historial completo. No hay cláusula de retención. Si decidís que eGarage no es para tu taller, te llevás todo.
+      </div>
+    </details>
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿Funciona en Chile?
+        <span class="faq-indicator text-cyan-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        Sí. eGarage está adaptado para Chile: patente en formato chileno, precios en CLP, IVA 19% calculado automáticamente, vocabulario del rubro local. El soporte está en español y opera en zona horaria de Santiago.
+      </div>
+    </details>
+
+    <details class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+      <summary class="flex items-center justify-between px-5 py-4 cursor-pointer text-slate-200 font-semibold text-sm hover:text-white transition-colors">
+        ¿Y si tengo muchos vehículos desde el primer día?
+        <span class="faq-indicator text-cyan-400 text-xl shrink-0 ml-4">+</span>
+      </summary>
+      <div class="px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-700/30 pt-4">
+        Podés ingresar tantos vehículos como quieras desde el primer día. No hay límite de vehículos, clientes ni órdenes de trabajo — en ningún plan.
+      </div>
+    </details>
+
+  </div>
+</section>
+
+
+<!-- ================================================================ -->
+<!-- BLOQUE 9 — CTA FINAL                                             -->
+<!-- ================================================================ -->
+<section class="px-6 py-24 text-center animate-in delay-2">
+
+  <h2 class="font-orbitron text-3xl sm:text-4xl font-black text-white mb-4 leading-tight">
+    El próximo auto que entre a tu taller<br>
+    <span class="text-cyan-400">ya puede tener su orden.</span>
+  </h2>
+  <p class="text-slate-400 mb-8">30 días gratis · Sin tarjeta · Sin instalación</p>
+
+  <a href="{% url 'account_signup' %}?rubro=TALLER_MECANICO"
+     class="inline-block px-12 py-5 rounded-xl bg-cyan-500 text-slate-950 font-black text-xl hover:bg-cyan-400 transition-all shadow-xl shadow-cyan-500/30 font-orbitron mb-6">
+    Prueba gratis 30 días →
+  </a>
+
+  <p class="text-slate-500 text-sm mb-12">Sin compromisos · Cancela cuando quieras · Soporte en español</p>
+
+  <!-- Hub de Soluciones -->
+  <p class="text-slate-600 text-xs uppercase tracking-widest mb-6">También puede interesarte</p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto text-left">
+
+    <a href="{% url 'landing_desarmadurias' %}"
+       class="flex items-center gap-4 px-5 py-4 rounded-xl bg-slate-800/50 border border-fuchsia-500/15 hover:border-fuchsia-500/40 hover:bg-slate-800/80 transition-all group">
+      <span class="text-2xl shrink-0" aria-hidden="true">🔩</span>
+      <div class="min-w-0">
+        <p class="text-slate-200 font-semibold text-sm group-hover:text-fuchsia-300 transition-colors">Desarmaduría</p>
+        <p class="text-slate-500 text-xs truncate">Kiosko de piezas y precio inteligente.</p>
+      </div>
+      <span class="text-fuchsia-500/60 group-hover:text-fuchsia-400 ml-auto shrink-0 transition-colors">→</span>
+    </a>
+
+    <a href="{% url 'landing_repuestos' %}"
+       class="flex items-center gap-4 px-5 py-4 rounded-xl bg-slate-800/50 border border-lime-500/15 hover:border-lime-500/40 hover:bg-slate-800/80 transition-all group">
+      <span class="text-2xl shrink-0" aria-hidden="true">🏪</span>
+      <div class="min-w-0">
+        <p class="text-slate-200 font-semibold text-sm group-hover:text-lime-300 transition-colors">Casa de Repuestos</p>
+        <p class="text-slate-500 text-xs truncate">Stock, pedidos y proveedores unificados.</p>
+      </div>
+      <span class="text-lime-500/60 group-hover:text-lime-400 ml-auto shrink-0 transition-colors">→</span>
+    </a>
+
+  </div>
+
 </section>
 
 {% endblock %}

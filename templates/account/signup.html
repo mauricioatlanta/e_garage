@@ -272,11 +272,30 @@
     <main class="signup-shell">
         <div class="mb-8 text-center">
             <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage" class="mx-auto mb-4 h-16 w-auto">
-            <h1 class="text-3xl font-extrabold tracking-tight md:text-5xl">Crea tu cuenta</h1>
-            <p class="signup-lead mx-auto mt-3 max-w-2xl">
-                Emrepuesto con 30 días gratis, sin tarjeta. Elige mensual o anual cuando tu taller esté listo.
+            <h1 class="text-3xl font-extrabold tracking-tight md:text-5xl" id="signup-headline">Crea tu cuenta</h1>
+            <p class="signup-lead mx-auto mt-3 max-w-2xl" id="signup-lead">
+                Empieza con 30 días gratis, sin tarjeta. Elige mensual o anual cuando tu negocio esté listo.
             </p>
         </div>
+        <script>
+        (function() {
+            var rubro = new URLSearchParams(window.location.search).get('rubro') || '';
+            var headlines = {
+                'TALLER_MECANICO':  'Estás a un paso de registrar tu primer vehículo.',
+                'DESARMADURIA':     'Estás a un paso de publicar tus primeras piezas.',
+                'CASA_REPUESTOS':   'Estás a un paso de poner tu catálogo en línea.',
+            };
+            var leads = {
+                'TALLER_MECANICO':  'Crea tu cuenta y el primer vehículo puede estar registrado en menos de un minuto.',
+                'DESARMADURIA':     'Crea tu cuenta y las primeras piezas pueden estar publicadas en menos de un minuto.',
+                'CASA_REPUESTOS':   'Crea tu cuenta y el catálogo empieza a trabajar por ti desde hoy.',
+            };
+            if (rubro && headlines[rubro]) {
+                document.getElementById('signup-headline').textContent = headlines[rubro];
+                document.getElementById('signup-lead').textContent = leads[rubro];
+            }
+        })();
+        </script>
 
         <form method="post" action="." class="signup-panel space-y-8">
             {% csrf_token %}
@@ -324,19 +343,19 @@
                     <div class="rubro-card" data-rubro="TALLER_MECANICO" data-section="principal" role="radio" tabindex="0">
                         <span class="rubro-badge" style="display:none">Principal</span>
                         <span class="rubro-card-icon">🔧</span>
-                        <span class="rubro-card-label">Taller Mecánico</span>
+                        <span class="rubro-card-label">{{ ui_labels.workshop }}</span>
                         <span class="rubro-card-desc">Autos, motos, camiones</span>
                     </div>
                     <div class="rubro-card" data-rubro="CASA_REPUESTOS" data-section="principal" role="radio" tabindex="0">
                         <span class="rubro-badge" style="display:none">Principal</span>
                         <span class="rubro-card-icon">📦</span>
-                        <span class="rubro-card-label">Casa de Repuestos</span>
+                        <span class="rubro-card-label">{{ ui_labels.parts_store }}</span>
                         <span class="rubro-card-desc">Partes y repuestos</span>
                     </div>
                     <div class="rubro-card" data-rubro="DESARMADURIA" data-section="principal" role="radio" tabindex="0">
                         <span class="rubro-badge" style="display:none">Principal</span>
                         <span class="rubro-card-icon">🔩</span>
-                        <span class="rubro-card-label">Desarmaduría</span>
+                        <span class="rubro-card-label">{{ ui_labels.salvage_yard }}</span>
                         <span class="rubro-card-desc">Despiece, piezas usadas</span>
                     </div>
                     <div class="rubro-card" data-rubro="NEUMATICOS" data-section="principal" role="radio" tabindex="0">
@@ -377,19 +396,19 @@
                         <div class="rubro-card" data-rubro="TALLER_MECANICO" data-section="adicional" role="checkbox" tabindex="0">
                             <span class="rubro-badge badge-adicional" style="display:none">+</span>
                             <span class="rubro-card-icon">🔧</span>
-                            <span class="rubro-card-label">Taller Mecánico</span>
+                            <span class="rubro-card-label">{{ ui_labels.workshop }}</span>
                             <span class="rubro-card-desc">Autos, motos, camiones</span>
                         </div>
                         <div class="rubro-card" data-rubro="CASA_REPUESTOS" data-section="adicional" role="checkbox" tabindex="0">
                             <span class="rubro-badge badge-adicional" style="display:none">+</span>
                             <span class="rubro-card-icon">📦</span>
-                            <span class="rubro-card-label">Casa de Repuestos</span>
+                            <span class="rubro-card-label">{{ ui_labels.parts_store }}</span>
                             <span class="rubro-card-desc">Partes y repuestos</span>
                         </div>
                         <div class="rubro-card" data-rubro="DESARMADURIA" data-section="adicional" role="checkbox" tabindex="0">
                             <span class="rubro-badge badge-adicional" style="display:none">+</span>
                             <span class="rubro-card-icon">🔩</span>
-                            <span class="rubro-card-label">Desarmaduría</span>
+                            <span class="rubro-card-label">{{ ui_labels.salvage_yard }}</span>
                             <span class="rubro-card-desc">Despiece, piezas usadas</span>
                         </div>
                         <div class="rubro-card" data-rubro="NEUMATICOS" data-section="adicional" role="checkbox" tabindex="0">
