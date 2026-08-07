@@ -195,8 +195,18 @@ def get_ui_labels(country_code=None, language_code=None):
     if not country_code:
         country_code = DEFAULT_COUNTRY_CODE
 
-    country_code = country_code.upper()
-    language_code = (language_code or DEFAULT_LANGUAGE_CODE).lower()
+    country_code = str(country_code).strip().upper()
+    language_code = (
+        str(language_code or DEFAULT_LANGUAGE_CODE)
+        .strip()
+        .lower()
+        .replace("_", "-")
+    )
+
+    # Brasil usa pt-br en configuración Django,
+    # pero los labels internos usan pt.
+    if country_code == "BR" and language_code == "pt-br":
+        language_code = "pt"
 
     # Mapeo (país, idioma) -> diccionario
     mapping = {
