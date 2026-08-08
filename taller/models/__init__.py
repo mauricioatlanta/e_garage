@@ -52,6 +52,7 @@ from .vehiculo_financial import (
     VehiculoFinancialSnapshot,
     VehicleFinancialEvent,
 )
+from .smart_yard_global import SmartYardGlobalMetric
 from .vendedor_desarme import VendedorDesarme
 from .venta_desarme import VentaDesarme, LineaVentaDesarme
 
@@ -131,6 +132,7 @@ __all__ = [
     "CatalogoRepuestoEmpresa",
     "VehiculoFinancialSnapshot",
     "VehicleFinancialEvent",
+"SmartYardGlobalMetric",
     "VendedorDesarme",
     # Ubicación
     "Estado",
