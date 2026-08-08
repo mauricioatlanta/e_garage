@@ -1,3 +1,4 @@
+from datetime import timedelta
 from decimal import Decimal
 
 from django.db.models import F, Sum, Avg
@@ -13,6 +14,7 @@ from taller.models.pieza_desarme import (
     ESTADO_RESERVADA,
 )
 from taller.models.vehiculo_desarme import VehiculoDesarme
+from taller.models.vendedor_desarme import VendedorDesarme
 from .desarme_financial_service import (
     calcular_ingresos_vehiculo,
     calcular_inversion_total_vehiculo,
@@ -199,3 +201,126 @@ def top_roi_vehiculos(empresa, limit=10):
         scored.append({"vehiculo_id": v.id, "patente": v.patente, "roi": roi})
     scored.sort(key=lambda x: float(x.get("roi") or 0), reverse=True)
     return scored[:limit]
+
+
+# --- Fase 1: Reportes de negocio para el dueño de la desarmaduría ---
+
+
+def vehiculos_zombis(empresa, limit=10):
+    """
+    Vehículos con peor health_score: capital atrapado sin retorno.
+    Le dice al dueño cuáles vehículos le están perjudicando ahora mismo.
+    """
+    vehs = VehiculoDesarme.objects.filter(empresa=empresa, es_placeholder=False)
+    scored = []
+    for v in vehs:
+        score = health_score(v)
+        dead = inventario_muerto(v)
+        scored.append(
+            {
+                "vehiculo_id": v.id,
+                "patente": v.patente or v.vin or f"ID {v.id}",
+                "marca": v.get_marca_display(),
+                "modelo": v.get_modelo_display(),
+                "health_score": score,
+                "inventario_muerto": dead,
+            }
+        )
+    scored.sort(key=lambda x: x["health_score"] if x["health_score"] is not None else 0)
+    return scored[:limit]
+
+
+def inventario_muerto_total(empresa):
+    """
+    Valor contable total de piezas en estados no vendibles (DANADA, SCRAP, FALTANTE)
+    de toda la flota activa. Un solo número que representa capital perdido.
+    """
+    qs = PiezaDesarme.objects.filter(
+        vehiculo_desarme__empresa=empresa,
+        vehiculo_desarme__es_placeholder=False,
+        estado_pieza__in=[ESTADO_DANADA, ESTADO_SCRAP, ESTADO_FALTANTE],
+    )
+    agg = qs.aggregate(
+        valor=Sum(F("costo_asignado") * F("cantidad")),
+        piezas=Sum("cantidad"),
+    )
+    return {
+        "valor_total": Decimal(agg["valor"] or 0),
+        "piezas_count": int(agg["piezas"] or 0),
+    }
+
+
+def top_proveedores(empresa, limit=10):
+    """
+    Proveedores (VendedorDesarme) rankeados por ROI promedio de los vehículos
+    comprados a ellos. Le dice al dueño a quién comprarle más y a quién no.
+    """
+    proveedores = VendedorDesarme.objects.filter(empresa=empresa)
+    result = []
+    for prov in proveedores:
+        vehs = VehiculoDesarme.objects.filter(
+            empresa=empresa, vendedor_desarme=prov, es_placeholder=False
+        )
+        if not vehs.exists():
+            continue
+        total_ganancia = Decimal("0")
+        total_inversion = Decimal("0")
+        count = 0
+        for v in vehs:
+            total_ganancia += calcular_ganancia_vehiculo(v)
+            total_inversion += calcular_inversion_total_vehiculo(v)
+            count += 1
+        roi = (
+            (total_ganancia / total_inversion) * Decimal("100")
+            if total_inversion > 0
+            else Decimal("0")
+        )
+        result.append(
+            {
+                "proveedor_id": prov.id,
+                "nombre": prov.nombre,
+                "vehiculos_comprados": count,
+                "ganancia_total": total_ganancia,
+                "roi_promedio": roi,
+            }
+        )
+    result.sort(key=lambda x: float(x["roi_promedio"]), reverse=True)
+    return result[:limit]
+
+
+def aging_inventario(empresa):
+    """
+    Piezas DISPONIBLES agrupadas por antigüedad desde fecha_extraccion.
+    Identifica inventario estancado que ocupa espacio y capital.
+    """
+    today = timezone.now().date()
+    base_qs = PiezaDesarme.objects.filter(
+        vehiculo_desarme__empresa=empresa,
+        vehiculo_desarme__es_placeholder=False,
+        estado_pieza=ESTADO_DISPONIBLE,
+        activo=True,
+        fecha_extraccion__isnull=False,
+    )
+    buckets = [
+        ("0-30 días", today - timedelta(days=30), today),
+        ("30-90 días", today - timedelta(days=90), today - timedelta(days=31)),
+        ("90-180 días", today - timedelta(days=180), today - timedelta(days=91)),
+        ("180+ días", None, today - timedelta(days=181)),
+    ]
+    result = []
+    for label, fecha_min, fecha_max in buckets:
+        qs = base_qs.filter(fecha_extraccion__lte=fecha_max)
+        if fecha_min:
+            qs = qs.filter(fecha_extraccion__gte=fecha_min)
+        agg = qs.aggregate(
+            valor=Sum(F("costo_asignado") * F("cantidad")),
+            piezas=Sum("cantidad"),
+        )
+        result.append(
+            {
+                "bucket": label,
+                "valor": Decimal(agg["valor"] or 0),
+                "piezas": int(agg["piezas"] or 0),
+            }
+        )
+    return result

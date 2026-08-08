@@ -100,6 +100,10 @@
     <div class="rpt-kpi-value">{{ kpis.roi_pct|floatformat:1 }}%</div>
     <div class="rpt-kpi-label">ROI global</div>
   </div>
+  <div class="rpt-kpi" style="border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.08);">
+    <div class="rpt-kpi-value" style="color: #fca5a5;">${{ inventario_muerto.valor_total|floatformat:0|intcomma }}</div>
+    <div class="rpt-kpi-label">Inventario muerto ({{ inventario_muerto.piezas_count }} piezas)</div>
+  </div>
 </div>
 
 <div class="rpt-grid-2">
@@ -236,5 +240,73 @@
   </table>
 </div>
 {% endif %}
+
+<div class="rpt-grid-2">
+
+  {# ── Vehículos zombis ── #}
+  <div class="rpt-section">
+    <h3>🧟 Vehículos zombis (peor health score)</h3>
+    {% if vehiculos_zombis %}
+    <table class="rpt-table">
+      <thead>
+        <tr><th>Patente</th><th>Marca/Modelo</th><th>Score</th><th class="num">Inv. muerto</th></tr>
+      </thead>
+      <tbody>
+        {% for v in vehiculos_zombis %}
+        <tr>
+          <td>{{ v.patente }}</td>
+          <td>{{ v.marca }} {{ v.modelo }}</td>
+          <td class="{% if v.health_score < 40 %}pct{% endif %}" style="{% if v.health_score < 40 %}color:#f87171{% endif %}">{{ v.health_score|floatformat:0 }}</td>
+          <td class="num">${{ v.inventario_muerto|floatformat:0|intcomma }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="rpt-empty">Sin datos suficientes todavía.</div>
+    {% endif %}
+  </div>
+
+  {# ── Top proveedores ── #}
+  <div class="rpt-section">
+    <h3>🏭 Top proveedores por ROI</h3>
+    {% if top_proveedores %}
+    <table class="rpt-table">
+      <thead>
+        <tr><th>Proveedor</th><th class="num">Vehículos</th><th class="pct">ROI prom.</th></tr>
+      </thead>
+      <tbody>
+        {% for p in top_proveedores %}
+        <tr>
+          <td>{{ p.nombre }}</td>
+          <td class="num">{{ p.vehiculos_comprados }}</td>
+          <td class="pct">{{ p.roi_promedio|floatformat:1 }}%</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="rpt-empty">Sin proveedores registrados todavía.</div>
+    {% endif %}
+  </div>
+
+</div>
+
+{# ── Aging de inventario ── #}
+<div class="rpt-section">
+  <h3>⏳ Antigüedad del inventario disponible</h3>
+  {% if aging_inventario %}
+  <div class="rpt-kpi-grid">
+    {% for b in aging_inventario %}
+    <div class="rpt-kpi">
+      <div class="rpt-kpi-value">{{ b.piezas }}</div>
+      <div class="rpt-kpi-label">{{ b.bucket }} — ${{ b.valor|floatformat:0|intcomma }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="rpt-empty">Sin datos suficientes todavía.</div>
+  {% endif %}
+</div>
 
 {% endblock %}

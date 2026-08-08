@@ -2043,6 +2043,10 @@ def reportes_desarme(request):
         top_marcas,
         top_modelos,
         top_roi_vehiculos,
+        vehiculos_zombis,
+        inventario_muerto_total,
+        top_proveedores,
+        aging_inventario,
     )
 
     kpis = kpis_resumen(empresa)
@@ -2058,6 +2062,10 @@ def reportes_desarme(request):
             "top_marcas": top_marcas(empresa, limit=5),
             "top_modelos": top_modelos(empresa, limit=5),
             "top_roi": top_roi_vehiculos(empresa, limit=5),
+            "vehiculos_zombis": vehiculos_zombis(empresa, limit=10),
+            "inventario_muerto": inventario_muerto_total(empresa),
+            "top_proveedores": top_proveedores(empresa, limit=10),
+            "aging_inventario": aging_inventario(empresa),
         },
     )
 
