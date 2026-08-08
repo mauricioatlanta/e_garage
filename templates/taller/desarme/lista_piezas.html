@@ -179,9 +179,9 @@
     </select>
     <select name="vehiculo" class="text-sm min-w-[160px]">
       <option value="">{% trans "Todos los vehículos" %}</option>
-      {% for id, pat, vin in vehiculos_choices %}
-      <option value="{{ id }}" {% if vehiculo_filtro == id or vehiculo_filtro == id|stringformat:"s" %}selected{% endif %}>
-        {{ pat|default:vin|default:id }}
+      {% for vid, label in vehiculos_choices %}
+      <option value="{{ vid }}" {% if vehiculo_filtro == vid or vehiculo_filtro == vid|stringformat:"s" %}selected{% endif %}>
+        {{ label }}
       </option>
       {% endfor %}
     </select>

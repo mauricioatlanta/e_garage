@@ -869,11 +869,21 @@ def lista_piezas(request):
     if request.GET.get("sin_ubicacion") == "1":
         piezas = piezas.filter(ubicacion_fisica__isnull=True)
 
-    vehiculos_choices = list(
+    _vqs = (
         VehiculoDesarme.objects.filter(empresa=empresa)
+        .select_related("marca", "modelo")
         .order_by("patente", "vin")
-        .values_list("id", "patente", "vin")
     )
+    vehiculos_choices = []
+    for v in _vqs:
+        tag = v.patente or v.vin or str(v.id)
+        parts = []
+        if v.anio:
+            parts.append(str(v.anio))
+        parts.append(v.get_marca_display())
+        parts.append(v.get_modelo_display())
+        parts.append(tag)
+        vehiculos_choices.append((v.id, " · ".join(parts)))
     from taller.models.pieza_desarme import ESTADO_PIEZA_CHOICES
 
     return_to = request.GET.get("return_to", "").strip()
