@@ -312,6 +312,29 @@ class PiezaDesarme(TenantScoped):
     def __str__(self):
         return f"{self.nombre} ({self.codigo}) x{self.cantidad} — {self.vehiculo_desarme}"
 
+    @property
+    def nombre_sin_vehiculo(self):
+        """Nombre de la pieza sin el sufijo de marca/modelo/año del vehículo."""
+        name = (self.nombre or "").strip()
+        if not self.vehiculo_desarme_id:
+            return name
+        try:
+            v = self.vehiculo_desarme
+            marca = v.get_marca_display()
+            modelo = v.get_modelo_display()
+            anio = str(v.anio) if v.anio else ""
+            candidates = []
+            if anio:
+                candidates.append(f"{marca} {modelo} {anio}")
+                candidates.append(f"{marca} {modelo} ({anio})")
+            candidates.append(f"{marca} {modelo}")
+            for suffix in candidates:
+                if name.lower().endswith(suffix.lower()):
+                    return name[: -len(suffix)].strip()
+        except Exception:
+            pass
+        return name
+
 
 # Idiomas para nombres canónicos (alineado con servicios)
 PIEZA_DESARME_LANGUAGE_CHOICES = [

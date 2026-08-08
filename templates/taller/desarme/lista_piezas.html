@@ -202,7 +202,7 @@
       <span class="font-mono text-cyan-300 font-semibold">{{ p.codigo }}</span>
       <span class="badge-estado badge-{{ p.estado_pieza }}">{{ p.get_estado_pieza_display|default:p.estado_pieza }}</span>
     </div>
-    <p class="text-white text-sm mb-1">{{ p.nombre }}</p>
+    <p class="text-white text-sm mb-1">{{ p.nombre_sin_vehiculo }}</p>
     <p class="text-cyan-400 font-semibold text-sm mb-1">
       {% if p.precio_venta_sugerido %}
         {% if request.path|slice:':4' == '/us/' %}${{ p.precio_venta_sugerido|floatformat:2|intcomma }}{% else %}${{ p.precio_venta_sugerido|add_thousands_separator }}{% endif %}
