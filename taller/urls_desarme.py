@@ -30,6 +30,7 @@ def _desarme_fallback_unavailable(request):
 
 try:
     from taller.desarme import views
+    from taller.desarme import views_pdf
     from taller.desarme import views_venta
     from taller.desarme.views_inventario import (
         confirmar_venta_desde_inventario,
@@ -101,6 +102,7 @@ try:
             "api/piezas/bulk-precio/", views.api_piezas_bulk_precio, name="api_piezas_bulk_precio"
         ),
         path("piezas/", views.lista_piezas, name="lista_piezas"),
+        path("piezas/reporte-pdf/", views_pdf.piezas_reporte_pdf, name="piezas_reporte_pdf"),
         path("piezas/crear/", views.crear_pieza, name="crear_pieza"),
         path("piezas/nueva-suelta/", views.crear_pieza_suelta, name="crear_pieza_suelta"),
         path("piezas/<int:pk>/editar/", views.editar_pieza, name="editar_pieza"),

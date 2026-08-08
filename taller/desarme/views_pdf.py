@@ -1,6 +1,7 @@
 # PDF Recibo/Invoice, panel impresión, enlace público, WhatsApp y email.
 
 import base64
+from decimal import Decimal
 from io import BytesIO
 from pathlib import Path
 from urllib.parse import quote
@@ -386,3 +387,61 @@ def enviar_documento_email(request, documento_id):
 
     messages.success(request, f"{label} enviado por email a {destino}.")
     return redirect("documentos:imprimir_documento", documento_id=documento.id)
+
+
+@login_required
+def piezas_reporte_pdf(request):
+    """
+    PDF del listado de piezas de desarme con los mismos filtros activos en pantalla.
+    Reutiliza _filtrar_piezas() de views.py para garantizar que el PDF muestre
+    exactamente lo que el usuario ve filtrado en lista_piezas.
+    """
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+
+    from .views import _filtrar_piezas
+
+    piezas = _filtrar_piezas(request, empresa)
+
+    total_piezas = 0
+    valor_costo_total = Decimal("0")
+    valor_sugerido_total = Decimal("0")
+    for p in piezas:
+        cantidad = p.cantidad or 0
+        total_piezas += cantidad
+        valor_costo_total += Decimal(p.costo_asignado or 0) * cantidad
+        precio = p.precio_sugerido or p.precio_venta_sugerido or 0
+        valor_sugerido_total += Decimal(precio) * cantidad
+
+    context = {
+        "empresa": empresa,
+        "piezas": piezas,
+        "total_piezas": total_piezas,
+        "valor_costo_total": valor_costo_total,
+        "valor_sugerido_total": valor_sugerido_total,
+        "generated_at": _generated_at(),
+        "filtros_aplicados": {
+            "q": request.GET.get("q", ""),
+            "estado": request.GET.get("estado", ""),
+            "condicion": request.GET.get("condicion", ""),
+            "zona": request.GET.get("zona", ""),
+            "fecha_desde": request.GET.get("fecha_desde", ""),
+            "fecha_hasta": request.GET.get("fecha_hasta", ""),
+        },
+        "logo_url": _get_logo_url(request, empresa),
+    }
+
+    html_string = render_to_string(
+        "taller/desarme/pdf/reporte_piezas_pdf.html", context, request=request
+    )
+    pdf_bytes = HTML(
+        string=html_string, base_url=request.build_absolute_uri("/")
+    ).write_pdf()
+
+    response = HttpResponse(pdf_bytes, content_type="application/pdf")
+    fecha_str = timezone.now().strftime("%Y%m%d_%H%M")
+    response["Content-Disposition"] = (
+        f'inline; filename="reporte_piezas_desarme_{fecha_str}.pdf"'
+    )
+    return response

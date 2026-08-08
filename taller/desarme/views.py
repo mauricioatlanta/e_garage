@@ -4,7 +4,7 @@ import json
 import logging
 import re
 import uuid as _uuid
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from datetime import timedelta
 from urllib.parse import urlencode
 
@@ -823,16 +823,21 @@ def editar_vehiculo(request, pk):
     )
 
 
-@login_required
-def lista_piezas(request):
-    """Listado de piezas con búsqueda por código/nombre y filtros por estado y vehículo."""
-    empresa = _empresa_or_redirect(request)
-    if not empresa:
-        return redirect("/")
-
+def _filtrar_piezas(request, empresa):
+    """
+    Filtra el queryset de PiezaDesarme según los parámetros GET.
+    Compartida entre lista_piezas() (HTML) y piezas_reporte_pdf() (PDF)
+    para que ambos apliquen exactamente los mismos filtros — nunca deben
+    divergir o el PDF mostrará datos distintos a lo que el usuario ve en pantalla.
+    """
     piezas = (
         PiezaDesarme.objects.filter(empresa=empresa)
-        .select_related("vehiculo_desarme", "vehiculo_desarme__marca", "vehiculo_desarme__modelo")
+        .select_related(
+            "vehiculo_desarme",
+            "vehiculo_desarme__marca",
+            "vehiculo_desarme__modelo",
+            "vehiculo_desarme__vendedor_desarme",
+        )
         .order_by("vehiculo_desarme__patente", "codigo")
     )
 
@@ -869,6 +874,54 @@ def lista_piezas(request):
     if request.GET.get("sin_ubicacion") == "1":
         piezas = piezas.filter(ubicacion_fisica__isnull=True)
 
+    # --- Filtros nuevos Fase 2 ---
+    condicion = request.GET.get("condicion", "").strip()
+    if condicion:
+        piezas = piezas.filter(condicion=condicion)
+
+    zona = request.GET.get("zona", "").strip()
+    if zona:
+        piezas = piezas.filter(zona__icontains=zona)
+
+    fecha_desde = request.GET.get("fecha_desde", "").strip()
+    if fecha_desde:
+        piezas = piezas.filter(fecha_extraccion__gte=fecha_desde)
+
+    fecha_hasta = request.GET.get("fecha_hasta", "").strip()
+    if fecha_hasta:
+        piezas = piezas.filter(fecha_extraccion__lte=fecha_hasta)
+
+    costo_min = request.GET.get("costo_min", "").strip()
+    if costo_min:
+        try:
+            piezas = piezas.filter(costo_asignado__gte=Decimal(costo_min))
+        except (InvalidOperation, ValueError):
+            pass
+
+    costo_max = request.GET.get("costo_max", "").strip()
+    if costo_max:
+        try:
+            piezas = piezas.filter(costo_asignado__lte=Decimal(costo_max))
+        except (InvalidOperation, ValueError):
+            pass
+
+    proveedor_id = request.GET.get("proveedor", "").strip()
+    if proveedor_id:
+        piezas = piezas.filter(vehiculo_desarme__vendedor_desarme_id=proveedor_id)
+
+    return piezas
+
+
+@login_required
+def lista_piezas(request):
+    """Listado de piezas con búsqueda y filtros combinables por estado,
+    condición, zona, rango de fecha de extracción, rango de costo y proveedor."""
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+
+    piezas = _filtrar_piezas(request, empresa)
+
     _vqs = (
         VehiculoDesarme.objects.filter(empresa=empresa)
         .select_related("marca", "modelo")
@@ -884,7 +937,15 @@ def lista_piezas(request):
         parts.append(v.get_modelo_display())
         parts.append(tag)
         vehiculos_choices.append((v.id, " · ".join(parts)))
-    from taller.models.pieza_desarme import ESTADO_PIEZA_CHOICES
+
+    from taller.models.pieza_desarme import ESTADO_PIEZA_CHOICES, CONDICION_CHOICES
+    from taller.models.vendedor_desarme import VendedorDesarme
+
+    proveedores_choices = list(
+        VendedorDesarme.objects.filter(empresa=empresa)
+        .order_by("nombre")
+        .values_list("id", "nombre")
+    )
 
     return_to = request.GET.get("return_to", "").strip()
     select_field = request.GET.get("select_field", "").strip()
@@ -895,13 +956,23 @@ def lista_piezas(request):
         {
             "piezas": piezas,
             "empresa": empresa,
-            "q": q,
-            "estado_filtro": estado,
-            "vehiculo_filtro": vehiculo_id,
+            "q": request.GET.get("q", "").strip(),
+            "estado_filtro": request.GET.get("estado", "").strip(),
+            "vehiculo_filtro": request.GET.get("vehiculo", "").strip(),
             "vehiculos_choices": vehiculos_choices,
             "estado_pieza_choices": ESTADO_PIEZA_CHOICES,
+            "condicion_choices": CONDICION_CHOICES,
+            "condicion_filtro": request.GET.get("condicion", "").strip(),
+            "zona_filtro": request.GET.get("zona", "").strip(),
+            "fecha_desde_filtro": request.GET.get("fecha_desde", "").strip(),
+            "fecha_hasta_filtro": request.GET.get("fecha_hasta", "").strip(),
+            "costo_min_filtro": request.GET.get("costo_min", "").strip(),
+            "costo_max_filtro": request.GET.get("costo_max", "").strip(),
+            "proveedor_filtro": request.GET.get("proveedor", "").strip(),
+            "proveedores_choices": proveedores_choices,
             "return_to": return_to,
             "select_field": select_field,
+            "querystring": request.GET.urlencode(),
         },
     )
 

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: letter; margin: 1.5cm; }
+  body { font-family: 'Helvetica', Arial, sans-serif; color: #1e293b; font-size: 10pt; }
+  .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1e293b; padding-bottom: 10px; margin-bottom: 16px; }
+  .header img { max-height: 50px; }
+  .header h1 { font-size: 16pt; margin: 0; }
+  .header .meta { font-size: 8pt; color: #64748b; text-align: right; }
+  .filtros { font-size: 8pt; color: #64748b; margin-bottom: 12px; }
+  .kpis { display: flex; gap: 12px; margin-bottom: 16px; }
+  .kpi { flex: 1; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; text-align: center; }
+  .kpi .value { font-size: 13pt; font-weight: 700; }
+  .kpi .label { font-size: 7pt; text-transform: uppercase; color: #64748b; }
+  table { width: 100%; border-collapse: collapse; font-size: 8pt; }
+  th { background: #1e293b; color: white; text-align: left; padding: 5px 6px; }
+  td { padding: 4px 6px; border-bottom: 1px solid #e2e8f0; }
+  tr:nth-child(even) { background: #f8fafc; }
+  .num { text-align: right; }
+  .footer { margin-top: 16px; font-size: 7pt; color: #94a3b8; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      {% if logo_url %}<img src="{{ logo_url }}" alt="Logo">{% endif %}
+      <h1>Reporte de Inventario — Desarme</h1>
+    </div>
+    <div class="meta">
+      {{ empresa.nombre_taller|default:empresa.empresa }}<br>
+      Generado el {{ generated_at|date:"d/m/Y H:i" }}
+    </div>
+  </div>
+
+  <div class="filtros">
+    {% if filtros_aplicados.q %}Búsqueda: "{{ filtros_aplicados.q }}" &middot; {% endif %}
+    {% if filtros_aplicados.estado %}Estado: {{ filtros_aplicados.estado }} &middot; {% endif %}
+    {% if filtros_aplicados.condicion %}Condición: {{ filtros_aplicados.condicion }} &middot; {% endif %}
+    {% if filtros_aplicados.zona %}Zona: {{ filtros_aplicados.zona }} &middot; {% endif %}
+    {% if filtros_aplicados.fecha_desde or filtros_aplicados.fecha_hasta %}
+      Extracción: {{ filtros_aplicados.fecha_desde|default:"—" }} a {{ filtros_aplicados.fecha_hasta|default:"—" }}
+    {% endif %}
+  </div>
+
+  <div class="kpis">
+    <div class="kpi">
+      <div class="value">{{ total_piezas }}</div>
+      <div class="label">Piezas (con filtros)</div>
+    </div>
+    <div class="kpi">
+      <div class="value">${{ valor_costo_total|floatformat:0 }}</div>
+      <div class="label">Valor costo</div>
+    </div>
+    <div class="kpi">
+      <div class="value">${{ valor_sugerido_total|floatformat:0 }}</div>
+      <div class="label">Valor venta sugerido</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Pieza</th>
+        <th>Vehículo</th>
+        <th>Estado</th>
+        <th>Condición</th>
+        <th>Zona</th>
+        <th class="num">Cant.</th>
+        <th class="num">Costo</th>
+        <th class="num">P. sugerido</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in piezas %}
+      <tr>
+        <td>{{ p.codigo }}</td>
+        <td>{{ p.nombre }}</td>
+        <td>{{ p.vehiculo_desarme.patente|default:p.vehiculo_desarme.vin }}</td>
+        <td>{{ p.get_estado_pieza_display }}</td>
+        <td>{{ p.get_condicion_display }}</td>
+        <td>{{ p.zona|default:"—" }}</td>
+        <td class="num">{{ p.cantidad }}</td>
+        <td class="num">${{ p.costo_asignado|floatformat:0 }}</td>
+        <td class="num">${{ p.precio_sugerido|default:p.precio_venta_sugerido|default:0|floatformat:0 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="footer">eGarage — Reporte generado automáticamente</div>
+</body>
+</html>
