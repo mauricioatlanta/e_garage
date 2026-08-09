@@ -7,7 +7,7 @@ class DocumentSequence(models.Model):
     """Modelo para manejar secuencias de documentos por empresa y tipo"""
 
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
-    tipo = models.CharField(max_length=3)  # 'OT','FAC','PRES'
+    tipo = models.CharField(max_length=4)  # 'OT','FAC','PRES'
     current = models.PositiveIntegerField(default=0)
 
     class Meta:
