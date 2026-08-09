@@ -22,6 +22,7 @@
   <nav class="eg-nav">
     {% if nav_items %}
       {% for item in nav_items %}
+      {% ifchanged item.section_label %}{% if item.section_label %}<div class="eg-nav-section">{{ item.section_label }}</div>{% endif %}{% endifchanged %}
       <a href="{{ item.url }}"{% if item.is_active %} class="is-active"{% endif %}>
         <i class="{{ item.icon }}"></i>
         {{ item.label }}

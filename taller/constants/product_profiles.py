@@ -86,7 +86,7 @@ PRODUCT_PROFILES = {
         "tagline":       "Control total de tu desarmaduría",
         "icon":          "fas fa-car-crash",
         "color_class":   "orange",
-        "default_rubro": "MIXED",
+        "default_rubro": "DESARMADURIA",
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",               "icon": "fas fa-home"},
             {"key": MOD_DESARME,       "label": "Vehículos de Desarme", "icon": "fas fa-car-crash"},
@@ -98,7 +98,7 @@ PRODUCT_PROFILES = {
         ],
         "kpi_labels": ["Vehículos disponibles", "Valor inventario", "Piezas vendidas hoy", "Vehículos sin movimiento"],
         "quick_access": [
-            {"label": "Ingresar Vehículo", "icon": "fas fa-plus-circle",   "path": "desarme/crear/"},
+            {"label": "Ingresar Vehículo", "icon": "fas fa-plus-circle",   "path": "desarme/vehiculos/crear/"},
             {"label": "Registrar Venta",   "icon": "fas fa-shopping-cart", "path": "documentos/form/"},
             {"label": "Ver Inventario",    "icon": "fas fa-boxes",         "path": "repuestos/"},
         ],
@@ -121,7 +121,7 @@ PRODUCT_PROFILES = {
         "kpi_labels": ["Ventas hoy", "Productos críticos", "Rotación", "Clientes frecuentes"],
         "quick_access": [
             {"label": "Nueva Venta",      "icon": "fas fa-shopping-cart", "path": "documentos/form/"},
-            {"label": "Agregar Repuesto", "icon": "fas fa-plus",          "path": "repuestos/nuevo/"},
+            {"label": "Agregar Repuesto", "icon": "fas fa-plus",          "path": "repuestos/crear/"},
             {"label": "Ver Inventario",   "icon": "fas fa-boxes",         "path": "repuestos/"},
         ],
     },

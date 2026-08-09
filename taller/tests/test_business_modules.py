@@ -423,3 +423,50 @@ class ProductProfileTests(TestCase):
                 PRODUCT_PROFILES,
                 f"Producto '{product_key}' no existe en PRODUCT_PROFILES",
             )
+
+
+# ---------------------------------------------------------------------------
+# DESARMADURIA single-rubro module activation
+# Phase 1 target: add "DESARMADURIA": frozenset({MOD_DESARME, MOD_REPUESTOS})
+#                 to MODULES_BY_RUBRO in business_modules.py
+# ---------------------------------------------------------------------------
+
+class DesarmaduriaSingleRubroModuleTests(TestCase):
+    """
+    DESARMADURIA pura (rubro_principal="DESARMADURIA", rubros=[]) debe activar
+    MOD_DESARME y MOD_REPUESTOS pero NO MOD_VEHICULOS ni MOD_SERVICIOS.
+
+    BUG: MODULES_BY_RUBRO no tiene entrada "DESARMADURIA".
+    test_desarmaduria_activa_mod_desarme y test_desarmaduria_activa_mod_repuestos
+    fallan hasta que se corrija (Phase 1).
+    """
+
+    def setUp(self):
+        from taller.tests.factories import EmpresaFactory
+        self.empresa = EmpresaFactory(nombre_taller="Desarmaduria Test", pais="CL")
+        self.config, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=self.empresa)
+        self.config.rubro_principal = "DESARMADURIA"
+        self.config.rubros = []
+        self.config.usa_vehiculos = True
+        self.config.usa_servicios = True
+
+    def test_desarmaduria_activa_mod_desarme(self):
+        active = BusinessModuleService.get_active_modules(self.config)
+        self.assertIn(MOD_DESARME, active)
+
+    def test_desarmaduria_activa_mod_repuestos(self):
+        active = BusinessModuleService.get_active_modules(self.config)
+        self.assertIn(MOD_REPUESTOS, active)
+
+    def test_desarmaduria_no_activa_mod_vehiculos(self):
+        active = BusinessModuleService.get_active_modules(self.config)
+        self.assertNotIn(MOD_VEHICULOS, active)
+
+    def test_desarmaduria_no_activa_mod_servicios(self):
+        active = BusinessModuleService.get_active_modules(self.config)
+        self.assertNotIn(MOD_SERVICIOS, active)
+
+    def test_desarmaduria_activa_always_on(self):
+        from taller.constants.business_modules import ALWAYS_ON
+        active = BusinessModuleService.get_active_modules(self.config)
+        self.assertTrue(ALWAYS_ON.issubset(active))

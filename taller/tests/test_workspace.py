@@ -1795,3 +1795,220 @@ class BriefingPrivacyTests(TestCase):
         from taller.services.workspace_briefing_service import BriefingAIProvider
         system, _ = BriefingAIProvider._build_prompt(self._ctx())
         self.assertNotIn("9999", system)
+
+
+# ---------------------------------------------------------------------------
+# Helper for multi-rubro tests — wires get_effective_rubros() correctly
+# ---------------------------------------------------------------------------
+
+def _make_effective_config(rubro_principal, rubros_adicionales=None, usa_vehiculos=True, usa_servicios=True):
+    """MagicMock config with get_effective_rubros() properly returning the full rubro list."""
+    cfg = MagicMock()
+    cfg.rubro_principal = rubro_principal
+    cfg.usa_vehiculos = usa_vehiculos
+    cfg.usa_servicios = usa_servicios
+    extra = rubros_adicionales or []
+    cfg.rubros = extra
+    all_rubros = [rubro_principal] + [r for r in extra if r != rubro_principal]
+    cfg.get_effective_rubros.return_value = all_rubros
+    return cfg
+
+
+# ---------------------------------------------------------------------------
+# 7. DESARMADURIA single-rubro nav tests
+# Phase 1 target: MODULES_BY_RUBRO["DESARMADURIA"] = frozenset({MOD_DESARME, MOD_REPUESTOS})
+# Phase 3 target: WorkspaceNavDef.path used in _resolve_nav
+# ---------------------------------------------------------------------------
+
+class DesarmaduriaSingleRubroNavTests(TestCase):
+    """
+    DESARMADURIA pura debe mostrar nav específico de desarme con rutas correctas.
+
+    test_desarmaduria_nav_includes_mod_desarme: falla hasta Phase 1.
+    test_desarmaduria_nav_repuestos_url_is_piezas: falla hasta Phase 3.
+    test_desarmaduria_nav_documentos_url_has_tipo_pts: falla hasta Phase 3.
+    test_desarmaduria_nav_repuestos_nav_key_is_desarm_parts: falla hasta Phase 2+3.
+    """
+
+    def setUp(self):
+        self.config = _make_effective_config("DESARMADURIA")
+
+    def test_desarmaduria_nav_includes_mod_desarme(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        keys = [item["key"] for item in ws["nav"]]
+        self.assertIn(MOD_DESARME, keys)
+
+    def test_desarmaduria_nav_repuestos_url_is_piezas(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        repuestos_item = next((i for i in ws["nav"] if i["key"] == MOD_REPUESTOS), None)
+        self.assertIsNotNone(repuestos_item, "MOD_REPUESTOS debe aparecer en nav de DESARMADURIA")
+        self.assertIn("desarme/piezas", repuestos_item["url"])
+
+    def test_desarmaduria_nav_documentos_url_has_tipo_pts(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        docs_item = next((i for i in ws["nav"] if i["key"] == MOD_DOCUMENTOS), None)
+        self.assertIsNotNone(docs_item)
+        self.assertIn("tipo=PTS", docs_item["url"])
+
+    def test_desarmaduria_nav_repuestos_nav_key_is_desarm_parts(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        repuestos_item = next((i for i in ws["nav"] if i["key"] == MOD_REPUESTOS), None)
+        self.assertIsNotNone(repuestos_item)
+        self.assertEqual(repuestos_item.get("nav_key"), "desarm_parts")
+
+    def test_desarmaduria_nav_excludes_mod_vehiculos(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        keys = [item["key"] for item in ws["nav"]]
+        self.assertNotIn(MOD_VEHICULOS, keys)
+
+    def test_desarmaduria_single_rubro_no_section_labels(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        sections = [i.get("section_label") for i in ws["nav"] if i.get("section_label")]
+        self.assertEqual(sections, [])
+
+
+# ---------------------------------------------------------------------------
+# 8. nav_key / module_key / section fields (all three active workspaces)
+# Phase 2+3 target: _resolve_nav emits nav_key, module_key, section, section_label
+# ---------------------------------------------------------------------------
+
+class WorkshopNavKeyTests(TestCase):
+    """
+    Todos los items del nav deben incluir nav_key, module_key, section, section_label.
+    item['key'] debe seguir siendo module_key (backward compat).
+
+    Fallan hasta Phase 2+3.
+    """
+
+    def setUp(self):
+        self.config = _make_effective_config("WORKSHOP")
+
+    def test_nav_items_have_nav_key_field(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        for item in ws["nav"]:
+            self.assertIn("nav_key", item, f"Item {item.get('key')} sin campo nav_key")
+
+    def test_nav_items_have_module_key_field(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        for item in ws["nav"]:
+            self.assertIn("module_key", item, f"Item {item.get('key')} sin campo module_key")
+
+    def test_key_equals_module_key_backward_compat(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        for item in ws["nav"]:
+            self.assertEqual(
+                item["key"], item["module_key"],
+                f"key != module_key para nav_key={item.get('nav_key')} — rompe backward compat",
+            )
+
+    def test_nav_items_have_section_field(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        for item in ws["nav"]:
+            self.assertIn("section", item, f"Item {item.get('key')} sin campo section")
+
+    def test_nav_items_have_section_label_field(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        for item in ws["nav"]:
+            self.assertIn("section_label", item, f"Item {item.get('key')} sin campo section_label")
+
+    def test_taller_parts_nav_key(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        parts_item = next((i for i in ws["nav"] if i["key"] == MOD_REPUESTOS), None)
+        self.assertIsNotNone(parts_item)
+        self.assertEqual(parts_item.get("nav_key"), "taller_parts")
+
+
+class PartsSingleRubroNavKeyTests(TestCase):
+    """
+    PARTS (CASA_REPUESTOS) debe usar nav_key 'parts_inventory' para MOD_REPUESTOS
+    y URL de documentos con ?tipo=PTS.
+
+    Fallan hasta Phase 2+3.
+    """
+
+    def setUp(self):
+        self.config = _make_effective_config("PARTS")
+
+    def test_parts_inventory_nav_key(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        repuestos_item = next((i for i in ws["nav"] if i["key"] == MOD_REPUESTOS), None)
+        self.assertIsNotNone(repuestos_item)
+        self.assertEqual(repuestos_item.get("nav_key"), "parts_inventory")
+
+    def test_parts_ventas_url_has_tipo_pts(self):
+        ws = WorkspaceService.resolve(self.config, "/cl/es", "")
+        docs_item = next((i for i in ws["nav"] if i["key"] == MOD_DOCUMENTOS), None)
+        self.assertIsNotNone(docs_item)
+        self.assertIn("tipo=PTS", docs_item["url"])
+
+
+# ---------------------------------------------------------------------------
+# 9. Multi-rubro grouped nav tests
+# Phase 5 target: _resolve_nav implementa lógica de grupos
+# ---------------------------------------------------------------------------
+
+class MultiRubroNavGroupTests(TestCase):
+    """
+    Navegación multi-rubro: rubro_principal = identidad, adicionales = secciones extra.
+    Deduplicación por nav_key (NO por module_key).
+    MOD_REPUESTOS puede aparecer dos veces con nav_keys distintos si apunta a URLs distintas.
+    ALWAYS_ON nunca se duplica.
+
+    Todos fallan hasta Phase 5.
+    """
+
+    def _nav(self, rubro_principal, rubros_adicionales):
+        config = _make_effective_config(rubro_principal, rubros_adicionales)
+        ws = WorkspaceService.resolve(config, "/cl/es", "")
+        return ws["nav"]
+
+    def test_workshop_plus_desarmaduria_has_section_labels(self):
+        nav = self._nav("WORKSHOP", ["DESARMADURIA"])
+        sections = [i.get("section_label") for i in nav if i.get("section_label")]
+        self.assertGreater(len(sections), 0,
+                           "Se esperan section_labels en nav multi-rubro WORKSHOP+DESARMADURIA")
+
+    def test_workshop_plus_desarmaduria_mod_repuestos_appears_twice(self):
+        nav = self._nav("WORKSHOP", ["DESARMADURIA"])
+        repuestos_items = [i for i in nav if i["key"] == MOD_REPUESTOS]
+        self.assertEqual(len(repuestos_items), 2,
+                         "MOD_REPUESTOS debe aparecer dos veces: taller_parts + desarm_parts")
+        nav_keys = {i.get("nav_key") for i in repuestos_items}
+        self.assertIn("taller_parts", nav_keys)
+        self.assertIn("desarm_parts", nav_keys)
+
+    def test_workshop_plus_desarmaduria_always_on_not_duplicated(self):
+        from taller.constants.business_modules import ALWAYS_ON
+        nav = self._nav("WORKSHOP", ["DESARMADURIA"])
+        for mod in ALWAYS_ON:
+            count = sum(1 for i in nav if i["key"] == mod)
+            self.assertLessEqual(count, 1,
+                                 f"{mod} aparece {count} veces — ALWAYS_ON no debe duplicarse")
+
+    def test_desarmaduria_plus_workshop_primary_has_desarm_home(self):
+        nav = self._nav("DESARMADURIA", ["WORKSHOP"])
+        primary_items = [i for i in nav if i.get("section") == "primary"]
+        primary_nav_keys = [i.get("nav_key") for i in primary_items]
+        self.assertIn("desarm_home", primary_nav_keys,
+                      f"Sección primary debe contener desarm_home. Obtenido: {primary_nav_keys}")
+
+    def test_desarmaduria_plus_workshop_secondary_has_taller_items(self):
+        nav = self._nav("DESARMADURIA", ["WORKSHOP"])
+        secondary_items = [i for i in nav if i.get("section") == "secondary"]
+        self.assertGreater(len(secondary_items), 0,
+                           "Se esperan items en sección secundaria para rubro WORKSHOP")
+        secondary_nav_keys = {i.get("nav_key") for i in secondary_items}
+        taller_specific = {"taller_parts", "taller_services", "taller_vehicles", "taller_fleet"}
+        self.assertTrue(
+            secondary_nav_keys & taller_specific,
+            f"Se esperan nav_keys de taller en sección secundaria. Obtenido: {secondary_nav_keys}",
+        )
+
+    def test_parts_plus_workshop_repuestos_appears_twice(self):
+        nav = self._nav("PARTS", ["WORKSHOP"])
+        repuestos_items = [i for i in nav if i["key"] == MOD_REPUESTOS]
+        self.assertGreaterEqual(len(repuestos_items), 2,
+                                "PARTS+WORKSHOP debe tener al menos 2 entradas MOD_REPUESTOS")
+        nav_keys = {i.get("nav_key") for i in repuestos_items}
+        self.assertIn("parts_inventory", nav_keys)
+        self.assertIn("taller_parts", nav_keys)

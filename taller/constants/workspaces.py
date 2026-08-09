@@ -67,6 +67,8 @@ class WorkspaceNavDef:
     module_key: str  # MOD_* constant from business_modules
     term_key: str    # terminology key → label shown in sidebar
     icon: str        # FontAwesome class
+    nav_key: str = ""  # unique visual identifier (e.g. "taller_parts", "desarm_parts"); defaults to module_key
+    path: str = ""     # URL path suffix override; empty → falls back to NAV_ITEMS[module_key]['path']
 
 
 @dataclass(frozen=True)
@@ -249,15 +251,15 @@ WORKSPACE_TALLER = WorkspaceDef(
         color_class="cyan",
     ),
     nav=(
-        WorkspaceNavDef(MOD_INICIO,        "workspace.taller.nav.home",      "fas fa-home"),
-        WorkspaceNavDef(MOD_DOCUMENTOS,    "workspace.taller.nav.documents", "fas fa-file-invoice"),
-        WorkspaceNavDef(MOD_VEHICULOS,     "workspace.taller.nav.vehicles",  "fas fa-car"),
-        WorkspaceNavDef(MOD_CLIENTES,      "workspace.taller.nav.clients",   "fas fa-users"),
-        WorkspaceNavDef(MOD_SERVICIOS,     "workspace.taller.nav.services",  "fas fa-tools"),
-        WorkspaceNavDef(MOD_REPUESTOS,     "workspace.taller.nav.parts",     "fas fa-cogs"),
-        WorkspaceNavDef(MOD_FLOTA,         "workspace.taller.nav.fleet",     "fas fa-truck"),
-        WorkspaceNavDef(MOD_REPORTES,      "workspace.taller.nav.reports",   "fas fa-chart-bar"),
-        WorkspaceNavDef(MOD_CONFIGURACION, "workspace.taller.nav.settings",  "fas fa-cog"),
+        WorkspaceNavDef(MOD_INICIO,        "workspace.taller.nav.home",      "fas fa-home",         nav_key="taller_home",    path="dashboard/"),
+        WorkspaceNavDef(MOD_DOCUMENTOS,    "workspace.taller.nav.documents", "fas fa-file-invoice", nav_key="taller_docs",    path="documentos/"),
+        WorkspaceNavDef(MOD_VEHICULOS,     "workspace.taller.nav.vehicles",  "fas fa-car",          nav_key="taller_vehicles",path="vehiculos/"),
+        WorkspaceNavDef(MOD_CLIENTES,      "workspace.taller.nav.clients",   "fas fa-users",        nav_key="taller_clients", path="clientes/"),
+        WorkspaceNavDef(MOD_SERVICIOS,     "workspace.taller.nav.services",  "fas fa-tools",        nav_key="taller_services",path="servicios/"),
+        WorkspaceNavDef(MOD_REPUESTOS,     "workspace.taller.nav.parts",     "fas fa-cogs",         nav_key="taller_parts",   path="repuestos/"),
+        WorkspaceNavDef(MOD_FLOTA,         "workspace.taller.nav.fleet",     "fas fa-truck",        nav_key="taller_fleet",   path="flota/"),
+        WorkspaceNavDef(MOD_REPORTES,      "workspace.taller.nav.reports",   "fas fa-chart-bar",    nav_key="taller_reports", path="reportes/"),
+        WorkspaceNavDef(MOD_CONFIGURACION, "workspace.taller.nav.settings",  "fas fa-cog",          nav_key="taller_config",  path="settings/"),
     ),
     widget_keys=(
         WGT_KPI_OT_OPEN,
@@ -292,13 +294,13 @@ WORKSPACE_DESARMADURIA = WorkspaceDef(
         color_class="orange",
     ),
     nav=(
-        WorkspaceNavDef(MOD_INICIO,        "workspace.desarm.nav.home",      "fas fa-home"),
-        WorkspaceNavDef(MOD_DESARME,       "workspace.desarm.nav.vehicles",  "fas fa-car-crash"),
-        WorkspaceNavDef(MOD_REPUESTOS,     "workspace.desarm.nav.parts",     "fas fa-boxes"),
-        WorkspaceNavDef(MOD_DOCUMENTOS,    "workspace.desarm.nav.documents", "fas fa-shopping-cart"),
-        WorkspaceNavDef(MOD_CLIENTES,      "workspace.desarm.nav.clients",   "fas fa-users"),
-        WorkspaceNavDef(MOD_REPORTES,      "workspace.desarm.nav.reports",   "fas fa-chart-bar"),
-        WorkspaceNavDef(MOD_CONFIGURACION, "workspace.desarm.nav.settings",  "fas fa-cog"),
+        WorkspaceNavDef(MOD_INICIO,        "workspace.desarm.nav.home",      "fas fa-home",         nav_key="desarm_home",    path="dashboard/"),
+        WorkspaceNavDef(MOD_DESARME,       "workspace.desarm.nav.vehicles",  "fas fa-car-crash",    nav_key="desarm_vehicles",path="desarme/vehiculos/"),
+        WorkspaceNavDef(MOD_REPUESTOS,     "workspace.desarm.nav.parts",     "fas fa-boxes",        nav_key="desarm_parts",   path="desarme/piezas/"),
+        WorkspaceNavDef(MOD_DOCUMENTOS,    "workspace.desarm.nav.documents", "fas fa-shopping-cart",nav_key="desarm_sales",   path="documentos/?tipo=PTS"),
+        WorkspaceNavDef(MOD_CLIENTES,      "workspace.desarm.nav.clients",   "fas fa-users",        nav_key="desarm_clients", path="clientes/"),
+        WorkspaceNavDef(MOD_REPORTES,      "workspace.desarm.nav.reports",   "fas fa-chart-bar",    nav_key="desarm_reports", path="reportes/"),
+        WorkspaceNavDef(MOD_CONFIGURACION, "workspace.desarm.nav.settings",  "fas fa-cog",          nav_key="desarm_config",  path="settings/"),
     ),
     widget_keys=(
         WGT_KPI_DESARM_AVAIL,
@@ -307,7 +309,7 @@ WORKSPACE_DESARMADURIA = WorkspaceDef(
         WGT_KPI_DESARM_DEPLETED,
     ),
     quick_actions=(
-        WorkspaceActionDef("workspace.desarm.action.new_vehicle",    "fas fa-plus-circle",   "desarme/crear/"),
+        WorkspaceActionDef("workspace.desarm.action.new_vehicle",    "fas fa-plus-circle",   "desarme/vehiculos/crear/"),
         WorkspaceActionDef("workspace.desarm.action.new_sale",       "fas fa-shopping-cart", "documentos/form/"),
         WorkspaceActionDef("workspace.desarm.action.view_inventory", "fas fa-boxes",         "repuestos/"),
     ),
@@ -333,12 +335,12 @@ WORKSPACE_CASA_REPUESTOS = WorkspaceDef(
         color_class="lime",
     ),
     nav=(
-        WorkspaceNavDef(MOD_INICIO,        "workspace.parts.nav.home",      "fas fa-home"),
-        WorkspaceNavDef(MOD_REPUESTOS,     "workspace.parts.nav.parts",     "fas fa-boxes"),
-        WorkspaceNavDef(MOD_DOCUMENTOS,    "workspace.parts.nav.documents", "fas fa-shopping-cart"),
-        WorkspaceNavDef(MOD_CLIENTES,      "workspace.parts.nav.clients",   "fas fa-users"),
-        WorkspaceNavDef(MOD_REPORTES,      "workspace.parts.nav.reports",   "fas fa-chart-bar"),
-        WorkspaceNavDef(MOD_CONFIGURACION, "workspace.parts.nav.settings",  "fas fa-cog"),
+        WorkspaceNavDef(MOD_INICIO,        "workspace.parts.nav.home",      "fas fa-home",         nav_key="parts_home",      path="dashboard/"),
+        WorkspaceNavDef(MOD_REPUESTOS,     "workspace.parts.nav.parts",     "fas fa-boxes",        nav_key="parts_inventory", path="repuestos/"),
+        WorkspaceNavDef(MOD_DOCUMENTOS,    "workspace.parts.nav.documents", "fas fa-shopping-cart",nav_key="parts_sales",     path="documentos/?tipo=PTS"),
+        WorkspaceNavDef(MOD_CLIENTES,      "workspace.parts.nav.clients",   "fas fa-users",        nav_key="parts_clients",   path="clientes/"),
+        WorkspaceNavDef(MOD_REPORTES,      "workspace.parts.nav.reports",   "fas fa-chart-bar",    nav_key="parts_reports",   path="reportes/"),
+        WorkspaceNavDef(MOD_CONFIGURACION, "workspace.parts.nav.settings",  "fas fa-cog",          nav_key="parts_config",    path="settings/"),
     ),
     widget_keys=(
         WGT_KPI_SALES_TODAY,
@@ -349,7 +351,7 @@ WORKSPACE_CASA_REPUESTOS = WorkspaceDef(
     quick_actions=(
         WorkspaceActionDef("workspace.parts.action.new_quote",      "fas fa-file-invoice",  "documentos/form/?tipo=PRES"),
         WorkspaceActionDef("workspace.parts.action.new_parts_sale", "fas fa-shopping-cart", "documentos/form/?tipo=PTS"),
-        WorkspaceActionDef("workspace.parts.action.add_part",       "fas fa-plus",          "repuestos/nuevo/"),
+        WorkspaceActionDef("workspace.parts.action.add_part",       "fas fa-plus",          "repuestos/crear/"),
         WorkspaceActionDef("workspace.parts.action.view_inventory", "fas fa-boxes",         "repuestos/"),
     ),
     theme={"--eg-primary": "#84cc16", "--eg-accent": "#65a30d"},
