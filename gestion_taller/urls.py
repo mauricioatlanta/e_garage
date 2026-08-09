@@ -448,6 +448,10 @@ urlpatterns = [
     path("ve/es/login/", redirect_qs("/ve/es/accounts/login/")),
     path("mx/login/", redirect_qs("/mx/es/accounts/login/")),
     path("mx/es/login/", redirect_qs("/mx/es/accounts/login/")),
+    path("ar/login/", redirect_qs("/ar/es/accounts/login/")),
+    path("ar/es/login/", redirect_qs("/ar/es/accounts/login/")),
+    path("uy/login/", redirect_qs("/uy/es/accounts/login/")),
+    path("uy/es/login/", redirect_qs("/uy/es/accounts/login/")),
     # Logout
     path("cl/accounts/logout/", redirect_qs("/accounts/logout/")),
     # Password reset (solicitud + enviado + confirm + completo)

@@ -1133,7 +1133,10 @@
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="tecnicos-tab" data-bs-toggle="pill" data-bs-target="#tecnicos" type="button" role="tab">
-                    <i class="fas fa-users"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Gestión de Empleados{% else %}Employee Management{% endif %}
+                <button class="nav-link" id="usuarios-tab" data-bs-toggle="pill" data-bs-target="#usuarios-sistema" type="button" role="tab">
+                    <i class="fas fa-users-cog"></i> Usuarios del Sistema
+                </button>
+                    <i class="fas fa-users"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}<i class="fas fa-wrench"></i> Técnicos{% else %}Employee Management{% endif %}
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -1434,11 +1437,11 @@
             </div>
 
             <!-- Tab: Employees -->
-            <div class="tab-pane fade" id="tecnicos" role="tabpanel">
+            <div class="tab-pane fade" id="tecnicos" class="tab-pane fade" role="tabpanel">
                 <div class="tecnicos-section">
                     <h4>
                         <i class="fas fa-users"></i>
-                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Gestión de Empleados{% else %}Employee Management{% endif %}
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}<i class="fas fa-wrench"></i> Técnicos{% else %}Employee Management{% endif %}
                     </h4>
 
                     <!-- Stats -->
@@ -1525,6 +1528,78 @@
             </div>
 
             <!-- Tab: Dominio Personalizado -->
+            
+            <!-- Panel Usuarios del Sistema -->
+            <div class="tab-pane fade" id="usuarios-sistema" role="tabpanel">
+                <div class="form-section">
+                    <h4><i class="fas fa-user-plus"></i> Registrar Usuario con Acceso (Login)</h4>
+                    <form method="POST" class="row g-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="crear_usuario_sistema" value="1">
+                        <div class="col-md-3">
+                            <label class="form-label">Nombre de Usuario (Email)</label>
+                            <input type="email" name="username" class="form-control" placeholder="ej: empleado@egarage.com" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input type="email" name="email" class="form-control" placeholder="ej: admin@egarage.com" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Rol / Privilegios</label>
+                            <select name="rol" class="form-select">
+                                <option value="ADMIN">ADMINISTRADOR</option>
+                                <option value="VENDEDOR">VENDEDOR</option>
+                            </select>
+                        </div>
+                        <div class="col-12 text-end mt-3">
+                            <button type="submit" class="btn btn-save btn-primary"><i class="fas fa-save"></i> Habilitar Cuenta</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="form-section mt-4">
+                    <h4><i class="fas fa-users"></i> Colaboradores con Login</h4>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover" style="background: rgba(10, 14, 39, 0.6); border: 1px solid rgba(0, 255, 255, 0.2); color: #fff;">
+                            <thead>
+                                <tr style="color: #00ffff; font-family: 'Orbitron', sans-serif;">
+                                    <th class="p-3">Usuario/Email</th>
+                                    <th class="p-3">Rol</th>
+                                    <th class="p-3 text-center">Permiso de Ingreso</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in usuarios_sistema %}
+                                <tr style="border-bottom: 1px solid rgba(0, 255, 255, 0.1);">
+                                    <td class="p-3 align-middle">{{ u.user.username }}</td>
+                                    <td class="p-3 align-middle"><span class="badge bg-info text-dark">{{ u.rol }}</span></td>
+                                    <td class="p-3 align-middle text-center">
+                                        <form method="POST" style="display:inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="toggle_usuario_sistema" value="{{ u.id }}">
+                                            {% if u.is_active %}
+                                                <button type="submit" class="btn btn-sm btn-success">ACTIVO (Haga clic para suspender)</button>
+                                            {% else %}
+                                                <button type="submit" class="btn btn-sm btn-danger">SUSPENDIDO (Haga clic para habilitar)</button>
+                                            {% endif %}
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center p-4 text-muted">No posees otros usuarios con acceso creados bajo tu suscripción.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div class="tab-pane fade" id="dominio" role="tabpanel">
                 <div class="form-section">
                     <h4>
