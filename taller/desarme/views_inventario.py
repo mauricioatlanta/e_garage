@@ -548,6 +548,7 @@ def finalizar_venta_desde_inventario(request, pk):
                     precio_unitario=precio_venta,
                     descuento=Decimal("0"),
                     origen_repuesto=ORIGEN_DESARME,
+                    vendedor=form.cleaned_data.get("vendedor"),
                 )
                 nueva_cantidad = max(0, (pieza.cantidad or 0) - cantidad)
                 nuevo_estado = ESTADO_VENDIDA if nueva_cantidad == 0 else pieza.estado_pieza

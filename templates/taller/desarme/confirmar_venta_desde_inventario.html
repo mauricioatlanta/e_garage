@@ -65,6 +65,7 @@
 
   /* Force contrast for problematic fields */
   .desarme-confirm-shell #id_cliente,
+  .desarme-confirm-shell #id_vendedor,
   .desarme-confirm-shell #id_observaciones,
   .desarme-confirm-shell #id_cliente_nombre,
   .desarme-confirm-shell #id_cliente_rut,
@@ -215,6 +216,14 @@
                   {% endif %}
                 </div>
               </div>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-slate-300">{{ form.vendedor.label }}</label>
+              {{ form.vendedor }}
+              {% if form.vendedor.errors %}
+                <div class="mt-1 text-sm text-rose-300">{{ form.vendedor.errors }}</div>
+              {% endif %}
             </div>
 
             <div>

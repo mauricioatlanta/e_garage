@@ -82,6 +82,30 @@
 
 {% block panel_content %}
 
+<div class="rpt-section" style="margin-bottom: 1.25rem;">
+  <form method="get" action="" class="flex flex-wrap items-end gap-3">
+    <div>
+      <label class="mb-1 block text-xs uppercase tracking-wide text-slate-400">{% trans "Desde" %}</label>
+      <input type="date" name="fecha_desde" value="{{ fecha_desde }}" class="text-sm">
+    </div>
+    <div>
+      <label class="mb-1 block text-xs uppercase tracking-wide text-slate-400">{% trans "Hasta" %}</label>
+      <input type="date" name="fecha_hasta" value="{{ fecha_hasta }}" class="text-sm">
+    </div>
+    <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">
+      {% trans "Filtrar" %}
+    </button>
+    {% if fecha_desde or fecha_hasta %}
+    <a href="{% country_url 'desarme:reportes' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-slate-500/30 text-slate-300 hover:bg-slate-500/20">
+      {% trans "Limpiar" %}
+    </a>
+    {% endif %}
+  </form>
+  <div class="rpt-empty" style="margin-top: 0.5rem;">
+    {% trans "Aplica solo a: top repuestos, top vehículos, top marcas, top modelos y top vendedores. Los demás indicadores (ROI, vehículos zombis, inventario muerto, proveedores, aging) son acumulados históricos y no se filtran por fecha." %}
+  </div>
+</div>
+
 {# ── KPIs globales ── #}
 <div class="rpt-kpi-grid">
   <div class="rpt-kpi">
@@ -240,6 +264,33 @@
   </table>
 </div>
 {% endif %}
+
+{# ── Top vendedores ── #}
+<div class="rpt-section">
+  <h3>🧑‍💼 {% trans "Top vendedores" %}</h3>
+  {% if top_vendedores %}
+  <table class="rpt-table">
+    <thead>
+      <tr>
+        <th>{% trans "Vendedor" %}</th>
+        <th class="num">{% trans "Piezas vendidas" %}</th>
+        <th class="num">{% trans "Ingresos" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for v in top_vendedores %}
+      <tr>
+        <td>{{ v.nombre }}</td>
+        <td class="num">{{ v.sold }}</td>
+        <td class="num">${{ v.revenue|floatformat:0|intcomma }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="rpt-empty">{% trans "Sin ventas con vendedor registrado en este período." %}</div>
+  {% endif %}
+</div>
 
 <div class="rpt-grid-2">
 

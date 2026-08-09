@@ -3,6 +3,7 @@
 from django import forms
 
 from taller.models.clientes import Cliente
+from taller.models.team_member import TeamMember
 
 
 INPUT_CLASS = (
@@ -81,6 +82,13 @@ class ConfirmarVentaDesdeInventarioForm(forms.Form):
         ),
     )
 
+    vendedor = forms.ModelChoiceField(
+        queryset=TeamMember.objects.none(),
+        required=False,
+        label="Vendedor",
+        widget=forms.Select(attrs={"class": INPUT_CLASS}),
+    )
+
     observaciones = forms.CharField(
         required=False,
         label="Observaciones",
@@ -100,6 +108,9 @@ class ConfirmarVentaDesdeInventarioForm(forms.Form):
             self.fields["cliente"].queryset = Cliente.objects.filter(empresa=empresa).order_by(
                 "nombre"
             )
+            self.fields["vendedor"].queryset = TeamMember.objects.filter(
+                empresa=empresa, is_active=True
+            ).select_related("user").order_by("user__first_name", "user__last_name")
 
     def clean(self):
         cleaned = super().clean()

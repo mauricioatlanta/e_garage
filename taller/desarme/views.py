@@ -2118,7 +2118,11 @@ def reportes_desarme(request):
         inventario_muerto_total,
         top_proveedores,
         aging_inventario,
+        top_vendedores,
     )
+
+    fecha_desde = request.GET.get("fecha_desde", "").strip() or None
+    fecha_hasta = request.GET.get("fecha_hasta", "").strip() or None
 
     kpis = kpis_resumen(empresa)
     return render(
@@ -2128,10 +2132,13 @@ def reportes_desarme(request):
             "eg_desarme_dashboard_compact": True,
             "empresa": empresa,
             "kpis": kpis,
-            "top_piezas": top_piezas(empresa, limit=10),
-            "top_vehiculos": top_vehiculos(empresa, limit=10),
-            "top_marcas": top_marcas(empresa, limit=5),
-            "top_modelos": top_modelos(empresa, limit=5),
+            "fecha_desde": fecha_desde or "",
+            "fecha_hasta": fecha_hasta or "",
+            "top_piezas": top_piezas(empresa, limit=10, fecha_desde=fecha_desde, fecha_hasta=fecha_hasta),
+            "top_vehiculos": top_vehiculos(empresa, limit=10, fecha_desde=fecha_desde, fecha_hasta=fecha_hasta),
+            "top_marcas": top_marcas(empresa, limit=5, fecha_desde=fecha_desde, fecha_hasta=fecha_hasta),
+            "top_modelos": top_modelos(empresa, limit=5, fecha_desde=fecha_desde, fecha_hasta=fecha_hasta),
+            "top_vendedores": top_vendedores(empresa, limit=10, fecha_desde=fecha_desde, fecha_hasta=fecha_hasta),
             "top_roi": top_roi_vehiculos(empresa, limit=5),
             "vehiculos_zombis": vehiculos_zombis(empresa, limit=10),
             "inventario_muerto": inventario_muerto_total(empresa),

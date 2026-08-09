@@ -48,13 +48,17 @@ def kpis_resumen(empresa):
     }
 
 
-def top_piezas(empresa, limit=10):
-    """Top piezas por ingresos generados (DESARME)."""
+def top_piezas(empresa, limit=10, fecha_desde=None, fecha_hasta=None):
+    """Top piezas por ingresos generados (DESARME), con filtro de fecha opcional."""
+    qs = LineaRepuesto.objects.filter(
+        documento__empresa=empresa, documento__estado="EMITIDO", origen_repuesto=ORIGEN_DESARME
+    )
+    if fecha_desde:
+        qs = qs.filter(documento__fecha_emision__gte=fecha_desde)
+    if fecha_hasta:
+        qs = qs.filter(documento__fecha_emision__lte=fecha_hasta)
     qs = (
-        LineaRepuesto.objects.filter(
-            documento__empresa=empresa, documento__estado="EMITIDO", origen_repuesto=ORIGEN_DESARME
-        )
-        .values("pieza_desarme", "pieza_desarme__nombre", "pieza_desarme__codigo")
+        qs.values("pieza_desarme", "pieza_desarme__nombre", "pieza_desarme__codigo")
         .annotate(revenue=Sum(F("precio_unitario") * F("cantidad")), sold=Sum("cantidad"))
         .order_by("-revenue")[:limit]
     )
@@ -72,13 +76,17 @@ def top_piezas(empresa, limit=10):
     return result
 
 
-def top_vehiculos(empresa, limit=10):
-    """Top vehículos por ingresos agregados de sus piezas (DESARME)."""
+def top_vehiculos(empresa, limit=10, fecha_desde=None, fecha_hasta=None):
+    """Top vehículos por ingresos agregados de sus piezas (DESARME), con filtro de fecha opcional."""
+    qs = LineaRepuesto.objects.filter(
+        documento__empresa=empresa, documento__estado="EMITIDO", origen_repuesto=ORIGEN_DESARME
+    )
+    if fecha_desde:
+        qs = qs.filter(documento__fecha_emision__gte=fecha_desde)
+    if fecha_hasta:
+        qs = qs.filter(documento__fecha_emision__lte=fecha_hasta)
     qs = (
-        LineaRepuesto.objects.filter(
-            documento__empresa=empresa, documento__estado="EMITIDO", origen_repuesto=ORIGEN_DESARME
-        )
-        .values("pieza_desarme__vehiculo_desarme_id", "pieza_desarme__vehiculo_desarme__patente")
+        qs.values("pieza_desarme__vehiculo_desarme_id", "pieza_desarme__vehiculo_desarme__patente")
         .annotate(revenue=Sum(F("precio_unitario") * F("cantidad")), sold=Sum("cantidad"))
         .order_by("-revenue")[:limit]
     )
@@ -173,20 +181,32 @@ def health_score(vehiculo):
 
 # Analytics por marca/modelo/ROI
 
-def top_marcas(empresa, limit=10):
+def top_marcas(empresa, limit=10, fecha_desde=None, fecha_hasta=None):
+    qs = LineaRepuesto.objects.filter(
+        documento__empresa=empresa, documento__estado="EMITIDO", origen_repuesto=ORIGEN_DESARME
+    )
+    if fecha_desde:
+        qs = qs.filter(documento__fecha_emision__gte=fecha_desde)
+    if fecha_hasta:
+        qs = qs.filter(documento__fecha_emision__lte=fecha_hasta)
     qs = (
-        LineaRepuesto.objects.filter(documento__empresa=empresa, documento__estado="EMITIDO", origen_repuesto=ORIGEN_DESARME)
-        .values("pieza_desarme__vehiculo_desarme__marca__nombre")
+        qs.values("pieza_desarme__vehiculo_desarme__marca__nombre")
         .annotate(revenue=Sum(F("precio_unitario") * F("cantidad")))
         .order_by("-revenue")[:limit]
     )
     return [{"marca": r.get("pieza_desarme__vehiculo_desarme__marca__nombre"), "revenue": Decimal(r.get("revenue") or 0)} for r in qs]
 
 
-def top_modelos(empresa, limit=10):
+def top_modelos(empresa, limit=10, fecha_desde=None, fecha_hasta=None):
+    qs = LineaRepuesto.objects.filter(
+        documento__empresa=empresa, documento__estado="EMITIDO", origen_repuesto=ORIGEN_DESARME
+    )
+    if fecha_desde:
+        qs = qs.filter(documento__fecha_emision__gte=fecha_desde)
+    if fecha_hasta:
+        qs = qs.filter(documento__fecha_emision__lte=fecha_hasta)
     qs = (
-        LineaRepuesto.objects.filter(documento__empresa=empresa, documento__estado="EMITIDO", origen_repuesto=ORIGEN_DESARME)
-        .values("pieza_desarme__vehiculo_desarme__modelo__nombre")
+        qs.values("pieza_desarme__vehiculo_desarme__modelo__nombre")
         .annotate(revenue=Sum(F("precio_unitario") * F("cantidad")))
         .order_by("-revenue")[:limit]
     )
@@ -321,6 +341,52 @@ def aging_inventario(empresa):
                 "bucket": label,
                 "valor": Decimal(agg["valor"] or 0),
                 "piezas": int(agg["piezas"] or 0),
+            }
+        )
+    return result
+
+
+def top_vendedores(empresa, limit=10, fecha_desde=None, fecha_hasta=None):
+    """
+    Top vendedores (TeamMember) por ingresos de piezas de desarme vendidas.
+    Solo cuenta ventas donde se registró vendedor — ventas anteriores a esta
+    funcionalidad quedan fuera (vendedor=NULL), no se infiere retroactivamente.
+    """
+    qs = LineaRepuesto.objects.filter(
+        documento__empresa=empresa,
+        documento__estado="EMITIDO",
+        origen_repuesto=ORIGEN_DESARME,
+        vendedor__isnull=False,
+    )
+    if fecha_desde:
+        qs = qs.filter(documento__fecha_emision__gte=fecha_desde)
+    if fecha_hasta:
+        qs = qs.filter(documento__fecha_emision__lte=fecha_hasta)
+    qs = (
+        qs.values("vendedor_id")
+        .annotate(revenue=Sum(F("precio_unitario") * F("cantidad")), sold=Sum("cantidad"))
+        .order_by("-revenue")[:limit]
+    )
+
+    from taller.models.team_member import TeamMember
+
+    vendedor_ids = [r["vendedor_id"] for r in qs]
+    vendedores_map = {}
+    for tm in TeamMember.objects.filter(id__in=vendedor_ids).select_related("user"):
+        nombre = ""
+        if tm.user_id:
+            nombre = (tm.user.get_full_name() or "").strip() or tm.user.username
+        vendedores_map[tm.id] = nombre or f"Vendedor #{tm.id}"
+
+    result = []
+    for r in qs:
+        vid = r["vendedor_id"]
+        result.append(
+            {
+                "vendedor_id": vid,
+                "nombre": vendedores_map.get(vid, f"Vendedor #{vid}"),
+                "revenue": Decimal(r.get("revenue") or 0),
+                "sold": int(r.get("sold") or 0),
             }
         )
     return result
