@@ -178,3 +178,7 @@ seed_datos_mauricio.py
 # Artefactos locales generados
 /audit_migraciones_0077_0078.txt
 /catalogo_desarme_para_revision.xlsx
+
+# Marketing masters pesados — fuentes locales, no versionar
+marketing/Assets/Master/*
+!marketing/Assets/Master/.gitkeep
