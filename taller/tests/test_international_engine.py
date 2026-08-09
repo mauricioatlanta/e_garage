@@ -417,3 +417,15 @@ def test_invalid_slug_raises_404(rf):
     from django.http import Http404
     with pytest.raises(Http404):
         _render(rf, "cl", "noexiste")
+
+
+# ---------------------------------------------------------------------------
+# SEO canonical — debe apuntar siempre a la URL oficial localizada
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("country_key", COUNTRIES)
+@pytest.mark.parametrize("vertical_key", VERTICALS)
+def test_canonical_path_matches_official_country_url(country_key, vertical_key):
+    ctx = get_landing_context(country_key, vertical_key)
+    official = get_hub_landing_urls(country_key)[vertical_key]
+    assert ctx["canonical_path"] == official

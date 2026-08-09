@@ -98,7 +98,7 @@ def get_landing_context(country_key: str, vertical_key: str) -> dict:
         # ── SEO ──────────────────────────────────────────────────────────
         "seo_title": fmt(text.get("seo_title", "")),
         "meta_description": fmt(text.get("meta_description", "")),
-        "canonical_path": fmt(text.get("canonical_path", f"/{url_prefix}/{vertical_slug}/")),
+        "canonical_path": f"/{url_prefix}/{vertical_slug}/",
         "og_title": fmt(text.get("og_title", "")),
         "og_description": fmt(text.get("meta_description", "")),
 
