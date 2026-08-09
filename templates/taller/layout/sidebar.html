@@ -26,9 +26,4 @@
   <a href="{% if request.path|slice:':3' == '/cl' %}/cl/es/servicios/otros-servicios/{% elif request.path|slice:':3' == '/us' %}/us/{{ request.LANGUAGE_CODE|default:'en' }}/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" title="Otros Servicios">
     <i class="fas fa-handshake text-xl text-cyan-300 hover:text-white"></i>
   </a>
-  {% if request.user|is_owner %}
-  <a href="{% country_url 'team:team_list' %}" title="Equipo">
-    <i class="fas fa-users-cog text-xl text-cyan-300 hover:text-white"></i>
-  </a>
-  {% endif %}
 </aside>
