@@ -1,4 +1,4 @@
-from taller.models.vehiculos import Vehiculo
+from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.services.desarme_financial_service import calcular_estado_financiero
 
 
@@ -6,7 +6,7 @@ class VehicleLifecycleService:
     """Servicio para mantener el estado financiero/lifecycle de vehículos de desarme."""
 
     @classmethod
-    def update_lifecycle(cls, vehiculo: Vehiculo) -> Vehiculo:
+    def update_lifecycle(cls, vehiculo: VehiculoDesarme) -> VehiculoDesarme:
         nuevo_estado = calcular_estado_financiero(vehiculo)
         if vehiculo.estado_desarme != nuevo_estado:
             vehiculo.estado_desarme = nuevo_estado
@@ -15,7 +15,7 @@ class VehicleLifecycleService:
 
     @classmethod
     def update_lifecycle_for_documento(cls, documento):
-        vehiculos = Vehiculo.objects.filter(
+        vehiculos = VehiculoDesarme.objects.filter(
             piezas_desarme__lineas_repuesto__documento=documento,
             piezas_desarme__lineas_repuesto__origen_repuesto="DESARME",
         ).distinct()
