@@ -342,9 +342,14 @@ urlpatterns = [
         password_reset_done,
         name="account_reset_password_done",
     ),
+    # Login explícito USA: debe ir ANTES del catch-all accounts/<path:rest>.
+    # Sin esta ruta, /us/accounts/login/ termina en /accounts/login/ (Chile).
+    path("accounts/login/", usa_login_view),
+
     # Signup explícito: /us/accounts/signup/ → usa_signup_view (EN).
     # Debe ir ANTES del catch-all accounts/<path:rest> o se redirige al CL genérico.
     path("accounts/signup/", usa_signup_view),
+
     # Resto de accounts/* (confirm-email, logout, etc.) → allauth global
     path(
         "accounts/",

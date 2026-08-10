@@ -482,7 +482,16 @@ urlpatterns = [
         "uy/",
         include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay"),
     ),
-    # 🇺🇸 USA - /us/en/accounts/* y /us/es/accounts/* redirigen al namespace usa
+    # 🇺🇸 USA - Login explícito: nunca debe caer al /accounts/login/ global (Chile).
+    path(
+        "us/en/accounts/login/",
+        lambda r: redirect("/us/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
+    ),
+    path(
+        "us/es/accounts/login/",
+        country_aware_login,
+    ),
+    # Resto de /us/<lang>/accounts/* mantiene compatibilidad con namespace USA.
     path("us/en/accounts/", lambda r: redirect("/us/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))),
     path("us/en/accounts/<path:rest>", lambda r, rest: redirect(f"/us/accounts/{rest}")),
     path("us/es/accounts/", lambda r: redirect("/us/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))),
