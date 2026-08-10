@@ -254,7 +254,24 @@ class CountryAwareLoginView(LoginView):
         if next_url:
             return next_url
 
-        country = getattr(self.request, "country", "CL")
+        # Después de autenticar, la empresa del usuario es la fuente de verdad.
+        # El path del formulario puede ser /cl/es/accounts/login/ aunque la
+        # empresa pertenezca a USA; no debemos heredar ese país incorrecto.
+        country = None
+        user = getattr(self.request, "user", None)
+
+        if user is not None and getattr(user, "is_authenticated", False):
+            try:
+                empresa = getattr(user, "empresa", None)
+                empresa_country = getattr(empresa, "pais", None) if empresa else None
+                if empresa_country:
+                    country = str(empresa_country).strip().upper()
+            except Exception:
+                country = None
+
+        if not country:
+            country = str(getattr(self.request, "country", "CL") or "CL").upper()
+
         if country == "US":
             return "/us/en/workspace/"
         if country == "BR":
