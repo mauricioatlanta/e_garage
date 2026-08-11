@@ -592,6 +592,14 @@
                 }
 
                 restoreState();
+
+                // Prefill desde la landing: reutiliza el mismo flujo de selección manual.
+                var rubroFromUrl = new URLSearchParams(window.location.search).get('rubro') || '';
+                var allowedRubros = ['TALLER_MECANICO', 'DESARMADURIA', 'CASA_REPUESTOS'];
+
+                if (allowedRubros.indexOf(rubroFromUrl) !== -1) {
+                    selectPrincipalCard(rubroFromUrl);
+                }
             });
         })();
 
