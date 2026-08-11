@@ -25,22 +25,22 @@
     <h2 class="text-lg font-semibold text-white mb-4">Datos de contacto</h2>
     <div class="space-y-4">
       <div>
-        <label for="id_name" class="block text-sm font-medium text-white/80 mb-1">Nombre completo</label>
-        <input type="text" id="id_name" name="name"
+        <label for="id_name" class="block text-sm font-medium text-white/80 mb-1">Nombre completo <span class="text-red-400">*</span></label>
+        <input type="text" id="id_name" name="name" required
                class="w-full rounded-lg bg-black/20 border border-[var(--border)] px-4 py-2 text-white placeholder-white/40 focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]"
                placeholder="Juan P&eacute;rez" value="{{ form.name.value|default:'' }}">
         {% if form.name.errors %}<p class="mt-1 text-sm text-red-400">{{ form.name.errors.0 }}</p>{% endif %}
       </div>
       <div>
-        <label for="id_email" class="block text-sm font-medium text-white/80 mb-1">Email</label>
-        <input type="email" id="id_email" name="email"
+        <label for="id_email" class="block text-sm font-medium text-white/80 mb-1">Email <span class="text-red-400">*</span></label>
+        <input type="email" id="id_email" name="email" required
                class="w-full rounded-lg bg-black/20 border border-[var(--border)] px-4 py-2 text-white placeholder-white/40 focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]"
                placeholder="correo@ejemplo.com" value="{{ form.email.value|default:'' }}">
         {% if form.email.errors %}<p class="mt-1 text-sm text-red-400">{{ form.email.errors.0 }}</p>{% endif %}
       </div>
       <div>
-        <label for="id_phone" class="block text-sm font-medium text-white/80 mb-1">Tel&eacute;fono</label>
-        <input type="text" id="id_phone" name="phone"
+        <label for="id_phone" class="block text-sm font-medium text-white/80 mb-1">Tel&eacute;fono <span class="text-red-400">*</span></label>
+        <input type="text" id="id_phone" name="phone" required
                class="w-full rounded-lg bg-black/20 border border-[var(--border)] px-4 py-2 text-white placeholder-white/40 focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]"
                placeholder="+56 9 1234 5678" value="{{ form.phone.value|default:'' }}">
         {% if form.phone.errors %}<p class="mt-1 text-sm text-red-400">{{ form.phone.errors.0 }}</p>{% endif %}

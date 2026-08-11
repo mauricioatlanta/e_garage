@@ -72,6 +72,12 @@ class OrderService:
         if not items:
             raise ValueError("El carrito está vacío.")
 
+        if not customer_data.get("name", "").strip():
+            raise ValueError("El nombre del comprador es requerido.")
+
+        if not customer_data.get("email", "").strip():
+            raise ValueError("El correo electrónico del comprador es requerido.")
+
         total = CartService.total(cart)
 
         order = CommerceOrder.objects.create(
