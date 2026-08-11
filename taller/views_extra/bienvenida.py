@@ -2,9 +2,18 @@ from django.shortcuts import render
 from django.utils import translation
 
 from taller.welcome_config import get_config
+from taller.models.public_page_view import PublicPageView
+from taller.services.public_analytics import track_public_page
 
 
 def bienvenida_view(request, country: str, lang: str = "es"):
+    track_public_page(
+        request,
+        page_type=PublicPageView.PAGE_WELCOME,
+        country=country,
+        language=lang,
+    )
+
     config = get_config(country, lang)
     translation.activate(lang)
     context = {**config, "lang": lang}

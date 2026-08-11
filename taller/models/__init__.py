@@ -82,6 +82,9 @@ from .empresa_dominio import EmpresaDominio
 # Trust & Security
 from .sesion_usuario import SesionUsuario
 
+# Analytics público
+from .public_page_view import PublicPageView, is_probable_bot
+
 # Ledger de movimientos de inventario
 from .movimiento_inventario import MovimientoInventario
 
@@ -168,6 +171,8 @@ __all__ = [
     "MovimientoInventario",
     # Trust & Security
     "SesionUsuario",
+    # Analytics público
+    "PublicPageView",
 ]
 
 # Intentar importar otros modelos si existen (para compatibilidad)

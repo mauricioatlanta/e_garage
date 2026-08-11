@@ -4,11 +4,18 @@ from django.shortcuts import render
 from commerce.views.catalog import catalog_home
 from taller.country.engine import URL_SLUG_TO_VERTICAL, get_hub_landing_urls, get_landing_context
 from taller.country.hub import COUNTRY_HUB
+from taller.services.public_analytics import track_public_page
+from taller.models.public_page_view import PublicPageView
 
 
 def landing_home(request):
     if getattr(request, "is_custom_domain", False):
         return catalog_home(request)
+
+    track_public_page(
+        request,
+        page_type=PublicPageView.PAGE_HOME,
+    )
     return render(request, "public/gateway.html")
 
 
