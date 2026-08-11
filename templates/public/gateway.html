@@ -1007,11 +1007,13 @@
     btnEn.addEventListener("click", function (event) {
       event.stopPropagation();
       setUsaLang("en");
+      navigateUsa();
     });
 
     btnEs.addEventListener("click", function (event) {
       event.stopPropagation();
       setUsaLang("es");
+      navigateUsa();
     });
 
     usaCard.addEventListener("click", function (event) {
