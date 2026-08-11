@@ -4,8 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% if language == "en" %}
+  <title>eGarage {{ country_name }} — Choose your business</title>
+  <meta name="description" content="eGarage {{ country_name }} — Management software for automotive businesses.">
+  {% else %}
   <title>eGarage {{ country_name }} — Elige tu negocio</title>
   <meta name="description" content="eGarage {{ country_name }} — Software de gestión para negocios automotrices.">
+  {% endif %}
   <link rel="canonical" href="https://egarage.cl/{{ country_code }}/">
   <link rel="icon" type="image/png" href="{% static 'images/egarage_icon_192x192.png' %}">
   <link rel="apple-touch-icon" href="{% static 'images/egarage_icon_192x192.png' %}">
@@ -203,15 +208,20 @@
   <div class="hub-content">
 
     <!-- Back to gateway -->
-    <a href="/" class="hub-back" aria-label="Volver al selector de país">
+    <a href="/" class="hub-back" aria-label="{% if language == 'en' %}Back to country selector{% else %}Volver al selector de país{% endif %}">
       ← eGarage
     </a>
 
     <!-- Logo + país -->
     <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage" class="hub-logo">
     <span class="hub-flag" aria-hidden="true">{{ flag }}</span>
+    {% if language == "en" %}
+    <h1 class="hub-title">Welcome to eGarage {{ country_name }}</h1>
+    <p class="hub-subtitle">Choose the type of business you want to manage.</p>
+    {% else %}
     <h1 class="hub-title">Bienvenido a eGarage {{ country_name }}</h1>
     <p class="hub-subtitle">Elige el tipo de negocio que quieres gestionar.</p>
+    {% endif %}
 
     <!-- Rubro cards -->
     <div class="hub-grid" role="list">
