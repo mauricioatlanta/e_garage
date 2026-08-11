@@ -71,6 +71,13 @@ def landing_vertical(request, country_key: str, url_slug: str):
     if not vertical_key or country_key not in COUNTRY_HUB:
         raise Http404
 
+    track_public_page(
+        request,
+        page_type=PublicPageView.PAGE_LANDING,
+        country=country_key,
+        language=COUNTRY_HUB[country_key].get("language", ""),
+    )
+
     ctx = get_landing_context(country_key, vertical_key)
     return render(request, "public/landing_vertical.html", ctx)
 
