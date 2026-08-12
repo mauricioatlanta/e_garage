@@ -1,0 +1,361 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+<style>
+.eg-analytics {
+    padding: 24px;
+    max-width: 1500px;
+}
+
+.eg-analytics h1 {
+    margin-bottom: 6px;
+}
+
+.eg-subtitle {
+    color: #64748b;
+    margin-bottom: 24px;
+}
+
+.eg-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 16px;
+    margin: 24px 0 34px;
+}
+
+.eg-card {
+    padding: 20px;
+    border-radius: 14px;
+    background: #111827;
+    color: white;
+}
+
+.eg-card.green {
+    background: #064e3b;
+}
+
+.eg-card.red {
+    background: #7f1d1d;
+}
+
+.eg-card.blue {
+    background: #1e3a8a;
+}
+
+.eg-card.purple {
+    background: #4c1d95;
+}
+
+.eg-card .label {
+    font-size: 13px;
+    opacity: .8;
+    margin-bottom: 8px;
+}
+
+.eg-card .value {
+    font-size: 30px;
+    font-weight: 800;
+}
+
+.eg-section {
+    margin-top: 36px;
+}
+
+.eg-section h2 {
+    margin-bottom: 12px;
+}
+
+.eg-table-wrap {
+    overflow-x: auto;
+}
+
+.eg-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.eg-table th,
+.eg-table td {
+    padding: 11px 13px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.eg-table th {
+    background: #f8fafc;
+    color: #334155;
+    font-weight: 700;
+}
+
+.eg-table tr:hover td {
+    background: #f8fafc;
+}
+
+.eg-badge {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #3730a3;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.eg-note {
+    margin-top: 10px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.eg-top-actions {
+    margin-bottom: 20px;
+}
+
+.eg-top-actions a {
+    display: inline-block;
+    padding: 8px 13px;
+    border-radius: 8px;
+    background: #334155;
+    color: white;
+    text-decoration: none;
+}
+</style>
+
+<div class="eg-analytics">
+
+    <div class="eg-top-actions">
+        <a href="/admin/">← Volver al panel admin</a>
+    </div>
+
+    <h1>📊 Analytics Público eGarage</h1>
+
+    <p class="eg-subtitle">
+        Análisis de adquisición por país, template de bienvenida y rubro automotriz.
+        Las comparaciones comerciales usan tráfico humano y excluyen bots.
+    </p>
+
+    <div class="eg-cards">
+
+        <div class="eg-card">
+            <div class="label">Total registrado</div>
+            <div class="value">{{ total }}</div>
+        </div>
+
+        <div class="eg-card green">
+            <div class="label">Visitas humanas</div>
+            <div class="value">{{ humanos }}</div>
+        </div>
+
+        <div class="eg-card red">
+            <div class="label">Bots / pruebas</div>
+            <div class="value">{{ bots }}</div>
+        </div>
+
+        <div class="eg-card blue">
+            <div class="label">Landings humanas</div>
+            <div class="value">{{ landings_humanas }}</div>
+        </div>
+
+        <div class="eg-card purple">
+            <div class="label">Bienvenidas humanas</div>
+            <div class="value">{{ bienvenidas_humanas }}</div>
+        </div>
+
+    </div>
+
+
+    <section class="eg-section">
+
+        <h2>🌎 Tráfico humano por país</h2>
+
+        <div class="eg-table-wrap">
+            <table class="eg-table">
+                <thead>
+                    <tr>
+                        <th>País</th>
+                        <th>Visitas humanas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in por_pais %}
+                    <tr>
+                        <td>
+                            <span class="eg-badge">
+                                {{ row.label }}
+                            </span>
+                        </td>
+                        <td>{{ row.total }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2">Sin datos todavía.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+
+    <section class="eg-section">
+
+        <h2>🏁 Templates de bienvenida por país</h2>
+
+        <div class="eg-table-wrap">
+            <table class="eg-table">
+                <thead>
+                    <tr>
+                        <th>País</th>
+                        <th>Visitas humanas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in por_bienvenida %}
+                    <tr>
+                        <td>{{ row.label }}</td>
+                        <td>{{ row.total }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2">Sin datos todavía.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+
+    <section class="eg-section">
+
+        <h2>🔧 Interés por rubro</h2>
+
+        <div class="eg-table-wrap">
+            <table class="eg-table">
+                <thead>
+                    <tr>
+                        <th>Rubro</th>
+                        <th>Visitas humanas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in por_rubro %}
+                    <tr>
+                        <td>{{ row.label }}</td>
+                        <td>{{ row.total }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2">Sin datos todavía.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <p class="eg-note">
+            El rubro se obtiene desde la landing visitada:
+            taller, desarmaduría, repuestos, carwash o vulcanización.
+        </p>
+
+    </section>
+
+
+    <section class="eg-section">
+
+        <h2>🎯 País + rubro</h2>
+
+        <div class="eg-table-wrap">
+            <table class="eg-table">
+                <thead>
+                    <tr>
+                        <th>País</th>
+                        <th>Rubro</th>
+                        <th>Visitas humanas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in pais_rubro %}
+                    <tr>
+                        <td>{{ row.country_label }}</td>
+                        <td>{{ row.rubro_label }}</td>
+                        <td>{{ row.total }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">Sin datos todavía.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+
+    <section class="eg-section">
+
+        <h2>🚗 Landings más visitadas por personas</h2>
+
+        <div class="eg-table-wrap">
+            <table class="eg-table">
+                <thead>
+                    <tr>
+                        <th>Landing</th>
+                        <th>Visitas humanas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in paginas_top %}
+                    <tr>
+                        <td>{{ row.path }}</td>
+                        <td>{{ row.total }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2">Sin datos todavía.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+
+    <section class="eg-section">
+
+        <h2>📅 Tendencia diaria humana</h2>
+
+        <div class="eg-table-wrap">
+            <table class="eg-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Visitas humanas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in tendencia %}
+                    <tr>
+                        <td>{{ row.fecha }}</td>
+                        <td>{{ row.total }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2">Sin datos todavía.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

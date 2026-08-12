@@ -19,6 +19,7 @@ from taller.models.interchange_pieza import InterchangePieza
 from taller.models.pieza_desarme import PiezaDesarme, PiezaDesarmeCompanyLabel
 from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculo_desarme_event import VehiculoDesarmeEvent
+from taller.models.public_page_view import PublicPageView
 from taller.models.precio_suscripcion import PrecioSuscripcion
 from taller.models.subscription_change import SubscriptionChange
 from taller.models.suscripcion_transaccion import SuscripcionTransaccion
@@ -1124,6 +1125,66 @@ class VehiculoDesarmeEventAdmin(admin.ModelAdmin):
         "updated_at",
     )
     actions = []
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+# ---------------------------------------------------------------------------
+# PublicPageView — Analytics público disponible en Django Admin estándar
+# ---------------------------------------------------------------------------
+
+@admin.register(PublicPageView)
+class PublicPageViewDefaultAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "created_at",
+        "country",
+        "language",
+        "page_type",
+        "path",
+        "is_mobile",
+        "is_bot",
+    )
+
+    list_filter = (
+        "country",
+        "language",
+        "page_type",
+        "is_mobile",
+        "is_bot",
+        "created_at",
+    )
+
+    search_fields = (
+        "path",
+        "country",
+        "language",
+        "referrer",
+    )
+
+    ordering = (
+        "-created_at",
+    )
+
+    readonly_fields = (
+        "path",
+        "page_type",
+        "country",
+        "language",
+        "visitor_hash",
+        "referrer",
+        "user_agent",
+        "is_mobile",
+        "is_bot",
+        "created_at",
+    )
 
     def has_add_permission(self, request):
         return False

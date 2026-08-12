@@ -13,18 +13,18 @@ class CheckoutForm(forms.Form):
     name = forms.CharField(
         label="Nombre completo",
         max_length=120,
-        required=False,
+        required=True,
         widget=forms.TextInput(attrs={"placeholder": "Tu nombre", "class": "form-input"}),
     )
     email = forms.EmailField(
         label="Correo electrónico",
-        required=False,
+        required=True,
         widget=forms.EmailInput(attrs={"placeholder": "correo@ejemplo.com", "class": "form-input"}),
     )
     phone = forms.CharField(
         label="Teléfono",
         max_length=20,
-        required=False,
+        required=True,
         widget=forms.TextInput(attrs={"placeholder": "+56 9 1234 5678", "class": "form-input"}),
     )
     shipping_address = forms.CharField(

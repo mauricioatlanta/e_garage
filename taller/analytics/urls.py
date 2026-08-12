@@ -6,7 +6,7 @@ Dashboard futurista con diferenciación por país
 from django.urls import path
 from django.views.generic import RedirectView
 
-from . import admin_views, apis_avanzadas, views
+from . import admin_views, apis_avanzadas, public_views, views
 from .admin_views import (
     api_admin_charts,
     dashboard_admin,
@@ -25,6 +25,8 @@ from .funcionalidades_adicionales import (
 app_name = "analytics"
 
 urlpatterns = [
+    # Analytics público de landings — separado del dashboard AI legacy
+    path("public/", public_views.public_analytics_dashboard, name="public"),
     # Dashboard principal
     path("", views.dashboard_ai_view, name="dashboard"),
     # Redirect sin trailing slash a con trailing slash
