@@ -10,6 +10,7 @@ from taller.models.catalogo import CatalogoModeloAuto
 from taller.models.clientes import Cliente
 from taller.models.color_cliente import ColorCliente
 from taller.models.comprobante_pago import ComprobantePago
+from taller.models.pago import PagoPendiente
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
 from taller.models.movimiento_inventario import MovimientoInventario
@@ -66,6 +67,12 @@ try:
     from taller.admin.servicios_externos_admin import *  # noqa: F401, F403
 except ImportError:
     pass  # Admin de servicios externos no disponible aún
+
+# Importar admin de pagos manuales
+try:
+    from taller.admin_modules import pago_admin  # noqa: F401
+except ImportError:
+    pass
 
 
 class MyAdminSite(AdminSite):
@@ -594,6 +601,63 @@ class ComprobantePagoAdmin(admin.ModelAdmin):
 
         if change and previous_estado != "aprobado" and obj.estado == "aprobado":
             obj.aprobar(procesado_por=request.user.username)
+
+
+
+@admin.register(PagoPendiente, site=admin_site)
+class PagoPendienteAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "empresa",
+        "plan",
+        "monto",
+        "estado",
+        "fecha_subida",
+        "metodo_pago",
+    )
+
+    list_filter = ("estado", "plan", "metodo_pago", "fecha_subida")
+    search_fields = (
+        "empresa__nombre_taller",
+        "referencia",
+    )
+
+    readonly_fields = (
+        "fecha_subida",
+        "fecha_verificacion",
+    )
+
+    actions = (
+        "aprobar_seleccionados",
+        "rechazar_seleccionados",
+    )
+
+    @admin.action(description="Aprobar pagos seleccionados")
+    def aprobar_seleccionados(self, request, queryset):
+        count = 0
+        for pago in queryset.filter(estado="pendiente"):
+            pago.aprobar_pago(request.user)
+            count += 1
+
+        self.message_user(
+            request,
+            f"Se aprobaron {count} pagos pendientes."
+        )
+
+    @admin.action(description="Rechazar pagos seleccionados")
+    def rechazar_seleccionados(self, request, queryset):
+        count = 0
+        for pago in queryset.filter(estado="pendiente"):
+            pago.rechazar_pago(
+                request.user,
+                "Rechazado desde administración"
+            )
+            count += 1
+
+        self.message_user(
+            request,
+            f"Se rechazaron {count} pagos pendientes."
+        )
 
 
 @admin.register(SuscripcionTransaccion, site=admin_site)
