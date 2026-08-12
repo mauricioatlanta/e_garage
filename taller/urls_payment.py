@@ -11,8 +11,9 @@ from taller.views_extra.payment_views import (
     payment_usa,
     start_flow_payment,
     start_mp_payment,
-    subir_comprobante,
 )
+
+from taller.views_extra.views_suscripciones import subir_comprobante
 from taller.views_extra.views_suscripciones import registrar_transferencia_ajax
 
 urlpatterns = [

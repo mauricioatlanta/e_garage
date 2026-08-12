@@ -19,8 +19,9 @@ from taller.views_extra.payment_views import (
     payment_chile,
     payment_success,
     payment_usa,
-    subir_comprobante,
 )
+
+from taller.views_extra.views_suscripciones import subir_comprobante
 from taller.views_extra.paypal_webhook import paypal_webhook
 from taller.views_extra.signup_complete import signup_complete
 
