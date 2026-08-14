@@ -220,6 +220,7 @@
     overflow: auto;
     border: 1px solid rgba(148,163,184,.12);
     border-radius: 14px;
+    background: #0d1526;
 }
 
 .eg-table {
@@ -233,13 +234,14 @@
     padding: 12px 14px;
     border-bottom: 1px solid rgba(148,163,184,.10);
     text-align: left;
+    background: transparent;
 }
 
 .eg-table th {
     position: sticky;
     top: 0;
     z-index: 2;
-    background: #111c2e;
+    background: #111c2e !important;
     color: #94a3b8;
     font-size: 11px;
     font-weight: 900;
@@ -250,10 +252,15 @@
 .eg-table td {
     color: #dbeafe;
     font-size: 13px;
+    background: transparent !important;
+}
+
+.eg-table tbody tr {
+    background: transparent;
 }
 
 .eg-table tbody tr:hover {
-    background: rgba(34,211,238,.045);
+    background: rgba(34,211,238,.08) !important;
 }
 
 .eg-number {
