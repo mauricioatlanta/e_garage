@@ -75,10 +75,27 @@ def catalog_home(request):
     gw = _gateway(request)
     ctx = _base_ctx(request, gw)
     ctx.update(_vehicle_ctx(request))
-    ctx["featured"] = gw.list_products(limit=8)
+
+    # Hasta 7 productos con imagen: 3 para el hero visual + 4 para destacados
+    products_with_img = list(gw.list_products_with_images(limit=7))
+    hero_products = products_with_img[:3]
+    featured_products = products_with_img[:4]
+
+    # Recientes: excluir los que ya están en destacados
+    featured_pks = {p.pk for p in featured_products}
+    recent_products = [
+        p for p in gw.list_products_recent(limit=12)
+        if p.pk not in featured_pks
+    ][:6]
+
     brand = ctx.get("brand") or {}
-    ctx["title"] = brand.get("meta_title", "")
-    ctx["meta_description"] = brand.get("meta_description", "")
+    ctx.update({
+        "hero_products": hero_products,
+        "featured_products": featured_products,
+        "recent_products": recent_products,
+        "title": brand.get("meta_title", ""),
+        "meta_description": brand.get("meta_description", ""),
+    })
     return render(request, "commerce/themes/monteazul/home.html", ctx)
 
 

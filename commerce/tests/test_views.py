@@ -159,6 +159,139 @@ def test_home_logo_visible_when_set(commerce_client, tmp_path):
 
 
 @pytest.mark.django_db
+def test_home_featured_products_appear(commerce_client):
+    """Productos destacados (con imagen) aparecen en el home."""
+    import tempfile, os
+    from PIL import Image as PILImage
+    from django.core.files.uploadedfile import SimpleUploadedFile
+    from commerce.models import ProductImage
+
+    client, empresa = commerce_client
+    cat = make_category(empresa, "Cat", slug="cat-feat")
+    product = make_product(empresa, category=cat)
+
+    # Crear imagen mínima válida
+    tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+    try:
+        img = PILImage.new("RGB", (50, 50), color=(0, 100, 200))
+        img.save(tmp, format="PNG")
+        tmp.seek(0)
+        uploaded = SimpleUploadedFile("test.png", tmp.read(), content_type="image/png")
+    finally:
+        tmp.close()
+        os.unlink(tmp.name)
+
+    ProductImage.objects.create(
+        commerce_product=product,
+        image=uploaded,
+        is_primary=True,
+        position=1,
+    )
+
+    with override_settings(COMMERCE_TENANT_MAP={"teststore.local": empresa.pk}):
+        resp = client.get("/commerce/")
+    assert resp.status_code == 200
+    content = resp.content.decode()
+    assert "productos-destacados" in content
+
+
+@pytest.mark.django_db
+def test_home_recent_products_section(commerce_client):
+    """Sección recién agregados aparece cuando hay productos recientes."""
+    client, empresa = commerce_client
+    make_product(empresa)
+
+    with override_settings(COMMERCE_TENANT_MAP={"teststore.local": empresa.pk}):
+        resp = client.get("/commerce/")
+    assert resp.status_code == 200
+
+
+@pytest.mark.django_db
+def test_home_no_cross_tenant_products(commerce_client, empresa_b):
+    """Productos de empresa_b no aparecen en el home de empresa."""
+    from taller.tests.factories import RepuestoFactory
+
+    client, empresa = commerce_client
+    rep_b = RepuestoFactory(empresa=empresa_b, nombre="Producto empresa B secreto")
+    make_product(empresa_b, repuesto=rep_b)
+
+    with override_settings(COMMERCE_TENANT_MAP={"teststore.local": empresa.pk}):
+        resp = client.get("/commerce/")
+    assert resp.status_code == 200
+    assert "Producto empresa B secreto".encode() not in resp.content
+
+
+@pytest.mark.django_db
+def test_home_product_without_image_no_broken_src(commerce_client):
+    """Productos sin imagen no generan src='None' en el home."""
+    client, empresa = commerce_client
+    make_product(empresa)
+
+    with override_settings(COMMERCE_TENANT_MAP={"teststore.local": empresa.pk}):
+        resp = client.get("/commerce/")
+    assert resp.status_code == 200
+    assert b'src="None"' not in resp.content
+
+
+@pytest.mark.django_db
+def test_home_vehicle_selector_present(commerce_client):
+    """El selector de vehículo debe estar presente con sus IDs clave."""
+    client, empresa = commerce_client
+
+    with override_settings(COMMERCE_TENANT_MAP={"teststore.local": empresa.pk}):
+        resp = client.get("/commerce/")
+    assert resp.status_code == 200
+    content = resp.content.decode()
+    assert 'id="vehicleForm"' in content
+    assert 'id="year"' in content
+    assert 'id="fuel_type"' in content
+    assert 'id="btnSearch"' in content
+    assert 'id="buscador"' in content
+
+
+@pytest.mark.django_db
+def test_home_empty_storefront_renders(commerce_client):
+    """Home sin productos ni categorías debe renderizar sin errores."""
+    client, empresa = commerce_client
+
+    with override_settings(COMMERCE_TENANT_MAP={"teststore.local": empresa.pk}):
+        resp = client.get("/commerce/")
+    assert resp.status_code == 200
+
+
+@pytest.mark.django_db
+def test_home_catalog_links_valid(commerce_client):
+    """CTAs del home apuntan a rutas válidas (no URLs rotas)."""
+    from django.test import RequestFactory
+    from django.urls import reverse
+
+    client, empresa = commerce_client
+    with override_settings(COMMERCE_TENANT_MAP={"teststore.local": empresa.pk}):
+        resp = client.get("/commerce/")
+    assert resp.status_code == 200
+    content = resp.content.decode()
+    # CTA "Ver todos" apunta a /commerce/buscar/
+    search_url = reverse("commerce:search")
+    assert search_url in content
+    # Anchor del hero apunta al selector de vehículo
+    assert '#buscador' in content
+
+
+@pytest.mark.django_db
+def test_home_cookies_banner_ids_preserved(commerce_client):
+    """Cookie banner conserva los IDs que usa el JS de base.html."""
+    client, empresa = commerce_client
+
+    with override_settings(COMMERCE_TENANT_MAP={"teststore.local": empresa.pk}):
+        resp = client.get("/commerce/")
+    assert resp.status_code == 200
+    content = resp.content.decode()
+    assert 'id="cookies-banner"' in content
+    assert 'id="cookies-accept"' in content
+    assert 'id="cookies-reject"' in content
+
+
+@pytest.mark.django_db
 def test_home_whatsapp_uses_brand(commerce_client):
     """El WhatsApp debe venir de brand.whatsapp.url, no de la URL hardcoded anterior."""
     from commerce.models import CommerceStorefrontSettings

@@ -1,491 +1,1016 @@
 {% extends "commerce/themes/monteazul/base.html" %}
-{% load static %}
+{% load static %}{% load humanize %}
 
 {% block meta_title %}{{ brand.meta_title|default:"Inicio" }}{% endblock %}
 {% block meta_description %}{{ brand.meta_description }}{% endblock %}
 
 {% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+/* ── Variables (product-card compat + home) ─────────────────────── */
 :root {
-      --bg: #0a0c10;
-      --surface: rgba(255,255,255,0.03);
-      --surface-hover: rgba(255,255,255,0.06);
-      --border: rgba(255,255,255,0.08);
-      --text: #f0f2f5;
-      --muted: rgba(255,255,255,0.5);
-      --accent: #00f0ff;
-      --accent-soft: rgba(0,240,255,0.12);
-      --glow: rgba(0,240,255,0.35);
-      --success: #00e676;
-      --radius: 16px;
-      --radius-sm: 10px;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Outfit', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    .bg-mesh {
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 120% 80% at 50% -20%, rgba(0,240,255,0.08), transparent 50%),
-        radial-gradient(ellipse 80% 60% at 100% 50%, rgba(120,80,255,0.06), transparent 45%),
-        linear-gradient(180deg, var(--bg) 0%, #0d1016 100%);
-      pointer-events: none;
-    }
-    .grid-overlay {
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 60px 60px;
-      pointer-events: none;
-      opacity: 0.6;
-    }
+  --bg: #0a0c10;
+  --surface: rgba(255,255,255,0.03);
+  --surface-hover: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.08);
+  --text: #e8ecf4;
+  --muted: rgba(255,255,255,0.5);
+  --text-muted: rgba(255,255,255,0.55);
+  --accent: #00f0ff;
+  --accent-soft: rgba(0,240,255,0.12);
+  --glow: rgba(0,240,255,0.35);
+  --success: #00e676;
+  /* aliases para product-card (de product_list.html) */
+  --navy: #0c1322;
+  --navy-mid: #121c2e;
+  --navy-light: #1a2742;
+  --navy-surface: rgba(255,255,255,0.04);
+  --navy-border: rgba(255,255,255,0.08);
+  --cyan: #00d4ff;
+  --cyan-soft: rgba(0,212,255,0.15);
+  --cyan-glow: rgba(0,212,255,0.25);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+@keyframes pulse { 0%,100%{ opacity:1 } 50%{ opacity:0.5 } }
+@keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
 
-    .header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(20px);
-      background: rgba(10,12,16,0.7);
-      border-bottom: 1px solid var(--border);
-    }
-    .header-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .logo-link {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: inherit;
-    }
-    .logo-link img { height: 52px; width: auto; display: block; object-fit: contain; }
-    .logo-text {
-      font-weight: 800;
-      font-size: 1.25rem;
-      letter-spacing: 0.06em;
-    }
-    .logo-sub { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
-    .nav {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .nav a {
-      padding: 10px 16px;
-      border-radius: var(--radius-sm);
-      color: var(--muted);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: color 0.2s, background 0.2s;
-    }
-    .nav a:hover { color: var(--accent); background: var(--surface-hover); }
-    .nav a.here { color: var(--accent); background: var(--accent-soft); }
+/* ── Layout común ────────────────────────────────────────────────── */
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.home-section {
+  padding: 56px 0;
+  position: relative;
+}
+.home-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.home-section-title {
+  font-weight: 800;
+  font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.home-section-link {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--cyan);
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+.home-section-link:hover { opacity: 1; }
 
-    .hero {
-      position: relative;
-      padding: 48px 24px 56px;
-      text-align: center;
-    }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      border: 1px solid rgba(0,240,255,0.25);
-      color: var(--accent);
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-    }
-    .hero-badge::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 12px var(--accent);
-      animation: pulse 2s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%,100%{ opacity:1 } 50%{ opacity:0.5 } }
-    .hero h1 {
-      font-weight: 800;
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-      margin-bottom: 14px;
-      max-width: 640px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .hero p {
-      color: var(--muted);
-      font-size: 1.05rem;
-      line-height: 1.6;
-      max-width: 480px;
-      margin: 0 auto 36px;
-    }
+/* ── Botones comunes ─────────────────────────────────────────────── */
+.home-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 15px 26px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent), #00c4d4);
+  color: #0a0c10;
+  font-weight: 800;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.home-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px var(--glow);
+}
+.home-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.18);
+  background: var(--surface-hover);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.home-btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
-    .validator-wrap {
-      position: relative;
-      max-width: 720px;
-      margin: 0 auto;
-    }
-    .validator-card {
-      background: rgba(15,18,24,0.92);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: var(--radius);
-      padding: 32px;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.35);
-      backdrop-filter: blur(12px);
-    }
-    .validator-title {
-      font-weight: 700;
-      font-size: 1rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.8);
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .steps-line {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 28px;
-      flex-wrap: wrap;
-    }
-    .step-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-      color: var(--muted);
-      font-weight: 700;
-      font-size: 0.8rem;
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .step-pill .num {
-      width: 24px;
-      height: 24px;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      background: rgba(255,255,255,0.06);
-      color: var(--text);
-    }
-    .step-pill.active {
-      border-color: rgba(0,240,255,0.4);
-      color: var(--text);
-      box-shadow: 0 0 0 1px rgba(0,240,255,0.15);
-    }
-    .step-pill.active .num { background: var(--accent-soft); color: var(--accent); }
-    .step-pill.done { border-color: rgba(0,230,118,0.3); color: var(--success); }
-    .step-pill.done .num { background: rgba(0,230,118,0.15); color: var(--success); }
-    .step-conn { width: 20px; height: 2px; background: var(--border); flex-shrink: 0; }
+/* ── HERO ────────────────────────────────────────────────────────── */
+.home-hero {
+  position: relative;
+  padding: 64px 0 48px;
+  overflow: hidden;
+}
+.home-hero-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+.home-hero-copy { display: flex; flex-direction: column; gap: 20px; }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-    }
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .field label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.88);
-    }
-    .field select {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(255,255,255,0.18);
-      background: #151a22 !important;
-      color: #f0f2f5 !important;
-      font-family: inherit;
-      font-size: 0.95rem;
-      font-weight: 500;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    .field select option {
-      background: #151a22 !important;
-      color: #f0f2f5 !important;
-    }
-    .field select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-soft);
-    }
-    .field select:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      background: #0f1218;
-      color: rgba(255,255,255,0.6);
-    }
-    .field .hint {
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.7);
-      line-height: 1.4;
-    }
+.home-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(0,240,255,0.25);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+.home-hero-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.home-hero-title {
+  font-weight: 800;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: #fff;
+}
+.home-hero-subtitle {
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  max-width: 440px;
+}
+.home-hero-ctas {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.home-hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.home-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: rgba(255,255,255,0.7);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
 
-    .actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 24px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
-    }
-    .btn-submit {
-      padding: 16px 28px;
-      border-radius: var(--radius-sm);
-      border: none;
-      background: linear-gradient(135deg, var(--accent), #00c4d4);
-      color: #0a0c10;
-      font-family: inherit;
-      font-weight: 800;
-      font-size: 0.9rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .btn-submit:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px var(--glow);
-    }
-    .btn-submit:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .btn-clear {
-      padding: 14px 20px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      font-family: inherit;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
-    }
-    .btn-clear:hover { color: var(--text); border-color: var(--muted); }
+/* Hero visual */
+.home-hero-visual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 340px;
+}
+.home-hero-img-main {
+  position: relative;
+  z-index: 2;
+  width: 260px;
+  max-width: 55%;
+  flex-shrink: 0;
+}
+.home-hero-img-main::before {
+  content: '';
+  position: absolute;
+  inset: -32px;
+  background: radial-gradient(ellipse 80% 80% at center, rgba(0,240,255,0.10), transparent 70%);
+  pointer-events: none;
+  border-radius: 50%;
+}
+.home-hero-img-main img {
+  width: 100%;
+  height: 260px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 32px rgba(0,240,255,0.18));
+}
+.home-hero-img-secondary {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 3;
+}
+.home-hero-img-sm {
+  width: 100px;
+  height: 100px;
+  background: rgba(15,20,28,0.85);
+  border: 1px solid rgba(0,240,255,0.18);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.home-hero-img-sm:hover {
+  border-color: rgba(0,240,255,0.4);
+  box-shadow: 0 0 16px rgba(0,240,255,0.12);
+}
+.home-hero-img-sm img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+.home-hero-fallback {
+  width: 260px;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.home-hero-fallback-icon { font-size: 5rem; opacity: 0.3; }
 
-    .links-row {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-top: 32px;
-    }
-    .links-row a {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 20px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: var(--surface-hover);
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: border-color 0.2s, color 0.2s;
-    }
-    .links-row a:hover { border-color: var(--accent); color: var(--accent); }
+/* ── FRANJA DE CONFIANZA ─────────────────────────────────────────── */
+.home-trust {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: rgba(0,240,255,0.02);
+  padding: 28px 0;
+}
+.home-trust-inner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.home-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+}
+.home-trust-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.home-trust-item strong {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.home-trust-item span {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
 
-    .wa-float {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      z-index: 60;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 18px;
-      border-radius: 999px;
-      background: rgba(0,230,118,0.12);
-      border: 1px solid rgba(0,230,118,0.3);
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 0.9rem;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-      transition: box-shadow 0.2s;
-    }
-    .wa-float:hover { box-shadow: 0 12px 40px rgba(0,230,118,0.2); }
+/* ── PRODUCT CARD (copiado de product_list.html para que funcione _product_card.html) */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+.product-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: var(--navy-surface);
+  border: 1px solid var(--navy-border);
+  border-radius: 14px;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.product-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(0,212,255,0.3);
+  box-shadow: 0 10px 36px rgba(0,212,255,0.10);
+}
+.product-card-img {
+  width: 100%;
+  aspect-ratio: 1.05;
+  background: var(--navy-light);
+  position: relative;
+  overflow: hidden;
+}
+.product-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transition: transform 0.2s;
+}
+.product-card:hover .product-card-img img { transform: scale(1.03); }
+.product-card-img .no-img {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.product-card-body { padding: 18px; }
+.product-card-cat {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 5px;
+}
+.product-card-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  margin-bottom: 6px;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.product-card-sku {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.product-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.product-card-price {
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--cyan);
+}
+.product-card-iva {
+  font-weight: 500;
+  font-size: 0.72rem;
+  color: var(--cyan);
+  opacity: 0.85;
+}
+.product-card-cta {
+  padding: 9px 16px;
+  background: var(--cyan-soft);
+  color: var(--cyan);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  border-radius: 8px;
+  border: 1px solid rgba(0,212,255,0.25);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.product-card:hover .product-card-cta {
+  background: rgba(0,212,255,0.22);
+  box-shadow: 0 0 14px var(--cyan-glow);
+}
+.product-card.product-card-inactive { opacity: 0.75; }
 
-    .toast {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      z-index: 70;
-      max-width: 360px;
-      padding: 16px 20px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: rgba(10,12,16,0.95);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 16px 48px rgba(0,0,0,0.4);
-      display: none;
-    }
-    .toast.show { display: block; animation: slideIn 0.25s ease; }
-    @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    .toast strong { display: block; font-size: 0.9rem; margin-bottom: 4px; }
-    .toast p { font-size: 0.85rem; color: var(--muted); }
+/* ── CATEGORÍAS VISUALES ─────────────────────────────────────────── */
+.home-cats { background: linear-gradient(180deg, rgba(0,240,255,0.02) 0%, transparent 100%); }
+.home-cats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.home-cat-card {
+  position: relative;
+  display: block;
+  height: 180px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  background: var(--navy-mid);
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.home-cat-card:hover {
+  border-color: rgba(0,240,255,0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,240,255,0.10);
+}
+.home-cat-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.25s;
+}
+.home-cat-card:hover .home-cat-img { transform: scale(1.04); }
+.home-cat-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  opacity: 0.15;
+  background: linear-gradient(135deg, rgba(0,240,255,0.06), rgba(120,80,255,0.06));
+}
+.home-cat-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 30%, rgba(8,10,14,0.82) 100%);
+}
+.home-cat-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 14px 16px;
+}
+.home-cat-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
 
-    .footer {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 32px 24px 48px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.85rem;
-      line-height: 1.6;
-    }
-    .footer-credits {
-      display: block;
-      margin-top: 12px;
-      font-size: 0.8rem;
-      opacity: 0.85;
-    }
+/* ── VEHICLE SELECTOR ────────────────────────────────────────────── */
+.home-vehicle { background: rgba(0,240,255,0.015); }
+.home-vehicle-head { text-align: center; margin-bottom: 36px; }
+.home-vehicle-sub {
+  color: var(--muted);
+  font-size: 1rem;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+.home-vehicle-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+.home-vehicle-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.home-vehicle-step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(0,240,255,0.3);
+  color: var(--accent);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.home-vehicle-step-conn {
+  width: 28px;
+  height: 2px;
+  background: var(--border);
+  flex-shrink: 0;
+}
 
-    /* ========== Mobile-First: touch targets ≥48px, sin zoom iOS, uso con pulgar ========== */
-    @media (max-width: 768px) {
-      .header-inner { padding: 12px 16px; gap: 12px; }
-      .nav a {
-        padding: 12px 16px;
-        min-height: 48px;
-        display: inline-flex;
-        align-items: center;
-        font-size: 0.9rem;
-      }
-      .hero { padding: 32px 16px 48px; }
-      .hero h1 { font-size: clamp(1.65rem, 6vw, 2.2rem); }
-      .hero p { font-size: 1rem; margin-bottom: 24px; }
-      .hero-marcas { font-size: 0.8rem !important; }
-      .validator-card { padding: 24px 20px; }
-      .validator-title { margin-bottom: 20px; font-size: 0.9rem; }
-      .steps-line { gap: 6px; margin-bottom: 22px; }
-      .step-pill {
-        padding: 12px 14px;
-        min-height: 44px;
-        font-size: 0.8rem;
-      }
-      .form-grid {
-        grid-template-columns: 1fr;
-        gap: 18px;
-      }
-      .field select {
-        min-height: 48px;
-        padding: 16px 18px;
-        font-size: 16px; /* Evita zoom automático en iOS al enfocar */
-      }
-      .field .hint { font-size: 0.8rem; }
-      .actions {
-        flex-direction: column;
-        gap: 12px;
-        margin-top: 20px;
-        padding-top: 20px;
-      }
-      .btn-submit {
-        width: 100%;
-        min-height: 52px;
-        padding: 16px 24px;
-        font-size: 1rem;
-      }
-      .btn-clear {
-        width: 100%;
-        min-height: 48px;
-        padding: 14px 24px;
-        font-size: 0.95rem;
-      }
-      .links-row { margin-top: 24px; gap: 12px; }
-      .links-row a {
-        min-height: 48px;
-        padding: 14px 20px;
-        font-size: 0.95rem;
-        justify-content: center;
-      }
-      .wa-float {
-        right: 16px;
-        bottom: max(16px, env(safe-area-inset-bottom));
-        padding: 14px 18px;
-        min-height: 48px;
-        font-size: 0.9rem;
-      }
-      .toast {
-        left: 16px;
-        right: 16px;
-        bottom: max(16px, env(safe-area-inset-bottom));
-        max-width: none;
-      }
-      .footer { padding: 24px 16px 40px; font-size: 0.8rem; }
-    }
-    @media (max-width: 380px) {
-      .validator-card { padding: 20px 16px; }
-      .step-pill .num { width: 22px; height: 22px; font-size: 0.75rem; }
-    }
+/* Reutilizar estilos validator del hero original */
+.validator-wrap { max-width: 720px; margin: 0 auto; }
+.validator-card {
+  background: rgba(15,18,24,0.92);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+  backdrop-filter: blur(12px);
+}
+.validator-title {
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.steps-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.step-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 0.8rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+.step-pill .num {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+}
+.step-pill.active {
+  border-color: rgba(0,240,255,0.4);
+  color: var(--text);
+  box-shadow: 0 0 0 1px rgba(0,240,255,0.15);
+}
+.step-pill.active .num { background: var(--accent-soft); color: var(--accent); }
+.step-pill.done { border-color: rgba(0,230,118,0.3); color: var(--success); }
+.step-pill.done .num { background: rgba(0,230,118,0.15); color: var(--success); }
+.step-conn { width: 20px; height: 2px; background: var(--border); flex-shrink: 0; }
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.88);
+}
+.field select {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.18);
+  background: #151a22 !important;
+  color: #f0f2f5 !important;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.field select option { background: #151a22 !important; color: #f0f2f5 !important; }
+.field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.field select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #0f1218;
+  color: rgba(255,255,255,0.6);
+}
+.field .hint { font-size: 0.75rem; color: rgba(255,255,255,0.7); line-height: 1.4; }
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.btn-submit {
+  padding: 16px 28px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: linear-gradient(135deg, var(--accent), #00c4d4);
+  color: #0a0c10;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px var(--glow);
+}
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-clear {
+  padding: 14px 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.btn-clear:hover { color: var(--text); border-color: var(--muted); }
+
+/* ── ESPECIALISTAS ───────────────────────────────────────────────── */
+.home-specialists-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+.home-specialists-visual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+}
+.home-specialists-visual::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(ellipse 80% 80% at center, rgba(0,240,255,0.07), transparent 70%);
+  pointer-events: none;
+  border-radius: 50%;
+}
+.home-specialists-visual img {
+  max-width: 280px;
+  max-height: 280px;
+  width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 32px rgba(0,240,255,0.12));
+  position: relative;
+  z-index: 1;
+}
+.home-specialists-fallback {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  opacity: 0.25;
+}
+.home-specialists-content { display: flex; flex-direction: column; gap: 18px; }
+.home-specialists-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(0,240,255,0.2);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+.home-specialists-body {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.home-specialists-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.home-specialists-list li {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.75);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.home-specialists-list li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+/* Toast (para feedback del formulario) */
+.home-toast {
+  position: fixed;
+  right: 20px;
+  bottom: 80px;
+  z-index: 70;
+  max-width: 320px;
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: rgba(10,12,16,0.95);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+  display: none;
+}
+.home-toast.show { display: block; animation: fadeUp 0.25s ease; }
+.home-toast strong { display: block; font-size: 0.875rem; margin-bottom: 3px; color: var(--text); }
+.home-toast p { font-size: 0.82rem; color: var(--muted); }
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .home-cats-grid { grid-template-columns: repeat(3, 1fr); }
+  .home-trust-inner { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+}
+@media (max-width: 768px) {
+  .home-hero { padding: 40px 0 32px; }
+  .home-hero-inner { grid-template-columns: 1fr; gap: 32px; }
+  .home-hero-visual { order: -1; min-height: 200px; }
+  .home-hero-img-main { width: 180px; }
+  .home-hero-img-main img { height: 180px; }
+  .home-hero-img-sm { width: 72px; height: 72px; }
+  .home-hero-title { font-size: clamp(1.7rem, 6vw, 2.2rem); }
+  .home-section { padding: 40px 0; }
+  .home-cats-grid { grid-template-columns: repeat(2, 1fr); }
+  .home-trust-inner { grid-template-columns: repeat(2, 1fr); gap: 4px; }
+  .home-trust-item { flex-direction: column; text-align: center; gap: 8px; }
+  .home-specialists-inner { grid-template-columns: 1fr; gap: 32px; }
+  .home-specialists-visual { min-height: 160px; }
+  .home-specialists-visual img { max-width: 160px; max-height: 160px; }
+  .form-grid { grid-template-columns: 1fr; gap: 18px; }
+  .field select { min-height: 48px; padding: 16px 18px; font-size: 16px; }
+  .actions { flex-direction: column; }
+  .btn-submit { width: 100%; min-height: 52px; }
+  .btn-clear { width: 100%; min-height: 48px; }
+  .validator-card { padding: 24px 20px; }
+  .home-toast { left: 16px; right: 16px; bottom: max(70px, env(safe-area-inset-bottom)); max-width: none; }
+}
+@media (max-width: 480px) {
+  .home-container { padding: 0 16px; }
+  .home-hero-ctas { flex-direction: column; width: 100%; }
+  .home-hero-ctas .home-btn-primary,
+  .home-hero-ctas .home-btn-secondary { width: 100%; justify-content: center; }
+  .home-cats-grid { gap: 10px; }
+  .home-cat-card { height: 140px; }
+}
+
+/* ── Accesibilidad ───────────────────────────────────────────────── */
+.home-btn-primary:focus-visible,
+.home-btn-secondary:focus-visible,
+.home-cat-card:focus-visible,
+.home-section-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-badge-dot { animation: none; }
+  .home-btn-primary:hover,
+  .home-btn-secondary,
+  .product-card,
+  .home-cat-card { transform: none !important; transition: none !important; }
+  .home-toast.show { animation: none; }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<main class="hero">
-    <div class="hero-badge">Mercado Chile • Desde 1980</div>
-    <h1>Repuestos que calzan en tu vehículo</h1>
-    <p style="max-width: 620px; margin-top: 0.75rem; color: var(--muted); font-size: 0.98rem;">
-      Valida compatibilidad por año, marca, modelo y motor exacto en un solo flujo, diseñado para catalíticos y flexibles.
-    </p>
-    <p style="max-width: 620px; margin-top: 0.35rem; color: var(--muted); font-size: 0.9rem;">
-      El motor que eliges (combustible y cilindrada reales) alimenta un motor de reglas técnicas que prioriza coincidencias exactas y sugiere alternativas seguras cuando no hay match directo.
-    </p>
 
-    <div class="validator-wrap" id="buscador">
+{# ── 1. HERO ──────────────────────────────────────────────────────── #}
+<section class="home-hero" aria-labelledby="hero-heading">
+  <div class="home-container home-hero-inner">
+
+    <div class="home-hero-copy">
+      <div class="home-hero-badge" aria-hidden="true">
+        <span class="home-hero-badge-dot"></span>
+        ESPECIALISTAS EN ESCAPES · CHILE
+      </div>
+
+      <h1 id="hero-heading" class="home-hero-title">
+        Repuestos de escape que calzan con tu vehículo
+      </h1>
+
+      <p class="home-hero-subtitle">
+        Catalíticos, flexibles y componentes de escape. Selecciona tu vehículo y te mostraremos los repuestos compatibles.
+      </p>
+
+      <div class="home-hero-ctas">
+        <a href="#buscador" class="home-btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+          Buscar por mi vehículo
+        </a>
+        <a href="#productos-destacados" class="home-btn-secondary">Ver catálogo</a>
+      </div>
+
+      <div class="home-hero-chips" aria-label="Beneficios principales">
+        <span class="home-chip">🚚 Envíos a todo Chile</span>
+        <span class="home-chip">🛡 Garantía en catalíticos</span>
+        <span class="home-chip">💬 Asesoría especializada</span>
+      </div>
+    </div>
+
+    {# Composición visual de productos reales #}
+    <div class="home-hero-visual" aria-hidden="true">
+      {% if hero_products %}
+        {% with main_p=hero_products.0 %}
+          {% with main_img=main_p.primary_image %}
+          {% if main_img %}
+          <div class="home-hero-img-main">
+            <img src="{{ main_img.image.url }}" alt="{{ main_p.nombre }}" loading="eager" width="260" height="260">
+          </div>
+          {% else %}
+          <div class="home-hero-fallback">
+            <span class="home-hero-fallback-icon" aria-hidden="true">⚙️</span>
+          </div>
+          {% endif %}
+          {% endwith %}
+        {% endwith %}
+
+        {% if hero_products|length > 1 %}
+        <div class="home-hero-img-secondary">
+          {% for product in hero_products %}{% if not forloop.first %}
+          {% with img=product.primary_image %}{% if img %}
+          <div class="home-hero-img-sm">
+            <img src="{{ img.image.url }}" alt="{{ product.nombre }}" loading="lazy" width="80" height="80">
+          </div>
+          {% endif %}{% endwith %}
+          {% endif %}{% endfor %}
+        </div>
+        {% endif %}
+
+      {% else %}
+      <div class="home-hero-fallback">
+        <span class="home-hero-fallback-icon" aria-hidden="true">⚙️</span>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+{# ── 2. FRANJA DE CONFIANZA ───────────────────────────────────────── #}
+<div class="home-trust" aria-label="Beneficios de compra">
+  <div class="home-container home-trust-inner">
+    <div class="home-trust-item">
+      <span class="home-trust-icon" aria-hidden="true">🚚</span>
+      <div>
+        <strong>Envíos a todo Chile</strong>
+        <span>Despacho a domicilio</span>
+      </div>
+    </div>
+    <div class="home-trust-item">
+      <span class="home-trust-icon" aria-hidden="true">🛡</span>
+      <div>
+        <strong>Garantía en catalíticos</strong>
+        <span>Productos certificados</span>
+      </div>
+    </div>
+    <div class="home-trust-item">
+      <span class="home-trust-icon" aria-hidden="true">✓</span>
+      <div>
+        <strong>Productos seleccionados</strong>
+        <span>Calidad garantizada</span>
+      </div>
+    </div>
+    <div class="home-trust-item">
+      <span class="home-trust-icon" aria-hidden="true">💬</span>
+      <div>
+        <strong>Asesoría especializada</strong>
+        <span>Equipo técnico disponible</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ── 3. PRODUCTOS DESTACADOS ──────────────────────────────────────── #}
+{% if featured_products %}
+<section class="home-section" id="productos-destacados" aria-labelledby="feat-heading">
+  <div class="home-container">
+    <div class="home-section-head">
+      <h2 id="feat-heading" class="home-section-title">Productos destacados</h2>
+      <a href="{% url 'commerce:search' %}" class="home-section-link" aria-label="Ver todos los productos">Ver todos →</a>
+    </div>
+    <div class="products-grid">
+      {% for product in featured_products %}
+      {% include "commerce/themes/monteazul/catalog/_product_card.html" %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ── 4. CATEGORÍAS VISUALES ───────────────────────────────────────── #}
+{% if categories %}
+<section class="home-section home-cats" aria-labelledby="cats-heading">
+  <div class="home-container">
+    <div class="home-section-head">
+      <h2 id="cats-heading" class="home-section-title">Encuentra lo que necesitas</h2>
+    </div>
+    <div class="home-cats-grid">
+      {% for cat in categories %}
+      <a href="{% url 'commerce:category' cat.slug %}"
+         class="home-cat-card"
+         aria-label="Ver {{ cat.name }}">
+        {% if cat.image %}
+        <img src="{{ cat.image.url }}" alt="" class="home-cat-img" loading="lazy">
+        {% else %}
+        <div class="home-cat-placeholder" aria-hidden="true">⚙</div>
+        {% endif %}
+        <div class="home-cat-overlay" aria-hidden="true"></div>
+        <div class="home-cat-content">
+          <span class="home-cat-name">{{ cat.name }}</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ── 5. SELECTOR DE VEHÍCULO ──────────────────────────────────────── #}
+<section class="home-section home-vehicle" id="buscador" aria-labelledby="vehicle-heading">
+  <div class="home-container">
+
+    <div class="home-vehicle-head">
+      <h2 id="vehicle-heading" class="home-section-title">Encuentra repuestos para tu vehículo</h2>
+      <p class="home-vehicle-sub">Selecciona tu vehículo y te mostraremos los repuestos compatibles.</p>
+      <div class="home-vehicle-steps" aria-hidden="true">
+        <div class="home-vehicle-step">
+          <span class="home-vehicle-step-num">1</span>
+          <span>Vehículo</span>
+        </div>
+        <div class="home-vehicle-step-conn"></div>
+        <div class="home-vehicle-step">
+          <span class="home-vehicle-step-num">2</span>
+          <span>Motor</span>
+        </div>
+        <div class="home-vehicle-step-conn"></div>
+        <div class="home-vehicle-step">
+          <span class="home-vehicle-step-num">3</span>
+          <span>Compatibilidad</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="validator-wrap">
       <div class="validator-card">
-        <div class="validator-title" id="validator-legend">Buscar por vehículo</div>
-        <div class="steps-line" aria-label="Progreso">
+        <div class="validator-title" id="validator-legend">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+          Buscar por vehículo
+        </div>
+        <div class="steps-line" aria-label="Progreso de selección">
           <div class="step-pill active" id="st1"><span class="num">1</span> Año</div>
-          <span class="step-conn"></span>
+          <span class="step-conn" aria-hidden="true"></span>
           <div class="step-pill" id="st2"><span class="num">2</span> Marca</div>
-          <span class="step-conn"></span>
+          <span class="step-conn" aria-hidden="true"></span>
           <div class="step-pill" id="st3"><span class="num">3</span> Modelo</div>
         </div>
 
-        <form method="get" action="{% url 'commerce:vehicle_search' %}" id="vehicleForm" role="search" aria-labelledby="validator-legend"
+        <form method="get" action="{% url 'commerce:vehicle_search' %}"
+              id="vehicleForm" role="search" aria-labelledby="validator-legend"
               data-url-modelos="{% url 'commerce:api_vehicle_models' %}">
           <div class="form-grid">
             <div class="field">
@@ -505,10 +1030,10 @@
                 <option value="HIBRIDO">Híbrido</option>
                 <option value="EV">Eléctrico</option>
               </select>
-              <span class="hint" id="fuel-hint">Paso 2: combustible</span>
+              <span class="hint" id="fuel-hint">Paso 2: combustible del motor</span>
             </div>
             <div class="field">
-              <label for="brand_label">Marca (opcional)</label>
+              <label for="brand_label">Marca <span style="font-weight:400;opacity:.65">(opcional)</span></label>
               <select id="brand" name="brand_id" disabled aria-describedby="brand-hint">
                 <option value="">Marca</option>
                 {% for b in brands %}<option value="{{ b.id }}" data-name="{{ b.name }}">{{ b.name }}</option>{% endfor %}
@@ -517,12 +1042,12 @@
               <span class="hint" id="brand-hint">Paso 3: marca (opcional)</span>
             </div>
             <div class="field">
-              <label for="model_label">Modelo (opcional)</label>
+              <label for="model_label">Modelo <span style="font-weight:400;opacity:.65">(opcional)</span></label>
               <select id="model" name="model_id" disabled aria-describedby="model-hint">
                 <option value="">Modelo</option>
               </select>
               <input type="hidden" id="model_name" name="model_name">
-              <span class="hint" id="model-hint">Paso 4: modelo</span>
+              <span class="hint" id="model-hint">Paso 4: modelo (opcional)</span>
             </div>
             <div class="field">
               <label for="displacement">Cilindrada (cc)</label>
@@ -538,7 +1063,7 @@
                 <option value="2700">2.7L · 2700 cc</option>
                 <option value="3000">3.0L · 3000 cc</option>
               </select>
-              <span class="hint" id="cc-hint">Ayuda a elegir el diámetro de flexibles.</span>
+              <span class="hint" id="cc-hint">Ayuda a elegir el diámetro de flexible correcto.</span>
             </div>
           </div>
 
@@ -550,41 +1075,106 @@
       </div>
     </div>
 
-    <div class="links-row">
-      <a href="{% url 'commerce:home' %}">Ver catálogo completo</a>
-      <a href="#contacto">Hablar con un experto</a>
-    </div>
-  </main>
+  </div>
+</section>
 
+{# ── 6. BLOQUE ESPECIALISTAS ──────────────────────────────────────── #}
+<section class="home-section" aria-labelledby="spec-heading">
+  <div class="home-container">
+    <div class="home-specialists-inner">
+
+      <div class="home-specialists-visual">
+        {% if hero_products %}
+          {% with sp=hero_products.0 %}{% with sp_img=sp.primary_image %}
+          {% if sp_img %}
+          <img src="{{ sp_img.image.url }}" alt="{{ sp.nombre }}" loading="lazy" width="280" height="280">
+          {% else %}
+          <div class="home-specialists-fallback" aria-hidden="true">⚙️</div>
+          {% endif %}
+          {% endwith %}{% endwith %}
+        {% else %}
+        <div class="home-specialists-fallback" aria-hidden="true">⚙️</div>
+        {% endif %}
+      </div>
+
+      <div class="home-specialists-content">
+        <div class="home-specialists-badge">Nuestros especialistas</div>
+        <h2 id="spec-heading" class="home-section-title">
+          {% if brand.tagline %}{{ brand.tagline }}{% else %}Especialistas en sistemas de escape{% endif %}
+        </h2>
+        <p class="home-specialists-body">
+          Contamos con amplia experiencia en catalizadores, flexibles y componentes de escape para todo tipo de vehículos. Nuestro equipo técnico te orienta para encontrar el repuesto correcto para tu vehículo.
+        </p>
+        <ul class="home-specialists-list" aria-label="Nuestras especialidades">
+          <li>Catalizadores TWC para norma Euro 3, 4 y 5</li>
+          <li>Flexibles reforzados en todos los diámetros</li>
+          <li>Silenciadores deportivos y de línea</li>
+          <li>Puntas y colas de escape universales</li>
+          <li>Asesoría técnica personalizada</li>
+        </ul>
+        {% if brand.whatsapp.url %}
+        <div style="margin-top: 8px;">
+          <a href="{{ brand.whatsapp.url }}" target="_blank" rel="noopener" class="home-btn-primary">
+            💬 Consultar a un especialista
+          </a>
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{# ── 7. PRODUCTOS RECIENTES ───────────────────────────────────────── #}
+{% if recent_products %}
+<section class="home-section" aria-labelledby="recent-heading" style="padding-top:0">
+  <div class="home-container">
+    <div class="home-section-head">
+      <h2 id="recent-heading" class="home-section-title">Recién agregados</h2>
+    </div>
+    <div class="products-grid">
+      {% for product in recent_products %}
+      {% include "commerce/themes/monteazul/catalog/_product_card.html" %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# Toast para feedback del formulario de vehículo #}
+<div class="home-toast" id="toast" role="status" aria-live="polite">
+  <strong id="toastTitle"></strong>
+  <p id="toastMsg"></p>
+</div>
 
 {% endblock %}
 
 {% block extra_js %}
 <script>
 (function () {
-  const vehicleForm = document.getElementById('vehicleForm');
+  var vehicleForm = document.getElementById('vehicleForm');
   if (!vehicleForm) return;
 
-  const urlModelos     = vehicleForm.getAttribute('data-url-modelos') || '/commerce/api/vehicle-models/';
-  const yearSelect     = document.getElementById('year');
-  const fuelSelect     = document.getElementById('fuel_type');
-  const brandSelect    = document.getElementById('brand');
-  const modelSelect    = document.getElementById('model');
-  const dispSelect     = document.getElementById('displacement');
-  const brandNameInput = document.getElementById('brand_name');
-  const modelNameInput = document.getElementById('model_name');
-  const btnSearch      = document.getElementById('btnSearch');
-  const btnClear       = document.getElementById('btnClear');
-  const steps          = [
+  var urlModelos     = vehicleForm.getAttribute('data-url-modelos') || '/commerce/api/vehicle-models/';
+  var yearSelect     = document.getElementById('year');
+  var fuelSelect     = document.getElementById('fuel_type');
+  var brandSelect    = document.getElementById('brand');
+  var modelSelect    = document.getElementById('model');
+  var dispSelect     = document.getElementById('displacement');
+  var brandNameInput = document.getElementById('brand_name');
+  var modelNameInput = document.getElementById('model_name');
+  var btnSearch      = document.getElementById('btnSearch');
+  var btnClear       = document.getElementById('btnClear');
+  var steps          = [
     document.getElementById('st1'),
     document.getElementById('st2'),
     document.getElementById('st3'),
   ].filter(Boolean);
 
-  const toast      = document.getElementById('toast');
-  const toastTitle = document.getElementById('toastTitle');
-  const toastMsg   = document.getElementById('toastMsg');
-  let toastT = null;
+  var toast      = document.getElementById('toast');
+  var toastTitle = document.getElementById('toastTitle');
+  var toastMsg   = document.getElementById('toastMsg');
+  var toastT = null;
 
   function showToast(title, msg) {
     if (!toast || !toastTitle || !toastMsg) return;
@@ -592,10 +1182,10 @@
     toastMsg.textContent = msg;
     toast.classList.add('show');
     clearTimeout(toastT);
-    toastT = setTimeout(() => toast.classList.remove('show'), 2800);
+    toastT = setTimeout(function() { toast.classList.remove('show'); }, 2800);
   }
   function setStep(active) {
-    steps.forEach((el, i) => {
+    steps.forEach(function(el, i) {
       el.classList.remove('active', 'done');
       if (i + 1 === active) el.classList.add('active');
       if (i + 1 < active) el.classList.add('done');
@@ -603,10 +1193,7 @@
   }
   function markDone(el) { if (el) { el.classList.add('done'); el.classList.remove('active'); } }
 
-  // El mínimo para buscar es año + combustible
-  function canSearch() {
-    return !!(yearSelect.value && fuelSelect.value);
-  }
+  function canSearch() { return !!(yearSelect.value && fuelSelect.value); }
 
   function enableAfterYear() {
     if (fuelSelect) fuelSelect.disabled = false;
@@ -614,15 +1201,14 @@
     if (dispSelect) dispSelect.disabled = false;
   }
   function disableAll() {
-    [fuelSelect, brandSelect, modelSelect, dispSelect].forEach(s => { if (s) s.disabled = true; });
+    [fuelSelect, brandSelect, modelSelect, dispSelect].forEach(function(s) { if (s) s.disabled = true; });
     if (modelSelect) modelSelect.innerHTML = '<option value="">Modelo</option>';
     if (brandNameInput) brandNameInput.value = '';
     if (modelNameInput) modelNameInput.value = '';
     if (btnSearch) btnSearch.disabled = true;
   }
 
-  // Año
-  yearSelect.addEventListener('change', () => {
+  yearSelect.addEventListener('change', function() {
     if (!yearSelect.value) { disableAll(); setStep(1); return; }
     enableAfterYear();
     markDone(steps[0]);
@@ -631,9 +1217,8 @@
     if (btnSearch) btnSearch.disabled = !canSearch();
   });
 
-  // Combustible — habilita el botón (mínimo requerido)
   if (fuelSelect) {
-    fuelSelect.addEventListener('change', () => {
+    fuelSelect.addEventListener('change', function() {
       if (btnSearch) btnSearch.disabled = !canSearch();
       if (fuelSelect.value && yearSelect.value) {
         markDone(steps[1]);
@@ -643,49 +1228,46 @@
     });
   }
 
-  // Marca → carga modelos por AJAX
   if (brandSelect) {
-    brandSelect.addEventListener('change', async () => {
+    brandSelect.addEventListener('change', async function() {
       if (!brandSelect.value) {
         if (modelSelect) { modelSelect.innerHTML = '<option value="">Modelo</option>'; modelSelect.disabled = true; }
         if (modelNameInput) modelNameInput.value = '';
         return;
       }
-      const sel = brandSelect.options[brandSelect.selectedIndex];
+      var sel = brandSelect.options[brandSelect.selectedIndex];
       if (brandNameInput) brandNameInput.value = sel ? (sel.getAttribute('data-name') || sel.textContent) : '';
       if (modelSelect) {
         modelSelect.disabled = true;
         modelSelect.innerHTML = '<option value="">Cargando…</option>';
         try {
-          const res  = await fetch(urlModelos + '?brand_id=' + encodeURIComponent(brandSelect.value));
-          const data = await res.json();
+          var res  = await fetch(urlModelos + '?brand_id=' + encodeURIComponent(brandSelect.value));
+          var data = await res.json();
           modelSelect.innerHTML = '<option value="">Modelo (opcional)</option>';
-          (data.models || []).forEach(m => {
-            const o = document.createElement('option');
+          (data.models || []).forEach(function(m) {
+            var o = document.createElement('option');
             o.value = m.id;
             o.textContent = m.name;
             o.setAttribute('data-name', m.name);
             modelSelect.appendChild(o);
           });
           modelSelect.disabled = false;
-        } catch {
+        } catch(e) {
           modelSelect.innerHTML = '<option value="">Error — intenta de nuevo</option>';
         }
       }
     });
   }
 
-  // Modelo
   if (modelSelect) {
-    modelSelect.addEventListener('change', () => {
-      const sel = modelSelect.options[modelSelect.selectedIndex];
+    modelSelect.addEventListener('change', function() {
+      var sel = modelSelect.options[modelSelect.selectedIndex];
       if (modelNameInput) modelNameInput.value = sel && modelSelect.value ? (sel.getAttribute('data-name') || sel.textContent) : '';
     });
   }
 
-  // Limpiar
   if (btnClear) {
-    btnClear.addEventListener('click', () => {
+    btnClear.addEventListener('click', function() {
       yearSelect.value = '';
       disableAll();
       setStep(1);
@@ -693,7 +1275,6 @@
     });
   }
 
-  // Estado inicial
   if (yearSelect.value) { enableAfterYear(); markDone(steps[0]); setStep(2); }
   if (btnSearch) btnSearch.disabled = !canSearch();
 })();

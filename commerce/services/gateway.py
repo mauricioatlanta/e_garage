@@ -63,6 +63,23 @@ class CommerceCatalogGateway:
             qs = qs[:limit]
         return qs
 
+    def list_products_with_images(self, limit=None):
+        """Productos publicables que tienen al menos una imagen cargada."""
+        from commerce.models import ProductImage
+        from django.db.models import Exists, OuterRef
+
+        qs = (
+            CommerceProduct.objects
+            .filter(empresa=self._empresa, is_publishable=True)
+            .filter(Exists(ProductImage.objects.filter(commerce_product=OuterRef("pk"))))
+            .select_related("repuesto", "category")
+            .prefetch_related("images")
+            .order_by("repuesto__nombre")
+        )
+        if limit:
+            qs = qs[:limit]
+        return qs
+
     def list_products_recent(self, limit=8):
         """Productos más recientemente agregados (por pk, proxy de fecha de carga)."""
         return (
