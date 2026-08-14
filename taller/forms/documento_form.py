@@ -355,9 +355,9 @@ class DocumentoForm(forms.ModelForm):
 
     def _configure_required_fields(self):
         """Configura quÃ© campos son requeridos: solo los esenciales"""
-        # Campos obligatorios: solo los esenciales
-        # NOTA: 'numero' se autogenera en el modelo, NO es requerido en el form
-        required_fields = ["tipo", "fecha_emision", "cliente"]
+        # Campos obligatorios base. cliente se valida condicionalmente en clean()
+        # segun tipo: OT/PRES lo requieren; PTS permite venta sin cliente registrado.
+        required_fields = ["tipo", "fecha_emision"]
 
         # Marcar todos los campos como no requeridos por defecto
         for field_name in self.fields:
@@ -409,7 +409,7 @@ class DocumentoForm(forms.ModelForm):
         cleaned_data = super().clean()
         self._parsed_line_items = {}
 
-        # Validar que cliente pertenece a la empresa
+        tipo = cleaned_data.get("tipo")
         cliente = cleaned_data.get("cliente")
         vehiculo = cleaned_data.get("vehiculo")
 
@@ -428,6 +428,24 @@ class DocumentoForm(forms.ModelForm):
         ):
             raise forms.ValidationError("El vehÃ­culo seleccionado no pertenece al cliente.")
 
+        # Validaciones por tipo de documento
+        if tipo in ("OT", "PRES"):
+            # Servicio mecánico: cliente y vehículo son obligatorios con datos de contacto completos.
+            if not cliente:
+                self.add_error("cliente", "El cliente es obligatorio para Órdenes de Trabajo y Presupuestos.")
+            else:
+                if not (cliente.apellido or "").strip():
+                    self.add_error("cliente", "El cliente debe tener apellido registrado para este tipo de documento.")
+                if not (cliente.telefono or "").strip():
+                    self.add_error("cliente", "El cliente debe tener teléfono registrado para este tipo de documento.")
+            if not vehiculo:
+                self.add_error("vehiculo", "El vehículo es obligatorio para Órdenes de Trabajo y Presupuestos.")
+        elif tipo == "PTS" and not cliente and self.empresa:
+            # Venta de repuestos sin cliente registrado: asignar cliente mostrador para cumplir
+            # la restricción NOT NULL del modelo sin obligar al vendedor a crear un cliente.
+            from taller.models.clientes import Cliente
+            cleaned_data["cliente"] = Cliente.get_or_create_mostrador(self.empresa)
+
         # Validaciones especÃ­ficas por paÃ­s
         if self.country == "CL":
             # En Chile, millas no debe tener valor
@@ -435,15 +453,9 @@ class DocumentoForm(forms.ModelForm):
                 raise forms.ValidationError(
                     "El campo millas no puede usarse en documentos de Chile."
                 )
-            # En Chile, si hay vehÃ­culo, el kilometraje_ingreso deberÃ­a ser requerido
-            vehiculo = cleaned_data.get("vehiculo")
-            if vehiculo and not cleaned_data.get("kilometraje_ingreso"):
-                # Advertencia, no error - permitir crear sin kilometraje si es necesario
-                pass
         elif self.country == "US":
             # En USA, si existe el campo millas usarlo como alternativa;
             # si no existe en el formulario renderizado, validar solo kilometraje_ingreso.
-            vehiculo = cleaned_data.get("vehiculo")
             if vehiculo:
                 kilometraje = cleaned_data.get("kilometraje_ingreso")
                 millas = cleaned_data.get("millas") if "millas" in self.fields else None

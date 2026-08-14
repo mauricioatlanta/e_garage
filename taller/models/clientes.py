@@ -192,6 +192,16 @@ class Cliente(AuditModelMixin, TenantScoped):
             return f"Cliente {self.telefono}"
         return f"Cliente #{self.pk}"
 
+    @classmethod
+    def get_or_create_mostrador(cls, empresa):
+        """Returns (or creates) the anonymous walk-in client for PTS without a named customer."""
+        obj, _ = cls.objects.get_or_create(
+            empresa=empresa,
+            nombre="[Mostrador]",
+            defaults={"apellido": None, "email": None, "telefono": None},
+        )
+        return obj
+
     def get_absolute_url(self):
         # Devuelve la URL con el prefijo de país correcto
         if hasattr(self, "empresa") and self.empresa and hasattr(self.empresa, "pais"):

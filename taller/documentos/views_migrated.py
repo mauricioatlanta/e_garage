@@ -1354,10 +1354,13 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
 
         from django.contrib import messages
 
-        messages.success(
-            self.request,
-            f"Documento {form.instance.numero_documento} creado exitosamente para {form.instance.cliente.nombre}.",
-        )
+        cliente_obj = form.instance.cliente
+        cliente_nombre = (cliente_obj.nombre or "") if cliente_obj else ""
+        if cliente_nombre and not cliente_nombre.startswith("["):
+            msg = f"Documento {form.instance.numero_documento} creado exitosamente para {cliente_nombre}."
+        else:
+            msg = f"Documento {form.instance.numero_documento} creado exitosamente."
+        messages.success(self.request, msg)
 
         return response
 
@@ -1457,10 +1460,13 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
 
         from django.contrib import messages
 
-        messages.success(
-            self.request,
-            f"Documento {form.instance.numero_documento} creado exitosamente para {form.instance.cliente.nombre}.",
-        )
+        cliente_obj = form.instance.cliente
+        cliente_nombre = (cliente_obj.nombre or "") if cliente_obj else ""
+        if cliente_nombre and not cliente_nombre.startswith("["):
+            msg = f"Documento {form.instance.numero_documento} creado exitosamente para {cliente_nombre}."
+        else:
+            msg = f"Documento {form.instance.numero_documento} creado exitosamente."
+        messages.success(self.request, msg)
 
         return response
 

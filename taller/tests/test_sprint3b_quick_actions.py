@@ -74,17 +74,27 @@ def test_get_crear_pres_preselecciona_tipo():
 
 @pytest.mark.django_db
 def test_form_pres_valido_y_guarda():
-    from django.contrib.auth.models import User
     from taller.forms.documento_form import DocumentoForm
     from taller.models.clientes import Cliente
+    from taller.models.vehiculos import Vehiculo
 
     empresa = EmpresaFactory(pais="CL")
-    cliente = Cliente.objects.create(empresa=empresa, nombre="Cliente Test PRES")
+    # PRES requires: cliente with apellido+telefono, and a vehicle.
+    cliente = Cliente.objects.create(
+        empresa=empresa, nombre="Cliente", apellido="Test", telefono="+56912345678"
+    )
+    vehiculo = Vehiculo.objects.create(
+        empresa=empresa,
+        cliente=cliente,
+        patente="TEST01",
+        tipo_uso=Vehiculo.TIPO_USO_CLIENTE,
+    )
 
     data = {
         "tipo": "PRES",
         "fecha_emision": date.today().isoformat(),
         "cliente": str(cliente.pk),
+        "vehiculo": str(vehiculo.pk),
         "repuestos_json": "[]",
         "servicios_json": "[]",
         "otros_json": "[]",
