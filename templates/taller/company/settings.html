@@ -1133,10 +1133,12 @@
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="tecnicos-tab" data-bs-toggle="pill" data-bs-target="#tecnicos" type="button" role="tab">
+                    <i class="fas fa-users"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}<i class="fas fa-wrench"></i> Técnicos{% else %}Employee Management{% endif %}
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
                 <button class="nav-link" id="usuarios-tab" data-bs-toggle="pill" data-bs-target="#usuarios-sistema" type="button" role="tab">
                     <i class="fas fa-users-cog"></i> Usuarios del Sistema
-                </button>
-                    <i class="fas fa-users"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}<i class="fas fa-wrench"></i> Técnicos{% else %}Employee Management{% endif %}
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -1847,6 +1849,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'theme': 'theme',
         'subscription': 'subscription',
         'tecnicos': 'profile',
+        'usuarios-sistema': 'profile',
         'dominio': 'dominio'
     };
     
