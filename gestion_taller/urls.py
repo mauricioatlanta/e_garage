@@ -90,6 +90,7 @@ from taller.views_extra.signup_email_verification import (
 from taller.views_extra.signup_redirects import signup_redirect
 from taller.views_extra.pwa import dynamic_manifest, dynamic_service_worker
 from taller.views_health import health_check, health_simple, healthz
+from taller.seo_views import robots_txt, sitemap_xml
 
 try:
     from taller.views_extra.compat_redirects import compat_settings_redirect
@@ -267,6 +268,8 @@ def country_aware_workspace_redirect(request, subpath=""):
 
 urlpatterns = [
     path("healthz/", healthz, name="healthz"),
+    path("robots.txt", robots_txt, name="robots_txt"),
+    path("sitemap.xml", sitemap_xml, name="sitemap_xml"),
     # Commerce Engine — catálogo público por tenant (dominio propio en producción)
     path("commerce/", include(("commerce.urls", "commerce"), namespace="commerce")),
     # Storefront público individual por empresa
