@@ -1,16 +1,18 @@
 from django.db import models
 
+from taller.config.country_settings import CountrySettings
+
+# Countries with active service catalog content. AR, CO, EC, UY are valid Empresa
+# tenants but have no catalog data, so they are intentionally excluded here.
+_CATALOG_COUNTRY_CODES = ("CL", "US", "MX", "VE", "PE", "BR")
+
 
 class CategoriaServicio(models.Model):
     """Categoría de servicios por país - identidad estable"""
 
     COUNTRY_CHOICES = [
-        ("CL", "Chile"),
-        ("US", "Estados Unidos"),
-        ("MX", "México"),
-        ("VE", "Venezuela"),
-        ("PE", "Perú"),
-        ("BR", "Brasil"),
+        (code, CountrySettings.COUNTRIES[code]["name_es"])
+        for code in _CATALOG_COUNTRY_CODES
     ]
 
     country = models.CharField(max_length=2, choices=COUNTRY_CHOICES, default="CL")

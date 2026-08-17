@@ -148,19 +148,8 @@ class CustomSignupForm(SignupForm):
         help_text="Puedes dejarlo en blanco y configurarlo después en Settings",
     )
     # ✅ PAÍS: Selector visible para que el usuario elija su país en todos los signups
-    COUNTRY_CHOICES = [
-        ("", "--- Seleccione país / Select country ---"),
-        ("US", "United States"),
-        ("AR", "Argentina"),
-        ("CL", "Chile"),
-        ("MX", "México"),
-        ("PE", "Perú"),
-        ("CO", "Colombia"),
-        ("EC", "Ecuador"),
-        ("BR", "Brasil"),
-        ("VE", "Venezuela"),
-        ("UY", "Uruguay"),
-    ]
+    COUNTRY_CHOICES = [("", "--- Seleccione país / Select country ---")] + \
+        CountrySettings.get_available_countries_for_choices()
     country = forms.ChoiceField(
         choices=COUNTRY_CHOICES,
         label="País / Country",

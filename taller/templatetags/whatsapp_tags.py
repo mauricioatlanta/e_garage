@@ -29,6 +29,15 @@ def only_digits(value):
     return "".join(ch for ch in str(value or "") if ch.isdigit())
 
 
+@register.filter
+def has_whatsapp(cliente):
+    """Verificar si cliente tiene teléfono para WhatsApp."""
+    if not cliente:
+        return False
+    telefono = getattr(cliente, "telefono", None) or getattr(cliente, "phone", None)
+    return bool(telefono)
+
+
 @register.simple_tag(takes_context=True)
 def whatsapp_document_link(context, document=None, text=None):
     """

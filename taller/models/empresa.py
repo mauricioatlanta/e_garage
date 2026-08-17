@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from taller.utils.plan_catalog import PLAN_BUSINESS, PLAN_ENTRY, PLAN_GROWTH, PLAN_TRIAL
+from taller.config.country_settings import CountrySettings
 
 # Si usas Django ≥4, evita pytz y usa zoneinfo:
 # from zoneinfo import ZoneInfo
@@ -35,12 +36,13 @@ class Empresa(models.Model):
         ("enterprise", "Plan Empresarial"),
     ]
 
-    PAIS_CHOICES = [
-        ("CL", "Chile"),
-        ("US", "United States"),
-        ("MX", "México"),
+    PAIS_CHOICES = [(code, cfg["name_es"]) for code, cfg in CountrySettings.COUNTRIES.items()]
+    MONEDA_CHOICES = [
+        (currency, currency)
+        for currency in dict.fromkeys(
+            cfg["currency"] for cfg in CountrySettings.COUNTRIES.values()
+        )
     ]
-    MONEDA_CHOICES = [("CLP", "CLP"), ("USD", "USD"), ("MXN", "MXN")]
 
     TIMEZONE_CHOICES = [
         ("America/New_York", "Eastern Time (ET)"),
@@ -56,6 +58,13 @@ class Empresa(models.Model):
         ("America/Tijuana", "Pacific Mexico Time"),
         ("America/Cancun", "Quintana Roo Time"),
         ("America/Mazatlan", "Pacific Mexico Time (MX)"),
+        ("America/Argentina/Buenos_Aires", "Argentina Time (ART)"),
+        ("America/Lima", "Peru Time (PET)"),
+        ("America/Bogota", "Colombia Time (COT)"),
+        ("America/Guayaquil", "Ecuador Time (ECT)"),
+        ("America/Sao_Paulo", "Brasilia Time (BRT)"),
+        ("America/Caracas", "Venezuela Time (VET)"),
+        ("America/Montevideo", "Uruguay Time (UYT)"),
     ]
 
     # Whitelists por país (evita pisar configuraciones válidas del usuario)
@@ -210,8 +219,13 @@ class Empresa(models.Model):
             if not self.zona_horaria or self.zona_horaria not in self.MX_TZS:
                 self.zona_horaria = "America/Mexico_City"
         else:
-            if not self.zona_horaria:
-                self.zona_horaria = "UTC"
+            country_cfg = CountrySettings.COUNTRIES.get(self.pais, {})
+            canonical_currency = country_cfg.get("currency")
+            canonical_tz = country_cfg.get("timezone")
+            if canonical_currency and self.moneda == "CLP" and self.pais != "CL":
+                self.moneda = canonical_currency
+            if canonical_tz and self.zona_horaria in ("", "UTC"):
+                self.zona_horaria = canonical_tz
 
         if not self.slug:
             self._generar_slug_unico()

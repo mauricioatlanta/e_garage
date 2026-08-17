@@ -70,6 +70,7 @@ class WhatsAppAdminNotificationLog(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     
     class Meta:
+        app_label = 'taller'
         verbose_name = "Notificación WhatsApp Admin"
         verbose_name_plural = "Notificaciones WhatsApp Admin"
         # Índice único en idempotency_key (ya está en el campo)

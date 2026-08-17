@@ -85,6 +85,17 @@ from .sesion_usuario import SesionUsuario
 # Analytics público
 from .public_page_view import PublicPageView, is_probable_bot
 
+# Sistema de notificaciones
+from .notificacion import (
+    TipoNotificacion,
+    NotificacionEnviada,
+    ConfiguracionNotificacion,
+    RecordatorioMantenimiento,
+)
+
+# WhatsApp admin notification log (tabla en taller, código en taller.whatsapp)
+from ..whatsapp.models import WhatsAppAdminNotificationLog
+
 # Ledger de movimientos de inventario
 from .movimiento_inventario import MovimientoInventario
 
@@ -173,6 +184,12 @@ __all__ = [
     "SesionUsuario",
     # Analytics público
     "PublicPageView",
+    # Notificaciones
+    "TipoNotificacion",
+    "NotificacionEnviada",
+    "ConfiguracionNotificacion",
+    "RecordatorioMantenimiento",
+    "WhatsAppAdminNotificationLog",
 ]
 
 # Intentar importar otros modelos si existen (para compatibilidad)
