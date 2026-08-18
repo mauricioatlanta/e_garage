@@ -200,6 +200,15 @@
     .hub-subtitle{ animation: hub-fade-up 0.4s 0.13s ease-out both; }
     .hub-grid    { animation: hub-fade-up 0.4s 0.18s ease-out both; }
   </style>
+  {% if egarage_analytics_id %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ egarage_analytics_id }}"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '{{ egarage_analytics_id }}');
+  </script>
+  {% endif %}
 </head>
 <body>
 

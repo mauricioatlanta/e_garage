@@ -3,6 +3,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-recovery-key')
 DEBUG = os.getenv('DJANGO_DEBUG', '1').lower() in {'1', 'true', 'yes', 'on'}
+GOOGLE_ANALYTICS_ID = os.getenv('GOOGLE_ANALYTICS_ID', '')
 ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'dal','dal_select2','django.contrib.admin','django.contrib.auth',
@@ -36,7 +37,7 @@ MIDDLEWARE = [
 ]
 ROOT_URLCONF = 'gestion_taller.urls'
 WSGI_APPLICATION = 'gestion_taller.wsgi.application'
-TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates','DIRS': [os.path.join(BASE_DIR, 'templates')],'APP_DIRS': True,'OPTIONS': {'context_processors': ['django.template.context_processors.debug','django.template.context_processors.request','django.template.context_processors.i18n','django.contrib.auth.context_processors.auth','django.template.context_processors.media','django.template.context_processors.static','django.template.context_processors.tz','django.contrib.messages.context_processors.messages','taller.context_processors.empresa_contexto','taller.context_processors.namespaces.ui_namespaces','taller.context_processors.company_context','taller.context_processors.company_branding','taller.context_processors.company_header','taller.context_processors.panel_chrome.us_authenticated_compact_chrome','taller.context_processors.panel_chrome.us_signup_slim_header','taller.context_processors.ui_labels.ui_labels_context','taller.context_processors.subscription_notice.subscription_notice','taller.context_processors.business_modules.business_modules'],},}]
+TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates','DIRS': [os.path.join(BASE_DIR, 'templates')],'APP_DIRS': True,'OPTIONS': {'context_processors': ['django.template.context_processors.debug','django.template.context_processors.request','django.template.context_processors.i18n','django.contrib.auth.context_processors.auth','django.template.context_processors.media','django.template.context_processors.static','django.template.context_processors.tz','django.contrib.messages.context_processors.messages','taller.context_processors.empresa_contexto','taller.context_processors.namespaces.ui_namespaces','taller.context_processors.company_context','taller.context_processors.company_branding','taller.context_processors.company_header','taller.context_processors.panel_chrome.us_authenticated_compact_chrome','taller.context_processors.panel_chrome.us_signup_slim_header','taller.context_processors.ui_labels.ui_labels_context','taller.context_processors.subscription_notice.subscription_notice','taller.context_processors.business_modules.business_modules','taller.context_processors.analytics.analytics_context'],},}]
 _db_path = os.getenv('DJANGO_DB_PATH') or str(BASE_DIR / 'db.sqlite3')
 DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': _db_path}}
 STATIC_URL = '/static/'

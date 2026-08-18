@@ -353,6 +353,30 @@ def test_sitemap_contains_complete_uruguay_surface(rf):
 
 
 # ---------------------------------------------------------------------------
+# GA4 — snippet aparece solo cuando GOOGLE_ANALYTICS_ID está configurado
+# ---------------------------------------------------------------------------
+
+@pytest.mark.django_db
+def test_hub_renders_ga4_when_configured(rf, settings):
+    settings.GOOGLE_ANALYTICS_ID = "G-SJ6KY7YSKL"
+    request = rf.get("/us/en/")
+    request.user = AnonymousUser()
+    html = hub_usa_en(request).content.decode()
+    assert "https://www.googletagmanager.com/gtag/js?id=G-SJ6KY7YSKL" in html
+    assert "gtag('config', 'G-SJ6KY7YSKL')" in html
+
+
+@pytest.mark.django_db
+def test_hub_omits_ga4_when_not_configured(rf, settings):
+    settings.GOOGLE_ANALYTICS_ID = ""
+    request = rf.get("/us/en/")
+    request.user = AnonymousUser()
+    html = hub_usa_en(request).content.decode()
+    assert "googletagmanager.com/gtag/js" not in html
+    assert "G-SJ6KY7YSKL" not in html
+
+
+# ---------------------------------------------------------------------------
 # robots_txt — host-aware sitemap pointer
 # ---------------------------------------------------------------------------
 

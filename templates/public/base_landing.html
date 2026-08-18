@@ -109,6 +109,15 @@
     .delay-3 { animation-delay: 0.3s; opacity: 0; }
     .delay-4 { animation-delay: 0.4s; opacity: 0; }
   </style>
+  {% if egarage_analytics_id %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ egarage_analytics_id }}"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '{{ egarage_analytics_id }}');
+  </script>
+  {% endif %}
   {% block extra_head %}{% endblock %}
 </head>
 <body class="min-h-screen" style="background: linear-gradient(135deg, #060e1e 0%, #0f1e38 50%, #080e20 100%);">
