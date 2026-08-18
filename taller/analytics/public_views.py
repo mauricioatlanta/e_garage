@@ -230,11 +230,22 @@ def public_analytics_dashboard(request):
     )
 
     # -------------------------------------------------------------
-    # Empresas registradas por día (via fecha_inicio).
+    # Empresas reales: excluir cuentas demo/seed.
+    # @egarage.test = dominio ficticio no deliverable (señal estructural).
+    # nombre_taller iregex = convención de seed manual + Validation Center.
     # -------------------------------------------------------------
     Empresa = apps.get_model("taller", "Empresa")
+    _DEMO_Q = (
+        Q(nombre_taller__iregex=r"(prueba|demo)")
+        | Q(user__email__endswith="@egarage.test")
+    )
+    qs_real = Empresa.objects.exclude(_DEMO_Q)
+
+    # -------------------------------------------------------------
+    # Empresas registradas por día (via fecha_inicio, solo reales).
+    # -------------------------------------------------------------
     empresas_por_dia = (
-        Empresa.objects
+        qs_real
         .annotate(dia=TruncDate("fecha_inicio"))
         .values("dia")
         .annotate(total=Count("id"))
@@ -242,13 +253,13 @@ def public_analytics_dashboard(request):
     )
 
     # -------------------------------------------------------------
-    # Funnel de adquisición first-party.
+    # Funnel de adquisición first-party (solo empresas reales).
     # -------------------------------------------------------------
     funnel = {
         "visitas":       humanos,
-        "empresas":      Empresa.objects.count(),
-        "trials":        Empresa.objects.filter(is_trial=True).count(),
-        "suscripciones": Empresa.objects.filter(
+        "empresas":      qs_real.count(),
+        "trials":        qs_real.filter(is_trial=True).count(),
+        "suscripciones": qs_real.filter(
                              suscripcion_activa=True, is_trial=False
                          ).count(),
     }

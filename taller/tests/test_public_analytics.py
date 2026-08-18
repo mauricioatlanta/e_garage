@@ -9,6 +9,8 @@ Cubre:
 5. home_humanas presente en contexto.
 6. tendencia usa humanos/bots (no total).
 7. empresas_por_dia presente en contexto.
+8. Funnel excluye cuentas demo (@egarage.test / nombre "prueba|demo").
+9. empresas_por_dia excluye cuentas demo.
 """
 import pytest
 from django.contrib.auth.models import User
@@ -98,3 +100,41 @@ def test_empresas_por_dia_present(rf, staff_user):
     request.user = staff_user
     resp = public_analytics_dashboard(request)
     assert "empresas_por_dia" in resp.context_data
+
+
+@pytest.mark.django_db
+def test_funnel_excludes_demo_companies(rf, staff_user):
+    from django.apps import apps
+    Empresa = apps.get_model("taller", "Empresa")
+
+    user_demo = User.objects.create_user(
+        username="seed_demo", email="seed@egarage.test", password="x"
+    )
+    user_real = User.objects.create_user(
+        username="cliente_real", email="cliente@example.com", password="x"
+    )
+    Empresa.objects.create(user=user_demo, nombre_taller="Taller Prueba CL")
+    Empresa.objects.create(user=user_real, nombre_taller="Taller Real S.A.")
+
+    request = rf.get("/analytics/public/")
+    request.user = staff_user
+    resp = public_analytics_dashboard(request)
+
+    assert resp.context_data["funnel"]["empresas"] == 1
+
+
+@pytest.mark.django_db
+def test_empresas_por_dia_excludes_demo_companies(rf, staff_user):
+    from django.apps import apps
+    Empresa = apps.get_model("taller", "Empresa")
+
+    user_demo = User.objects.create_user(
+        username="vc_seed", email="demo@egarage.test", password="x"
+    )
+    Empresa.objects.create(user=user_demo, nombre_taller="Demo Taller AutoShop")
+
+    request = rf.get("/analytics/public/")
+    request.user = staff_user
+    resp = public_analytics_dashboard(request)
+
+    assert list(resp.context_data["empresas_por_dia"]) == []
