@@ -10,13 +10,17 @@ from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory
 
 from taller.country.hub import COUNTRY_HUB
+from taller.seo_views import sitemap_xml
 from taller.views.landing_views import (
     hub_argentina,
+    hub_brasil,
     hub_chile,
+    hub_ecuador,
     hub_mexico,
     hub_peru,
     hub_usa_en,
     hub_usa_es,
+    hub_venezuela,
 )
 
 
@@ -32,7 +36,7 @@ REQUIRED_KEYS = {
 }
 
 
-@pytest.mark.parametrize("key", ["cl", "ar", "pe", "mx", "us_en", "us_es"])
+@pytest.mark.parametrize("key", ["cl", "ar", "pe", "mx", "us_en", "us_es", "ec", "uy", "ve", "br"])
 def test_hub_has_all_required_keys(key):
     hub = COUNTRY_HUB[key]
     missing = REQUIRED_KEYS - set(hub.keys())
@@ -176,3 +180,160 @@ def test_usa_es_html_lang(rf):
 def test_chile_html_lang(rf):
     html = _get_html(hub_chile, rf)
     assert 'lang="es"' in html
+
+
+# ---------------------------------------------------------------------------
+# Coverage for ec / ve / br hubs (previously untested)
+# ---------------------------------------------------------------------------
+
+@pytest.mark.django_db
+def test_ecuador_hub_terminology(rf):
+    html = _get_html(hub_ecuador, rf)
+    assert "Llantera" in html
+    assert "Chatarrería" in html
+    assert "Almacén de Repuestos" in html
+    assert "Enderezada y Pintura" in html
+
+
+@pytest.mark.django_db
+def test_venezuela_hub_terminology(rf):
+    html = _get_html(hub_venezuela, rf)
+    assert "Cauchera" in html
+    assert "Desarmadero" in html
+    assert "Latonería y Pintura" in html
+
+
+@pytest.mark.django_db
+def test_brasil_hub_terminology(rf):
+    html = _get_html(hub_brasil, rf)
+    assert "Oficina Mecânica" in html
+    assert "Borracharia" in html
+    assert "Desmanche" in html
+    assert "Funilaria e Pintura" in html
+    assert "Frotas" in html
+
+
+@pytest.mark.django_db
+def test_brasil_hub_html_lang(rf):
+    html = _get_html(hub_brasil, rf)
+    assert 'lang="pt"' in html
+
+
+@pytest.mark.django_db
+def test_no_chilean_slang_in_ecuador(rf):
+    html = _get_html(hub_ecuador, rf)
+    assert "Vulcanización" not in html
+
+
+@pytest.mark.django_db
+def test_no_spanish_in_brasil(rf):
+    html = _get_html(hub_brasil, rf)
+    assert "Vulcanización" not in html
+    assert "Gomería" not in html
+
+
+# ---------------------------------------------------------------------------
+# Sitemap regression — all country landing URLs must be present
+# ---------------------------------------------------------------------------
+
+@pytest.mark.django_db
+def test_sitemap_returns_xml(rf):
+    request = rf.get("/sitemap.xml")
+    request.user = AnonymousUser()
+    response = sitemap_xml(request)
+    assert response.status_code == 200
+    assert "application/xml" in response["Content-Type"]
+    content = response.content.decode()
+    assert content.startswith("<?xml")
+    assert "<urlset" in content
+
+
+@pytest.mark.django_db
+def test_sitemap_contains_all_country_hubs(rf):
+    request = rf.get("/sitemap.xml")
+    request.user = AnonymousUser()
+    content = sitemap_xml(request).content.decode()
+    for path in ("/cl/", "/ar/", "/pe/", "/mx/", "/ec/", "/ve/", "/br/", "/uy/es/", "/us/", "/us/en/", "/us/es/"):
+        assert path in content, f"Sitemap missing hub path: {path}"
+
+
+@pytest.mark.django_db
+def test_sitemap_contains_landing_urls(rf):
+    request = rf.get("/sitemap.xml")
+    request.user = AnonymousUser()
+    content = sitemap_xml(request).content.decode()
+    # Spot-check key localized landing URLs
+    for path in (
+        "/cl/talleres/", "/cl/repuestos/", "/cl/vulcanizaciones/",
+        "/ar/gomeria/", "/mx/refaccionaria/", "/mx/yonke/",
+        "/us/en/auto-repair/", "/us/es/talleres/",
+        "/br/oficina-mecanica/", "/br/borracharia/",
+        "/ve/cauchera/", "/ec/llantera/",
+        "/uy/talleres/", "/uy/casas-de-repuestos/",
+        "/uy/desarmadurias/", "/uy/neumaticos/", "/uy/lavado/",
+    ):
+        assert path in content, f"Sitemap missing landing path: {path}"
+
+
+@pytest.mark.django_db
+def test_sitemap_uses_canonical_host(rf):
+    import re
+    request = rf.get("/sitemap.xml")
+    request.user = AnonymousUser()
+    content = sitemap_xml(request).content.decode()
+    assert "https://egarage.cl" in content
+    # Every <loc> entry must use the HTTPS canonical host (namespace URI is excluded)
+    locs = re.findall(r"<loc>(.*?)</loc>", content)
+    assert locs, "Sitemap has no <loc> entries"
+    for loc in locs:
+        assert loc.startswith("https://egarage.cl"), f"Non-canonical loc: {loc}"
+
+
+@pytest.mark.django_db
+def test_uruguay_engine_and_legacy_routes(client):
+    public_paths = (
+        "/uy/talleres/",
+        "/uy/casas-de-repuestos/",
+        "/uy/desarmadurias/",
+        "/uy/neumaticos/",
+        "/uy/lavado/",
+    )
+    for path in public_paths:
+        response = client.get(path, follow=False)
+        assert response.status_code == 200, path
+
+    root = client.get("/uy/", follow=False)
+    assert root.status_code == 302
+    assert root["Location"] == "/uy/es/"
+
+    assert client.get("/uy/es/", follow=False).status_code == 200
+
+    legacy = client.get("/uy/repuestos/", follow=False)
+    assert legacy.status_code == 302
+    assert "/accounts/login/" in legacy["Location"]
+
+    legacy_es = client.get("/uy/es/repuestos/", follow=False)
+    assert legacy_es.status_code == 302
+    assert "/accounts/login/" in legacy_es["Location"]
+
+
+@pytest.mark.django_db
+def test_sitemap_contains_complete_uruguay_surface(rf):
+    request = rf.get("/sitemap.xml")
+    request.user = AnonymousUser()
+    content = sitemap_xml(request).content.decode()
+
+    expected = (
+        "/uy/es/",
+        "/uy/talleres/",
+        "/uy/casas-de-repuestos/",
+        "/uy/desarmadurias/",
+        "/uy/neumaticos/",
+        "/uy/lavado/",
+    )
+    for path in expected:
+        assert f"https://egarage.cl{path}" in content
+
+    import re
+    locs = re.findall(r"<loc>(.*?)</loc>", content)
+    assert len(locs) == 62

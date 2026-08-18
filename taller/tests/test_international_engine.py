@@ -16,7 +16,7 @@ from taller.country.engine import get_hub_landing_urls, get_landing_context
 from taller.country.verticals import VERTICAL_CONTENT
 from taller.views.landing_views import landing_vertical
 
-COUNTRIES = ["cl", "ar", "pe", "mx", "us_en", "us_es", "br", "ec", "ve"]
+COUNTRIES = ["cl", "ar", "pe", "mx", "us_en", "us_es", "br", "ec", "uy", "ve"]
 VERTICALS = ["workshop", "parts", "salvage", "tire", "carwash"]
 
 
@@ -164,6 +164,72 @@ def test_salvage_has_no_case_study_for_countries_without_one():
     ctx = get_landing_context("cl", "salvage")
     # Either has a case or not — just must not raise
     assert isinstance(ctx["case_study"], (dict, type(None)))
+
+
+def test_us_es_seo_title_uses_estados_unidos():
+    ctx = get_landing_context("us_es", "workshop")
+    assert "Estados Unidos" in ctx["seo_title"], (
+        "hub.py us_es.country_name must be 'Estados Unidos' — it overrides content.py in subs dict"
+    )
+    assert "United States" not in ctx["seo_title"]
+
+
+def test_us_es_meta_description_uses_estados_unidos():
+    ctx = get_landing_context("us_es", "parts")
+    assert "Estados Unidos" in ctx["meta_description"]
+    assert "United States" not in ctx["meta_description"]
+
+
+def test_ec_parts_has_testimonial():
+    ctx = get_landing_context("ec", "parts")
+    assert ctx["testimonial"] is not None
+    assert "Quito" in ctx["testimonial"]["source"]
+
+
+def test_ve_parts_has_testimonial():
+    ctx = get_landing_context("ve", "parts")
+    assert ctx["testimonial"] is not None
+    assert "Caracas" in ctx["testimonial"]["source"]
+
+
+def test_uy_localized_content():
+    ctx = get_landing_context("uy", "workshop")
+    assert ctx["language"] == "es"
+    assert "Uruguay" in ctx["seo_title"]
+    assert "Montevideo" in str(ctx)
+    assert "matrícula" in str(ctx).lower()
+
+
+def test_uy_workshop_has_no_testimonial():
+    ctx = get_landing_context("uy", "workshop")
+    assert ctx["testimonial"] is None
+
+
+def test_uy_parts_has_no_testimonial():
+    ctx = get_landing_context("uy", "parts")
+    assert ctx["testimonial"] is None
+
+
+def test_uy_workshop_has_no_case_study():
+    ctx = get_landing_context("uy", "workshop")
+    assert ctx["case_study"] is None
+
+
+def test_uy_hub_landing_urls():
+    urls = get_hub_landing_urls("uy")
+    assert urls["workshop"] == "/uy/talleres/"
+    assert urls["parts"] == "/uy/casas-de-repuestos/"
+    assert urls["salvage"] == "/uy/desarmadurias/"
+    assert urls["tire"] == "/uy/neumaticos/"
+    assert urls["carwash"] == "/uy/lavado/"
+
+
+def test_uy_content_regressions():
+    ctx = get_landing_context("uy", "parts")
+    full = str(ctx)
+    assert "ABC1234" in full
+    assert "Hilux" in full
+    assert "2023" in full
 
 
 # ---------------------------------------------------------------------------
@@ -429,3 +495,43 @@ def test_canonical_path_matches_official_country_url(country_key, vertical_key):
     ctx = get_landing_context(country_key, vertical_key)
     official = get_hub_landing_urls(country_key)[vertical_key]
     assert ctx["canonical_path"] == official
+
+
+# ---------------------------------------------------------------------------
+# UY — las 5 landings HTTP 200
+# ---------------------------------------------------------------------------
+
+@pytest.mark.django_db
+def test_uy_talleres_renders_200(rf):
+    html = _render(rf, "uy", "talleres")
+    assert "Montevideo" in html
+    assert "¿Recuerdas" in html
+    assert "Taller Mecánico" in html
+
+
+@pytest.mark.django_db
+def test_uy_autopartes_renders_200(rf):
+    html = _render(rf, "uy", "casas-de-repuestos")
+    assert "Uruguay" in html
+    assert "Casa de Repuestos" in html
+
+
+@pytest.mark.django_db
+def test_uy_desarmaderos_renders_200(rf):
+    html = _render(rf, "uy", "desarmadurias")
+    assert "Desarmaduría" in html
+    assert "Uruguay" in html
+
+
+@pytest.mark.django_db
+def test_uy_gomerias_renders_200(rf):
+    html = _render(rf, "uy", "neumaticos")
+    assert "Vulcanización" in html
+    assert "Uruguay" in html
+
+
+@pytest.mark.django_db
+def test_uy_lavadero_renders_200(rf):
+    html = _render(rf, "uy", "lavado")
+    assert "eGarage" in html
+    assert "Uruguay" in html

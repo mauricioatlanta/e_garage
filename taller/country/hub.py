@@ -88,7 +88,7 @@ COUNTRY_HUB = {
     },
 
     "us_es": {
-        "country_name": "United States",
+        "country_name": "Estados Unidos",
         "country_code": "us",
         "language": "es",
         "flag": "🇺🇸",
@@ -116,6 +116,24 @@ COUNTRY_HUB = {
         "tire_name": "Llantera",
         "carwash_name": "Lavado de Autos",
         "bodyshop_name": "Enderezada y Pintura",
+        "electric_name": "Electricidad Automotriz",
+        "fleet_name": "Flotas",
+        "soon_label": "Pronto",
+    },
+
+
+    "uy": {
+        "country_name": "Uruguay",
+        "country_code": "uy",
+        "language": "es",
+        "flag": "🇺🇾",
+        "hero_image": static("img/welcome/cl/hero.webp"),
+        "workshop_name": "Taller Mecánico",
+        "salvage_name": "Desarmaduría",
+        "parts_name": "Casa de Repuestos",
+        "tire_name": "Vulcanización",
+        "carwash_name": "Lavado de Autos",
+        "bodyshop_name": "Hojalatería y Pintura",
         "electric_name": "Electricidad Automotriz",
         "fleet_name": "Flotas",
         "soon_label": "Pronto",

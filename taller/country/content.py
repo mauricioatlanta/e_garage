@@ -456,6 +456,12 @@ COUNTRY_CONTENT = {
                 "source": "Taller El Cóndor · Quito · 2 mecánicos",
                 "quote": "Antes todo era de palabra y al final del mes no sabía bien qué había ganado. Con eGarage tengo el historial de cada auto y el resumen del mes en el teléfono.",
             },
+            "parts": {
+                "initials": "FP",
+                "name": "Francisco Peña",
+                "source": "Repuestos El Eje · Quito · 2 vendedores",
+                "quote": "Los mecánicos de la zona ahora revisan el catálogo antes de llamar. Las llamadas que recibo son para confirmar el pedido, no para preguntar si tengo la pieza.",
+            },
         },
         "cases": {
             "workshop": {
@@ -470,6 +476,34 @@ COUNTRY_CONTENT = {
                 ],
             },
         },
+    },
+
+
+    "uy": {
+        "language": "es",
+        "country_name": "Uruguay",
+        "currency_code": "UYU",
+        "currency_symbol": "$",
+        "tax_name": "IVA",
+        "tax_rate": 22,
+        "plate_term": "matrícula",
+        "plate_example": "ABC1234",
+        "city_1": "Montevideo",
+        "city_2": "Punta del Este",
+        "example_car": "Hilux",
+        "example_car_year": "2023",
+        "example_car_id": "ABC1234",
+        "faq_country_q": "¿Funciona en Uruguay?",
+        "faq_country_a": "Sí. eGarage está adaptado para Uruguay: matrícula en formato uruguayo, precios en pesos uruguayos (UYU), IVA 22% calculado automáticamente, vocabulario del rubro local. El soporte opera en español y en zona horaria de Montevideo.",
+        "vertical_slugs": {
+            "workshop": "talleres",
+            "parts": "casas-de-repuestos",
+            "salvage": "desarmadurias",
+            "tire": "neumaticos",
+            "carwash": "lavado",
+        },
+        "testimonials": {},
+        "cases": {},
     },
 
     "ve": {
@@ -501,6 +535,12 @@ COUNTRY_CONTENT = {
                 "name": "Rafael Torres",
                 "source": "Taller El Expreso · Caracas · 3 mecánicos",
                 "quote": "El mayor cambio fue tener el historial por vehículo. Cuando un cliente reclama garantía, abro el sistema y le muestro exactamente qué se hizo. Sin discusión.",
+            },
+            "parts": {
+                "initials": "CL",
+                "name": "Carlos León",
+                "source": "Repuestos El Libertador · Caracas · 2 vendedores",
+                "quote": "El catálogo redujo a la mitad las llamadas de consulta. El mecánico busca solo y llama para confirmar el despacho, no para preguntar disponibilidad.",
             },
         },
         "cases": {
