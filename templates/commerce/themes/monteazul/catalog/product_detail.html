@@ -727,7 +727,15 @@ Por plataforma Delta II y motorización compartida con General Motors, este cata
     "price": "{{ product.precio_venta|floatformat:0 }}",
     "priceCurrency": "CLP",
     "availability": "https://schema.org/{% if product.stock > 0 %}InStock{% else %}OutOfStock{% endif %}",
-    "url": "{{ request.build_absolute_uri }}"
+    "url": "{{ request.build_absolute_uri }}",
+    "hasMerchantReturnPolicy": {
+      "@type": "MerchantReturnPolicy",
+      "applicableCountry": "CL",
+      "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+      "merchantReturnDays": 7,
+      "returnMethod": "https://schema.org/ReturnByMail",
+      "returnFees": "https://schema.org/ReturnShippingFees"
+    }
   }
 }
 </script>
