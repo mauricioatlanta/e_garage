@@ -1,6 +1,6 @@
 from django.urls import path
 
-from commerce.views import cart, catalog, checkout, pages, payment
+from commerce.views import cart, catalog, checkout, pages, payment, sitemap as sitemap_views
 from commerce.views.admin import categories as admin_cat
 from commerce.views.admin import dashboard as admin_dash
 from commerce.views.admin import media as admin_media
@@ -46,4 +46,6 @@ urlpatterns = [
     path("pedido/<str:order_number>/pago/iniciar/", payment.payment_start, name="payment_start"),
     path("pago/retorno/", payment.payment_return, name="payment_return"),
     path("pedido/<str:order_number>/pago/cancelado/", payment.payment_cancel, name="payment_cancel"),
+    # SEO
+    path("sitemap.xml", sitemap_views.commerce_sitemap_xml, name="sitemap"),
 ]

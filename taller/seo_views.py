@@ -57,7 +57,11 @@ def sitemap_xml(request):
 
 
 def robots_txt(request):
-    body = """User-agent: *
+    if getattr(request, "is_custom_domain", False):
+        sitemap_url = f"https://{request.get_host()}/commerce/sitemap.xml"
+    else:
+        sitemap_url = "https://egarage.cl/sitemap.xml"
+    body = f"""User-agent: *
 Allow: /
 
 Disallow: /admin/
@@ -70,6 +74,6 @@ Disallow: /*/*/workspace/
 Disallow: /*/dashboard/
 Disallow: /*/*/dashboard/
 
-Sitemap: https://egarage.cl/sitemap.xml
+Sitemap: {sitemap_url}
 """
     return HttpResponse(body, content_type="text/plain; charset=utf-8")

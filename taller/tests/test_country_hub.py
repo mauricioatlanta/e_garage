@@ -10,7 +10,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory
 
 from taller.country.hub import COUNTRY_HUB
-from taller.seo_views import sitemap_xml
+from taller.seo_views import robots_txt, sitemap_xml
 from taller.views.landing_views import (
     hub_argentina,
     hub_brasil,
@@ -350,3 +350,38 @@ def test_sitemap_contains_complete_uruguay_surface(rf):
     import re
     locs = re.findall(r"<loc>(.*?)</loc>", content)
     assert len(locs) == 62
+
+
+# ---------------------------------------------------------------------------
+# robots_txt — host-aware sitemap pointer
+# ---------------------------------------------------------------------------
+
+@pytest.fixture
+def rf():
+    return RequestFactory()
+
+
+@pytest.mark.django_db
+def test_robots_txt_egarage_domain_points_to_canonical_sitemap(rf):
+    request = rf.get("/robots.txt", HTTP_HOST="egarage.cl")
+    request.is_custom_domain = False
+    content = robots_txt(request).content.decode()
+    assert "Sitemap: https://egarage.cl/sitemap.xml" in content
+    assert "commerce/sitemap.xml" not in content
+
+
+@pytest.mark.django_db
+def test_robots_txt_custom_domain_points_to_commerce_sitemap(rf):
+    request = rf.get("/robots.txt", HTTP_HOST="www.monteazulspa.cl")
+    request.is_custom_domain = True
+    content = robots_txt(request).content.decode()
+    assert "Sitemap: https://www.monteazulspa.cl/commerce/sitemap.xml" in content
+    assert "egarage.cl/sitemap.xml" not in content
+
+
+@pytest.mark.django_db
+def test_robots_txt_custom_domain_uses_request_host(rf):
+    request = rf.get("/robots.txt", HTTP_HOST="otro-taller.cl")
+    request.is_custom_domain = True
+    content = robots_txt(request).content.decode()
+    assert "https://otro-taller.cl/commerce/sitemap.xml" in content
