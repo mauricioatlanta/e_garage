@@ -354,6 +354,29 @@
     </header>
 
 
+    <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+        <div class="eg-kpi" style="color:var(--eg-cyan);text-align:center;">
+            <div class="eg-label">Visitas humanas</div>
+            <div class="eg-value">{{ funnel.visitas }}</div>
+            <div class="eg-mini">Tráfico real</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-blue);text-align:center;">
+            <div class="eg-label">Empresas registradas</div>
+            <div class="eg-value">{{ funnel.empresas }}</div>
+            <div class="eg-mini">Cuentas creadas</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-purple);text-align:center;">
+            <div class="eg-label">Trials activos</div>
+            <div class="eg-value">{{ funnel.trials }}</div>
+            <div class="eg-mini">En prueba</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-green);text-align:center;">
+            <div class="eg-label">Suscripciones pagadas</div>
+            <div class="eg-value">{{ funnel.suscripciones }}</div>
+            <div class="eg-mini">Activas</div>
+        </div>
+    </section>
+
     <section class="eg-kpis">
 
         <article class="eg-kpi total">
@@ -512,6 +535,64 @@
                         <tr>
                             <td colspan="2" class="eg-empty">Sin datos todavía.</td>
                         </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="eg-panel third">
+            <div class="eg-panel-title">
+                <h2>🔗 Fuentes de tráfico</h2>
+                <small>Referrers humanos</small>
+            </div>
+            <div class="eg-table-wrap">
+                <table class="eg-table">
+                    <thead>
+                        <tr><th>Referrer</th><th>Visitas</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for row in por_referrer %}
+                        <tr>
+                            <td style="word-break:break-all;font-size:11px;">{{ row.referrer }}</td>
+                            <td class="eg-number">{{ row.total }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="2" class="eg-empty">Sin referrers externos.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="eg-panel third">
+            <div class="eg-panel-title">
+                <h2>📱 Dispositivo</h2>
+                <small>Mobile vs Desktop</small>
+            </div>
+            <div class="eg-chart">
+                <canvas id="chartMobile"></canvas>
+            </div>
+        </article>
+
+        <article class="eg-panel third">
+            <div class="eg-panel-title">
+                <h2>🌐 Idioma</h2>
+                <small>Visitas humanas</small>
+            </div>
+            <div class="eg-table-wrap">
+                <table class="eg-table">
+                    <thead>
+                        <tr><th>Idioma</th><th>Visitas</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for row in por_idioma %}
+                        <tr>
+                            <td><span class="eg-pill">{{ row.language|upper }}</span></td>
+                            <td class="eg-number">{{ row.total }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="2" class="eg-empty">Sin datos de idioma.</td></tr>
                     {% endfor %}
                     </tbody>
                 </table>
@@ -747,6 +828,31 @@
                             display: false
                         }
                     }
+                }
+            }
+        });
+    }
+    const mobileCanvas = document.getElementById("chartMobile");
+    if (mobileCanvas) {
+        new Chart(mobileCanvas, {
+            type: "doughnut",
+            data: {
+                labels: ["Desktop", "Mobile"],
+                datasets: [{
+                    data: [{{ mobile_share.desktop }}, {{ mobile_share.mobile }}],
+                    backgroundColor: ["rgba(34,211,238,.72)", "rgba(168,85,247,.72)"],
+                    borderColor: "#0f172a",
+                    borderWidth: 3,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "62%",
+                plugins: {
+                    legend: { position: "bottom", labels: { usePointStyle: true, padding: 16 } },
+                    tooltip: { callbacks: { label: function(ctx) { return " " + ctx.label + ": " + ctx.raw; } } }
                 }
             }
         });

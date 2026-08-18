@@ -1,9 +1,10 @@
 from collections import Counter
 
+from django.apps import apps
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count
 from django.db.models.functions import TruncDate
-from django.shortcuts import render
+from django.template.response import TemplateResponse
 
 from taller.country.engine import URL_SLUG_TO_VERTICAL
 from taller.models.public_page_view import PublicPageView
@@ -221,6 +222,53 @@ def public_analytics_dashboard(request):
         .order_by("-fecha")[:30]
     )
 
+    # -------------------------------------------------------------
+    # Funnel de adquisición first-party.
+    # -------------------------------------------------------------
+    Empresa = apps.get_model("taller", "Empresa")
+    funnel = {
+        "visitas":       humanos,
+        "empresas":      Empresa.objects.count(),
+        "trials":        Empresa.objects.filter(is_trial=True).count(),
+        "suscripciones": Empresa.objects.filter(
+                             suscripcion_activa=True, is_trial=False
+                         ).count(),
+    }
+
+    # -------------------------------------------------------------
+    # Referrers: humanos, sin vacíos, top 15.
+    # -------------------------------------------------------------
+    por_referrer = list(
+        qs_human
+        .exclude(referrer="")
+        .values("referrer")
+        .annotate(total=Count("id"))
+        .order_by("-total")[:15]
+    )
+
+    # -------------------------------------------------------------
+    # Mobile vs desktop: humanos.
+    # -------------------------------------------------------------
+    _mob = {
+        r["is_mobile"]: r["n"]
+        for r in qs_human.values("is_mobile").annotate(n=Count("id"))
+    }
+    mobile_share = {
+        "mobile":  _mob.get(True, 0),
+        "desktop": _mob.get(False, 0),
+    }
+
+    # -------------------------------------------------------------
+    # Idioma: humanos, sin vacíos.
+    # -------------------------------------------------------------
+    por_idioma = list(
+        qs_human
+        .exclude(language="")
+        .values("language")
+        .annotate(total=Count("id"))
+        .order_by("-total")
+    )
+
     context = {
         "total": total,
         "humanos": humanos,
@@ -233,9 +281,13 @@ def public_analytics_dashboard(request):
         "por_bienvenida": por_bienvenida,
         "paginas_top": paginas_top,
         "tendencia": tendencia,
+        "funnel": funnel,
+        "por_referrer": por_referrer,
+        "mobile_share": mobile_share,
+        "por_idioma": por_idioma,
     }
 
-    return render(
+    return TemplateResponse(
         request,
         "analytics/public_dashboard.html",
         context,
