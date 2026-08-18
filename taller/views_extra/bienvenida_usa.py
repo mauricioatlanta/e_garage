@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.utils import translation
 
+from taller.welcome_config import get_config
+
 
 def _render_bienvenida_usa(request, forced_lang=None):
     """
@@ -22,6 +24,7 @@ def _render_bienvenida_usa(request, forced_lang=None):
     translation.activate(lang)
 
     context = {
+        **get_config("us", lang),
         "LANGUAGE_CODE": lang,
         "page_title": "eGarage USA - Professional Automotive Management",
         "is_usa_market": True,

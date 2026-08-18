@@ -11,8 +11,9 @@
   <title>eGarage {{ country_name }} — Elige tu negocio</title>
   <meta name="description" content="eGarage {{ country_name }} — Software de gestión para negocios automotrices.">
   {% endif %}
-  <link rel="canonical" href="https://egarage.cl/{{ country_code }}/">
-  <link rel="icon" type="image/png" href="{% static 'images/egarage_icon_192x192.png' %}">
+  <link rel="canonical" href="https://egarage.cl{{ canonical_path }}">
+  {% for hreflang, href in hreflang_alternates %}<link rel="alternate" hreflang="{{ hreflang }}" href="https://egarage.cl{{ href }}">
+  {% endfor %}<link rel="icon" type="image/png" href="{% static 'images/egarage_icon_192x192.png' %}">
   <link rel="apple-touch-icon" href="{% static 'images/egarage_icon_192x192.png' %}">
   <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">

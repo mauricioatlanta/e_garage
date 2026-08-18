@@ -258,6 +258,19 @@ def test_sitemap_contains_all_country_hubs(rf):
 
 
 @pytest.mark.django_db
+def test_usa_hubs_have_self_canonical_and_hreflang(rf):
+    en_html = _get_html(hub_usa_en, rf)
+    es_html = _get_html(hub_usa_es, rf)
+
+    assert 'rel="canonical" href="https://egarage.cl/us/en/"' in en_html
+    assert 'rel="canonical" href="https://egarage.cl/us/es/"' in es_html
+
+    for html in (en_html, es_html):
+        assert 'hreflang="en-US" href="https://egarage.cl/us/en/"' in html
+        assert 'hreflang="es-US" href="https://egarage.cl/us/es/"' in html
+
+
+@pytest.mark.django_db
 def test_sitemap_contains_landing_urls(rf):
     request = rf.get("/sitemap.xml")
     request.user = AnonymousUser()

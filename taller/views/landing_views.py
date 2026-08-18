@@ -19,9 +19,24 @@ def landing_home(request):
     return render(request, "public/gateway.html")
 
 
+_HUB_CANONICAL_PATH = {
+    "us_en": "/us/en/",
+    "us_es": "/us/es/",
+}
+
+_HUB_HREFLANG = {
+    "us_en": (("en-US", "/us/en/"), ("es-US", "/us/es/")),
+    "us_es": (("en-US", "/us/en/"), ("es-US", "/us/es/")),
+}
+
+
 def render_country_hub(request, country_key):
     ctx = dict(COUNTRY_HUB[country_key])
     ctx["landing_urls"] = get_hub_landing_urls(country_key)
+    ctx["canonical_path"] = _HUB_CANONICAL_PATH.get(
+        country_key, f"/{COUNTRY_HUB[country_key]['country_code']}/"
+    )
+    ctx["hreflang_alternates"] = _HUB_HREFLANG.get(country_key, ())
     return render(request, "public/hub_country.html", ctx)
 
 
