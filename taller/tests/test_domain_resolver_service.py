@@ -232,3 +232,30 @@ class TestConstantes:
 
     def test_cache_ttl_miss_positivo(self):
         assert DomainResolverService.CACHE_TTL_MISS > 0
+
+def test_normalize_host_elimina_www():
+    from django.test import RequestFactory
+    from taller.services.domain_resolver_service import DomainResolverService
+
+    request = RequestFactory().get(
+        "/",
+        HTTP_HOST="www.taller.midominio.cl",
+    )
+
+    assert DomainResolverService.normalize_host(request) == "taller.midominio.cl"
+
+
+@pytest.mark.django_db
+def test_www_resuelve_mismo_dominio_activo(dominio_activo):
+    from django.test import RequestFactory
+    from taller.services.domain_resolver_service import DomainResolverService
+
+    request = RequestFactory().get(
+        "/",
+        HTTP_HOST=f"www.{HOST}",
+    )
+
+    result = DomainResolverService.resolve(request)
+
+    assert result is not None
+    assert result.pk == dominio_activo.pk

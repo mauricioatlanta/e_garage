@@ -78,7 +78,10 @@ class DomainResolverService:
         elif ":" in host:
             # hostname:puerto → hostname
             host = host.rsplit(":", 1)[0]
-        return host.lower()
+        host = host.lower()
+        if host.startswith("www."):
+            host = host[4:]
+        return host
 
     @staticmethod
     def is_custom_host(host: str) -> bool:
