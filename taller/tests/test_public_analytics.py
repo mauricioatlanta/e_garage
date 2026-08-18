@@ -3,9 +3,12 @@ Tests del dashboard de analytics público de eGarage.
 
 Cubre:
 1. Respuesta HTTP 200 para staff.
-2. Contexto contiene las 4 variables nuevas.
+2. Contexto contiene las variables de Fase 5 y Fase 8.
 3. Funnel tiene las claves esperadas con valores enteros.
 4. 403 para usuario no-staff.
+5. home_humanas presente en contexto.
+6. tendencia usa humanos/bots (no total).
+7. empresas_por_dia presente en contexto.
 """
 import pytest
 from django.contrib.auth.models import User
@@ -66,3 +69,32 @@ def test_dashboard_forbidden_for_regular_user(rf, regular_user):
     request.user = regular_user
     resp = public_analytics_dashboard(request)
     assert resp.status_code in (302, 403)
+
+
+@pytest.mark.django_db
+def test_home_kpi_in_context(rf, staff_user):
+    request = rf.get("/analytics/public/")
+    request.user = staff_user
+    resp = public_analytics_dashboard(request)
+    assert "home_humanas" in resp.context_data
+    assert isinstance(resp.context_data["home_humanas"], int)
+
+
+@pytest.mark.django_db
+def test_tendencia_has_bots_split(rf, staff_user):
+    request = rf.get("/analytics/public/")
+    request.user = staff_user
+    resp = public_analytics_dashboard(request)
+    rows = list(resp.context_data["tendencia"])
+    if rows:
+        assert "humanos" in rows[0], "tendencia debe tener clave 'humanos'"
+        assert "bots" in rows[0], "tendencia debe tener clave 'bots'"
+        assert "total" not in rows[0], "tendencia no debe usar 'total' (fue reemplazado)"
+
+
+@pytest.mark.django_db
+def test_empresas_por_dia_present(rf, staff_user):
+    request = rf.get("/analytics/public/")
+    request.user = staff_user
+    resp = public_analytics_dashboard(request)
+    assert "empresas_por_dia" in resp.context_data

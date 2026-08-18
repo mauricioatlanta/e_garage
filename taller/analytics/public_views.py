@@ -2,7 +2,7 @@ from collections import Counter
 
 from django.apps import apps
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.template.response import TemplateResponse
 
@@ -92,6 +92,10 @@ def public_analytics_dashboard(request):
 
     bienvenidas_humanas = qs_human.filter(
         page_type=PublicPageView.PAGE_WELCOME
+    )
+
+    home_humanas = qs_human.filter(
+        page_type=PublicPageView.PAGE_HOME
     )
 
     # -------------------------------------------------------------
@@ -212,20 +216,34 @@ def public_analytics_dashboard(request):
     ]
 
     # -------------------------------------------------------------
-    # Tendencia: solo humanos.
+    # Tendencia: humanos + bots por día para detectar spikes de crawlers.
     # -------------------------------------------------------------
     tendencia = (
-        qs_human
+        qs_all
         .annotate(fecha=TruncDate("created_at"))
         .values("fecha")
-        .annotate(total=Count("id"))
+        .annotate(
+            humanos=Count("id", filter=Q(is_bot=False)),
+            bots=Count("id", filter=Q(is_bot=True)),
+        )
         .order_by("-fecha")[:30]
+    )
+
+    # -------------------------------------------------------------
+    # Empresas registradas por día (via fecha_inicio).
+    # -------------------------------------------------------------
+    Empresa = apps.get_model("taller", "Empresa")
+    empresas_por_dia = (
+        Empresa.objects
+        .annotate(dia=TruncDate("fecha_inicio"))
+        .values("dia")
+        .annotate(total=Count("id"))
+        .order_by("-dia")[:15]
     )
 
     # -------------------------------------------------------------
     # Funnel de adquisición first-party.
     # -------------------------------------------------------------
-    Empresa = apps.get_model("taller", "Empresa")
     funnel = {
         "visitas":       humanos,
         "empresas":      Empresa.objects.count(),
@@ -275,6 +293,7 @@ def public_analytics_dashboard(request):
         "bots": bots,
         "landings_humanas": landings_humanas.count(),
         "bienvenidas_humanas": bienvenidas_humanas.count(),
+        "home_humanas": home_humanas.count(),
         "por_pais": por_pais,
         "por_rubro": por_rubro,
         "pais_rubro": pais_rubro,
@@ -285,6 +304,7 @@ def public_analytics_dashboard(request):
         "por_referrer": por_referrer,
         "mobile_share": mobile_share,
         "por_idioma": por_idioma,
+        "empresas_por_dia": empresas_por_dia,
     }
 
     return TemplateResponse(

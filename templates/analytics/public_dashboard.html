@@ -409,6 +409,12 @@
             <div class="eg-mini">Entradas por país / idioma</div>
         </article>
 
+        <article class="eg-kpi">
+            <div class="eg-label">Home humanas</div>
+            <div class="eg-value">{{ home_humanas }}</div>
+            <div class="eg-mini">Visitas humanas a página principal</div>
+        </article>
+
     </section>
 
 
@@ -599,6 +605,30 @@
             </div>
         </article>
 
+        <article class="eg-panel third">
+            <div class="eg-panel-title">
+                <h2>🏢 Empresas / día</h2>
+                <small>Por fecha_inicio</small>
+            </div>
+            <div class="eg-table-wrap">
+                <table class="eg-table">
+                    <thead>
+                        <tr><th>Día</th><th>Altas</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for row in empresas_por_dia %}
+                        <tr>
+                            <td>{{ row.dia|date:"Y-m-d" }}</td>
+                            <td class="eg-number">{{ row.total }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="2" class="eg-empty">Sin registros todavía.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
     </section>
 
     <p class="eg-note">
@@ -767,9 +797,15 @@
         {% endfor %}
     ];
 
-    const tendenciaValues = [
+    const tendenciaHumanos = [
         {% for row in tendencia reversed %}
-        {{ row.total|default:0 }}{% if not forloop.last %},{% endif %}
+        {{ row.humanos|default:0 }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const tendenciaBots = [
+        {% for row in tendencia reversed %}
+        {{ row.bots|default:0 }}{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
 
@@ -786,20 +822,37 @@
             type: "line",
             data: {
                 labels: tendenciaLabels,
-                datasets: [{
-                    label: "Visitas humanas",
-                    data: tendenciaValues,
-                    borderColor: "#22d3ee",
-                    backgroundColor: gradient,
-                    fill: true,
-                    tension: .35,
-                    borderWidth: 3,
-                    pointRadius: 4,
-                    pointHoverRadius: 7,
-                    pointBackgroundColor: "#0f172a",
-                    pointBorderColor: "#22d3ee",
-                    pointBorderWidth: 2
-                }]
+                datasets: [
+                    {
+                        label: "Humanos",
+                        data: tendenciaHumanos,
+                        borderColor: "#22d3ee",
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: .35,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: "#0f172a",
+                        pointBorderColor: "#22d3ee",
+                        pointBorderWidth: 2
+                    },
+                    {
+                        label: "Bots",
+                        data: tendenciaBots,
+                        borderColor: "#f43f5e",
+                        backgroundColor: "rgba(244,63,94,.10)",
+                        fill: true,
+                        tension: .35,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: "#0f172a",
+                        pointBorderColor: "#f43f5e",
+                        pointBorderWidth: 2,
+                        borderDash: [4, 3]
+                    }
+                ]
             },
             options: {
                 responsive: true,
@@ -810,7 +863,8 @@
                 },
                 plugins: {
                     legend: {
-                        display: false
+                        display: true,
+                        labels: { usePointStyle: true, padding: 16 }
                     }
                 },
                 scales: {
