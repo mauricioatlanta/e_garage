@@ -6,6 +6,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from core.views import TenantViewMixin
 from taller.common.mixins.context_return import ContextReturnCreateMixin
+from taller.forms.servicio import ServicioForm
 from taller.servicios.models import CategoriaServicio, Servicio, SubcategoriaServicio
 from taller.templatetags.country_url import reverse_country_url
 
@@ -47,7 +48,12 @@ class ServicioDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
 class ServicioCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
     model = Servicio
     template_name = "taller/common/servicios/crear_servicio.html"
-    fields = ["nombre", "categoria"]
+    form_class = ServicioForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
     def get_template_names(self):
         return ["taller/common/servicios/crear_servicio.html", "servicios/crear_servicio.html"]
@@ -72,14 +78,9 @@ class ServicioCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantVie
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        from taller.utils.country import get_country_for_request
-        country_code = get_country_for_request(self.request) if hasattr(self.request, 'empresa') else None
-        if not country_code:
-            try:
-                from taller.servicios.views import _detectar_pais
-                country_code = _detectar_pais(self.request)
-            except Exception:
-                country_code = 'CL'
+        from taller.servicios.views import _detectar_pais
+
+        country_code = _detectar_pais(self.request)
         if 'subcategoria' in form.fields:
             form.fields['subcategoria'].queryset = SubcategoriaServicio.objects.filter(
                 country=country_code
