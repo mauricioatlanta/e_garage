@@ -32,6 +32,33 @@ def registrar_signup(user, pais, obtuvo_trial=False, trial_started_at=None, tria
                 "trial_ends_at": trial_ends_at,
             },
         )
+        # La empresa puede haberse creado ANTES que el registro del embudo.
+        # Sincronizar la etapa empresa de forma idempotente.
+        try:
+            empresa = getattr(user, "empresa", None)
+        except Exception:
+            empresa = None
+
+        if empresa is not None and not embudo.empresa_creada_at:
+            # El flujo actual crea Empresa milisegundos antes de crear el
+            # RegistroEmbudoSuscriptor. Para el funnel, una etapa posterior
+            # nunca debe quedar cronológicamente antes del signup.
+            empresa_fecha = getattr(empresa, "fecha_inicio", None)
+            if empresa_fecha:
+                embudo.empresa_creada_at = max(
+                    embudo.fecha_registro,
+                    empresa_fecha,
+                )
+            else:
+                embudo.empresa_creada_at = max(
+                    embudo.fecha_registro,
+                    timezone.now(),
+                )
+
+            embudo.save(
+                update_fields=["empresa_creada_at", "updated_at"]
+            )
+
         if created:
             log.info(f"[Embudo] Signup registrado para {user.email} ({pais})")
         else:

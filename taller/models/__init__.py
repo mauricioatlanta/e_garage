@@ -82,6 +82,9 @@ from .empresa_dominio import EmpresaDominio
 # Trust & Security
 from .sesion_usuario import SesionUsuario
 
+# Embudo de adquisición / registro
+from .registro_embudo import RegistroEmbudoSuscriptor
+
 # Analytics público
 from .public_page_view import PublicPageView, is_probable_bot
 
@@ -182,6 +185,8 @@ __all__ = [
     "MovimientoInventario",
     # Trust & Security
     "SesionUsuario",
+    # Embudo de adquisición / registro
+    "RegistroEmbudoSuscriptor",
     # Analytics público
     "PublicPageView",
     # Notificaciones
