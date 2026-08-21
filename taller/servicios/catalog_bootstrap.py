@@ -178,6 +178,9 @@ def get_master_catalog_service_items(
 
 
 def ensure_company_services_catalog(empresa, country_code):
+    # Solo debe invocarse desde flujos explícitos y controlados (management
+    # command, admin action). Nunca desde una vista GET: escribiría en la BD
+    # como efecto lateral de una lectura.
     if not empresa or not getattr(empresa, "pk", None):
         return 0
 

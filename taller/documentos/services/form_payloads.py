@@ -246,14 +246,10 @@ def build_prefetch_payloads(*, empresa, language, mode, country_code=None):
     from taller.models.clientes import Cliente
     from taller.models.repuesto import Repuesto
     from taller.models.vehiculos import Vehiculo
-    from taller.servicios.catalog_bootstrap import (
-        ensure_company_services_catalog,
-        get_master_catalog_service_items,
-    )
+    from taller.servicios.catalog_bootstrap import get_master_catalog_service_items
     from taller.servicios.models import Servicio, ServicioExterno
 
     country_code = str(country_code or getattr(empresa, "pais", None) or "CL").upper()
-    ensure_company_services_catalog(empresa, country_code)
 
     payload = _blank_prefetch()
     payload["clientes_prefetch"] = [

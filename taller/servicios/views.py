@@ -14,7 +14,7 @@ import json
 
 from taller.utils.templates import select_country_lang_template
 
-from .catalog_bootstrap import ensure_company_services_catalog, get_master_catalog_service_items
+from .catalog_bootstrap import get_master_catalog_service_items
 from .models import (
     CategoriaServicio,
     CategoriaServicioName,
@@ -113,9 +113,6 @@ def _resolve_servicios_menu_scope(request):
     country_code = _detectar_pais(request)
     request_lang = get_language() or getattr(request, "LANGUAGE_CODE", None) or "es"
     language = COUNTRY_LANGUAGE_MAP.get(country_code, (request_lang or "es")[:2])
-
-    if empresa:
-        ensure_company_services_catalog(empresa, country_code)
 
     servicios_pais = Servicio.objects.filter(categoria__country=country_code)
     total_servicios_pais = servicios_pais.count()
@@ -371,8 +368,6 @@ def buscar_servicios_api(request):
 
     if not empresa:
         return JsonResponse({"servicios": [], "total": 0})
-
-    ensure_company_services_catalog(empresa, country)
 
     servicios = (
         Servicio.objects.filter(

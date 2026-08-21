@@ -271,23 +271,35 @@ def test_document_form_prefetch_repuestos_incluye_costo_y_stock(auth_client, use
 
 
 @pytest.mark.django_db
-def test_document_form_prefetch_servicios_bootstrapea_catalogo_si_empresa_esta_vacia(
-    auth_client, user_cl
+def test_document_form_prefetch_servicios_no_bootstrapea_catalogo_usa_fallback_virtual(
+    user_cl,
 ):
+    # build_prefetch_payloads es el punto exacto de donde se removió el
+    # bootstrap eager; se prueba directo porque DocumentoCreateView en modo
+    # GET simple resuelve siempre a form_mode "clean" (bug preexistente y
+    # fuera de alcance: Cliente.objects.for_user no existe), lo que impide
+    # ejercitar esta ruta a través del endpoint HTTP.
+    from taller.documentos.services.form_mode import DocumentFormMode
+    from taller.documentos.services.form_payloads import build_prefetch_payloads
+
     empresa = user_cl.empresa
     assert not Servicio.objects.filter(empresa=empresa, categoria__country="CL").exists()
 
-    response = auth_client.get("/cl/documentos/form/")
+    payload = build_prefetch_payloads(
+        empresa=empresa,
+        language="es",
+        mode=DocumentFormMode(mode="prefill"),
+        country_code="CL",
+    )
 
-    assert response.status_code == 200
-    servicios_prefetch = response.context["servicios_prefetch"]
+    servicios_prefetch = payload["servicios_prefetch"]
     assert servicios_prefetch
-    assert Servicio.objects.filter(empresa=empresa, categoria__country="CL", activo=True).exists()
     assert any("aceite" in item["nombre"].lower() for item in servicios_prefetch)
+    assert not Servicio.objects.filter(empresa=empresa, categoria__country="CL").exists()
 
 
 @pytest.mark.django_db
-def test_buscar_servicios_api_bootstrapea_catalogo_si_empresa_esta_vacia(auth_client, user_cl):
+def test_buscar_servicios_api_no_bootstrapea_catalogo_usa_fallback_virtual(auth_client, user_cl):
     empresa = user_cl.empresa
     assert not Servicio.objects.filter(empresa=empresa, categoria__country="CL").exists()
 
@@ -300,3 +312,31 @@ def test_buscar_servicios_api_bootstrapea_catalogo_si_empresa_esta_vacia(auth_cl
     payload = response.json()
     assert payload["total"] > 0
     assert any("aceite" in item["nombre"].lower() for item in payload["servicios"])
+    assert not Servicio.objects.filter(empresa=empresa, categoria__country="CL").exists()
+
+
+@pytest.mark.django_db
+def test_servicios_menu_get_no_crea_servicio(auth_client, user_cl):
+    empresa = user_cl.empresa
+    assert not Servicio.objects.filter(empresa=empresa, categoria__country="CL").exists()
+
+    response = auth_client.get(reverse("chile:taller:servicios:servicios_menu"))
+
+    assert response.status_code == 200
+    assert not Servicio.objects.filter(empresa=empresa, categoria__country="CL").exists()
+
+
+@pytest.mark.django_db
+def test_servicios_menu_data_api_get_no_crea_servicio(auth_client, user_cl):
+    empresa = user_cl.empresa
+    assert not Servicio.objects.filter(empresa=empresa, categoria__country="CL").exists()
+
+    response = auth_client.get(
+        reverse("chile:taller:servicios:servicios_menu_data_api"),
+        {"q": "aceite"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["total"] > 0
+    assert not Servicio.objects.filter(empresa=empresa, categoria__country="CL").exists()
