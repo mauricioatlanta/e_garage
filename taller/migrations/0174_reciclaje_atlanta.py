@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('taller', '0165_smartyardglobalmetric_and_more'),
+        ('taller', '0173_reconcile_publicpageview_page_type'),
     ]
 
     operations = [
