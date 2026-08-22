@@ -161,6 +161,7 @@ class ConfiguracionEmpresa(models.Model):
         ("FLEET_REPAIR", "Taller de Reparación de Flotas Corporativas"),
         ("BODY_GLASS", "Taller de Carrocería y Reparación de Vidrios"),
         ("TUNING", "Taller de Tuning / Personalización"),
+        ("RECYCLING", "Reciclaje / Chatarra electrónica y catalíticos"),
         ("MIXED", "Mixto (multi-rubro — varios giros)"),
     ]
 

@@ -56,6 +56,7 @@ MODULES_BY_RUBRO = {
     "WORKSHOP_HEAVY":      frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS}),
     "EXHAUST":             frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS}),
     "PARTS":               frozenset({MOD_REPUESTOS}),
+    "RECYCLING":           frozenset({MOD_REPUESTOS}),
     "TIRE":                frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS}),
     "BODYSHOP":            frozenset({MOD_VEHICULOS, MOD_SERVICIOS}),
     "DETAILING":           frozenset({MOD_VEHICULOS, MOD_SERVICIOS}),

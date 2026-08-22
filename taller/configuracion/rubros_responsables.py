@@ -21,6 +21,7 @@ RESPONSABLE_LABEL_POR_RUBRO = {
     "DETAILING": "Técnico responsable",
     "GLASS_AUDIO": "Técnico responsable",
     "FLEET": "Técnico responsable de flota",
+    "RECYCLING": "Responsable de acopio",
     "MIXED": "Responsable",
 }
 
