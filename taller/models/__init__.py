@@ -54,6 +54,9 @@ from .vehiculo_financial import (
 )
 from .smart_yard_global import SmartYardGlobalMetric
 from .vendedor_desarme import VendedorDesarme
+
+# Modelos de reciclaje (Atlanta Reciclajes — chatarra electrónica y catalíticos)
+from .reciclaje import CategoriaChatarra, ProductoChatarra, Catalitico
 from .venta_desarme import VentaDesarme, LineaVentaDesarme
 
 # Modelos de ubicación
@@ -151,6 +154,10 @@ __all__ = [
     "VehicleFinancialEvent",
 "SmartYardGlobalMetric",
     "VendedorDesarme",
+    # Reciclaje (Atlanta Reciclajes)
+    "CategoriaChatarra",
+    "ProductoChatarra",
+    "Catalitico",
     # Ubicación
     "Estado",
     "Ciudad",

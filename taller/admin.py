@@ -18,6 +18,7 @@ from taller.models.extras_vehiculo import CajaVehiculoEmpresa, MotorVehiculoEmpr
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.interchange_pieza import InterchangePieza
 from taller.models.pieza_desarme import PiezaDesarme, PiezaDesarmeCompanyLabel
+from taller.models.reciclaje import CategoriaChatarra, ProductoChatarra, Catalitico
 from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculo_desarme_event import VehiculoDesarmeEvent
 from taller.models.public_page_view import PublicPageView
@@ -443,6 +444,48 @@ class PiezaDesarmeCompanyLabelAdmin(admin.ModelAdmin):
     list_select_related = ("empresa", "pieza_desarme")
     raw_id_fields = ("empresa", "pieza_desarme")
     ordering = ("-updated_at",)
+
+
+@admin.register(CategoriaChatarra, site=admin_site)
+class CategoriaChatarraAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "empresa")
+    list_filter = ("empresa",)
+    search_fields = ("nombre",)
+
+
+@admin.register(ProductoChatarra, site=admin_site)
+class ProductoChatarraAdmin(admin.ModelAdmin):
+    list_display = (
+        "codigo",
+        "nombre",
+        "categoria",
+        "unidad_medida",
+        "cantidad_stock",
+        "precio_venta",
+        "activo",
+        "empresa",
+    )
+    list_filter = ("empresa", "categoria", "unidad_medida", "activo")
+    search_fields = ("codigo", "nombre")
+    list_select_related = ("categoria", "empresa")
+    ordering = ("-created_at",)
+
+
+@admin.register(Catalitico, site=admin_site)
+class CataliticoAdmin(admin.ModelAdmin):
+    list_display = (
+        "codigo",
+        "nombre",
+        "tipo_catalizador",
+        "estado",
+        "peso_kg",
+        "precio_venta",
+        "empresa",
+    )
+    list_filter = ("empresa", "tipo_catalizador", "estado", "activo")
+    search_fields = ("codigo", "nombre", "marca_vehiculo", "modelo_vehiculo")
+    list_select_related = ("empresa",)
+    ordering = ("-created_at",)
 
 
 # === ADMINISTRACIÓN DE SERVICIOS MULTILENGUAJE ===

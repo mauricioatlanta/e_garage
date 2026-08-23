@@ -35,6 +35,7 @@ from taller.models.documento import Documento
 from taller.models.empresa import Empresa
 from taller.models.lineas_documento import LineaRepuesto, ORIGEN_EXTERNO
 from taller.models.pieza_desarme import PiezaDesarme
+from taller.models.reciclaje import CategoriaChatarra, ProductoChatarra, Catalitico
 from taller.models.repuesto import Repuesto
 from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
@@ -403,3 +404,80 @@ def LineaRepuestoFactory(*, documento=None, empresa=None, **kwargs) -> LineaRepu
     )
     defaults.update(kwargs)
     return LineaRepuesto.objects.create(**defaults)
+
+
+# ---------------------------------------------------------------------------
+# Reciclaje (Atlanta Reciclajes): CategoriaChatarraFactory, ProductoChatarraFactory,
+# CataliticoFactory
+# ---------------------------------------------------------------------------
+
+def CategoriaChatarraFactory(*, empresa: Empresa | None = None, **kwargs) -> CategoriaChatarra:
+    """
+    Creates a CategoriaChatarra for an Empresa.
+
+    Auto-generated fields:
+        nombre → "Categoría Chatarra <n>"
+    """
+    if empresa is None:
+        empresa = EmpresaFactory()
+
+    n = _seq()
+    defaults = {
+        "empresa": empresa,
+        "nombre": f"Categoría Chatarra {n}",
+    }
+    defaults.update(kwargs)
+    return CategoriaChatarra.objects.create(**defaults)
+
+
+def ProductoChatarraFactory(*, empresa: Empresa | None = None, **kwargs) -> ProductoChatarra:
+    """
+    Creates a ProductoChatarra for an Empresa.
+
+    Auto-generated fields:
+        codigo         → "CHT-<n>"
+        nombre         → "Chatarra <n>"
+        precio_venta   → Decimal("1000.00")
+        cantidad_stock → Decimal("10.000")
+
+    Override:
+        ProductoChatarraFactory(empresa=empresa, codigo="CU-01", unidad_medida=ProductoChatarra.UNIDAD_KG)
+    """
+    if empresa is None:
+        empresa = EmpresaFactory()
+
+    n = _seq()
+    defaults = {
+        "empresa": empresa,
+        "codigo": f"CHT-{n}",
+        "nombre": f"Chatarra {n}",
+        "precio_venta": Decimal("1000.00"),
+        "cantidad_stock": Decimal("10.000"),
+    }
+    defaults.update(kwargs)
+    return ProductoChatarra.objects.create(**defaults)
+
+
+def CataliticoFactory(*, empresa: Empresa | None = None, **kwargs) -> Catalitico:
+    """
+    Creates a Catalitico for an Empresa.
+
+    Auto-generated fields:
+        codigo       → "CAT-<n>"
+        precio_venta → Decimal("50000.00")
+
+    Override:
+        CataliticoFactory(empresa=empresa, estado=Catalitico.ESTADO_VENDIDO)
+    """
+    if empresa is None:
+        empresa = EmpresaFactory()
+
+    n = _seq()
+    defaults = {
+        "empresa": empresa,
+        "codigo": f"CAT-{n}",
+        "nombre": f"Catalítico {n}",
+        "precio_venta": Decimal("50000.00"),
+    }
+    defaults.update(kwargs)
+    return Catalitico.objects.create(**defaults)
