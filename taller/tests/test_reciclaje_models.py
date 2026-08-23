@@ -14,14 +14,13 @@ from django.db import IntegrityError
 
 from taller.constants.product_profiles import PRODUCT_PROFILES, RUBRO_TO_PRODUCT
 from taller.models.configuracion import ConfiguracionEmpresa
-from taller.models.reciclaje import CategoriaChatarra, Catalitico, ProductoChatarra
+from taller.models.reciclaje import Catalitico, CategoriaChatarra, ProductoChatarra
 from taller.tests.factories import (
     CataliticoFactory,
     CategoriaChatarraFactory,
     EmpresaFactory,
     ProductoChatarraFactory,
 )
-
 
 # ---------------------------------------------------------------------------
 # Rubro RECYCLING

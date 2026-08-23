@@ -53,25 +53,25 @@ def _parse_decimal(raw: str | None, field: str) -> Decimal:
         text = text.replace(",", "")
     try:
         return Decimal(text)
-    except InvalidOperation:
-        raise ValueError(f"'{field}' inválido: '{raw}'")
+    except InvalidOperation as exc:
+        raise ValueError(f"'{field}' inválido: '{raw}'") from exc
 
 
 def _resolve_empresa(identifier: str) -> Empresa:
     if identifier.isdigit():
         try:
             return Empresa.objects.get(pk=int(identifier))
-        except Empresa.DoesNotExist:
-            raise CommandError(f"No existe Empresa con id={identifier}")
+        except Empresa.DoesNotExist as exc:
+            raise CommandError(f"No existe Empresa con id={identifier}") from exc
     User = get_user_model()
     try:
         user = User.objects.get(username=identifier)
-    except User.DoesNotExist:
-        raise CommandError(f"No existe usuario/empresa para --empresa='{identifier}'")
+    except User.DoesNotExist as exc:
+        raise CommandError(f"No existe usuario/empresa para --empresa='{identifier}'") from exc
     try:
         return user.empresa
-    except Empresa.DoesNotExist:
-        raise CommandError(f"El usuario '{identifier}' no tiene Empresa asociada")
+    except Empresa.DoesNotExist as exc:
+        raise CommandError(f"El usuario '{identifier}' no tiene Empresa asociada") from exc
 
 
 class Command(BaseCommand):
@@ -104,7 +104,7 @@ class Command(BaseCommand):
         try:
             fh = open(csv_path, newline="", encoding=options["encoding"])
         except OSError as exc:
-            raise CommandError(f"No se pudo abrir '{csv_path}': {exc}")
+            raise CommandError(f"No se pudo abrir '{csv_path}': {exc}") from exc
 
         created = updated = skipped = 0
         errors: list[str] = []

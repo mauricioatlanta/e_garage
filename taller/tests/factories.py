@@ -422,10 +422,10 @@ def CategoriaChatarraFactory(*, empresa: Empresa | None = None, **kwargs) -> Cat
         empresa = EmpresaFactory()
 
     n = _seq()
-    defaults = dict(
-        empresa=empresa,
-        nombre=f"Categoría Chatarra {n}",
-    )
+    defaults = {
+        "empresa": empresa,
+        "nombre": f"Categoría Chatarra {n}",
+    }
     defaults.update(kwargs)
     return CategoriaChatarra.objects.create(**defaults)
 
@@ -447,13 +447,13 @@ def ProductoChatarraFactory(*, empresa: Empresa | None = None, **kwargs) -> Prod
         empresa = EmpresaFactory()
 
     n = _seq()
-    defaults = dict(
-        empresa=empresa,
-        codigo=f"CHT-{n}",
-        nombre=f"Chatarra {n}",
-        precio_venta=Decimal("1000.00"),
-        cantidad_stock=Decimal("10.000"),
-    )
+    defaults = {
+        "empresa": empresa,
+        "codigo": f"CHT-{n}",
+        "nombre": f"Chatarra {n}",
+        "precio_venta": Decimal("1000.00"),
+        "cantidad_stock": Decimal("10.000"),
+    }
     defaults.update(kwargs)
     return ProductoChatarra.objects.create(**defaults)
 
@@ -473,11 +473,11 @@ def CataliticoFactory(*, empresa: Empresa | None = None, **kwargs) -> Catalitico
         empresa = EmpresaFactory()
 
     n = _seq()
-    defaults = dict(
-        empresa=empresa,
-        codigo=f"CAT-{n}",
-        nombre=f"Catalítico {n}",
-        precio_venta=Decimal("50000.00"),
-    )
+    defaults = {
+        "empresa": empresa,
+        "codigo": f"CAT-{n}",
+        "nombre": f"Catalítico {n}",
+        "precio_venta": Decimal("50000.00"),
+    }
     defaults.update(kwargs)
     return Catalitico.objects.create(**defaults)
