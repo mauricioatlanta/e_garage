@@ -85,13 +85,24 @@ class Command(BaseCommand):
 
             config, _config_created = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
             config.rubro_principal = "RECYCLING"
+            # Atlanta compra convertidores catalíticos (su negocio principal) y
+            # chatarra electrónica; ver Fase 304 (especialidad de reciclaje).
+            config.recycling_type_principal = "CATALYTIC_RECYCLING"
+            config.recycling_types = ["CATALYTIC_RECYCLING", "ELECTRONIC_SCRAP"]
             config.nombre_publico = options["nombre"]
             config.modules_configured_at = config.modules_configured_at or timezone.now()
-            config.save(update_fields=["rubro_principal", "nombre_publico", "modules_configured_at"])
+            config.save(update_fields=[
+                "rubro_principal",
+                "recycling_type_principal",
+                "recycling_types",
+                "nombre_publico",
+                "modules_configured_at",
+            ])
 
         self.stdout.write(self.style.SUCCESS(
             f"Tenant listo: empresa_id={empresa.id} username={username} "
-            f"(usuario_nuevo={user_created}, empresa_nueva={empresa_created}) rubro=RECYCLING"
+            f"(usuario_nuevo={user_created}, empresa_nueva={empresa_created}) "
+            f"rubro=RECYCLING especialidad={config.recycling_types}"
         ))
         if generated_password:
             self.stdout.write(self.style.WARNING(

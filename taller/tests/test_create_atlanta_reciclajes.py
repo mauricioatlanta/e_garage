@@ -20,6 +20,11 @@ class TestCreateAtlantaReciclajes:
 
         assert empresa.nombre_taller == "Atlanta Reciclajes"
         assert config.rubro_principal == "RECYCLING"
+        assert config.recycling_type_principal == "CATALYTIC_RECYCLING"
+        assert config.get_effective_recycling_types() == [
+            "CATALYTIC_RECYCLING",
+            "ELECTRONIC_SCRAP",
+        ]
 
     def test_es_idempotente_no_duplica_al_correr_dos_veces(self):
         call_command("create_atlanta_reciclajes", "--username", "atlanta_test")
