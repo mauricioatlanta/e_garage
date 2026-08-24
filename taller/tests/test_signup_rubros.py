@@ -370,3 +370,161 @@ def test_group_key_to_rubros_cubre_todos_los_grupos():
     for g in SIGNUP_RUBRO_GROUPS:
         assert g["key"] in _GROUP_KEY_TO_RUBROS
         assert len(_GROUP_KEY_TO_RUBROS[g["key"]]) >= 1
+
+
+# ─── 12. Hook de sync de catálogo en signup ──────────────────────────────────
+
+
+@pytest.mark.django_db
+def test_signup_workshop_materializa_catalogo_matrix(django_user_model):
+    """
+    El catálogo curado es parte crítica del alta de una empresa
+    de servicios: un WORKSHOP debe salir del signup con catálogo.
+    """
+    from taller.models import ConfiguracionEmpresa
+    from taller.services.registration_service import RegistrationService
+    from taller.servicios.models import Servicio, ServicioName, ServicioRubro
+
+    user = django_user_model.objects.create_user(
+        username="signup-workshop-matrix",
+        email="signup-workshop-matrix@example.com",
+        password="test-pass-123",
+    )
+
+    result = RegistrationService.create_company_for_user(
+        user=user,
+        company_data={
+            "nombre_taller": "Signup Workshop Matrix",
+            "pais": "CL",
+            "telefono": "+56900100011",
+        },
+        rubros_list=["WORKSHOP", "WORKSHOP_HEAVY", "WORKSHOP_MOTO"],
+    )
+
+    empresa = result["empresa"]
+
+    config = ConfiguracionEmpresa.objects.get(empresa=empresa)
+    assert config.rubro_principal == "WORKSHOP"
+    assert config.rubros == ["WORKSHOP", "WORKSHOP_HEAVY", "WORKSHOP_MOTO"]
+
+    assert Servicio.objects.filter(empresa=empresa).count() == 109
+    assert ServicioRubro.objects.filter(servicio__empresa=empresa).exists()
+    assert ServicioName.objects.filter(
+        servicio__empresa=empresa, country_code="CL", language="es"
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_signup_parts_cero_servicios_es_valido(django_user_model):
+    """
+    PARTS queda fuera del alcance de la matriz de servicios.
+    El signup debe completar normalmente con catálogo vacío.
+    """
+    from taller.services.registration_service import RegistrationService
+    from taller.servicios.models import Servicio, ServicioRubro
+
+    user = django_user_model.objects.create_user(
+        username="signup-parts-matrix",
+        email="signup-parts-matrix@example.com",
+        password="test-pass-123",
+    )
+
+    result = RegistrationService.create_company_for_user(
+        user=user,
+        company_data={
+            "nombre_taller": "Signup Parts Matrix",
+            "pais": "CL",
+            "telefono": "+56900100012",
+        },
+        rubros_list=["PARTS"],
+    )
+
+    empresa = result["empresa"]
+    assert empresa.pk is not None
+
+    assert Servicio.objects.filter(empresa=empresa).count() == 0
+    assert ServicioRubro.objects.filter(servicio__empresa=empresa).count() == 0
+
+
+@pytest.mark.django_db
+def test_signup_rollback_si_falla_catalog_sync(django_user_model, monkeypatch):
+    """
+    El sync es crítico: si falla, @transaction.atomic debe revertir
+    también Empresa/ConfiguracionEmpresa.
+    """
+    from taller.models import ConfiguracionEmpresa
+    from taller.models.empresa import Empresa
+    from taller.services import registration_service
+    from taller.services.registration_service import RegistrationService
+
+    user = django_user_model.objects.create_user(
+        username="signup-catalog-rollback",
+        email="signup-catalog-rollback@example.com",
+        password="test-pass-123",
+    )
+
+    def fail_sync(*args, **kwargs):
+        raise RuntimeError("catalog sync failed")
+
+    monkeypatch.setattr(
+        registration_service, "sync_company_service_catalog", fail_sync
+    )
+
+    with pytest.raises(RuntimeError, match="catalog sync failed"):
+        RegistrationService.create_company_for_user(
+            user=user,
+            company_data={
+                "nombre_taller": "Rollback Catalog",
+                "pais": "CL",
+                "telefono": "+56900100013",
+            },
+            rubros_list=["WORKSHOP"],
+        )
+
+    assert not Empresa.objects.filter(user=user).exists()
+    assert not ConfiguracionEmpresa.objects.filter(empresa__user=user).exists()
+
+
+@pytest.mark.django_db
+def test_signup_uy_crea_nombre_pais_cuando_hay_traduccion(django_user_model):
+    """
+    UY comparte idioma 'es' con CL, pero country_code debe permitir
+    guardar ambas variantes sin colisión.
+    """
+    from taller.services.registration_service import RegistrationService
+    from taller.servicios.models import Servicio, ServicioName
+
+    user = django_user_model.objects.create_user(
+        username="signup-uy-matrix",
+        email="signup-uy-matrix@example.com",
+        password="test-pass-123",
+    )
+
+    result = RegistrationService.create_company_for_user(
+        user=user,
+        company_data={
+            "nombre_taller": "Signup UY Matrix",
+            "pais": "UY",
+            "telefono": "+59800100014",
+        },
+        rubros_list=["WORKSHOP"],
+    )
+
+    empresa = result["empresa"]
+
+    servicio = Servicio.objects.get(
+        empresa=empresa,
+        codigo_interno="DIAGNOSTICO_COMPUTARIZADO_CON_ESCANER_OBD_II",
+    )
+
+    cl = ServicioName.objects.get(
+        servicio=servicio, country_code="CL", language="es", is_default=True
+    )
+    uy = ServicioName.objects.get(
+        servicio=servicio, country_code="UY", language="es", is_default=True
+    )
+
+    assert cl.label
+    assert uy.label
+    assert cl.label != uy.label
+    assert uy.label == "Diagnóstico Computarizado"

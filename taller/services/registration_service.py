@@ -20,6 +20,7 @@ from django.utils.translation import activate
 
 from taller.models.empresa import Empresa
 from taller.models.suscripcion import Suscripcion
+from taller.servicios.catalog_bootstrap import sync_company_service_catalog
 from taller.services.trial_service import can_start_trial
 from taller.utils.country_config import get_country_config, get_config_from_empresa
 from taller.config.country_settings import CountrySettings
@@ -344,6 +345,13 @@ class RegistrationService:
                 rubros_list[0],
                 rubros_list,
             )
+
+        # Materializar catálogo curado de servicios según país + rubros.
+        # Crítico (sin try/except): un WORKSHOP sin catálogo es el estado
+        # incompleto que motivó esta feature; si falla, @transaction.atomic
+        # revierte Empresa + ConfiguracionEmpresa igual que arriba.
+        # selected=0 (PARTS/DESARMADURIA/RECYCLING/MIXED) es válido, no error.
+        sync_company_service_catalog(empresa, country_code)
 
         # Crear suscripción
         suscripcion = None
