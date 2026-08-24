@@ -1,0 +1,7395 @@
+[
+  {
+    "candidate_code": "AFINAMIENTO_COMPLETO_BUJIAS_FILTROS_INYECTORES_SEN",
+    "category": "maintenance",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Afinamiento completo (bujías, filtros, inyectores, sensores)",
+        "aliases": []
+      },
+      "US": {
+        "label": "Complete Tune-Up",
+        "aliases": [
+          "Tune-Up"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "Afinación Mayor",
+        "aliases": [
+          "Afinación",
+          "Afinación Completa"
+        ],
+        "status": "direct"
+      },
+      "AR": {
+        "label": "Puesta a Punto / Service",
+        "aliases": [
+          "Puesta a Punto",
+          "Service"
+        ],
+        "status": "draft_review"
+      },
+      "CO": {
+        "label": "Sincronización de Motor",
+        "aliases": [
+          "Sincronización"
+        ],
+        "status": "draft_review"
+      },
+      "EC": {
+        "label": "ABC de Motor",
+        "aliases": [
+          "ABC",
+          "Tune Up"
+        ],
+        "status": "draft_review"
+      },
+      "PE": {
+        "label": "Afinamiento de Motor",
+        "aliases": [
+          "Afinamiento",
+          "Tune Up"
+        ],
+        "status": "draft_review"
+      },
+      "VE": {
+        "label": "Afinamiento de Motor",
+        "aliases": [
+          "Afinamiento",
+          "Tune Up"
+        ],
+        "status": "draft_review"
+      },
+      "BR": {
+        "label": "Regulagem de Motor",
+        "aliases": [
+          "Regulagem"
+        ],
+        "status": "draft_review"
+      },
+      "UY": {
+        "label": "Afinación de Motor",
+        "aliases": [
+          "afinación",
+          "bujías",
+          "tune up",
+          "servicio"
+        ],
+        "status": "draft_review"
+      }
+    }
+  },
+  {
+    "candidate_code": "ALINEACION_Y_BALANCEO_COMPUTARIZADO_DE_RUEDAS",
+    "category": "tires_alignment",
+    "rubros": [
+      "FLEET",
+      "FLEET_REPAIR",
+      "TIRE",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Alineación y balanceo computarizado de ruedas",
+        "aliases": []
+      },
+      "US": {
+        "label": "Computerized Wheel Alignment and Balancing",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "Alineación y Balanceo Computarizado",
+        "aliases": [
+          "Alineación y Balanceo"
+        ],
+        "status": "direct"
+      },
+      "AR": {
+        "label": "Alineación y Balanceo",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "CO": {
+        "label": "Alineación y Balanceo",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "EC": {
+        "label": "Alineación y Balanceo",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "PE": {
+        "label": "Alineación y Balanceo",
+        "aliases": [
+          "Alineación",
+          "Balanceo",
+          "Alineación y Balanceo"
+        ],
+        "status": "draft_review"
+      },
+      "VE": {
+        "label": "Alineación y Balanceo",
+        "aliases": [
+          "Alineación",
+          "Balanceo"
+        ],
+        "status": "draft_review"
+      },
+      "BR": {
+        "label": "Alinhamento e Balanceamento",
+        "aliases": [
+          "Alinhamento",
+          "Balanceamento"
+        ],
+        "status": "draft_review"
+      },
+      "UY": {
+        "label": "Alineación y Balanceo",
+        "aliases": [
+          "alineación",
+          "balanceo",
+          "alinear",
+          "balancear"
+        ],
+        "status": "draft_review"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_ACEITE_Y_FILTRO_MOTOR",
+    "category": "maintenance",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de aceite y filtro (motor)",
+        "aliases": []
+      },
+      "US": {
+        "label": "Engine Oil and Filter Change",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "Servicio de Aceite",
+        "aliases": [
+          "Cambio de Aceite y Filtro",
+          "Aceite y Filtro"
+        ],
+        "status": "direct"
+      },
+      "AR": {
+        "label": "Cambio de Aceite",
+        "aliases": [
+          "Service de Aceite",
+          "Lubricentro"
+        ],
+        "status": "draft_review"
+      },
+      "CO": {
+        "label": "Cambio de Aceite",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "EC": {
+        "label": "Cambio de Aceite",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "PE": {
+        "label": "Cambio de Aceite y Filtro",
+        "aliases": [
+          "Cambio de Aceite",
+          "Aceite y Filtro"
+        ],
+        "status": "direct"
+      },
+      "VE": {
+        "label": "Cambio de Aceite",
+        "aliases": [
+          "Aceite",
+          "Mantenimiento"
+        ],
+        "status": "draft_review"
+      },
+      "BR": {
+        "label": "Troca de Óleo",
+        "aliases": [
+          "Troca Óleo",
+          "Óleo",
+          "Lubrificação"
+        ],
+        "status": "draft_review"
+      },
+      "UY": {
+        "label": "Cambio de Aceite",
+        "aliases": [
+          "cambio de aceite",
+          "aceite",
+          "lubricación"
+        ],
+        "status": "draft_review"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_CORREAS_DISTRIBUCION_ALTERNADOR_ACCESORI",
+    "category": "maintenance",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de correas (distribución, alternador, accesorios)",
+        "aliases": []
+      },
+      "US": {
+        "label": "Timing, Alternator, and Accessory Belt Replacement",
+        "aliases": [
+          "Timing Belt Replacement",
+          "Alternator Belt Replacement",
+          "Accessory Belt Replacement",
+          "Serpentine Belt Replacement"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_FILTRO_DE_AIRE",
+    "category": "maintenance",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de filtro de aire",
+        "aliases": []
+      },
+      "US": {
+        "label": "Air Filter Replacement",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "Cambio de Filtro de Aire",
+        "aliases": [],
+        "status": "direct"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "Filtro de Aire",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "VE": {
+        "label": "Filtro de Aire",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "BR": {
+        "label": "Filtro de Ar",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_FILTRO_DE_COMBUSTIBLE",
+    "category": "maintenance",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de filtro de combustible",
+        "aliases": []
+      },
+      "US": {
+        "label": "Fuel Filter Replacement",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_FILTRO_DE_CABINA_HABITACULO",
+    "category": "maintenance",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de filtro de cabina (habitáculo)",
+        "aliases": []
+      },
+      "US": {
+        "label": "Cabin Air Filter Replacement",
+        "aliases": [
+          "Pollen Filter"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CHEQUEO_Y_CAMBIO_DE_LIQUIDOS_REFRIGERANTE_FRENOS_H",
+    "category": "maintenance",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Chequeo y cambio de líquidos (refrigerante, frenos, hidráulico, transmisión)",
+        "aliases": []
+      },
+      "US": {
+        "label": "Fluid Check and Top-Off (Coolant, Brake, Power Steering, Transmission)",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "DIAGNOSTICO_COMPUTARIZADO_CON_ESCANER_OBD_II",
+    "category": "maintenance",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Diagnóstico computarizado con escáner OBD-II",
+        "aliases": []
+      },
+      "US": {
+        "label": "Computerized OBD-II Diagnostic Scan",
+        "aliases": [
+          "OBD-II Scan",
+          "OBD Diagnostic Scan",
+          "Computer Diagnostics"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "Escaneo Diagnóstico",
+        "aliases": [
+          "Diagnóstico OBD",
+          "Escaneo OBD",
+          "OBD"
+        ],
+        "status": "direct"
+      },
+      "AR": {
+        "label": "Diagnóstico Computarizado",
+        "aliases": [
+          "Diagnóstico OBD",
+          "Escaneo OBD",
+          "OBD"
+        ],
+        "status": "direct"
+      },
+      "CO": {
+        "label": "Diagnóstico Computarizado",
+        "aliases": [
+          "Diagnóstico OBD",
+          "Escaneo OBD",
+          "OBD"
+        ],
+        "status": "direct"
+      },
+      "EC": {
+        "label": "Diagnóstico Computarizado",
+        "aliases": [
+          "Diagnóstico OBD",
+          "Escaneo OBD",
+          "OBD"
+        ],
+        "status": "direct"
+      },
+      "PE": {
+        "label": "Diagnóstico Computarizado",
+        "aliases": [
+          "Diagnóstico OBD",
+          "Escaneo OBD",
+          "OBD"
+        ],
+        "status": "direct"
+      },
+      "VE": {
+        "label": "Diagnóstico Computarizado",
+        "aliases": [
+          "Diagnóstico OBD",
+          "Escaneo OBD",
+          "OBD"
+        ],
+        "status": "direct"
+      },
+      "BR": {
+        "label": "Varredura Diagnóstica",
+        "aliases": [
+          "Diagnóstico Computadorizado",
+          "Scanner",
+          "OBD"
+        ],
+        "status": "direct"
+      },
+      "UY": {
+        "label": "Diagnóstico Computarizado",
+        "aliases": [
+          "scanner",
+          "diagnóstico",
+          "obd",
+          "check engine"
+        ],
+        "status": "direct"
+      }
+    }
+  },
+  {
+    "candidate_code": "INSPECCION_DE_SUSPENSION_ROTULAS_Y_AMORTIGUADORES",
+    "category": "maintenance",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Inspección de suspensión, rótulas y amortiguadores",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "Inspección de Suspensión",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "LUBRICACION_DE_BISAGRAS_CERRADURAS_Y_COMPONENTES_M",
+    "category": "maintenance",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Lubricación de bisagras, cerraduras y componentes móviles",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REVISION_Y_AJUSTE_DEL_SISTEMA_DE_FRENOS",
+    "category": "maintenance",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Revisión y ajuste del sistema de frenos",
+        "aliases": []
+      },
+      "US": {
+        "label": "Brake System Inspection and Adjustment",
+        "aliases": [
+          "Brake Inspection",
+          "Complete Brake System Inspection"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "Revisión y Ajuste de Frenos",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "Servicio de Frenos",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "VE": {
+        "label": "Servicio de Frenos",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "BR": {
+        "label": "Serviço de Freios",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REVISION_DE_PRESION_Y_ESTADO_DE_NEUMATICOS",
+    "category": "tires_alignment",
+    "rubros": [
+      "FLEET",
+      "FLEET_REPAIR",
+      "TIRE",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Revisión de presión y estado de neumáticos",
+        "aliases": []
+      },
+      "US": {
+        "label": "Tire Pressure and Condition Inspection",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "Revisión de Presión y Estado de Llantas",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REVISION_DEL_SISTEMA_DE_ESCAPE_Y_CATALIZADOR",
+    "category": "exhaust_emissions",
+    "rubros": [
+      "EXHAUST",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Revisión del sistema de escape y catalizador",
+        "aliases": []
+      },
+      "US": {
+        "label": "Exhaust and Catalytic Converter Inspection",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "Revisión del Sistema de Escape",
+        "aliases": [
+          "Sistema de Escape"
+        ],
+        "status": "draft_review"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "ROTACION_CRUZADA_DE_NEUMATICOS",
+    "category": "tires_alignment",
+    "rubros": [
+      "FLEET",
+      "FLEET_REPAIR",
+      "TIRE",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Rotación cruzada de neumáticos",
+        "aliases": []
+      },
+      "US": {
+        "label": "Tire Rotation",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "Rotación de Llantas",
+        "aliases": [
+          "Rotación Cruzada de Llantas"
+        ],
+        "status": "direct"
+      },
+      "AR": {
+        "label": "Rotación de Cubiertas",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "CO": {
+        "label": "Rotación de Llantas",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "EC": {
+        "label": "Rotación de Llantas",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "PE": {
+        "label": "Rotación de Neumáticos",
+        "aliases": [
+          "Rotación de Neumáticos",
+          "Rotación de Llantas"
+        ],
+        "status": "draft_review"
+      },
+      "VE": {
+        "label": "Rotación de Cauchos",
+        "aliases": [
+          "Rotar Cauchos",
+          "Rotación Gomas"
+        ],
+        "status": "draft_review"
+      },
+      "BR": {
+        "label": "Rotação de Pneus",
+        "aliases": [
+          "Rotação de Pneus",
+          "Rodízio de Pneus"
+        ],
+        "status": "draft_review"
+      },
+      "UY": {
+        "label": "Rotación de Cubiertas",
+        "aliases": [
+          "rotación",
+          "rotar cubiertas",
+          "cambio posición"
+        ],
+        "status": "draft_review"
+      }
+    }
+  },
+  {
+    "candidate_code": "TEST_DE_BATERIA_Y_SISTEMA_DE_CARGA_ELECTRICA",
+    "category": "maintenance",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Test de batería y sistema de carga eléctrica",
+        "aliases": []
+      },
+      "US": {
+        "label": "Battery and Charging System Test",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "AJUSTE_Y_SINCRONIZACION_ELECTRONICA_DEL_MOTOR",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Ajuste y sincronización electrónica del motor",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_ALTERNADOR",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de alternador",
+        "aliases": []
+      },
+      "US": {
+        "label": "Alternator Replacement",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_BOMBA_DE_AGUA",
+    "category": "cooling_engine",
+    "rubros": [
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de bomba de agua",
+        "aliases": []
+      },
+      "US": {
+        "label": "Water Pump Replacement",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_CADENA_O_CORREA_DE_DISTRIBUCION",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de cadena o correa de distribución",
+        "aliases": []
+      },
+      "US": {
+        "label": "Timing Belt / Chain Replacement",
+        "aliases": [
+          "Timing Belt Replacement",
+          "Timing Chain Replacement"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_EMPAQUETADURA_DE_CULATA",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de empaquetadura de culata",
+        "aliases": []
+      },
+      "US": {
+        "label": "Head Gasket Replacement",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_EMPAQUETADURAS_Y_RETENES_GENERALES",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de empaquetaduras y retenes generales",
+        "aliases": []
+      },
+      "US": {
+        "label": "Engine Gasket and Seal Replacement",
+        "aliases": [
+          "Engine Gasket Replacement",
+          "Engine Seals Replacement"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_MOTOR_DE_ARRANQUE",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de motor de arranque",
+        "aliases": []
+      },
+      "US": {
+        "label": "Starter Replacement",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_PISTONES_ANILLOS_Y_METALES",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de pistones, anillos y metales",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_RADIADOR_Y_COMPONENTES_DE_REFRIGERACION",
+    "category": "cooling_engine",
+    "rubros": [
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de radiador y componentes de refrigeración",
+        "aliases": []
+      },
+      "US": {
+        "label": "Radiator and Cooling Component Replacement",
+        "aliases": [
+          "Radiator Replacement"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_SENSORES_MAP_MAF_O2_TEMPERATURA_CIGUENAL",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de sensores (MAP, MAF, O2, temperatura, cigüeñal, etc.)",
+        "aliases": []
+      },
+      "US": {
+        "label": "MAP, MAF, O2, Temperature, and Crankshaft Sensor Replacement",
+        "aliases": [
+          "Mass Air Flow Sensor Replacement",
+          "Oxygen Sensor Replacement"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_SOPORTES_DE_MOTOR",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de soportes de motor",
+        "aliases": []
+      },
+      "US": {
+        "label": "Engine Mount Replacement",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "DIAGNOSTICO_Y_REPARACION_DE_FALLAS_DE_MOTOR",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Diagnóstico y reparación de fallas de motor",
+        "aliases": []
+      },
+      "US": {
+        "label": "Engine Diagnosis and Repair",
+        "aliases": [
+          "Engine Diagnostics",
+          "Engine Diagnosis"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "Diagnóstico del Motor",
+        "aliases": [
+          "Diagnóstico de Motor"
+        ],
+        "status": "draft_review"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "Diagnóstico del Motor",
+        "aliases": [
+          "Diagnóstico del Motor",
+          "Engine Diagnostic"
+        ],
+        "status": "draft_review"
+      },
+      "VE": {
+        "label": "Diagnóstico del Motor",
+        "aliases": [
+          "Diagnóstico del Motor",
+          "Engine Diagnostic"
+        ],
+        "status": "draft_review"
+      },
+      "BR": {
+        "label": "Diagnóstico do Motor",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "LIMPIEZA_ULTRASONICA_DE_INYECTORES",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Limpieza ultrasónica de inyectores",
+        "aliases": []
+      },
+      "US": {
+        "label": "Fuel Injector Cleaning",
+        "aliases": [
+          "Fuel Injector Service"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "RECTIFICACION_DE_CULATA_Y_PRUEBA_HIDRAULICA",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Rectificación de culata y prueba hidráulica",
+        "aliases": []
+      },
+      "US": {
+        "label": "Cylinder Head Resurfacing and Pressure Test",
+        "aliases": [
+          "Cylinder Head Resurfacing"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REPARACION_DE_FUGAS_DE_ACEITE_Y_REFRIGERANTE",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Reparación de fugas de aceite y refrigerante",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REPARACION_DE_SISTEMA_DE_INYECCION_COMMON_RAIL_TBI",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Reparación de sistema de inyección (common rail, TBI)",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REVISION_Y_REPARACION_DE_SISTEMA_DE_ESCAPE_FLEXIBL",
+    "category": "exhaust_emissions",
+    "rubros": [
+      "EXHAUST",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Revisión y reparación de sistema de escape (flexibles, catalizador)",
+        "aliases": []
+      },
+      "US": {
+        "label": "Exhaust System Inspection and Repair",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "Revisión y Reparación de Sistema de Escape",
+        "aliases": [
+          "Sistema de Escape"
+        ],
+        "status": "draft_review"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_CILINDRO_MAESTRO_DE_FRENOS",
+    "category": "brakes",
+    "rubros": [
+      "BRAKES",
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de cilindro maestro de frenos",
+        "aliases": []
+      },
+      "US": {
+        "label": "Brake Master Cylinder Replacement",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_DISCOS_VENTILADOS_O_SOLIDOS",
+    "category": "brakes",
+    "rubros": [
+      "BRAKES",
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de discos ventilados o sólidos",
+        "aliases": []
+      },
+      "US": {
+        "label": "Brake Rotor Replacement",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_Y_PURGADO_DE_LIQUIDO_DE_FRENOS",
+    "category": "brakes",
+    "rubros": [
+      "BRAKES",
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio y purgado de líquido de frenos",
+        "aliases": []
+      },
+      "US": {
+        "label": "Brake Fluid Replacement and Bleeding",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_MANGUERAS_Y_LINEAS_DE_FRENO",
+    "category": "brakes",
+    "rubros": [
+      "BRAKES",
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de mangueras y líneas de freno",
+        "aliases": []
+      },
+      "US": {
+        "label": "Brake Hoses and Lines Replacement",
+        "aliases": [
+          "Brake Line Replacement",
+          "Brake Lines & Hoses"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_PASTILLAS_DE_FRENO",
+    "category": "brakes",
+    "rubros": [
+      "BRAKES",
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de pastillas de freno",
+        "aliases": []
+      },
+      "US": {
+        "label": "Brake Pad Replacement",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "Cambio de Balatas",
+        "aliases": [
+          "Balatas",
+          "Cambio de Balatas Delanteras"
+        ],
+        "status": "direct"
+      },
+      "AR": {
+        "label": "Cambio de Pastillas de Freno",
+        "aliases": [
+          "Pastillas",
+          "Cambio de Pastillas de Freno Delanteras"
+        ],
+        "status": "direct"
+      },
+      "CO": {
+        "label": "Cambio de Pastillas de Freno",
+        "aliases": [
+          "Pastillas",
+          "Cambio de Pastillas de Freno Delanteras"
+        ],
+        "status": "direct"
+      },
+      "EC": {
+        "label": "Cambio de Pastillas de Freno",
+        "aliases": [
+          "Pastillas",
+          "Cambio de Pastillas de Freno Delanteras"
+        ],
+        "status": "direct"
+      },
+      "PE": {
+        "label": "Cambio de Pastillas de Freno",
+        "aliases": [
+          "Pastillas",
+          "Pastillas Delanteras",
+          "Frenos Delanteros",
+          "Cambio de Pastillas de Freno Delanteras"
+        ],
+        "status": "direct"
+      },
+      "VE": {
+        "label": "Cambio de Pastillas de Freno",
+        "aliases": [
+          "Pastillas",
+          "Pastillas Delanteras",
+          "Frenos Delanteros",
+          "Cambio de Pastillas de Freno Delanteras"
+        ],
+        "status": "direct"
+      },
+      "BR": {
+        "label": "Troca de Pastilhas de Freio",
+        "aliases": [
+          "Pastilhas",
+          "Pastilhas Dianteiras",
+          "Freios Dianteiros",
+          "Troca de Pastilhas Dianteiras"
+        ],
+        "status": "direct"
+      },
+      "UY": {
+        "label": "Cambio de Pastillas de Freno Delanteras",
+        "aliases": [
+          "pastillas delanteras",
+          "frenos delanteros",
+          "pastillas"
+        ],
+        "status": "direct"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_TAMBORES_Y_ZAPATAS",
+    "category": "brakes",
+    "rubros": [
+      "BRAKES",
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de tambores y zapatas",
+        "aliases": []
+      },
+      "US": {
+        "label": "Brake Drum and Shoe Replacement",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "PURGADO_Y_SANGRADO_DEL_SISTEMA_DE_FRENOS",
+    "category": "brakes",
+    "rubros": [
+      "BRAKES",
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Purgado y sangrado del sistema de frenos",
+        "aliases": []
+      },
+      "US": {
+        "label": "Brake System Bleeding",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "DIAGNOSTICO_Y_REPARACION_DE_ABS",
+    "category": "brakes",
+    "rubros": [
+      "BRAKES",
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Diagnóstico y reparación de ABS",
+        "aliases": []
+      },
+      "US": {
+        "label": "ABS Diagnosis and Repair",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REVISION_Y_AJUSTE_DEL_FRENO_DE_MANO",
+    "category": "brakes",
+    "rubros": [
+      "BRAKES",
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Revisión y ajuste del freno de mano",
+        "aliases": []
+      },
+      "US": {
+        "label": "Parking Brake Inspection and Adjustment",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_ACEITE_DE_TRANSMISION_AUTOMATICA_ATF",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de aceite de transmisión automática (ATF)",
+        "aliases": []
+      },
+      "US": {
+        "label": "Automatic Transmission Fluid (ATF) Service",
+        "aliases": [
+          "Transmission Fluid Service",
+          "Transmission Flush",
+          "ATF Service"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_ACEITE_DE_CAJA_MECANICA",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de aceite de caja mecánica",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_CARDAN_Y_CRUCETAS",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de cardán y crucetas",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_CONVERTIDOR_DE_PAR",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de convertidor de par",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_KIT_DE_EMBRAGUE_DISCO_PRENSA_Y_RODAMIENT",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de kit de embrague (disco, prensa y rodamiento)",
+        "aliases": []
+      },
+      "US": {
+        "label": "Clutch Kit Replacement",
+        "aliases": [
+          "Clutch Replacement"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_HOMOCINETICAS_INTERNAS_Y_EXTERNAS",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de homocinéticas internas y externas",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_RETENES_DE_TRANSMISION",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de retenes de transmisión",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_VOLANTE_DE_INERCIA_BIMASA_O_SOLIDO",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de volante de inercia (bimasa o sólido)",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REPARACION_O_REEMPLAZO_DE_CAJA_DE_CAMBIOS",
+    "category": "engine_transmission",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Reparación o reemplazo de caja de cambios",
+        "aliases": []
+      },
+      "US": {
+        "label": "Transmission Repair or Replacement",
+        "aliases": [
+          "Transmission Repair",
+          "Transmission Replacement",
+          "Gearbox Repair or Replacement"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "AJUSTE_Y_CALIBRACION_DE_DIRECCION_HIDRAULICA_O_EPS",
+    "category": "suspension_steering",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "SUSPENSION_STEERING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Ajuste y calibración de dirección hidráulica o EPS",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_AMORTIGUADORES_GAS_O_ACEITE",
+    "category": "suspension_steering",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "SUSPENSION_STEERING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de amortiguadores (gas o aceite)",
+        "aliases": []
+      },
+      "US": {
+        "label": "Shock Absorber Replacement",
+        "aliases": [
+          "Shock Replacement"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_AXIALES_Y_TERMINALES_DE_DIRECCION",
+    "category": "suspension_steering",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "SUSPENSION_STEERING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de axiales y terminales de dirección",
+        "aliases": []
+      },
+      "US": {
+        "label": "Tie Rod Replacement",
+        "aliases": [
+          "Tie Rod End Replacement"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_BIELETAS_ESTABILIZADORAS",
+    "category": "suspension_steering",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "SUSPENSION_STEERING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de bieletas estabilizadoras",
+        "aliases": []
+      },
+      "US": {
+        "label": "Sway Bar Link Replacement",
+        "aliases": [
+          "Stabilizer Link Replacement"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_BRAZOS_DE_SUSPENSION_TRAPECIOS",
+    "category": "suspension_steering",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "SUSPENSION_STEERING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de brazos de suspensión (trapecios)",
+        "aliases": []
+      },
+      "US": {
+        "label": "Control Arm Replacement",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_BUJES_DE_SUSPENSION",
+    "category": "suspension_steering",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "SUSPENSION_STEERING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de bujes de suspensión",
+        "aliases": []
+      },
+      "US": {
+        "label": "Suspension Bushing Replacement",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_CREMALLERA_O_CAJA_DE_DIRECCION",
+    "category": "suspension_steering",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "SUSPENSION_STEERING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de cremallera o caja de dirección",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_ESPIRALES_O_RESORTES",
+    "category": "suspension_steering",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "SUSPENSION_STEERING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de espirales o resortes",
+        "aliases": []
+      },
+      "US": {
+        "label": "Coil Spring Replacement",
+        "aliases": [
+          "Spring Replacement"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REPARACION_DE_SISTEMA_DE_DIRECCION_ASISTIDA",
+    "category": "suspension_steering",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "SUSPENSION_STEERING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Reparación de sistema de dirección asistida",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REVISION_GENERAL_DE_ALINEACION_Y_GEOMETRIA",
+    "category": "tires_alignment",
+    "rubros": [
+      "FLEET",
+      "FLEET_REPAIR",
+      "TIRE",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Revisión general de alineación y geometría",
+        "aliases": []
+      },
+      "US": {
+        "label": "Wheel Alignment and Geometry Inspection",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "Revisión de Alineación y Geometría",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_FOCOS_AMPOLLETAS_HALOGENAS_Y_LED",
+    "category": "electrical",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de focos, ampolletas halógenas y LED",
+        "aliases": []
+      },
+      "US": {
+        "label": "Halogen and LED Bulb Replacement",
+        "aliases": [
+          "Bulb Replacement",
+          "Light Bulb Replacement",
+          "LED Bulb Replacement"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_BATERIA_Y_LIMPIEZA_DE_BORNES",
+    "category": "electrical",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de batería y limpieza de bornes",
+        "aliases": []
+      },
+      "US": {
+        "label": "Battery Replacement and Terminal Cleaning",
+        "aliases": [
+          "Battery Replacement",
+          "Battery Terminal Cleaning"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "Cambio de Batería",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "Cambio de Batería",
+        "aliases": [
+          "Cambio de Batería"
+        ],
+        "status": "draft_review"
+      },
+      "VE": {
+        "label": "Cambio de Batería",
+        "aliases": [
+          "Cambio de Batería"
+        ],
+        "status": "draft_review"
+      },
+      "BR": {
+        "label": "Substituição de Bateria",
+        "aliases": [
+          "Troca de Bateria",
+          "Substituição de Bateria"
+        ],
+        "status": "draft_review"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REPARACION_O_CAMBIO_DE_CABLEADO_ELECTRICO",
+    "category": "electrical",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Reparación o cambio de cableado eléctrico",
+        "aliases": []
+      },
+      "US": {
+        "label": "Electrical Wiring Repair or Replacement",
+        "aliases": [
+          "Wiring Repair"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_FUSIBLES_RELES_Y_CAJAS_ELECTRICAS",
+    "category": "electrical",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de fusibles, relés y cajas eléctricas",
+        "aliases": []
+      },
+      "US": {
+        "label": "Fuse, Relay, and Electrical Box Replacement",
+        "aliases": [
+          "Fuse Replacement"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_SENSORES_DE_ABS_VELOCIDAD_REVERSA",
+    "category": "electrical",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de sensores de ABS, velocidad, reversa",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "DIAGNOSTICO_Y_REPARACION_DE_ALTERNADOR",
+    "category": "electrical",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Diagnóstico y reparación de alternador",
+        "aliases": []
+      },
+      "US": {
+        "label": "Alternator Diagnosis and Repair",
+        "aliases": [
+          "Alternator Repair"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "DIAGNOSTICO_Y_REPARACION_DE_ECU_O_MODULOS_ELECTRON",
+    "category": "electrical",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Diagnóstico y reparación de ECU o módulos electrónicos",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "INSTALACION_DE_ALARMA_CIERRE_CENTRALIZADO_Y_GPS",
+    "category": "electrical",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Instalación de alarma, cierre centralizado y GPS",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "INSTALACION_DE_CAMARA_DE_RETROCESO_Y_SENSORES",
+    "category": "electrical",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Instalación de cámara de retroceso y sensores",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "INSTALACION_DE_LUCES_LED_O_XENON",
+    "category": "electrical",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Instalación de luces LED o xenón",
+        "aliases": []
+      },
+      "US": {
+        "label": "LED or Xenon Light Installation",
+        "aliases": [
+          "LED Light Installation"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "INSTALACION_DE_PANTALLAS_RADIOS_Y_MULTIMEDIA",
+    "category": "electrical",
+    "rubros": [
+      "AUDIO_ENTERTAINMENT",
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "GLASS_AUDIO",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Instalación de pantallas, radios y multimedia",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REPARACION_DE_ALZAVIDRIOS_ELECTRICOS",
+    "category": "electrical",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Reparación de alzavidrios eléctricos",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "DETECCION_Y_SOLUCION_DE_CORTOCIRCUITOS",
+    "category": "electrical",
+    "rubros": [
+      "CLASSIC_CARS",
+      "ELECTRIC",
+      "FLEET",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Detección y solución de cortocircuitos",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_COMPRESOR_DE_AIRE_ACONDICIONADO",
+    "category": "climate_control",
+    "rubros": [
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de compresor de aire acondicionado",
+        "aliases": []
+      },
+      "US": {
+        "label": "A/C Compressor Replacement",
+        "aliases": [
+          "AC Compressor Replacement"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_CONDENSADOR_Y_VALVULA_DE_EXPANSION",
+    "category": "climate_control",
+    "rubros": [
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de condensador y válvula de expansión",
+        "aliases": []
+      },
+      "US": {
+        "label": "A/C Condenser and Expansion Valve Replacement",
+        "aliases": [
+          "A/C Condenser Replacement",
+          "AC Condenser Replacement"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_EVAPORADOR",
+    "category": "climate_control",
+    "rubros": [
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de evaporador",
+        "aliases": []
+      },
+      "US": {
+        "label": "A/C Evaporator Replacement",
+        "aliases": [
+          "AC Evaporator Replacement"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CARGA_Y_RECICLADO_DE_GAS_REFRIGERANTE_R134A_O_R123",
+    "category": "climate_control",
+    "rubros": [
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Carga y reciclado de gas refrigerante R134a o R1234yf",
+        "aliases": []
+      },
+      "US": {
+        "label": "A/C Refrigerant Recharge and Recycling (R134a/R1234yf)",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "Recarga de Gas para Aire Acondicionado (R134a)",
+        "aliases": [
+          "Recarga de Gas para Aire Acondicionado",
+          "R134a",
+          "Clima"
+        ],
+        "status": "draft_review"
+      },
+      "AR": {
+        "label": "Carga de Gas para Aire Acondicionado",
+        "aliases": [
+          "Gas",
+          "Recarga de Aire",
+          "Aire",
+          "Gas Refrigerante"
+        ],
+        "status": "draft_review"
+      },
+      "CO": {
+        "label": "Recarga de Gas Refrigerante",
+        "aliases": [
+          "Gas",
+          "Recarga Aire",
+          "Aire Acondicionado",
+          "Gas Refrigerante"
+        ],
+        "status": "draft_review"
+      },
+      "EC": {
+        "label": "Recarga de Gas Refrigerante",
+        "aliases": [
+          "Gas",
+          "Recarga Aire",
+          "Aire Acondicionado",
+          "Gas Refrigerante"
+        ],
+        "status": "draft_review"
+      },
+      "PE": {
+        "label": "Carga de Gas Refrigerante",
+        "aliases": [
+          "Gas",
+          "Recarga Aire",
+          "Aire Acondicionado",
+          "Gas Refrigerante"
+        ],
+        "status": "draft_review"
+      },
+      "VE": {
+        "label": "Carga de Gas Refrigerante",
+        "aliases": [
+          "Gas",
+          "Recarga Aire",
+          "Aire Acondicionado",
+          "Gas Refrigerante"
+        ],
+        "status": "draft_review"
+      },
+      "BR": {
+        "label": "Recarga de Gás Refrigerante",
+        "aliases": [
+          "gás",
+          "recarga ar",
+          "ar condicionado",
+          "gás refrigerante"
+        ],
+        "status": "draft_review"
+      },
+      "UY": {
+        "label": "Carga de Gas Refrigerante",
+        "aliases": [
+          "gas",
+          "recarga aire",
+          "aire acondicionado",
+          "gas refrigerante"
+        ],
+        "status": "draft_review"
+      }
+    }
+  },
+  {
+    "candidate_code": "DETECCION_DE_FUGAS_CON_NITROGENO_O_UV",
+    "category": "climate_control",
+    "rubros": [
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Detección de fugas con nitrógeno o UV",
+        "aliases": []
+      },
+      "US": {
+        "label": "A/C Leak Detection with Nitrogen or UV",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "LIMPIEZA_INTERNA_DEL_SISTEMA_DE_CLIMATIZACION",
+    "category": "climate_control",
+    "rubros": [
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Limpieza interna del sistema de climatización",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REVISION_Y_CAMBIO_DE_VENTILADORES_INTERIORES_O_RAD",
+    "category": "climate_control",
+    "rubros": [
+      "FLEET",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Revisión y cambio de ventiladores interiores o radiador",
+        "aliases": []
+      },
+      "US": {
+        "label": "Interior Blower or Radiator Inspection and Replacement",
+        "aliases": [
+          "Radiator Repair",
+          "Radiator Replacement"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "ELIMINACION_DE_RAYONES_Y_MICROARANAZOS",
+    "category": "body_repair",
+    "rubros": [
+      "BODYSHOP",
+      "BODY_GLASS",
+      "CLASSIC_CARS",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Eliminación de rayones y microarañazos",
+        "aliases": []
+      },
+      "US": {
+        "label": "Paint Scratch and Micro-Scratch Repair",
+        "aliases": [
+          "Paint Scratch Repair"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "PINTURA_COMPLETA_PROFESIONAL_CON_HORNO",
+    "category": "body_repair",
+    "rubros": [
+      "BODYSHOP",
+      "BODY_GLASS",
+      "CLASSIC_CARS",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Pintura completa profesional con horno",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "PINTURA_DE_CALIPERS_Y_DETALLES_DEPORTIVOS",
+    "category": "body_repair",
+    "rubros": [
+      "BODYSHOP",
+      "BODY_GLASS",
+      "CLASSIC_CARS",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Pintura de calipers y detalles deportivos",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "PINTURA_Y_RESTAURACION_DE_LLANTAS",
+    "category": "body_repair",
+    "rubros": [
+      "BODYSHOP",
+      "BODY_GLASS",
+      "CLASSIC_CARS",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Pintura y restauración de llantas",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "PINTURA_PARCIAL_DE_PIEZAS_CAPO_PARACHOQUES_PUERTAS",
+    "category": "body_repair",
+    "rubros": [
+      "BODYSHOP",
+      "BODY_GLASS",
+      "CLASSIC_CARS",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Pintura parcial de piezas (capó, parachoques, puertas)",
+        "aliases": []
+      },
+      "US": {
+        "label": "Panel Painting",
+        "aliases": [
+          "Partial Paint"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "Pintura Parcial de Piezas",
+        "aliases": [
+          "Pintura por Pieza"
+        ],
+        "status": "draft_review"
+      },
+      "AR": {
+        "label": "Pintura de Chapa por Pieza",
+        "aliases": [
+          "Chapa y Pintura",
+          "Pintura",
+          "Chapa"
+        ],
+        "status": "draft_review"
+      },
+      "CO": {
+        "label": "Pintura de Latonería por Pieza",
+        "aliases": [
+          "Latonería y Pintura",
+          "Pintura",
+          "Latonería"
+        ],
+        "status": "draft_review"
+      },
+      "EC": {
+        "label": "Pintura por Pieza",
+        "aliases": [
+          "Pintura",
+          "Enderezada y Pintura"
+        ],
+        "status": "draft_review"
+      },
+      "PE": {
+        "label": "Pintura Parcial de Piezas",
+        "aliases": [
+          "Pintura",
+          "Pintura por Pieza",
+          "Chapa y Pintura"
+        ],
+        "status": "draft_review"
+      },
+      "VE": {
+        "label": "Pintura Parcial de Piezas",
+        "aliases": [
+          "Pintura",
+          "Chapa"
+        ],
+        "status": "draft_review"
+      },
+      "BR": {
+        "label": "Pintura Parcial de Peças",
+        "aliases": [
+          "pintura",
+          "peça"
+        ],
+        "status": "draft_review"
+      },
+      "UY": {
+        "label": "Pintura Parcial de Piezas",
+        "aliases": [
+          "pintura",
+          "chapa"
+        ],
+        "status": "draft_review"
+      }
+    }
+  },
+  {
+    "candidate_code": "APLICACION_DE_CERAMICO_O_FILM_PPF",
+    "category": "detailing_cleaning",
+    "rubros": [
+      "BODYSHOP",
+      "CLASSIC_CARS",
+      "DETAILING",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Aplicación de cerámico o film PPF",
+        "aliases": []
+      },
+      "US": {
+        "label": "Ceramic Coating or PPF Application",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "PULIDO_ABRILLANTADO_Y_ENCERADO_PROFESIONAL",
+    "category": "detailing_cleaning",
+    "rubros": [
+      "BODYSHOP",
+      "CLASSIC_CARS",
+      "DETAILING",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Pulido, abrillantado y encerado profesional",
+        "aliases": []
+      },
+      "US": {
+        "label": "Professional Polishing and Waxing",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REPARACION_DE_GOLPES_LEVES_Y_ABOLLADURAS",
+    "category": "body_repair",
+    "rubros": [
+      "BODYSHOP",
+      "BODY_GLASS",
+      "CLASSIC_CARS",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Reparación de golpes leves y abolladuras",
+        "aliases": []
+      },
+      "US": {
+        "label": "Dent Repair",
+        "aliases": [
+          "Dent Removal",
+          "Paintless Dent Removal",
+          "Dent Repair (PDR)"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "Reparación de Golpes y Abolladuras",
+        "aliases": [
+          "Golpes",
+          "Desabollado"
+        ],
+        "status": "draft_review"
+      },
+      "AR": {
+        "label": "Reparación de Golpes y Abolladuras",
+        "aliases": [
+          "Bollo",
+          "Choque",
+          "Chapista"
+        ],
+        "status": "draft_review"
+      },
+      "CO": {
+        "label": "Reparación de Golpes",
+        "aliases": [
+          "Golpe",
+          "Enderezado"
+        ],
+        "status": "draft_review"
+      },
+      "EC": {
+        "label": "Enderezada de Golpes",
+        "aliases": [
+          "Choque",
+          "Enderezado",
+          "Enderezar"
+        ],
+        "status": "draft_review"
+      },
+      "PE": {
+        "label": "Reparación de Golpes y Abolladuras",
+        "aliases": [
+          "Golpe",
+          "Desabollado",
+          "Chapa"
+        ],
+        "status": "draft_review"
+      },
+      "VE": {
+        "label": "Reparación de Golpes y Abolladuras",
+        "aliases": [
+          "Golpe",
+          "Desabollado",
+          "Chapa"
+        ],
+        "status": "draft_review"
+      },
+      "BR": {
+        "label": "Funilaria de Amassados",
+        "aliases": [
+          "funilaria",
+          "amassado",
+          "chapa"
+        ],
+        "status": "draft_review"
+      },
+      "UY": {
+        "label": "Chapeado de Golpes",
+        "aliases": [
+          "chapeado",
+          "golpe",
+          "chapa"
+        ],
+        "status": "draft_review"
+      }
+    }
+  },
+  {
+    "candidate_code": "REPARACION_Y_PINTURA_DE_PARACHOQUES_PLASTICOS",
+    "category": "body_repair",
+    "rubros": [
+      "BODYSHOP",
+      "BODY_GLASS",
+      "CLASSIC_CARS",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Reparación y pintura de parachoques plásticos",
+        "aliases": []
+      },
+      "US": {
+        "label": "Bumper Repair and Refinish",
+        "aliases": [
+          "Bumper Restoration"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_O_REPARACION_DE_MOLDURAS_EXTERNAS",
+    "category": "body_repair",
+    "rubros": [
+      "BODYSHOP",
+      "BODY_GLASS",
+      "CLASSIC_CARS",
+      "FLEET_REPAIR",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio o reparación de molduras externas",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_LUNETA_TRASERA_CON_DESEMPANADOR",
+    "category": "glass_audio_accessories",
+    "rubros": [
+      "BODY_GLASS",
+      "FLEET_REPAIR",
+      "GLASS_AUDIO",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de luneta trasera con desempañador",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_PARABRISAS_CON_INSTALACION_PROFESIONAL",
+    "category": "glass_audio_accessories",
+    "rubros": [
+      "BODY_GLASS",
+      "FLEET_REPAIR",
+      "GLASS_AUDIO",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de parabrisas con instalación profesional",
+        "aliases": []
+      },
+      "US": {
+        "label": "Windshield Replacement and Installation",
+        "aliases": [],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_VIDRIOS_LATERALES_MANUALES_O_ELECTRICOS",
+    "category": "glass_audio_accessories",
+    "rubros": [
+      "BODY_GLASS",
+      "FLEET_REPAIR",
+      "GLASS_AUDIO",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de vidrios laterales (manuales o eléctricos)",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "INSTALACION_DE_BARRAS_DE_TECHO_Y_PORTAEQUIPAJES",
+    "category": "glass_audio_accessories",
+    "rubros": [
+      "BODY_GLASS",
+      "FLEET_REPAIR",
+      "GLASS_AUDIO",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Instalación de barras de techo y portaequipajes",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "INSTALACION_DE_ESTRIBOS_Y_ACCESORIOS_EXTERIORES",
+    "category": "glass_audio_accessories",
+    "rubros": [
+      "BODY_GLASS",
+      "FLEET_REPAIR",
+      "GLASS_AUDIO",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Instalación de estribos y accesorios exteriores",
+        "aliases": []
+      },
+      "US": {
+        "label": "Running Board and Exterior Accessory Installation",
+        "aliases": [
+          "Accessory Installation",
+          "Custom Accessory Installation",
+          "4x4 Accessories Install"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAMBIO_DE_PLUMILLAS_Y_SISTEMA_DE_LIMPIAPARABRISAS",
+    "category": "glass_audio_accessories",
+    "rubros": [
+      "BODY_GLASS",
+      "FLEET_REPAIR",
+      "GLASS_AUDIO",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Cambio de plumillas y sistema de limpiaparabrisas",
+        "aliases": []
+      },
+      "US": {
+        "label": "Windshield Wiper Blade Replacement",
+        "aliases": [
+          "Wiper Blade Replacement",
+          "Windshield Wiper Replacement"
+        ],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "POLARIZADO_DE_VIDRIOS_CON_LAMINA_CERTIFICADA",
+    "category": "glass_audio_accessories",
+    "rubros": [
+      "BODY_GLASS",
+      "FLEET_REPAIR",
+      "GLASS_AUDIO",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Polarizado de vidrios con lámina certificada",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REPARACION_Y_MANTENIMIENTO_DE_SUNROOF",
+    "category": "glass_audio_accessories",
+    "rubros": [
+      "BODY_GLASS",
+      "FLEET_REPAIR",
+      "GLASS_AUDIO",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Reparación y mantenimiento de sunroof",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "REPARACION_DE_TRIZADURAS_CON_RESINA",
+    "category": "glass_audio_accessories",
+    "rubros": [
+      "BODY_GLASS",
+      "FLEET_REPAIR",
+      "GLASS_AUDIO",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Reparación de trizaduras con resina",
+        "aliases": []
+      },
+      "US": {
+        "label": "Windshield Chip and Crack Repair",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CERTIFICACION_DE_CONVERSION_A_GAS_VEHICULAR_GLP_GN",
+    "category": "diagnostics_inspection",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "GAS_CONVERSION",
+      "OBD_DIAGNOSTIC",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Certificación de conversión a gas vehicular (GLP/GNC)",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "MEDICION_Y_CERTIFICACION_DE_GASES_CONTAMINANTES",
+    "category": "exhaust_emissions",
+    "rubros": [
+      "EXHAUST",
+      "FLEET_REPAIR",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Medición y certificación de gases contaminantes",
+        "aliases": []
+      },
+      "US": {
+        "label": "Emissions Testing and Certification",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "INSPECCION_DE_FRENOS_EN_BANCO_DINAMOMETRICO",
+    "category": "diagnostics_inspection",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "OBD_DIAGNOSTIC",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Inspección de frenos en banco dinamométrico",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "INSPECCION_DE_SEGURIDAD_AIRBAGS_CINTURONES_ISOFIX",
+    "category": "diagnostics_inspection",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "OBD_DIAGNOSTIC",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Inspección de seguridad (airbags, cinturones, ISOFIX)",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CHEQUEO_COMPLETO_DE_SUSPENSION_Y_DIRECCION",
+    "category": "diagnostics_inspection",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "OBD_DIAGNOSTIC",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Chequeo completo de suspensión y dirección",
+        "aliases": []
+      },
+      "US": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "INSPECCION_DE_SISTEMA_ELECTRICO_Y_LUCES",
+    "category": "diagnostics_inspection",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "OBD_DIAGNOSTIC",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Inspección de sistema eléctrico y luces",
+        "aliases": []
+      },
+      "US": {
+        "label": "Electrical System and Lighting Inspection",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "INSPECCION_PRE_COMPRA_PARA_AUTOS_USADOS",
+    "category": "diagnostics_inspection",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "OBD_DIAGNOSTIC",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Inspección pre-compra para autos usados",
+        "aliases": []
+      },
+      "US": {
+        "label": "Pre-Purchase Vehicle Inspection",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "PRE_CHEQUEO_TECNICO_PARA_REVISION_TECNICA",
+    "category": "diagnostics_inspection",
+    "rubros": [
+      "CLASSIC_CARS",
+      "FLEET",
+      "FLEET_REPAIR",
+      "OBD_DIAGNOSTIC",
+      "TUNING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY",
+      "WORKSHOP_MOTO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Pre-chequeo técnico para Revisión Técnica",
+        "aliases": []
+      },
+      "US": {
+        "label": "Inspection Prep",
+        "aliases": [
+          "Inspection Preparation"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "POWER_STEERING_SERVICE",
+    "category": "suspension_steering",
+    "rubros": [
+      "FLEET_REPAIR",
+      "SUSPENSION_STEERING",
+      "WORKSHOP",
+      "WORKSHOP_HEAVY"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Servicio dirección hidráulica",
+        "aliases": []
+      },
+      "US": {
+        "label": "Power Steering Service",
+        "aliases": [
+          "Steering service"
+        ],
+        "status": "direct"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "GAS_CONVERSION_INSTALLATION",
+    "category": "engine_transmission",
+    "rubros": [
+      "GAS_CONVERSION"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Instalación de GNC/GLP",
+        "aliases": []
+      },
+      "US": {
+        "label": "CNG/LPG Conversion Kit Installation",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  },
+  {
+    "candidate_code": "CAR_STEREO_INSTALLATION",
+    "category": "glass_audio_accessories",
+    "rubros": [
+      "AUDIO_ENTERTAINMENT",
+      "GLASS_AUDIO"
+    ],
+    "translations": {
+      "CL": {
+        "label": "Instalación de estéreo",
+        "aliases": []
+      },
+      "US": {
+        "label": "Car Stereo Installation",
+        "aliases": [],
+        "status": "draft_review"
+      },
+      "MX": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "AR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "CO": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "EC": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "PE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "VE": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "BR": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      },
+      "UY": {
+        "label": "",
+        "aliases": [],
+        "status": "pending"
+      }
+    }
+  }
+]
