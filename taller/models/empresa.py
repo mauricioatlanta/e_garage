@@ -304,16 +304,24 @@ class Empresa(models.Model):
             "vencida": "gray",
         }.get(self.estado_suscripcion, "gray")
 
-    def extender_suscripcion(self, dias=30, enviar_notificacion=False):
+    def extender_suscripcion(self, dias=30, enviar_notificacion=False, desde_ahora=False):
         """
         Extender suscripción por un número de días
 
         Args:
             dias: Número de días a extender
             enviar_notificacion: Si True, envía notificación de renovación (Email + WhatsApp)
+            desde_ahora: Si True, la extensión parte de "ahora" en vez de fecha_fin,
+                incluso si fecha_fin (ej. el trial vigente) es futura. Usar cuando el
+                pago activa una suscripción nueva/desde trial, para no sumar los días
+                de trial restantes al período pagado. Las extensiones manuales
+                (botones de admin) deben dejarlo en False para acumular sobre el
+                período ya vigente.
         """
         base = (
-            self.fecha_fin if self.fecha_fin and self.fecha_fin > timezone.now() else timezone.now()
+            timezone.now()
+            if desde_ahora
+            else (self.fecha_fin if self.fecha_fin and self.fecha_fin > timezone.now() else timezone.now())
         )
         fecha_fin_anterior = self.fecha_fin
         self.fecha_fin = base + timedelta(days=dias)
@@ -376,7 +384,7 @@ class Empresa(models.Model):
             self.plan = plan
 
         # Extender suscripción (sin notificación aquí, la enviaremos después)
-        self.extender_suscripcion(30, enviar_notificacion=False)
+        self.extender_suscripcion(30, enviar_notificacion=False, desde_ahora=es_nueva_suscripcion)
 
         # Enviar notificaciones automáticas si se solicita
         if enviar_notificacion:

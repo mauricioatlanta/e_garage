@@ -157,6 +157,42 @@ def test_extender_suscripcion(empresa_chile):
 
 
 @pytest.mark.django_db
+def test_extender_suscripcion_desde_ahora_ignora_fecha_fin_futura(empresa_chile):
+    """
+    Regresión: activar un pago sobre un trial vigente (fecha_fin futura) no debe
+    sumar los días de trial restantes al período pagado. desde_ahora=True fuerza
+    la extensión desde "ahora", igual que si la suscripción ya hubiera vencido.
+    """
+    ahora = timezone.now()
+    fecha_fin_trial = ahora + timedelta(days=30)
+    empresa_chile.fecha_fin = fecha_fin_trial
+    empresa_chile.suscripcion_activa = False
+    empresa_chile.save()
+
+    empresa_chile.extender_suscripcion(365, desde_ahora=True)
+
+    fecha_esperada = ahora + timedelta(days=365)
+    assert abs((empresa_chile.fecha_fin - fecha_esperada).total_seconds()) < 5
+    # Nunca debería acercarse a fecha_fin_trial + 365 (el bug original).
+    assert empresa_chile.fecha_fin < fecha_fin_trial + timedelta(days=365)
+    assert empresa_chile.suscripcion_activa is True
+
+
+@pytest.mark.django_db
+def test_extender_suscripcion_desde_ahora_false_preserva_comportamiento_default(empresa_chile):
+    """desde_ahora=False (default) sigue acumulando sobre fecha_fin futura, sin cambios."""
+    ahora = timezone.now()
+    fecha_fin_original = ahora + timedelta(days=10)
+    empresa_chile.fecha_fin = fecha_fin_original
+    empresa_chile.suscripcion_activa = True
+    empresa_chile.save()
+
+    empresa_chile.extender_suscripcion(30, desde_ahora=False)
+
+    assert empresa_chile.fecha_fin == fecha_fin_original + timedelta(days=30)
+
+
+@pytest.mark.django_db
 def test_formato_moneda(empresa_chile, empresa_usa):
     """Test que verifica el formato de moneda por país"""
     # Test Chile

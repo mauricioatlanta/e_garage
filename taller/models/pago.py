@@ -86,7 +86,9 @@ class PagoPendiente(models.Model):
         # Actualizar empresa
         # 🔒 IDEMPOTENCIA: Pasar ID del pago para tracking en DB
         # No enviar notificación aquí, se enviará después si corresponde
-        self.empresa.extender_suscripcion(dias=dias, enviar_notificacion=False)
+        self.empresa.extender_suscripcion(
+            dias=dias, enviar_notificacion=False, desde_ahora=es_nueva_suscripcion
+        )
 
         # Resetear flag de notificación antes de notificar
         if hasattr(self.empresa, "_admin_whatsapp_notified"):

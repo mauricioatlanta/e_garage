@@ -510,8 +510,13 @@ def approve_transaction(
             plan_anterior = empresa.plan
             fecha_inicio_notificacion = empresa.fecha_inicio
             dias_renovados = DAYS_BY_BILLING_CYCLE.get(locked.billing_cycle, 30)
+            es_nueva_suscripcion = (not suscripcion_activa_anterior) or plan_anterior == "trial"
 
-            empresa.extender_suscripcion(dias=dias_renovados, enviar_notificacion=False)
+            empresa.extender_suscripcion(
+                dias=dias_renovados,
+                enviar_notificacion=False,
+                desde_ahora=es_nueva_suscripcion,
+            )
             empresa.plan = normalized_plan
             empresa.valor_mensual = locked.amount
             empresa.save()

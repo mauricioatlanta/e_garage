@@ -76,7 +76,9 @@ class ComprobantePago(models.Model):
         dias_extension = dias_por_periodo.get(self.meses_pagados, self.meses_pagados * 30)
         # 🔒 ANTI-DUPLICADO: No enviar notificación aquí, la enviaremos después
         # Esto evita doble notificación si extender_suscripcion() también notifica
-        self.empresa.extender_suscripcion(dias_extension, enviar_notificacion=False)
+        self.empresa.extender_suscripcion(
+            dias_extension, enviar_notificacion=False, desde_ahora=es_nueva_suscripcion
+        )
         self.plan_solicitado = plan_nuevo
         self.empresa.plan = plan_nuevo
         self.empresa.valor_mensual = self.monto / self.meses_pagados
