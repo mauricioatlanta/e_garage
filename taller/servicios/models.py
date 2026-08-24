@@ -170,6 +170,7 @@ RUBRO_CHOICES = [
     ("WORKSHOP_MOTO", "Taller de motos"),
     ("WORKSHOP_HEAVY", "Taller de camiones/buses"),
     ("EXHAUST", "Escapes y mufflers"),
+    ("DESARMADURIA", "Desarmaduría / Salvage"),
     ("PARTS", "Casa de repuestos / Autopartes"),
     ("TIRE", "Vulcanización / Neumáticos y llantas"),
     ("BODYSHOP", "Carrocería / Pintura"),
@@ -187,7 +188,7 @@ RUBRO_CHOICES = [
     ("BODY_GLASS", "Taller de Carrocería y Reparación de Vidrios"),
     ("TUNING", "Taller de Tuning / Personalización"),
     ("RECYCLING", "Reciclaje / Chatarra electrónica y catalíticos"),
-    ("MIXED", "Mixto (varios rubros)"),
+    ("MIXED", "Mixto (multi-rubro — varios giros)"),
 ]
 
 
@@ -286,17 +287,55 @@ class Servicio(TenantScoped):
         return self.nombre
 
 
+class ServicioRubro(models.Model):
+    servicio = models.ForeignKey(
+        "taller.Servicio",
+        on_delete=models.CASCADE,
+        related_name="rubros_rel",
+    )
+    rubro = models.CharField(
+        max_length=32,
+        choices=RUBRO_CHOICES,
+        db_index=True,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["servicio", "rubro"],
+                name="uniq_servicio_rubro",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=["rubro", "servicio"],
+                name="idx_servicio_rubro_lookup",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.servicio_id}:{self.rubro}"
+
+
 class ServicioName(models.Model):
     """Nombres localizados para servicios"""
 
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name="names")
+    country_code = models.CharField(
+        max_length=2,
+        blank=True,
+        default="",
+        db_index=True,
+        help_text="Código ISO-2 del país para esta variante de nombre.",
+    )
+
     language = models.CharField(max_length=2, choices=CategoriaServicioName.LANGUAGE_CHOICES)
     label = models.CharField(max_length=100, help_text="Nombre canónico en este idioma")
     aliases = models.JSONField(default=list, blank=True, help_text="Lista de sinónimos/slang")
     is_default = models.BooleanField(default=False, help_text="Nombre principal para este idioma")
 
     class Meta:
-        unique_together = [["servicio", "language", "is_default"]]
+        unique_together = [["servicio", "country_code", "language", "is_default"]]
         verbose_name = "Nombre de Servicio"
         verbose_name_plural = "Nombres de Servicios"
 
