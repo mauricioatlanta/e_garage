@@ -3,7 +3,7 @@ Endpoints API modernos para servicios con soporte completo de:
 - Búsqueda inteligente por rubro
 - Creación rápida desde documentos
 - Filtrado por categorías/subcategorías
-- Integración con ServicioBase (catálogo global)
+- Búsqueda sobre servicios de empresa
 """
 
 import json
@@ -18,7 +18,6 @@ from taller.models.configuracion import ConfiguracionEmpresa
 from taller.servicios.models import (
     CategoriaServicio,
     Servicio,
-    ServicioBase,
     SubcategoriaServicio,
 )
 
@@ -81,7 +80,7 @@ def api_buscar_servicios(request):
             empresa=empresa,
             activo=True,
         )
-        .select_related("categoria", "subcategoria", "servicio_base")
+        .select_related("categoria", "subcategoria")
         .prefetch_related("names", "categoria__names", "subcategoria__names")
     )
 
@@ -150,7 +149,6 @@ def api_buscar_servicios(request):
                     ),
                     "code": servicio.subcategoria.code if servicio.subcategoria else "",
                 },
-                "servicio_base_id": servicio.servicio_base_id,
             }
         )
 

@@ -191,87 +191,12 @@ RUBRO_CHOICES = [
 ]
 
 
-class ServicioBase(models.Model):
-    """
-    Catálogo global de servicios (sin empresa).
-    Servicios base que pueden ser usados por múltiples empresas.
-    """
-
-    subcategoria = models.ForeignKey(
-        "SubcategoriaServicio",
-        on_delete=models.PROTECT,
-        related_name="servicios_base",
-        db_index=True,
-    )
-    nombre = models.CharField(max_length=255, db_index=True)
-    descripcion = models.TextField(
-        blank=True,
-        default="",
-        help_text="Descripción detallada del servicio",
-    )
-    duracion_estimada_min = models.PositiveIntegerField(
-        null=True,
-        blank=True,
-        help_text="Duración estimada en minutos",
-    )
-    codigo_interno = models.CharField(
-        max_length=50,
-        blank=True,
-        default="",
-        help_text="Código interno del servicio (opcional)",
-    )
-    rubro_sugerido = models.CharField(
-        max_length=30,
-        choices=RUBRO_CHOICES,
-        blank=True,
-        null=True,
-        help_text="Rubro donde este servicio es más común",
-    )
-    rubros = models.JSONField(
-        default=list,
-        blank=True,
-        help_text="Lista de rubros a los que pertenece este servicio (múltiples rubros)",
-    )
-    es_generico = models.BooleanField(
-        default=False,
-        help_text="Si es True, puede aparecer en cualquier empresa",
-    )
-    activo = models.BooleanField(
-        default=True,
-        help_text="Si el servicio está activo",
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["subcategoria__categoria__orden", "subcategoria__orden", "nombre"]
-        indexes = [
-            Index(fields=["subcategoria"]),
-            Index(fields=["activo"]),
-            Index(fields=["rubro_sugerido"]),
-            Index(fields=["es_generico"]),
-        ]
-        verbose_name = "Servicio Base"
-        verbose_name_plural = "Servicios Base"
-
-    def __str__(self):
-        return self.nombre
-
-
 class Servicio(TenantScoped):
     """
     Servicio por empresa (tenant-scoped).
-    Puede estar basado en un ServicioBase o ser completamente personalizado.
+    Puede ser un servicio del catálogo o completamente personalizado.
     """
 
-    servicio_base = models.ForeignKey(
-        ServicioBase,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="servicios_por_empresa",
-        help_text="Servicio base del catálogo global (opcional)",
-    )
     nombre = models.CharField(max_length=160, db_index=True)
     categoria = models.ForeignKey("CategoriaServicio", on_delete=models.PROTECT, db_index=True)
     subcategoria = models.ForeignKey(
