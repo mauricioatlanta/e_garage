@@ -1636,6 +1636,7 @@
                             {% endif %}
                         </div>
                         {% if dom.estado == 'PENDIENTE' or dom.estado == 'VERIFICANDO' or dom.estado == 'ERROR_DNS' %}
+                        {% with dns=dom.get_dns_instructions %}
                         <div class="mt-3 p-3" style="background:rgba(0,0,0,0.3);border-radius:6px;font-size:0.82rem;">
                             <strong style="color:var(--neon-cyan);">
                                 {% if request.path|slice:':3' == '/cl' %}Instrucciones DNS{% else %}DNS Instructions{% endif %}
@@ -1644,18 +1645,27 @@
                                 {% if request.path|slice:':3' == '/cl' %}Crea estos registros en tu proveedor de DNS:{% else %}Create these records in your DNS provider:{% endif %}
                             </p>
                             <div class="mb-1">
-                                <span class="badge bg-secondary me-1">TXT</span>
-                                <code>{{ dom.get_txt_record_name }}</code>
+                                <span class="badge bg-secondary me-1">{{ dns.apex.type }}</span>
+                                <code>{{ dns.apex.name }}</code>
                                 <span class="text-muted mx-1">→</span>
-                                <code>{{ dom.get_txt_record_value }}</code>
+                                <code>{{ dns.apex.value }}</code>
                             </div>
-                            <div>
-                                <span class="badge bg-secondary me-1">CNAME</span>
-                                <code>{{ dom.dominio }}</code>
+                            {% if dns.www.enabled %}
+                            <div class="mb-1">
+                                <span class="badge bg-secondary me-1">{{ dns.www.type }}</span>
+                                <code>{{ dns.www.name }}</code>
                                 <span class="text-muted mx-1">→</span>
-                                <code>{{ dom.get_cname_target }}</code>
+                                <code>{{ dns.www.value }}</code>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <span class="badge bg-secondary me-1">{{ dns.txt.type }}</span>
+                                <code>{{ dns.txt.name }}</code>
+                                <span class="text-muted mx-1">→</span>
+                                <code>{{ dns.txt.value }}</code>
                             </div>
                         </div>
+                        {% endwith %}
                         {% endif %}
                     </div>
                     {% endfor %}

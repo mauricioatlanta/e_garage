@@ -4,6 +4,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-recovery-key')
 DEBUG = os.getenv('DJANGO_DEBUG', '1').lower() in {'1', 'true', 'yes', 'on'}
 GOOGLE_ANALYTICS_ID = os.getenv('GOOGLE_ANALYTICS_ID', '')
+# IP pública del VPS de eGarage — instrucción canónica de DNS (registro A) para
+# dominios personalizados de tenants. Ver ADR-004 (arquitectura A_DIRECT_VPS).
+CUSTOM_DOMAIN_VPS_IP = os.getenv('EGARAGE_CUSTOM_DOMAIN_VPS_IP', '159.223.200.106')
 ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'dal','dal_select2','django.contrib.admin','django.contrib.auth',

@@ -87,6 +87,17 @@ class EmpresaDominio(models.Model):
     ssl_key_path  = models.CharField(max_length=512, blank=True, default="")
     ssl_expira_en = models.DateField(null=True, blank=True)
 
+    # ── DNS ───────────────────────────────────────────────────────────────
+    incluir_www = models.BooleanField(
+        default=True,
+        help_text=(
+            "Si está activo, la emisión SSL y la configuración Nginx incluyen "
+            "también www.<dominio> como alias (SAN adicional en el mismo "
+            "certificado). Desactivar solo si el tenant no puede o no quiere "
+            "configurar el CNAME de www."
+        ),
+    )
+
     # ── Auditoría ─────────────────────────────────────────────────────────
     creado_en      = models.DateTimeField(auto_now_add=True)
     actualizado_en = models.DateTimeField(auto_now=True)
@@ -141,8 +152,49 @@ class EmpresaDominio(models.Model):
         return f"egarage-verify={self.token_verificacion}"
 
     def get_cname_target(self) -> str:
-        """Destino del CNAME que el tenant debe apuntar a eGarage."""
-        return "proxy.egarage.cl"
+        """Deprecated compatibility helper.
+
+        Antes de ADR-004 devolvía "proxy.egarage.cl", un target que nunca
+        existió en DNS (ver auditoría Fase 340-342). La arquitectura real
+        (confirmada por el único tenant ya operando, MonteAzul) es apex A
+        directo al VPS + www como CNAME AL APEX, no a un proxy intermedio.
+
+        Se mantiene por compatibilidad con callers existentes (admin, tests
+        históricos) — devuelve el destino real del CNAME opcional de "www":
+        el propio dominio apex.
+        """
+        return self.dominio
+
+    def get_dns_instructions(self) -> dict:
+        """Instrucciones DNS estructuradas (ADR-004: arquitectura A_DIRECT_VPS).
+
+        Devuelve un dict con los registros que el tenant debe crear:
+            - apex: A -> IP del VPS (settings.CUSTOM_DOMAIN_VPS_IP)
+            - www:  CNAME -> dominio apex (solo si incluir_www)
+            - txt:  registro de verificación
+
+        No incluye HTML ni texto — la presentación vive en el template/admin.
+        """
+        from django.conf import settings
+
+        return {
+            "apex": {
+                "type": "A",
+                "name": "@",
+                "value": settings.CUSTOM_DOMAIN_VPS_IP,
+            },
+            "www": {
+                "enabled": self.incluir_www,
+                "type": "CNAME",
+                "name": "www",
+                "value": self.dominio,
+            },
+            "txt": {
+                "type": "TXT",
+                "name": self.get_txt_record_name(),
+                "value": self.get_txt_record_value(),
+            },
+        }
 
     # ── Transiciones de estado ────────────────────────────────────────────
 

@@ -145,11 +145,71 @@ class TestMetodosDNS:
         assert str(dominio_pendiente.token_verificacion) in valor
 
     def test_cname_target(self, dominio_pendiente):
-        assert dominio_pendiente.get_cname_target() == "proxy.egarage.cl"
+        """Fase 343 (ADR-004): get_cname_target() ya NO devuelve
+        "proxy.egarage.cl" (destino que nunca existió en DNS) — devuelve el
+        propio apex, que es el destino real del CNAME opcional de www
+        (confirmado por el patrón ya operando de MonteAzul: www CNAME -> apex)."""
+        assert dominio_pendiente.get_cname_target() == dominio_pendiente.dominio
+        assert dominio_pendiente.get_cname_target() != "proxy.egarage.cl"
 
     def test_txt_record_name_formato(self, empresa):
         ed = EmpresaDominio.objects.create(empresa=empresa, dominio="sub.ejemplo.com")
         assert ed.get_txt_record_name() == "_egarage-verify.sub.ejemplo.com"
+
+
+@pytest.mark.django_db
+class TestIncluirWww:
+    def test_default_true(self, empresa):
+        ed = EmpresaDominio.objects.create(empresa=empresa, dominio="con-www.cl")
+        assert ed.incluir_www is True
+
+    def test_puede_desactivarse(self, empresa):
+        ed = EmpresaDominio.objects.create(
+            empresa=empresa, dominio="sin-www.cl", incluir_www=False
+        )
+        assert ed.incluir_www is False
+
+
+@pytest.mark.django_db
+class TestDnsInstructions:
+    def test_con_incluir_www_true(self, settings, empresa):
+        settings.CUSTOM_DOMAIN_VPS_IP = "203.0.113.10"
+        ed = EmpresaDominio.objects.create(
+            empresa=empresa, dominio="con-www.cl", incluir_www=True
+        )
+        instrucciones = ed.get_dns_instructions()
+
+        assert instrucciones["apex"] == {
+            "type": "A", "name": "@", "value": "203.0.113.10",
+        }
+        assert instrucciones["www"] == {
+            "enabled": True, "type": "CNAME", "name": "www", "value": "con-www.cl",
+        }
+        assert instrucciones["txt"] == {
+            "type": "TXT",
+            "name": ed.get_txt_record_name(),
+            "value": ed.get_txt_record_value(),
+        }
+
+    def test_con_incluir_www_false(self, settings, empresa):
+        settings.CUSTOM_DOMAIN_VPS_IP = "203.0.113.10"
+        ed = EmpresaDominio.objects.create(
+            empresa=empresa, dominio="sin-www.cl", incluir_www=False
+        )
+        instrucciones = ed.get_dns_instructions()
+
+        assert instrucciones["apex"]["value"] == "203.0.113.10"
+        assert instrucciones["www"]["enabled"] is False
+        # El registro TXT sigue siendo exacto independientemente de www.
+        assert instrucciones["txt"]["name"] == ed.get_txt_record_name()
+        assert instrucciones["txt"]["value"] == ed.get_txt_record_value()
+
+    def test_ip_sale_de_setting_overrideable(self, settings, empresa):
+        """La IP no debe estar hardcodeada en el modelo — debe salir de
+        settings.CUSTOM_DOMAIN_VPS_IP, overrideable en tests/producción."""
+        settings.CUSTOM_DOMAIN_VPS_IP = "198.51.100.7"
+        ed = EmpresaDominio.objects.create(empresa=empresa, dominio="ip-test.cl")
+        assert ed.get_dns_instructions()["apex"]["value"] == "198.51.100.7"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
