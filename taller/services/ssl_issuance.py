@@ -14,10 +14,15 @@ No modifica:
 """
 
 import logging
+import os
+import stat
 import subprocess
+import tempfile
 from abc import ABC, abstractmethod
 from datetime import date, datetime
 from pathlib import Path
+
+from django.db import transaction
 
 from taller.models.empresa_dominio import EmpresaDominio
 
@@ -89,6 +94,45 @@ class LetsEncryptSSLIssuanceService(SSLIssuanceService):
         - Nginx instalado; configuración en /etc/nginx/sites-enabled/
         - El proceso tiene privilegios para escribir en NGINX_CONF_DIR y
           ejecutar certbot, nginx -t y systemctl reload nginx
+
+    Precondición no resuelta por este servicio (chicken-and-egg conocido):
+        _ejecutar_certbot() usa el plugin --webroot y se ejecuta ANTES de que
+        _escribir_nginx_conf() genere el bloque Nginx del tenant. Para que el
+        challenge HTTP-01 de un dominio nuevo (sin bloque Nginx propio
+        todavía) tenga dónde responder, debe existir de antemano un bloque
+        Nginx (default_server o catch-all) que sirva
+        /.well-known/acme-challenge/ desde CERTBOT_WEBROOT para CUALQUIER
+        Host, no solo los dominios ya configurados. Esa pieza vive en
+        /etc/nginx (fuera de este repo) y no está confirmada en producción —
+        ver ADR-003 §11 Paso 1c. emitir() no la crea ni la valida; si no
+        existe, certbot fallará y este método revertirá el estado a ACTIVO
+        con ssl_emitido=False, sin dejar el tenant en un estado inconsistente
+        (ver limpieza de conf huérfano más abajo).
+
+    Concurrencia (Fase 329/330):
+        La transición ACTIVO → SSL_PENDIENTE se hace con
+        select_for_update() dentro de una transacción corta, para que dos
+        llamadas verdaderamente simultáneas partiendo de ACTIVO no puedan
+        ambas ganar la carrera y lanzar certbot dos veces para el mismo
+        dominio. La transacción NO envuelve certbot/nginx (subprocess.run
+        externo, potencialmente lento) — solo el chequeo+flip de estado.
+
+        Gap conocido y NO cerrado a propósito: SSL_PENDIENTE sigue siendo un
+        estado "apto" para (re)iniciar emitir() — es el contrato preexistente
+        que permite reintentar tras un crash a mitad de emisión (ver
+        test_emitir_ssl_pendiente_es_estado_valido, ya existente antes de
+        esta fase). Excluir SSL_PENDIENTE rompería ese reintento legítimo de
+        recuperación; por eso NO se excluyó de _ESTADOS_APTOS aquí. Esto
+        significa que dos llamadas mientras el dominio YA está en
+        SSL_PENDIENTE (una legítima recuperación y otra concurrente, o dos
+        reintentos concurrentes) siguen pudiendo correr certbot dos veces —
+        ese caso específico requeriría una decisión de producto (¿cuánto
+        tiempo es "demasiado" en SSL_PENDIENTE para considerarlo huérfano?)
+        que excede el alcance de esta corrección.
+
+        select_for_update() no bloquea filas en SQLite (los tests locales
+        corren sobre SQLite en memoria) — la exclusión mutua real solo se
+        valida contra PostgreSQL en producción.
     """
 
     NGINX_CONF_DIR  = Path("/etc/nginx/sites-enabled")
@@ -103,16 +147,35 @@ class LetsEncryptSSLIssuanceService(SSLIssuanceService):
     # ── Interfaz pública ──────────────────────────────────────────────────
 
     def emitir(self, empresa_dominio: EmpresaDominio) -> None:
-        if empresa_dominio.estado not in self._ESTADOS_APTOS:
-            raise ValueError(
-                f"El dominio '{empresa_dominio.dominio}' está en estado "
-                f"'{empresa_dominio.get_estado_display()}' y no puede recibir un certificado."
-            )
-
         dominio = empresa_dominio.dominio
 
-        empresa_dominio.estado = EmpresaDominio.Estado.SSL_PENDIENTE
-        empresa_dominio.save(update_fields=["estado", "actualizado_en"])
+        with transaction.atomic():
+            locked = EmpresaDominio.objects.select_for_update().get(pk=empresa_dominio.pk)
+            if locked.estado not in self._ESTADOS_APTOS:
+                raise ValueError(
+                    f"El dominio '{locked.dominio}' está en estado "
+                    f"'{locked.get_estado_display()}' y no puede recibir un certificado."
+                )
+            locked.estado = EmpresaDominio.Estado.SSL_PENDIENTE
+            locked.save(update_fields=["estado", "actualizado_en"])
+        empresa_dominio.estado = locked.estado
+
+        conf_path = self._nginx_conf_path(dominio)
+        conf_existia_antes = conf_path.exists()
+        contenido_original: str | None = None
+        if conf_existia_antes:
+            try:
+                contenido_original = conf_path.read_text(encoding="utf-8")
+            except OSError as exc:
+                # No podemos garantizar un rollback seguro sin el contenido
+                # original: abortar ANTES de tocar certbot/nginx, sin dejar
+                # el dominio a medio camino en SSL_PENDIENTE.
+                empresa_dominio.estado = EmpresaDominio.Estado.ACTIVO
+                empresa_dominio.save(update_fields=["estado", "actualizado_en"])
+                raise SSLIssuanceError(
+                    f"No se pudo leer la configuración Nginx existente de {dominio} "
+                    f"antes de modificarla; abortando por seguridad: {exc}"
+                ) from exc
 
         try:
             self._ejecutar_certbot(dominio)
@@ -120,6 +183,7 @@ class LetsEncryptSSLIssuanceService(SSLIssuanceService):
             self._recargar_nginx()
         except Exception as exc:
             logger.error("SSLIssuanceService.emitir: fallo para %s — %s", dominio, exc)
+            self._revertir_conf_nginx(conf_path, conf_existia_antes, contenido_original)
             empresa_dominio.estado = EmpresaDominio.Estado.ACTIVO
             empresa_dominio.save(update_fields=["estado", "actualizado_en"])
             raise SSLIssuanceError(f"No se pudo emitir SSL para {dominio}: {exc}") from exc
@@ -212,8 +276,138 @@ class LetsEncryptSSLIssuanceService(SSLIssuanceService):
 
     def _escribir_nginx_conf(self, dominio: str) -> None:
         conf_path = self._nginx_conf_path(dominio)
-        conf_path.write_text(_NGINX_CONF_TEMPLATE.format(domain=dominio), encoding="utf-8")
+        self._escribir_atomico(conf_path, _NGINX_CONF_TEMPLATE.format(domain=dominio))
         logger.info("SSLIssuanceService: conf Nginx escrita en %s", conf_path)
+
+    @staticmethod
+    def _modo_por_defecto_umask() -> int:
+        """Modo que produciría escribir un archivo NUEVO bajo el umask actual
+        del proceso — el mismo comportamiento que Path.write_text()/open().
+
+        tempfile.mkstemp() ignora el umask por diseño (siempre crea con 0600
+        por seguridad); sin este ajuste, un .conf nuevo quedaría con permisos
+        más restrictivos de los que tenía antes de introducir la escritura
+        atómica, lo que podría impedir que el worker de Nginx (usuario sin
+        privilegios) lo lea.
+        """
+        umask_actual = os.umask(0)
+        os.umask(umask_actual)
+        return 0o666 & ~umask_actual
+
+    @classmethod
+    def _escribir_atomico(cls, path: Path, contenido: str) -> None:
+        """Escribe *contenido* en *path* de forma atómica, preservando modo
+        (y, en la medida de lo posible, propietario/grupo) si *path* ya
+        existía.
+
+        Usa tempfile.mkstemp() en el MISMO directorio (mismo filesystem,
+        requisito para que os.replace() sea atómico) con nombre único
+        garantizado por el sistema operativo, y reemplaza con os.replace().
+        Evita que *path* quede parcialmente escrito si el proceso se
+        interrumpe a mitad de la escritura (crash, OOM-kill, etc.).
+
+        os.replace() sustituye el inode completo del destino por el del
+        temporal: sin preservación explícita, un archivo PREEXISTENTE perdería
+        su modo/propietario originales (heredaría el modo por defecto del
+        proceso que escribió el temporal). Preservar el modo es obligatorio;
+        preservar propietario/grupo es best-effort — un chown() sin
+        privilegios NO debe hacer fallar una escritura por lo demás legítima.
+        """
+        stat_original = None
+        if path.exists():
+            try:
+                stat_original = path.stat()
+            except OSError as exc:
+                logger.warning(
+                    "SSLIssuanceService._escribir_atomico: no se pudo leer "
+                    "metadata previa de %s, se preservará solo el modo por "
+                    "defecto del proceso — %s",
+                    path, exc,
+                )
+
+        fd, tmp_name = tempfile.mkstemp(
+            prefix=f".{path.name}.", suffix=".tmp", dir=str(path.parent)
+        )
+        tmp_path = Path(tmp_name)
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                f.write(contenido)
+
+            modo_destino = (
+                stat.S_IMODE(stat_original.st_mode)
+                if stat_original is not None
+                else cls._modo_por_defecto_umask()
+            )
+            try:
+                os.chmod(tmp_path, modo_destino)
+            except OSError as exc:
+                logger.warning(
+                    "SSLIssuanceService._escribir_atomico: no se pudo aplicar "
+                    "el modo %o a %s — %s", modo_destino, path, exc,
+                )
+
+            if stat_original is not None:
+                tmp_stat = os.stat(tmp_path)
+                if (tmp_stat.st_uid, tmp_stat.st_gid) != (
+                    stat_original.st_uid, stat_original.st_gid,
+                ):
+                    try:
+                        os.chown(tmp_path, stat_original.st_uid, stat_original.st_gid)
+                    except (PermissionError, OSError) as exc:
+                        logger.warning(
+                            "SSLIssuanceService._escribir_atomico: no se pudo "
+                            "preservar propietario/grupo (uid=%s gid=%s) de %s "
+                            "— %s",
+                            stat_original.st_uid, stat_original.st_gid, path, exc,
+                        )
+
+            os.replace(tmp_path, path)
+        finally:
+            if tmp_path.exists():
+                tmp_path.unlink(missing_ok=True)
+
+    def _revertir_conf_nginx(
+        self,
+        conf_path: Path,
+        existia_antes: bool,
+        contenido_original: str | None,
+    ) -> None:
+        """Deja el .conf del tenant como estaba antes de una emisión fallida.
+
+        - No existía antes: elimina el archivo que ESTA ejecución creó (evita
+          un huérfano que rompa el próximo `nginx -t`/reload de otro tenant).
+        - Ya existía: restaura su contenido ORIGINAL byte a byte —
+          _escribir_nginx_conf() pudo haberlo sobrescrito con la plantilla
+          nueva antes de que `nginx -t`/reload fallara; no basta con "no
+          borrarlo", el contenido debe volver a ser el de antes.
+
+        Nunca propaga una excepción: un fallo durante el rollback se
+        registra, pero la excepción real (certbot/nginx) es la que debe
+        llegar al llamador — no debe quedar oculta detrás de un error de
+        limpieza.
+        """
+        try:
+            if not existia_antes:
+                if conf_path.exists():
+                    conf_path.unlink()
+                    logger.info(
+                        "SSLIssuanceService.emitir: conf huérfano eliminado tras fallo (%s)",
+                        conf_path,
+                    )
+            elif contenido_original is not None:
+                self._escribir_atomico(conf_path, contenido_original)
+                logger.info(
+                    "SSLIssuanceService.emitir: conf preexistente restaurada a su "
+                    "contenido original tras fallo (%s)",
+                    conf_path,
+                )
+        except OSError as rollback_exc:
+            logger.error(
+                "SSLIssuanceService.emitir: fallo al revertir conf Nginx de %s "
+                "tras un error de emisión — %s",
+                conf_path,
+                rollback_exc,
+            )
 
     def _recargar_nginx(self) -> None:
         test = subprocess.run(["nginx", "-t"], capture_output=True, text=True)

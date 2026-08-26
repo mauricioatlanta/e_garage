@@ -100,6 +100,22 @@ def test_multiples_txt_con_valor_correcto(dominio):
     assert dominio.estado == EmpresaDominio.Estado.ACTIVO
 
 
+@pytest.mark.django_db
+def test_txt_correcto_invalida_cache_de_resolucion_exactamente_una_vez(dominio):
+    """Al activar el dominio, la caché de HostTenantMiddleware debe invalidarse
+    para que el próximo request no sirva un miss negativo cacheado."""
+    expected = dominio.get_txt_record_value()
+
+    with patch("dns.resolver.resolve", return_value=_dns_answer(expected)), \
+         patch(
+             "taller.services.domain_resolver_service.DomainResolverService.invalidate_cache"
+         ) as mock_invalidate:
+        result = DomainVerificationService.verificar(dominio)
+
+    assert result.success is True
+    mock_invalidate.assert_called_once_with(dominio.dominio)
+
+
 # ── Tests: verificación fallida ───────────────────────────────────────────────
 
 
@@ -116,6 +132,19 @@ def test_txt_incorrecto_marca_error_dns(dominio):
     assert dominio.estado         == EmpresaDominio.Estado.ERROR_DNS
     assert dominio.verificado_en  is None       # no debe marcarse como verificado
     assert dominio.intentos_verificacion == 1
+
+
+@pytest.mark.django_db
+def test_txt_incorrecto_no_invalida_cache(dominio):
+    """Un fallo de verificación no debe tocar la caché de resolución de dominio."""
+    with patch("dns.resolver.resolve", return_value=_dns_answer("egarage-verify=token-ajeno")), \
+         patch(
+             "taller.services.domain_resolver_service.DomainResolverService.invalidate_cache"
+         ) as mock_invalidate:
+        result = DomainVerificationService.verificar(dominio)
+
+    assert result.success is False
+    mock_invalidate.assert_not_called()
 
 
 @pytest.mark.django_db

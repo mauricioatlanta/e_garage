@@ -72,7 +72,9 @@ ALLOWED_HOSTS = env_list(
 
 CSRF_TRUSTED_ORIGINS = env_list(
     "DJANGO_CSRF_TRUSTED_ORIGINS",
-    "https://egarage.cl,https://www.egarage.cl,https://atlantareciclajes.cl,https://www.atlantareciclajes.cl",
+    "https://egarage.cl,https://www.egarage.cl,"
+    "https://monteazulspa.cl,https://www.monteazulspa.cl,"
+    "https://atlantareciclajes.cl,https://www.atlantareciclajes.cl",
 )
 
 
@@ -292,10 +294,10 @@ MEDIA_ROOT = "/srv/egarage/media"
 
 # Configuración crítica para el SSL que acabas de instalar
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-CSRF_TRUSTED_ORIGINS = [
-    "https://egarage.cl", "https://www.egarage.cl",
-    "https://monteazulspa.cl", "https://www.monteazulspa.cl",
-]
+# CSRF_TRUSTED_ORIGINS: fuente única de verdad definida arriba (línea ~73) vía
+# DJANGO_CSRF_TRUSTED_ORIGINS. Una reasignación hardcodeada aquí pisaba ese
+# valor y dejaba fuera cualquier dominio de tenant (ej. atlantareciclajes.cl)
+# que solo estuviera en el .env — ver auditoría Fase 305/327.
 
 
 # ===== FIX IDIOMA USA/CHILE EN PRODUCCION =====

@@ -97,6 +97,9 @@ class DomainVerificationService:
 
         empresa_dominio.save(update_fields=update_fields)
 
+        if success:
+            cls._invalidar_cache(empresa_dominio.dominio)
+
         logger.info(
             "DomainVerificationService.verificar: dominio=%s success=%s intentos=%d",
             empresa_dominio.dominio,
@@ -153,3 +156,17 @@ class DomainVerificationService:
     def _coincide(registros: list[str], valor_esperado: str) -> bool:
         """True si alguno de los registros TXT encontrados coincide exactamente."""
         return valor_esperado in registros
+
+    @staticmethod
+    def _invalidar_cache(dominio: str) -> None:
+        """Elimina la entrada de caché de resolución tras activar el dominio.
+
+        Import local (mismo patrón que domain_service.py) para evitar acoplar
+        el módulo a la caché en tiempo de import y no propagar errores si el
+        backend de caché no está disponible (p.ej. en tests).
+        """
+        try:
+            from taller.services.domain_resolver_service import DomainResolverService
+            DomainResolverService.invalidate_cache(dominio)
+        except Exception as exc:
+            logger.debug("_invalidar_cache: %s — %s", dominio, exc)

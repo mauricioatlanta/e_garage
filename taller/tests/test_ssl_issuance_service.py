@@ -5,6 +5,8 @@ Usa mocks de subprocess.run y operaciones de archivo para evitar llamadas
 reales a certbot, nginx ni openssl.
 """
 
+import os
+import stat
 import pytest
 from datetime import date
 from pathlib import Path
@@ -218,6 +220,226 @@ def test_nginx_fallo_lanza_ssl_issuance_error_y_revierte_activo(dominio_activo, 
     dominio_activo.refresh_from_db()
     assert dominio_activo.ssl_emitido is False
     assert dominio_activo.estado      == EmpresaDominio.Estado.ACTIVO
+
+
+@pytest.mark.django_db
+def test_A_conf_inexistente_nginx_falla_conf_desaparece(dominio_activo, svc, tmp_path):
+    """CASO A: el .conf no existía, esta ejecución lo escribe de verdad
+    (sin mockear _escribir_nginx_conf) y, si nginx falla después, el
+    archivo recién creado debe desaparecer del disco."""
+    def _conf_path(dominio):
+        return tmp_path / f"tenant_{dominio}.conf"
+
+    with (
+        patch.object(svc, "_nginx_conf_path", side_effect=_conf_path),
+        patch.object(svc, "_ejecutar_certbot"),
+        patch.object(svc, "_recargar_nginx", side_effect=SSLIssuanceError("nginx -t falló")),
+        pytest.raises(SSLIssuanceError),
+    ):
+        svc.emitir(dominio_activo)
+
+    conf_path = tmp_path / f"tenant_{dominio_activo.dominio}.conf"
+    assert not conf_path.exists()
+    assert list(tmp_path.iterdir()) == []  # sin restos (.tmp<pid> incluidos)
+    dominio_activo.refresh_from_db()
+    assert dominio_activo.ssl_emitido is False
+    assert dominio_activo.estado      == EmpresaDominio.Estado.ACTIVO
+
+
+@pytest.mark.django_db
+def test_B_conf_preexistente_restaura_contenido_original_tras_fallo(dominio_activo, svc, tmp_path):
+    """CASO B — el hallazgo crítico de Fase 329: no basta con "no borrar" un
+    .conf preexistente. _escribir_nginx_conf() lo sobrescribe de verdad con
+    la plantilla nueva; si nginx falla después, el contenido en disco debe
+    volver a ser EXACTAMENTE el original, no el nuevo (aunque el archivo
+    "siga existiendo")."""
+    conf_path = tmp_path / f"tenant_{dominio_activo.dominio}.conf"
+    conf_path.write_text("ORIGINAL CONFIG\n", encoding="utf-8")
+
+    with (
+        patch.object(svc, "_nginx_conf_path", return_value=conf_path),
+        patch.object(svc, "_ejecutar_certbot"),
+        patch.object(svc, "_recargar_nginx", side_effect=SSLIssuanceError("nginx -t falló")),
+        pytest.raises(SSLIssuanceError),
+    ):
+        svc.emitir(dominio_activo)
+
+    assert conf_path.read_text(encoding="utf-8") == "ORIGINAL CONFIG\n"
+    dominio_activo.refresh_from_db()
+    assert dominio_activo.ssl_emitido is False
+    assert dominio_activo.estado      == EmpresaDominio.Estado.ACTIVO
+
+
+@pytest.mark.django_db
+def test_C_certbot_falla_antes_de_escribir_no_toca_conf_preexistente(dominio_activo, svc, tmp_path):
+    """CASO C: certbot falla ANTES de _escribir_nginx_conf() — un .conf
+    preexistente no debe modificarse ni borrarse en absoluto."""
+    conf_path = tmp_path / f"tenant_{dominio_activo.dominio}.conf"
+    conf_path.write_text("ORIGINAL CONFIG\n", encoding="utf-8")
+
+    with (
+        patch.object(svc, "_nginx_conf_path", return_value=conf_path),
+        patch.object(svc, "_ejecutar_certbot", side_effect=SSLIssuanceError("certbot rc=1")),
+        pytest.raises(SSLIssuanceError, match="certbot"),
+    ):
+        svc.emitir(dominio_activo)
+
+    assert conf_path.read_text(encoding="utf-8") == "ORIGINAL CONFIG\n"
+
+
+@pytest.mark.django_db
+def test_D_certbot_falla_antes_de_escribir_conf_inexistente_no_crea_nada(dominio_activo, svc, tmp_path):
+    """CASO D: certbot falla ANTES de _escribir_nginx_conf() y el .conf no
+    existía — no debe aparecer ningún archivo nuevo en el directorio."""
+    def _conf_path(dominio):
+        return tmp_path / f"tenant_{dominio}.conf"
+
+    with (
+        patch.object(svc, "_nginx_conf_path", side_effect=_conf_path),
+        patch.object(svc, "_ejecutar_certbot", side_effect=SSLIssuanceError("certbot rc=1")),
+        pytest.raises(SSLIssuanceError, match="certbot"),
+    ):
+        svc.emitir(dominio_activo)
+
+    conf_path = tmp_path / f"tenant_{dominio_activo.dominio}.conf"
+    assert not conf_path.exists()
+    assert list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.django_db
+def test_E_fallo_durante_rollback_no_oculta_excepcion_original(dominio_activo, svc, tmp_path):
+    """CASO E: si la propia restauración del .conf preexistente falla
+    (ej. disco lleno), el SSLIssuanceError final debe seguir describiendo la
+    causa RAÍZ del fallo de emisión (nginx en este caso), no el error de
+    limpieza — y el fallo de limpieza no debe propagarse en su lugar."""
+    conf_path = tmp_path / f"tenant_{dominio_activo.dominio}.conf"
+    conf_path.write_text("ORIGINAL CONFIG\n", encoding="utf-8")
+
+    real_escribir_atomico = LetsEncryptSSLIssuanceService._escribir_atomico
+    llamadas = {"n": 0}
+
+    def _escribir_atomico_flaky(path, contenido):
+        llamadas["n"] += 1
+        if llamadas["n"] == 1:
+            return real_escribir_atomico(path, contenido)  # escritura hacia adelante: real
+        raise OSError("disco lleno (simulado) durante el rollback")
+
+    with (
+        patch.object(svc, "_nginx_conf_path", return_value=conf_path),
+        patch.object(svc, "_ejecutar_certbot"),
+        patch.object(svc, "_escribir_atomico", side_effect=_escribir_atomico_flaky),
+        patch.object(
+            svc, "_recargar_nginx",
+            side_effect=SSLIssuanceError("nginx -t falló: causa raíz"),
+        ),
+        pytest.raises(SSLIssuanceError, match="nginx -t falló: causa raíz"),
+    ):
+        svc.emitir(dominio_activo)
+
+    # El rollback falló de verdad (el contenido NO volvió al original) pero
+    # la excepción que llegó al llamador sigue siendo la causa raíz (nginx),
+    # no un error interno de limpieza.
+    assert conf_path.read_text(encoding="utf-8") != "ORIGINAL CONFIG\n"
+    dominio_activo.refresh_from_db()
+    assert dominio_activo.estado == EmpresaDominio.Estado.ACTIVO
+
+
+# ── Concurrencia: select_for_update en la transición ACTIVO → SSL_PENDIENTE ───
+#
+# NOTA (Fase 330): no se implementa un TEST F de "segunda emisión en
+# SSL_PENDIENTE no ejecuta certbot" porque esa protección NO se implementó a
+# propósito — excluir SSL_PENDIENTE de _ESTADOS_APTOS rompería el reintento
+# legítimo tras crash que ya prueba test_emitir_ssl_pendiente_es_estado_valido
+# (preexistente). Ver el docstring de LetsEncryptSSLIssuanceService
+# ("Concurrencia") para el razonamiento completo.
+
+
+@pytest.mark.django_db
+def test_emitir_usa_select_for_update_para_la_transicion_de_estado(dominio_activo, svc):
+    """La transición ACTIVO → SSL_PENDIENTE debe hacerse re-consultando la
+    fila con select_for_update(), no confiando en el estado en memoria del
+    objeto que recibió el llamador."""
+    with (
+        patch.object(
+            EmpresaDominio.objects, "select_for_update", wraps=EmpresaDominio.objects.select_for_update
+        ) as mock_sfu,
+        patch.object(svc, "_ejecutar_certbot"),
+        patch.object(svc, "_escribir_nginx_conf"),
+        patch.object(svc, "_recargar_nginx"),
+        patch.object(LetsEncryptSSLIssuanceService, "_leer_expiracion", return_value=None),
+    ):
+        svc.emitir(dominio_activo)
+
+    mock_sfu.assert_called_once()
+
+
+# ── Tests: metadata / permisos en escritura atómica (Fase 331/332) ────────────
+#
+# Hallazgo de Fase 331, confirmado con una prueba local real (fuera del repo,
+# sin tocar /etc/nginx): os.replace() reemplaza el inode completo del
+# destino, por lo que el archivo resultante hereda el modo de CREACIÓN del
+# temporal, no el del archivo que reemplaza — MODE_BEFORE=0640 se convertía
+# en MODE_AFTER=0664. Estos tests fijan la corrección: _escribir_atomico()
+# ahora preserva el modo explícitamente.
+
+
+@pytest.mark.django_db
+def test_escribir_atomico_preserva_modo_de_conf_preexistente(dominio_activo, svc, tmp_path):
+    """TEST MODE EXISTENTE: un .conf con chmod 0640 debe conservar
+    exactamente ese modo tras una escritura atómica exitosa (camino feliz,
+    sin fallo posterior) — no el modo por defecto del umask del proceso."""
+    conf_path = tmp_path / f"tenant_{dominio_activo.dominio}.conf"
+    conf_path.write_text("ORIGINAL CONFIG\n", encoding="utf-8")
+    os.chmod(conf_path, 0o640)
+
+    svc._escribir_atomico(conf_path, "NUEVO CONTENIDO\n")
+
+    assert conf_path.read_text(encoding="utf-8") == "NUEVO CONTENIDO\n"
+    assert stat.S_IMODE(conf_path.stat().st_mode) == 0o640
+    assert list(tmp_path.iterdir()) == [conf_path]  # sin temporales residuales
+
+
+@pytest.mark.django_db
+def test_escribir_atomico_archivo_nuevo_no_impone_modo_artificial(dominio_activo, svc, tmp_path):
+    """TEST ARCHIVO NUEVO: si el .conf no existía, no se le impone 0640 ni
+    ningún modo artificial — se aplica el modo por defecto que produciría el
+    umask actual del proceso (el mismo que Path.write_text() habría usado),
+    NO el 0600 fijo que tempfile.mkstemp() aplica por diseño de seguridad."""
+    conf_path = tmp_path / f"tenant_{dominio_activo.dominio}.conf"
+    assert not conf_path.exists()
+
+    svc._escribir_atomico(conf_path, "CONTENIDO\n")
+
+    assert conf_path.exists()
+    assert conf_path.read_text(encoding="utf-8") == "CONTENIDO\n"
+    modo_esperado = LetsEncryptSSLIssuanceService._modo_por_defecto_umask()
+    assert stat.S_IMODE(conf_path.stat().st_mode) == modo_esperado
+    assert stat.S_IMODE(conf_path.stat().st_mode) != 0o600  # no el default de mkstemp
+    assert list(tmp_path.iterdir()) == [conf_path]  # sin temporales residuales
+
+
+@pytest.mark.django_db
+def test_rollback_restaura_contenido_y_modo_original(dominio_activo, svc, tmp_path):
+    """TEST ROLLBACK + MODE: hay DOS escrituras atómicas en juego (la nueva,
+    que sobrescribe, y la de rollback, que restaura) — ambas deben preservar
+    el modo 0640 original, no solo el contenido."""
+    conf_path = tmp_path / f"tenant_{dominio_activo.dominio}.conf"
+    conf_path.write_text("ORIGINAL CONFIG\n", encoding="utf-8")
+    os.chmod(conf_path, 0o640)
+
+    with (
+        patch.object(svc, "_nginx_conf_path", return_value=conf_path),
+        patch.object(svc, "_ejecutar_certbot"),
+        patch.object(svc, "_recargar_nginx", side_effect=SSLIssuanceError("nginx -t falló")),
+        pytest.raises(SSLIssuanceError),
+    ):
+        svc.emitir(dominio_activo)
+
+    assert conf_path.read_text(encoding="utf-8") == "ORIGINAL CONFIG\n"
+    assert stat.S_IMODE(conf_path.stat().st_mode) == 0o640
+    assert list(tmp_path.iterdir()) == [conf_path]  # sin temporales residuales
+    dominio_activo.refresh_from_db()
+    assert dominio_activo.estado == EmpresaDominio.Estado.ACTIVO
 
 
 # ── Tests: revocar ────────────────────────────────────────────────────────────
