@@ -179,6 +179,35 @@ class ConfiguracionEmpresa(models.Model):
         help_text="Lista de rubros que ofrece el taller (múltiples rubros)",
     )
 
+    # —— ESPECIALIDAD DE RECICLAJE (solo aplica cuando el rubro es RECYCLING) ——
+    # Segunda capa bajo rubro_principal="RECYCLING": una recicladora de metales,
+    # una compradora de catalíticos y una planta de chatarra electrónica son
+    # operativamente distintas aunque compartan el mismo rubro. Mismo convenio
+    # que rubro_principal/rubros: recycling_type_principal siempre incluido
+    # primero en recycling_types.
+    RECYCLING_TYPE_CHOICES = [
+        ("METAL_RECYCLING", "Reciclaje de metales"),
+        ("CATALYTIC_RECYCLING", "Convertidores catalíticos"),
+        ("ELECTRONIC_SCRAP", "Chatarra electrónica"),
+        ("AUTO_PARTS_RECYCLING", "Reciclaje de autopartes"),
+        ("INDUSTRIAL_SCRAP", "Chatarra industrial"),
+    ]
+
+    recycling_type_principal = models.CharField(
+        max_length=30,
+        choices=RECYCLING_TYPE_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Especialidad de reciclaje principal",
+        help_text="Solo aplica cuando el rubro es RECYCLING. Especialidad principal del negocio.",
+    )
+    recycling_types = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Especialidades de reciclaje",
+        help_text="Lista de especialidades de reciclaje activas (subconjunto de RECYCLING_TYPE_CHOICES).",
+    )
+
     # —— CONTROL DE MÓDULOS ——
     modules_configured_at = models.DateTimeField(
         null=True,
@@ -214,6 +243,23 @@ class ConfiguracionEmpresa(models.Model):
         result = [principal]
         for r in stored:
             if r not in result:
+                result.append(r)
+        return result
+
+    def get_effective_recycling_types(self) -> list:
+        """
+        Retorna las especialidades de reciclaje activas: recycling_type_principal
+        siempre primero, seguido de recycling_types adicionales sin duplicar.
+        Lista vacía si no hay recycling_type_principal (empresa no es RECYCLING,
+        o aún no configuró su especialidad).
+        """
+        principal = (self.recycling_type_principal or "").strip()
+        if not principal:
+            return []
+        stored = list(self.recycling_types or [])
+        result = [principal]
+        for r in stored:
+            if r and r not in result:
                 result.append(r)
         return result
 
