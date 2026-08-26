@@ -257,3 +257,76 @@ def test_reload_settings_prod_restaura_estado_compartido(monkeypatch):
         == _CONTEXT_PROCESSORS_BASELINE
     )
     assert _base_settings.TEMPLATES[0]["DIRS"] == _DIRS_BASELINE
+
+
+# ── CUSTOM_DOMAIN_VPS_IP — fuente única (Fase 344/345) ────────────────────────
+#
+# Fase 343 introdujo CUSTOM_DOMAIN_VPS_IP en gestion_taller/settings/__init__.py
+# y, por descuido, también en settings_prod.py — reproduciendo el mismo patrón
+# de doble fuente que causó el bug de CSRF de este archivo. Fase 345 elimina
+# la redefinición en settings_prod.py; estos tests fijan que NO vuelva a
+# aparecer y que el valor efectivo en settings_prod siga siendo controlable
+# por EGARAGE_CUSTOM_DOMAIN_VPS_IP (heredado del settings base, sin pisarlo).
+
+
+def test_custom_domain_vps_ip_no_tiene_asignacion_propia_en_settings_prod():
+    """Regresión Fase 345: settings_prod.py NO debe redefinir
+    CUSTOM_DOMAIN_VPS_IP a nivel de módulo — la única fuente de verdad es
+    gestion_taller/settings/__init__.py, heredada vía `from .settings import *`."""
+    asignaciones = _module_level_assignments("CUSTOM_DOMAIN_VPS_IP")
+    assert asignaciones == [], (
+        f"CUSTOM_DOMAIN_VPS_IP tiene asignación propia en settings_prod.py "
+        f"(líneas {asignaciones}); debe eliminarse y heredarse del settings base."
+    )
+
+
+def _custom_domain_vps_ip_en_proceso_fresco(valor_env: str | None) -> str:
+    """Lee settings.CUSTOM_DOMAIN_VPS_IP (bajo settings_prod) en un proceso
+    Python nuevo, con EGARAGE_CUSTOM_DOMAIN_VPS_IP seteada a *valor_env* (o
+    ausente si es None).
+
+    A diferencia de CSRF_TRUSTED_ORIGINS (calculado con env_list(...) dentro
+    del propio settings_prod.py, y por tanto reevaluable con
+    importlib.reload()), CUSTOM_DOMAIN_VPS_IP ahora vive EXCLUSIVAMENTE en
+    gestion_taller/settings/__init__.py (fix Fase 345) y settings_prod.py lo
+    hereda vía `from .settings import *` — una copia de atributo tomada en el
+    momento del import, no una referencia viva. reload_settings_prod()
+    recarga solo settings_prod, no el paquete base ya importado por pytest
+    (que es el propio DJANGO_SETTINGS_MODULE de la sesión — recargarlo
+    correría de nuevo TODO settings/__init__.py sobre el proceso de test en
+    curso, con el mismo riesgo de estado compartido corrupto que ya audita
+    este archivo para MIDDLEWARE/TEMPLATES). Un proceso nuevo es el
+    equivalente fiel a cómo arranca gunicorn en producción: la env var se lee
+    una sola vez, al importar, en un proceso propio."""
+    import os
+    import subprocess
+    import sys
+
+    env = dict(os.environ)
+    env.pop("EGARAGE_CUSTOM_DOMAIN_VPS_IP", None)
+    if valor_env is not None:
+        env["EGARAGE_CUSTOM_DOMAIN_VPS_IP"] = valor_env
+    env["DJANGO_SETTINGS_MODULE"] = "gestion_taller.settings_prod"
+
+    resultado = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import django; django.setup(); from django.conf import settings; "
+            "print(settings.CUSTOM_DOMAIN_VPS_IP)",
+        ],
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert resultado.returncode == 0, resultado.stderr
+    return resultado.stdout.strip()
+
+
+def test_custom_domain_vps_ip_default_cuando_env_var_ausente():
+    assert _custom_domain_vps_ip_en_proceso_fresco(None) == "159.223.200.106"
+
+
+def test_custom_domain_vps_ip_efectivo_respeta_env_var():
+    assert _custom_domain_vps_ip_en_proceso_fresco("203.0.113.50") == "203.0.113.50"

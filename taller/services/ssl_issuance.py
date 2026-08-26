@@ -32,13 +32,13 @@ _NGINX_CONF_TEMPLATE = """\
 # Generado por eGarage / LetsEncryptSSLIssuanceService — no editar manualmente.
 server {{
     listen 80;
-    server_name {domain};
+    server_name {server_names};
     location /.well-known/acme-challenge/ {{ root /var/www/certbot; }}
     location / {{ return 301 https://$host$request_uri; }}
 }}
 server {{
     listen 443 ssl http2;
-    server_name {domain};
+    server_name {server_names};
     ssl_certificate     /etc/letsencrypt/live/{domain}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/{domain}/privkey.pem;
     ssl_protocols       TLSv1.2 TLSv1.3;
@@ -148,6 +148,7 @@ class LetsEncryptSSLIssuanceService(SSLIssuanceService):
 
     def emitir(self, empresa_dominio: EmpresaDominio) -> None:
         dominio = empresa_dominio.dominio
+        domains = self._get_domains(empresa_dominio)
 
         with transaction.atomic():
             locked = EmpresaDominio.objects.select_for_update().get(pk=empresa_dominio.pk)
@@ -178,8 +179,8 @@ class LetsEncryptSSLIssuanceService(SSLIssuanceService):
                 ) from exc
 
         try:
-            self._ejecutar_certbot(dominio)
-            self._escribir_nginx_conf(dominio)
+            self._ejecutar_certbot(domains)
+            self._escribir_nginx_conf(dominio, domains)
             self._recargar_nginx()
         except Exception as exc:
             logger.error("SSLIssuanceService.emitir: fallo para %s — %s", dominio, exc)
@@ -244,20 +245,38 @@ class LetsEncryptSSLIssuanceService(SSLIssuanceService):
     def _nginx_conf_path(self, dominio: str) -> Path:
         return self.NGINX_CONF_DIR / f"tenant_{dominio}.conf"
 
-    def _ejecutar_certbot(self, dominio: str) -> None:
-        resultado = subprocess.run(
-            [
-                "certbot", "certonly",
-                "--webroot",
-                "-w", str(self.CERTBOT_WEBROOT),
-                "-d", dominio,
-                "--non-interactive",
-                "--agree-tos",
-                "--email", "support@egarage.cl",
-            ],
-            capture_output=True,
-            text=True,
-        )
+    @staticmethod
+    def _get_domains(empresa_dominio: EmpresaDominio) -> list[str]:
+        """Dominios efectivos (apex + www opcional) para certbot y Nginx.
+
+        El apex SIEMPRE va primero — certbot lo usa como --cert-name y como
+        directorio en /etc/letsencrypt/live/, y ese es el contrato que ya
+        usan los paths de este servicio (LE_LIVE_DIR / dominio / ...).
+        www solo se agrega si incluir_www=True, y solo si el propio apex
+        almacenado no empieza ya con "www." (defensivo: el modelo espera
+        que dominio sea siempre el apex canónico, pero esto evita generar
+        "www.www.ejemplo.cl" si esa invariante alguna vez se rompiera).
+        """
+        apex = empresa_dominio.dominio
+        domains = [apex]
+        if empresa_dominio.incluir_www and not apex.startswith("www."):
+            domains.append(f"www.{apex}")
+        return domains
+
+    def _ejecutar_certbot(self, domains: list[str]) -> None:
+        cmd = [
+            "certbot", "certonly",
+            "--webroot",
+            "-w", str(self.CERTBOT_WEBROOT),
+        ]
+        for domain in domains:
+            cmd.extend(["-d", domain])
+        cmd.extend([
+            "--non-interactive",
+            "--agree-tos",
+            "--email", "support@egarage.cl",
+        ])
+        resultado = subprocess.run(cmd, capture_output=True, text=True)
         if resultado.returncode != 0:
             raise SSLIssuanceError(
                 f"certbot falló (rc={resultado.returncode}): {resultado.stderr.strip()}"
@@ -274,9 +293,13 @@ class LetsEncryptSSLIssuanceService(SSLIssuanceService):
                 f"certbot delete falló (rc={resultado.returncode}): {resultado.stderr.strip()}"
             )
 
-    def _escribir_nginx_conf(self, dominio: str) -> None:
+    def _escribir_nginx_conf(self, dominio: str, domains: list[str] | None = None) -> None:
+        """Escribe el .conf del tenant. *domains* son los server_name a incluir
+        (apex [+ www]); si se omite, se usa solo el apex (compatibilidad)."""
         conf_path = self._nginx_conf_path(dominio)
-        self._escribir_atomico(conf_path, _NGINX_CONF_TEMPLATE.format(domain=dominio))
+        server_names = " ".join(domains) if domains else dominio
+        contenido = _NGINX_CONF_TEMPLATE.format(domain=dominio, server_names=server_names)
+        self._escribir_atomico(conf_path, contenido)
         logger.info("SSLIssuanceService: conf Nginx escrita en %s", conf_path)
 
     @staticmethod

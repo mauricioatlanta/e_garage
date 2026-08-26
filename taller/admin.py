@@ -1062,7 +1062,7 @@ class EmpresaDominioAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Dominio", {"fields": ("empresa", "dominio", "estado", "creado_por")}),
         ("Instrucciones DNS", {
-            "fields": ("txt_record_name", "txt_record_value", "cname_target"),
+            "fields": ("incluir_www", "txt_record_name", "txt_record_value", "cname_target"),
             "classes": ("collapse",),
         }),
         ("Verificación", {
@@ -1101,9 +1101,15 @@ class EmpresaDominioAdmin(admin.ModelAdmin):
     def txt_record_value(self, obj):
         return obj.get_txt_record_value() if obj.pk else "—"
 
-    @admin.display(description="CNAME destino")
+    @admin.display(description="Registros DNS (A / CNAME www)")
     def cname_target(self, obj):
-        return obj.get_cname_target()
+        if not obj.pk:
+            return "—"
+        dns = obj.get_dns_instructions()
+        texto = f"A @ → {dns['apex']['value']}"
+        if dns["www"]["enabled"]:
+            texto += f" | CNAME www → {dns['www']['value']}"
+        return texto
 
     @admin.action(description="Suspender dominios seleccionados")
     def suspender_action(self, request, queryset):

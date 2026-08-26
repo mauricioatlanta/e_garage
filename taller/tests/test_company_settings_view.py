@@ -199,3 +199,50 @@ def test_settings_can_toggle_technician_status(client):
 
     tecnico.refresh_from_db()
     assert tecnico.activo is False
+
+
+# ── Instrucciones DNS de dominio personalizado (Fase 343 — ADR-004) ──────────
+
+
+@pytest.mark.django_db
+def test_settings_dns_instructions_incluir_www_true(client, settings):
+    from taller.models.empresa_dominio import EmpresaDominio
+
+    settings.CUSTOM_DOMAIN_VPS_IP = "203.0.113.10"
+    user, empresa = _make_user_and_company(username="settings-dns-www")
+    ed = EmpresaDominio.objects.create(
+        empresa=empresa, dominio="conwww.cl", incluir_www=True,
+    )
+    client.force_login(user)
+
+    response = client.get("/cl/es/settings/")
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    # No debe quedar ningún rastro del target obsoleto.
+    assert "proxy.egarage.cl" not in content
+    # Registro A al VPS y CNAME de www -> apex, tal como decide ADR-004.
+    assert "203.0.113.10" in content
+    assert ed.get_txt_record_name() in content
+    assert str(ed.token_verificacion) in content
+
+
+@pytest.mark.django_db
+def test_settings_dns_instructions_incluir_www_false_no_muestra_www(client, settings):
+    from taller.models.empresa_dominio import EmpresaDominio
+
+    settings.CUSTOM_DOMAIN_VPS_IP = "203.0.113.10"
+    user, empresa = _make_user_and_company(username="settings-dns-nowww")
+    EmpresaDominio.objects.create(
+        empresa=empresa, dominio="sinwww.cl", incluir_www=False,
+    )
+    client.force_login(user)
+
+    response = client.get("/cl/es/settings/")
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert "proxy.egarage.cl" not in content
+    assert "203.0.113.10" in content
+    # Sin instrucción de CNAME www cuando incluir_www=False.
+    assert "www.sinwww.cl" not in content

@@ -77,6 +77,11 @@ CSRF_TRUSTED_ORIGINS = env_list(
     "https://atlantareciclajes.cl,https://www.atlantareciclajes.cl",
 )
 
+# CUSTOM_DOMAIN_VPS_IP: NO redefinir aquí. Fuente única de verdad en
+# gestion_taller/settings/__init__.py (heredada vía `from .settings import *`
+# arriba). Redefinirla en este módulo reproduciría el patrón de doble fuente
+# que causó el bug de CSRF_TRUSTED_ORIGINS (ver Fase 328/344).
+
 
 # =========================
 # HTTPS detrás de proxy (Nginx / DigitalOcean)

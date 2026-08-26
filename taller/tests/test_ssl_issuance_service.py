@@ -442,6 +442,112 @@ def test_rollback_restaura_contenido_y_modo_original(dominio_activo, svc, tmp_pa
     assert dominio_activo.estado == EmpresaDominio.Estado.ACTIVO
 
 
+# ── Tests: www condicional (Fase 343 — ADR-004) ───────────────────────────────
+#
+# dominio_activo tiene incluir_www=True por default del modelo — se usa tal
+# cual para los casos "con www" (equivalente al patrón real de MonteAzul).
+# Para "sin www" se crea una instancia explícita con incluir_www=False
+# (equivalente a un futuro tenant apex-only).
+
+
+@pytest.fixture
+def dominio_activo_sin_www(db, empresa):
+    """EmpresaDominio ACTIVO con incluir_www=False (tenant apex-only)."""
+    return EmpresaDominio.objects.create(
+        empresa=empresa,
+        dominio="apexonly.example.cl",
+        estado=EmpresaDominio.Estado.ACTIVO,
+        ssl_emitido=False,
+        incluir_www=False,
+    )
+
+
+@pytest.mark.django_db
+def test_get_domains_incluye_www_por_defecto(dominio_activo, svc):
+    assert dominio_activo.incluir_www is True
+    assert LetsEncryptSSLIssuanceService._get_domains(dominio_activo) == [
+        "taller.example.cl",
+        "www.taller.example.cl",
+    ]
+
+
+@pytest.mark.django_db
+def test_get_domains_sin_www_si_incluir_www_false(dominio_activo_sin_www, svc):
+    assert LetsEncryptSSLIssuanceService._get_domains(dominio_activo_sin_www) == [
+        "apexonly.example.cl",
+    ]
+
+
+@pytest.mark.django_db
+def test_get_domains_no_duplica_www_si_apex_ya_empieza_con_www(db, empresa):
+    ed = EmpresaDominio.objects.create(
+        empresa=empresa,
+        dominio="www.raro.example.cl",
+        estado=EmpresaDominio.Estado.ACTIVO,
+        incluir_www=True,
+    )
+    # No debe generar "www.www.raro.example.cl".
+    assert LetsEncryptSSLIssuanceService._get_domains(ed) == ["www.raro.example.cl"]
+
+
+@pytest.mark.django_db
+def test_emitir_con_incluir_www_true_genera_server_name_apex_y_www(
+    dominio_activo, svc, tmp_path
+):
+    """CASO I (MonteAzul-like): certbot recibe ambos -d y el .conf real
+    generado por _escribir_nginx_conf() (sin mockear) tiene server_name con
+    apex + www — igual al patrón ya operando en producción para MonteAzul."""
+    with (
+        patch.object(svc, "_nginx_conf_path", return_value=tmp_path / "tenant_taller.example.cl.conf"),
+        patch("subprocess.run", return_value=_proc(returncode=0)) as mock_run,
+        patch.object(svc, "_recargar_nginx"),
+        patch.object(LetsEncryptSSLIssuanceService, "_leer_expiracion", return_value=None),
+    ):
+        svc.emitir(dominio_activo)
+
+    certbot_args = mock_run.call_args_list[0].args[0]
+    d_values = [certbot_args[i + 1] for i, a in enumerate(certbot_args) if a == "-d"]
+    assert d_values == ["taller.example.cl", "www.taller.example.cl"]
+
+    conf = (tmp_path / "tenant_taller.example.cl.conf").read_text(encoding="utf-8")
+    assert "server_name taller.example.cl www.taller.example.cl;" in conf
+    # El path del certificado sigue basado SOLO en el apex (certbot usa el
+    # primer -d como --cert-name, igual que el cert real de MonteAzul).
+    assert "/etc/letsencrypt/live/taller.example.cl/fullchain.pem" in conf
+    assert "/etc/letsencrypt/live/taller.example.cl/privkey.pem" in conf
+    assert "www.example.cl/fullchain" not in conf
+
+    dominio_activo.refresh_from_db()
+    assert dominio_activo.ssl_cert_path == "/etc/letsencrypt/live/taller.example.cl/fullchain.pem"
+    assert dominio_activo.ssl_key_path == "/etc/letsencrypt/live/taller.example.cl/privkey.pem"
+
+
+@pytest.mark.django_db
+def test_emitir_con_incluir_www_false_no_incluye_www_en_nada(
+    dominio_activo_sin_www, svc, tmp_path
+):
+    """CASO J (apex-only): un tenant que no quiere/puede www sigue
+    funcionando exactamente igual que antes de esta fase."""
+    with (
+        patch.object(
+            svc, "_nginx_conf_path", return_value=tmp_path / "tenant_apexonly.example.cl.conf"
+        ),
+        patch("subprocess.run", return_value=_proc(returncode=0)) as mock_run,
+        patch.object(svc, "_recargar_nginx"),
+        patch.object(LetsEncryptSSLIssuanceService, "_leer_expiracion", return_value=None),
+    ):
+        svc.emitir(dominio_activo_sin_www)
+
+    certbot_args = mock_run.call_args_list[0].args[0]
+    d_values = [certbot_args[i + 1] for i, a in enumerate(certbot_args) if a == "-d"]
+    assert d_values == ["apexonly.example.cl"]
+    assert "www.apexonly.example.cl" not in certbot_args
+
+    conf = (tmp_path / "tenant_apexonly.example.cl.conf").read_text(encoding="utf-8")
+    assert "server_name apexonly.example.cl;" in conf
+    assert "www.apexonly.example.cl" not in conf
+
+
 # ── Tests: revocar ────────────────────────────────────────────────────────────
 
 
@@ -522,7 +628,7 @@ def test_revocar_certbot_delete_fallo_no_interrumpe_limpieza_db(dominio_con_ssl,
 
 def test_ejecutar_certbot_incluye_dominio_y_flags(svc):
     with patch("subprocess.run", return_value=_proc(returncode=0)) as mock_run:
-        svc._ejecutar_certbot("taller.example.cl")
+        svc._ejecutar_certbot(["taller.example.cl"])
 
     args = mock_run.call_args[0][0]
     assert args[0] == "certbot"
@@ -531,10 +637,25 @@ def test_ejecutar_certbot_incluye_dominio_y_flags(svc):
     assert "--agree-tos" in args
 
 
+def test_ejecutar_certbot_incluye_apex_y_www_como_dos_flags_d(svc):
+    """Fase 343: incluir_www debe traducirse en DOS flags -d repetidos, no en
+    un solo dominio con comas — certbot exige -d por cada SAN."""
+    with patch("subprocess.run", return_value=_proc(returncode=0)) as mock_run:
+        svc._ejecutar_certbot(["taller.example.cl", "www.taller.example.cl"])
+
+    args = mock_run.call_args[0][0]
+    assert args[0] == "certbot"
+    # Exactamente dos pares "-d <dominio>", en el orden apex primero.
+    d_indices = [i for i, a in enumerate(args) if a == "-d"]
+    assert len(d_indices) == 2
+    assert args[d_indices[0] + 1] == "taller.example.cl"
+    assert args[d_indices[1] + 1] == "www.taller.example.cl"
+
+
 def test_ejecutar_certbot_fallo_lanza_ssl_issuance_error(svc):
     with patch("subprocess.run", return_value=_proc(returncode=1, stderr="ACME error")):
         with pytest.raises(SSLIssuanceError, match="certbot falló"):
-            svc._ejecutar_certbot("taller.example.cl")
+            svc._ejecutar_certbot(["taller.example.cl"])
 
 
 def test_ejecutar_certbot_delete_fallo_lanza_ssl_issuance_error(svc):
