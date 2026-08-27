@@ -1047,7 +1047,7 @@ VERTICAL_CONTENT = {
         "slug": "recycling",
         "rubro_key": "RECICLAJE",
         "url_slug": {"es": "reciclaje", "en": "reciclaje", "pt": "reciclaje"},
-        "scene_image": "img/welcome/scenes/placeholder.webp",
+        "scene_image": "img/welcome/scenes/reciclaje.webp",
 
         "tw": {
             "badge_bg": "bg-emerald-500/10",
