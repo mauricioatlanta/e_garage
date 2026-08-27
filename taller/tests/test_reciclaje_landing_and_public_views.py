@@ -84,7 +84,7 @@ def test_landing_home_dominio_recycling_muestra_bienvenida_atlanta(empresa_recyc
     ]
     content = response.content.decode()
     assert "Bienvenido a Atlanta Reciclajes" in content
-    assert "/reciclaje/consulta-catalitico/" in content
+    assert "/reciclaje/cataliticos/" in content
     assert "/reciclaje/chatarra/" in content
 
 
@@ -100,6 +100,45 @@ def test_landing_home_dominio_no_recycling_sigue_usando_catalog_home(empresa_wor
     assert "commerce/themes/monteazul/home.html" in [
         t.name for t in response.templates if t.name
     ]
+
+
+# ── landing_cataliticos ──────────────────────────────────────────────────────
+
+
+@pytest.mark.django_db
+def test_landing_cataliticos_responde_200_con_contenido_y_cta(empresa_recycling):
+    """La 'sección Catalíticos' es una bienvenida propia con contenido real
+    (qué compramos, cómo funciona) y un CTA hacia la consulta de precio —
+    no debe saltar directo a la búsqueda."""
+    client = Client(HTTP_HOST="landing-recycling.example.cl")
+    response = client.get("/reciclaje/cataliticos/")
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert "Catalíticos" in content
+    assert "Pago al Contado" in content
+    assert "¿Cómo funciona?" in content
+    assert "/reciclaje/consulta-catalitico/" in content
+    assert "/accounts/login/" in content
+
+
+@pytest.mark.django_db
+def test_landing_cataliticos_muestra_panel_si_esta_autenticado(empresa_recycling):
+    client = Client(HTTP_HOST="landing-recycling.example.cl")
+    client.force_login(empresa_recycling.user)
+    response = client.get("/reciclaje/cataliticos/")
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert "/cl/es/reciclaje/" in content
+    assert "/accounts/login/" not in content
+
+
+@pytest.mark.django_db
+def test_landing_cataliticos_404_sin_tenant_resuelto(db):
+    client = Client(HTTP_HOST="sin-tenant.example.cl")
+    response = client.get("/reciclaje/cataliticos/")
+    assert response.status_code == 404
 
 
 # ── vistas públicas: aislamiento multi-tenant ────────────────────────────────

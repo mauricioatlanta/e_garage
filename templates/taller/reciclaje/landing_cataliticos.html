@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalíticos | Atlanta Reciclajes</title>
+    <meta name="description" content="Compra de convertidores catalíticos con tasación transparente desde 2005. Pago al contado, precios reales, cobertura nacional. Consulta el precio de tu catalítico.">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+      body {
+        min-height: 100vh;
+        background: #0f2027;
+        background: linear-gradient(120deg, #0f2027 0%, #2c5364 100%);
+      }
+      .glass {
+        background: rgba(20, 30, 60, 0.15) !important;
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.15);
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+      .neon { color: #00fff7; text-shadow: 0 0 12px #00fff7a0; }
+      .futur-btn {
+        background: linear-gradient(90deg, #00fff7 0%, #0ff 100%);
+        color: #0f2027 !important;
+        font-weight: bold;
+      }
+      .btn-secondary {
+        background: rgba(255,255,255,0.08);
+        color: #e5e7eb !important;
+        font-weight: bold;
+        border: 1px solid rgba(255,255,255,0.2);
+      }
+      .whatsapp-btn { background: #25D366; color: #fff !important; }
+      .step-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 9999px;
+        background: rgba(0,255,247,0.15);
+        border: 1px solid rgba(0,255,247,0.4);
+        color: #00fff7;
+        font-weight: bold;
+        flex-shrink: 0;
+      }
+    </style>
+</head>
+<body class="min-h-screen text-white font-sans">
+  <div class="max-w-5xl mx-auto py-16 px-4">
+    <div class="text-center mb-10">
+      <a href="/" class="text-cyan-300 text-sm">&larr; Volver al inicio</a>
+      <h1 class="text-4xl md:text-5xl font-bold neon mt-6 mb-4">🚗 Catalíticos</h1>
+      <p class="text-lg text-cyan-300 mb-2">Convertidores Catalíticos · Tasación transparente desde 2005</p>
+      <p class="text-xl md:text-2xl text-cyan-200 max-w-2xl mx-auto">
+        Compra inmediata con <span class="neon font-semibold">precios reales</span>.
+        Tasamos justa y transparentemente el metal precioso (platino, paladio y rodio)
+        que contiene tu catalítico usado.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div class="glass p-6 text-center">
+        <div class="text-4xl mb-3">🛡️</div>
+        <h3 class="text-lg font-bold text-cyan-200 mb-2">Pago al Contado</h3>
+        <p class="text-cyan-300 text-sm">Transferencia inmediata con trazabilidad y guía de despacho.</p>
+      </div>
+      <div class="glass p-6 text-center">
+        <div class="text-4xl mb-3">📊</div>
+        <h3 class="text-lg font-bold text-cyan-200 mb-2">Precios Reales</h3>
+        <p class="text-cyan-300 text-sm">Tasación basada en cotizaciones internacionales y mercado actual.</p>
+      </div>
+      <div class="glass p-6 text-center">
+        <div class="text-4xl mb-3">🌐</div>
+        <h3 class="text-lg font-bold text-cyan-200 mb-2">Cobertura Nacional</h3>
+        <p class="text-cyan-300 text-sm">Logística flexible y servicio en todo Chile con retiro a domicilio.</p>
+      </div>
+    </div>
+
+    <div class="glass p-8 mb-10">
+      <h2 class="text-2xl neon font-bold mb-6 text-center">¿Cómo funciona?</h2>
+      <div class="space-y-5">
+        <div class="flex items-start gap-4">
+          <span class="step-number">1</span>
+          <p class="text-cyan-200 pt-1">Identificas tu catalítico por código, marca o modelo.</p>
+        </div>
+        <div class="flex items-start gap-4">
+          <span class="step-number">2</span>
+          <p class="text-cyan-200 pt-1">Consultas el precio referencial de compra al instante, sin llamarnos.</p>
+        </div>
+        <div class="flex items-start gap-4">
+          <span class="step-number">3</span>
+          <p class="text-cyan-200 pt-1">Coordinamos la entrega o retiro y recibes tu pago al contado.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass p-8 mb-10 text-center" style="background: rgba(0, 255, 255, 0.06) !important;">
+      <p class="text-cyan-200 mb-6">
+        Más de 13 años reciclando catalíticos de forma responsable, evitando que sus
+        metales terminen contaminando y devolviéndoles valor real.
+      </p>
+      <div class="flex flex-col md:flex-row gap-4 justify-center">
+        <a href="{% url 'reciclaje:consulta_catalitico' %}" class="futur-btn rounded-lg px-8 py-4 text-lg">
+          🔍 Consultar precio de mi catalítico
+        </a>
+        {% if user.is_authenticated %}
+        <a href="{{ dashboard_url }}" class="btn-secondary rounded-lg px-8 py-4 text-lg">
+          📊 Panel de Reciclaje
+        </a>
+        {% else %}
+        <a href="/accounts/login/" class="btn-secondary rounded-lg px-8 py-4 text-lg">
+          🔐 Iniciar sesión
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="text-center">
+      <a href="https://wa.me/56963607348?text=¡Hola!%20Quiero%20cotizar%20mi%20catalítico" class="whatsapp-btn inline-block rounded-lg px-6 py-3 font-bold">
+        📱 Cotizar por WhatsApp
+      </a>
+    </div>
+  </div>
+</body>
+</html>
