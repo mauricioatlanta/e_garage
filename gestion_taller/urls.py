@@ -274,6 +274,8 @@ urlpatterns = [
     path("commerce/", include(("commerce.urls", "commerce"), namespace="commerce")),
     # Storefront público individual por empresa
     path("tienda/", include(("taller.urls_public", "tienda"), namespace="tienda")),
+    # Reciclaje — storefront público de tenants RECYCLING (dominio propio, ver landing_home)
+    path("reciclaje/", include(("taller.reciclaje.urls_public", "reciclaje"), namespace="reciclaje")),
     # Payment URLs globales (sin namespace para compatibilidad con templates)
     path("", include("taller.urls_payment")),
     # PWA Dinámicas (manifest y service worker por país e idioma)
