@@ -11,6 +11,8 @@ patrón de taller/desarme/views.py. Scoping por empresa manual
 (get_user_empresa_safe), no automático.
 """
 
+import json
+from datetime import date, timedelta
 from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
@@ -18,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import F
+from django.db.models import F, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -91,6 +93,89 @@ def _resolver_cliente(request, empresa, prefix="cliente"):
     )
 
 
+def _sumar_meses(base: date, delta_meses: int) -> date:
+    """base menos/más delta_meses meses, siempre al día 1 (para agrupar por mes)."""
+    mes_total = base.month - 1 + delta_meses
+    anio = base.year + mes_total // 12
+    mes = mes_total % 12 + 1
+    return date(anio, mes, 1)
+
+
+def _dashboard_chart_data(empresa) -> dict:
+    """Tendencias de compras (7 días / 6 meses), distribución de precio de
+    venta del catálogo, y top 5 catalíticos más comprados por cantidad —
+    portado del dashboard real del proyecto original (PythonAnywhere), con
+    la agregación de 'top clientes' corregida (el original multiplicaba dos
+    Sum() agregados entre sí, lo que da un total incorrecto en compras con
+    más de una línea)."""
+    hoy = timezone.now().date()
+
+    dias_labels, compras_por_dia = [], []
+    for i in range(6, -1, -1):
+        dia = hoy - timedelta(days=i)
+        dias_labels.append(dia.strftime("%d/%m"))
+        compras_por_dia.append(
+            CompraReciclaje.objects.filter(empresa=empresa, created_at__date=dia).count()
+        )
+
+    meses_labels, compras_por_mes = [], []
+    inicio_mes_actual = hoy.replace(day=1)
+    for i in range(5, -1, -1):
+        mes = _sumar_meses(inicio_mes_actual, -i)
+        meses_labels.append(mes.strftime("%b %Y"))
+        compras_por_mes.append(
+            CompraReciclaje.objects.filter(
+                empresa=empresa, created_at__year=mes.year, created_at__month=mes.month
+            ).count()
+        )
+
+    rangos_precio = {
+        "0-10k": Catalitico.objects.filter(empresa=empresa, precio_venta__lt=10000).count(),
+        "10k-25k": Catalitico.objects.filter(
+            empresa=empresa, precio_venta__gte=10000, precio_venta__lt=25000
+        ).count(),
+        "25k-50k": Catalitico.objects.filter(
+            empresa=empresa, precio_venta__gte=25000, precio_venta__lt=50000
+        ).count(),
+        "50k+": Catalitico.objects.filter(empresa=empresa, precio_venta__gte=50000).count(),
+    }
+
+    top_cataliticos = list(
+        DetalleCompraCatalitico.objects.filter(compra__empresa=empresa)
+        .values("catalitico__codigo")
+        .annotate(total=Sum("cantidad"))
+        .order_by("-total")[:5]
+    )
+
+    return {
+        "chart_data_json": json.dumps({
+            "compras_diarias": {"labels": dias_labels, "data": compras_por_dia},
+            "compras_mensuales": {"labels": meses_labels, "data": compras_por_mes},
+            "rangos_precio": {
+                "labels": list(rangos_precio.keys()),
+                "data": list(rangos_precio.values()),
+            },
+            "top_cataliticos": {
+                "labels": [item["catalitico__codigo"] for item in top_cataliticos],
+                "data": [item["total"] for item in top_cataliticos],
+            },
+        }),
+    }
+
+
+def _top_clientes_por_gasto(empresa, limite=5) -> list[dict]:
+    gastos: dict[int | None, dict] = {}
+    compras = CompraReciclaje.objects.filter(empresa=empresa).select_related("cliente")
+    for compra in compras:
+        clave = compra.cliente_id
+        entrada = gastos.setdefault(
+            clave, {"cliente": compra.cliente, "total": Decimal("0"), "compras": 0}
+        )
+        entrada["total"] += compra.total()
+        entrada["compras"] += 1
+    return sorted(gastos.values(), key=lambda x: x["total"], reverse=True)[:limite]
+
+
 # ── Dashboard ─────────────────────────────────────────────────────────────────
 
 
@@ -104,6 +189,11 @@ def dashboard(request):
     valor_stock = sum(
         (c.precio_venta or Decimal("0")) for c in catalogo_disponible
     )
+
+    catalogo_empresa = Catalitico.objects.filter(empresa=empresa, activo=True)
+    catalitico_mas_caro = catalogo_empresa.order_by("-precio_venta").first()
+    catalitico_mas_barato = catalogo_empresa.exclude(precio_venta=0).order_by("precio_venta").first()
+
     context = {
         "total_catalogo_disponible": catalogo_disponible.count(),
         "valor_stock_catalitico": valor_stock,
@@ -119,6 +209,10 @@ def dashboard(request):
             stock_minimo__isnull=False,
             cantidad_stock__lt=F("stock_minimo"),
         ),
+        "top_clientes": _top_clientes_por_gasto(empresa),
+        "catalitico_mas_caro": catalitico_mas_caro,
+        "catalitico_mas_barato": catalitico_mas_barato,
+        **_dashboard_chart_data(empresa),
     }
     return render(request, "taller/reciclaje/staff/dashboard.html", context)
 
