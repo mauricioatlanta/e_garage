@@ -28,10 +28,21 @@ def landing_cataliticos(request):
     precio por código."""
     empresa = _empresa_publica(request)
     precios_metal = PrecioMetal.objects.filter(empresa=empresa).first()
+    precio_metal_max = None
+    if precios_metal:
+        valores = [
+            v for v in (precios_metal.platino, precios_metal.paladio, precios_metal.rodio)
+            if v
+        ]
+        precio_metal_max = max(valores) if valores else None
     return render(
         request,
         "taller/reciclaje/landing_cataliticos.html",
-        {"dashboard_url": _reciclaje_url(""), "precios_metal": precios_metal},
+        {
+            "dashboard_url": _reciclaje_url(""),
+            "precios_metal": precios_metal,
+            "precio_metal_max": precio_metal_max,
+        },
     )
 
 
