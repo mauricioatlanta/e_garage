@@ -60,7 +60,7 @@
     <h3>Catalíticos</h3>
     <table class="rec-table" id="tabla-catalitico">
       <thead>
-        <tr><th>Código</th><th>Nombre</th><th>Marca</th><th>Modelo</th><th>Cantidad</th><th>Precio unitario</th><th></th></tr>
+        <tr><th>Código</th><th>Nombre</th><th>Marca</th><th>Modelo</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th><th></th></tr>
       </thead>
       <tbody>
         <tr>
@@ -68,11 +68,15 @@
           <td><input type="text" name="catalitico_nombre[]" class="rec-input"></td>
           <td><input type="text" name="catalitico_marca[]" class="rec-input" style="width:100px;"></td>
           <td><input type="text" name="catalitico_modelo[]" class="rec-input" style="width:100px;"></td>
-          <td><input type="number" name="catalitico_cantidad[]" class="rec-input" value="1" min="1" style="width:70px;"></td>
-          <td><input type="number" name="catalitico_precio[]" class="rec-input" step="any" style="width:110px;"></td>
+          <td><input type="number" name="catalitico_cantidad[]" class="rec-input rec-linea-cantidad" value="1" min="1" style="width:70px;"></td>
+          <td><input type="number" name="catalitico_precio[]" class="rec-input rec-linea-precio" step="any" style="width:110px;"></td>
+          <td class="rec-linea-subtotal">$0</td>
           <td><button type="button" class="rec-btn-sm" onclick="agregarFila('tabla-catalitico', this)">+ fila</button></td>
         </tr>
       </tbody>
+      <tfoot>
+        <tr><td colspan="6" style="text-align:right;color:#9ca3af;">Subtotal catalíticos</td><td id="subtotal-catalitico">$0</td><td></td></tr>
+      </tfoot>
     </table>
   </div>
 
@@ -80,7 +84,7 @@
     <h3>Chatarra electrónica</h3>
     <table class="rec-table" id="tabla-chatarra">
       <thead>
-        <tr><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th></th></tr>
+        <tr><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th><th></th></tr>
       </thead>
       <tbody>
         <tr>
@@ -92,12 +96,21 @@
               {% endfor %}
             </select>
           </td>
-          <td><input type="number" name="chatarra_cantidad[]" class="rec-input" step="any" style="width:90px;"></td>
-          <td><input type="number" name="chatarra_precio[]" class="rec-input" step="any" style="width:110px;"></td>
+          <td><input type="number" name="chatarra_cantidad[]" class="rec-input rec-linea-cantidad" step="any" style="width:90px;"></td>
+          <td><input type="number" name="chatarra_precio[]" class="rec-input rec-linea-precio" step="any" style="width:110px;"></td>
+          <td class="rec-linea-subtotal">$0</td>
           <td><button type="button" class="rec-btn-sm" onclick="agregarFila('tabla-chatarra', this)">+ fila</button></td>
         </tr>
       </tbody>
+      <tfoot>
+        <tr><td colspan="3" style="text-align:right;color:#9ca3af;">Subtotal chatarra</td><td id="subtotal-chatarra">$0</td><td></td></tr>
+      </tfoot>
     </table>
+  </div>
+
+  <div class="rec-card" style="text-align:right;">
+    <span class="rec-field-label" style="display:inline;">Total de la compra</span>
+    <span id="total-compra" style="font-size:1.3rem;font-weight:bold;color:#00fff7;margin-left:0.5rem;">$0</span>
   </div>
 
   <div class="rec-card">
@@ -120,7 +133,40 @@ function agregarFila(tablaId, boton) {
     }
   });
   fila.querySelectorAll('select').forEach(function (select) { select.selectedIndex = 0; });
+  fila.querySelector('.rec-linea-subtotal').textContent = '$0';
   tabla.appendChild(fila);
+  recalcularTotales();
 }
+
+function formatoCLP(numero) {
+  return '$' + Math.round(numero).toLocaleString('es-CL');
+}
+
+function recalcularTotales() {
+  let totalGeneral = 0;
+
+  ['tabla-catalitico', 'tabla-chatarra'].forEach(function (tablaId) {
+    const tabla = document.getElementById(tablaId);
+    let subtotalTabla = 0;
+    tabla.querySelectorAll('tbody tr').forEach(function (fila) {
+      const cantidad = parseFloat(fila.querySelector('.rec-linea-cantidad').value) || 0;
+      const precio = parseFloat(fila.querySelector('.rec-linea-precio').value) || 0;
+      const subtotal = cantidad * precio;
+      fila.querySelector('.rec-linea-subtotal').textContent = formatoCLP(subtotal);
+      subtotalTabla += subtotal;
+    });
+    totalGeneral += subtotalTabla;
+    const destino = tablaId === 'tabla-catalitico' ? 'subtotal-catalitico' : 'subtotal-chatarra';
+    document.getElementById(destino).textContent = formatoCLP(subtotalTabla);
+  });
+
+  document.getElementById('total-compra').textContent = formatoCLP(totalGeneral);
+}
+
+document.addEventListener('input', function (event) {
+  if (event.target.classList.contains('rec-linea-cantidad') || event.target.classList.contains('rec-linea-precio')) {
+    recalcularTotales();
+  }
+});
 </script>
 {% endblock %}

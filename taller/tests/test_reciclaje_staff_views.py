@@ -24,6 +24,7 @@ from django.test import Client
 from taller.models.reciclaje import (
     Catalitico,
     CompraReciclaje,
+    DetalleCompraCatalitico,
     VentaReciclaje,
 )
 from taller.models.team_member import TeamMember
@@ -78,6 +79,70 @@ def test_dashboard_bloquea_rol_no_autorizado(vendedor_user):
 def test_dashboard_permite_owner(cliente_owner):
     response = cliente_owner.get("/cl/es/reciclaje/")
     assert response.status_code == 200
+
+
+# ── Dashboard: gráficas y agregados ───────────────────────────────────────────
+
+
+@pytest.mark.django_db
+def test_dashboard_incluye_chart_data_json(cliente_owner):
+    response = cliente_owner.get("/cl/es/reciclaje/")
+    assert response.status_code == 200
+    data = response.context["chart_data_json"]
+    assert '"compras_diarias"' in data
+    assert '"compras_mensuales"' in data
+    assert '"rangos_precio"' in data
+    assert '"top_cataliticos"' in data
+    content = response.content.decode()
+    assert 'id="chart-compras-7d"' in content
+    assert 'id="chart-top-cataliticos"' in content
+
+
+@pytest.mark.django_db
+def test_dashboard_top_clientes_suma_correctamente_compra_multilinea(cliente_owner, empresa_a):
+    """Regresión: el dashboard original (PythonAnywhere) calculaba el gasto
+    de cada cliente multiplicando dos Sum() agregados entre sí
+    (Sum(cantidad) * Sum(precio_unitario)), lo que da un total incorrecto
+    apenas una compra tiene más de una línea. Debe sumarse por línea."""
+    cat1 = CataliticoFactory(empresa=empresa_a, codigo="CAT-X1", precio_venta=Decimal("10000"))
+    cat2 = CataliticoFactory(empresa=empresa_a, codigo="CAT-X2", precio_venta=Decimal("20000"))
+    compra = CompraReciclaje.objects.create(empresa=empresa_a, cliente=None)
+    DetalleCompraCatalitico.objects.create(
+        compra=compra, catalitico=cat1, cantidad=2, precio_unitario=Decimal("5000")
+    )
+    DetalleCompraCatalitico.objects.create(
+        compra=compra, catalitico=cat2, cantidad=1, precio_unitario=Decimal("30000")
+    )
+    # Total correcto: (2*5000) + (1*30000) = 40000.
+    # El bug original habría dado Sum(cantidad)=3 * Sum(precio_unitario)=35000 = 105000.
+
+    response = cliente_owner.get("/cl/es/reciclaje/")
+
+    top_clientes = response.context["top_clientes"]
+    assert len(top_clientes) == 1
+    assert top_clientes[0]["total"] == Decimal("40000")
+
+
+@pytest.mark.django_db
+def test_dashboard_rangos_precio_y_extremos(cliente_owner, empresa_a):
+    CataliticoFactory(empresa=empresa_a, codigo="BARATO", precio_venta=Decimal("5000"))
+    CataliticoFactory(empresa=empresa_a, codigo="CARO", precio_venta=Decimal("60000"))
+
+    response = cliente_owner.get("/cl/es/reciclaje/")
+
+    assert response.context["catalitico_mas_caro"].codigo == "CARO"
+    assert response.context["catalitico_mas_barato"].codigo == "BARATO"
+
+
+@pytest.mark.django_db
+def test_dashboard_no_mezcla_datos_de_otra_empresa(cliente_owner, empresa_a, empresa_b):
+    CataliticoFactory(empresa=empresa_b, codigo="OTRA-EMPRESA", precio_venta=Decimal("999999"))
+
+    response = cliente_owner.get("/cl/es/reciclaje/")
+
+    assert "OTRA-EMPRESA" not in response.content.decode()
+    if response.context["catalitico_mas_caro"] is not None:
+        assert response.context["catalitico_mas_caro"].empresa_id == empresa_a.pk
 
 
 # ── Compra: catalítico ────────────────────────────────────────────────────────

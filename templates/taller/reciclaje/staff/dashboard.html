@@ -16,6 +16,8 @@
   .rec-table { width: 100%; border-collapse: collapse; color: #e5e7eb; }
   .rec-table th, .rec-table td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
   .rec-alert { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; }
+  .rec-charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+  .rec-chart-caption { color: #9ca3af; font-size: 0.85rem; text-align: center; margin-top: 0.5rem; }
 </style>
 {% endblock %}
 
@@ -46,6 +48,61 @@
     <div class="rec-kpi">{{ productos_bajo_stock|length }}</div>
     <div class="rec-label">Productos de chatarra bajo stock mínimo</div>
   </div>
+</div>
+
+<div class="rec-card" style="margin-bottom:1.5rem;">
+  <h3>📈 Gráficas</h3>
+  <div class="rec-charts-grid">
+    <div>
+      <canvas id="chart-compras-7d" height="220"></canvas>
+      <p class="rec-chart-caption">Compras últimos 7 días</p>
+    </div>
+    <div>
+      <canvas id="chart-compras-mensuales" height="220"></canvas>
+      <p class="rec-chart-caption">Compras por mes (últimos 6 meses)</p>
+    </div>
+    <div>
+      <canvas id="chart-rangos-precio" height="220"></canvas>
+      <p class="rec-chart-caption">Distribución del catálogo por precio de venta (CLP)</p>
+    </div>
+    <div>
+      <canvas id="chart-top-cataliticos" height="220"></canvas>
+      <p class="rec-chart-caption">Top catalíticos más comprados</p>
+    </div>
+  </div>
+</div>
+
+<div class="rec-grid">
+  {% if catalitico_mas_caro %}
+  <div class="rec-card">
+    <div class="rec-kpi">${{ catalitico_mas_caro.precio_venta|floatformat:0 }}</div>
+    <div class="rec-label">Catalítico más caro ({{ catalitico_mas_caro.codigo }})</div>
+  </div>
+  {% endif %}
+  {% if catalitico_mas_barato %}
+  <div class="rec-card">
+    <div class="rec-kpi">${{ catalitico_mas_barato.precio_venta|floatformat:0 }}</div>
+    <div class="rec-label">Catalítico más barato ({{ catalitico_mas_barato.codigo }})</div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="rec-card" style="margin-bottom:1.5rem;">
+  <h3>👑 Top clientes por gasto</h3>
+  <table class="rec-table">
+    <thead><tr><th>Cliente</th><th>Compras</th><th>Total gastado</th></tr></thead>
+    <tbody>
+      {% for item in top_clientes %}
+      <tr>
+        <td>{{ item.cliente|default:"Mostrador" }}</td>
+        <td>{{ item.compras }}</td>
+        <td>${{ item.total|floatformat:0 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3">Sin compras registradas.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
 <div class="rec-card" style="margin-bottom:1.5rem;">
@@ -83,4 +140,69 @@
     </tbody>
   </table>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var chartData = {{ chart_data_json|safe }};
+  var neonCyan = 'rgba(0, 255, 247, 0.9)';
+  var neonCyanDim = 'rgba(0, 255, 247, 0.4)';
+  var gridColor = 'rgba(0, 255, 247, 0.15)';
+  var fontColor = 'rgba(255, 255, 255, 0.9)';
+  var defaults = {
+    font: { color: fontColor },
+    plugins: { legend: { labels: { color: fontColor } } },
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { color: fontColor } },
+      y: { grid: { color: gridColor }, ticks: { color: fontColor } }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  };
+
+  if (document.getElementById('chart-compras-7d')) {
+    new Chart(document.getElementById('chart-compras-7d'), {
+      type: 'line',
+      data: {
+        labels: chartData.compras_diarias.labels,
+        datasets: [{ label: 'Compras', data: chartData.compras_diarias.data, borderColor: neonCyan, backgroundColor: neonCyanDim, fill: true, tension: 0.4 }]
+      },
+      options: defaults
+    });
+  }
+
+  if (document.getElementById('chart-compras-mensuales')) {
+    new Chart(document.getElementById('chart-compras-mensuales'), {
+      type: 'bar',
+      data: {
+        labels: chartData.compras_mensuales.labels,
+        datasets: [{ label: 'Compras', data: chartData.compras_mensuales.data, backgroundColor: neonCyanDim, borderColor: neonCyan, borderWidth: 1 }]
+      },
+      options: defaults
+    });
+  }
+
+  if (document.getElementById('chart-rangos-precio')) {
+    new Chart(document.getElementById('chart-rangos-precio'), {
+      type: 'doughnut',
+      data: {
+        labels: chartData.rangos_precio.labels,
+        datasets: [{ data: chartData.rangos_precio.data, backgroundColor: ['#00fff7', '#00c9b7', '#009688', '#004d40'], borderColor: 'rgba(0,0,0,0.3)', borderWidth: 1 }]
+      },
+      options: defaults
+    });
+  }
+
+  if (document.getElementById('chart-top-cataliticos')) {
+    new Chart(document.getElementById('chart-top-cataliticos'), {
+      type: 'bar',
+      data: {
+        labels: chartData.top_cataliticos.labels,
+        datasets: [{ label: 'Cantidad comprada', data: chartData.top_cataliticos.data, backgroundColor: neonCyanDim, borderColor: neonCyan, borderWidth: 1 }]
+      },
+      options: Object.assign({}, defaults, { indexAxis: 'y' })
+    });
+  }
+});
+</script>
 {% endblock %}
