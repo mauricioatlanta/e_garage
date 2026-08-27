@@ -12,7 +12,6 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, render
 
 from taller.models.reciclaje import Catalitico, ProductoChatarra
-from taller.reciclaje.views_staff import _reciclaje_url
 
 
 def _empresa_publica(request):
@@ -20,17 +19,6 @@ def _empresa_publica(request):
     if empresa is None:
         raise Http404
     return empresa
-
-
-def landing_cataliticos(request):
-    """Mini página de bienvenida de la sección Catalíticos, entre la
-    bienvenida general del tenant y la consulta de precio por código."""
-    _empresa_publica(request)
-    return render(
-        request,
-        "taller/reciclaje/landing_cataliticos.html",
-        {"dashboard_url": _reciclaje_url("")},
-    )
 
 
 def consulta_catalitico(request):
