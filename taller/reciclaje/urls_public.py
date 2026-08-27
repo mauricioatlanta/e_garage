@@ -5,6 +5,7 @@ from . import views_public
 app_name = "reciclaje"
 
 urlpatterns = [
+    path("cataliticos/", views_public.landing_cataliticos, name="landing_cataliticos"),
     path("consulta-catalitico/", views_public.consulta_catalitico, name="consulta_catalitico"),
     path("catalitico/<int:pk>/", views_public.detalle_catalitico, name="detalle_catalitico"),
     path("chatarra/", views_public.catalogo_chatarra, name="catalogo_chatarra"),
