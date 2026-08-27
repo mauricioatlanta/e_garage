@@ -3,101 +3,2809 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Precio de Catalíticos | Atlanta Reciclajes</title>
-    <meta name="description" content="Consulta el precio referencial de tu catalítico por código, marca o modelo. Compra directa, pago seguro. Atlanta Reciclajes.">
+    <title>{{ page_title|default:"Precio de Catalíticos | Atlanta Reciclajes" }}</title>
+    <meta name="description" content="{{ meta_description|default:'Consulta el precio referencial de tu catalítico por código. Compra directa, pago seguro. Atlanta Reciclajes - Santiago.' }}">
+    {% load static %}
+    {% load humanize %}
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Montserrat:wght@700;900&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-      body {
-        min-height: 100vh;
-        background: #0f2027;
-        background: linear-gradient(120deg, #0f2027 0%, #2c5364 100%);
-      }
-      .glass {
-        background: rgba(20, 30, 60, 0.15) !important;
-        border-radius: 1.25rem;
-        box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.15);
-        backdrop-filter: blur(6px);
-        border: 1px solid rgba(255,255,255,0.08);
-      }
-      .neon {
-        color: #00fff7;
-        text-shadow: 0 0 12px #00fff7a0;
-      }
-      .search-input {
-        background: rgba(10, 14, 20, 0.9);
-        border: 2px solid rgba(0, 255, 247, 0.3);
-        color: #00fff7;
-      }
-      .search-input:focus {
-        outline: none;
-        border-color: #00fff7;
-        box-shadow: 0 0 0 3px rgba(0, 255, 247, 0.2);
-      }
-      .futur-btn {
-        background: linear-gradient(90deg, #00fff7 0%, #0ff 100%);
-        color: #0f2027 !important;
-        font-weight: bold;
-      }
-      .whatsapp-btn { background: #25D366; color: #fff !important; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto Mono', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0e14;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Patrón hexagonal de fondo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(0, 242, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 242, 255, 0.03) 0%, transparent 50%);
+            background-size: 120px 120px;
+            background-position: 0 0, 60px 60px;
+            opacity: 0.4;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* Patrón de malla hexagonal sutil */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 242, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(10, 14, 20, 0.98);
+            backdrop-filter: blur(15px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+        
+        /* Ticker de Metales Futurista */
+        .ticker-metales-container {
+            width: 100%;
+            background: linear-gradient(90deg, 
+                rgba(0, 242, 255, 0.03) 0%, 
+                rgba(0, 242, 255, 0.12) 25%,
+                rgba(0, 242, 255, 0.18) 50%,
+                rgba(0, 242, 255, 0.12) 75%,
+                rgba(0, 242, 255, 0.03) 100%);
+            border-top: 1px solid rgba(0, 242, 255, 0.4);
+            border-bottom: 1px solid rgba(0, 242, 255, 0.4);
+            overflow: hidden;
+            position: relative;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.1);
+        }
+        
+        /* Efecto de fade en los bordes */
+        .ticker-metales-container::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 200px;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                rgba(10, 14, 20, 1) 0%, 
+                rgba(10, 14, 20, 0.8) 30%,
+                rgba(10, 14, 20, 0) 100%);
+            z-index: 2;
+            pointer-events: none;
+            animation: fade-edge 3s ease-in-out infinite;
+        }
+        
+        .ticker-metales-container::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 200px;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                rgba(10, 14, 20, 0) 0%, 
+                rgba(10, 14, 20, 0.8) 70%,
+                rgba(10, 14, 20, 1) 100%);
+            z-index: 2;
+            pointer-events: none;
+            animation: fade-edge 3s ease-in-out infinite;
+        }
+        
+        @keyframes fade-edge {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        .ticker-wrapper {
+            display: flex;
+            white-space: nowrap;
+            animation: ticker-scroll 40s linear infinite;
+            will-change: transform;
+            position: absolute;
+            right: 0;
+        }
+        
+        .ticker-wrapper:hover {
+            animation-play-state: paused;
+        }
+        
+        @keyframes ticker-scroll {
+            0% {
+                transform: translateX(100vw);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+        
+        .ticker-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0 2rem;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #e0e0e0;
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+            position: relative;
+        }
+        
+        .ticker-item::before {
+            content: '●';
+            color: #00f2ff;
+            font-size: 0.5rem;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% {
+                opacity: 1;
+                text-shadow: 0 0 5px rgba(0, 242, 255, 0.8);
+            }
+            50% {
+                opacity: 0.5;
+                text-shadow: 0 0 15px rgba(0, 242, 255, 1);
+            }
+        }
+        
+        .ticker-item span {
+            color: #00f2ff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+        }
+        
+        .ticker-precio {
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        
+        .ticker-variacion {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .ticker-variacion.up {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+        }
+        
+        .ticker-variacion.down {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+        
+        .ticker-separator {
+            color: rgba(0, 242, 255, 0.3);
+            margin: 0 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo-ar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.75rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #e0e0e0;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .nav-links a:hover {
+            color: #00f2ff;
+            text-shadow: 0 0 8px rgba(0, 242, 255, 0.5);
+        }
+        
+        .btn-whatsapp-header {
+            background: linear-gradient(135deg, #00f2ff 0%, #00d4ff 100%);
+            color: #0a0e14;
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .btn-whatsapp-header:hover {
+            background: linear-gradient(135deg, #00d4ff 0%, #00f2ff 100%);
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        .btn-empleados {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #0a0e14;
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .btn-empleados:hover {
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            margin-top: 130px;
+            min-height: calc(100vh - 80px);
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            padding: 3rem 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+            z-index: 1;
+        }
+        
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .hero-section {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-subtitle {
+            color: #9ca3af;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            font-family: 'Archivo Black', 'Montserrat', sans-serif;
+            color: #e0e0e0;
+        }
+        
+        .hero-title .highlight {
+            color: #00f2ff;
+            display: block;
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.5);
+        }
+        
+        .hero-description {
+            color: #e0e0e0;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00f2ff 0%, #00d4ff 100%);
+            color: #0a0e14;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            display: inline-block;
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #00d4ff 0%, #00f2ff 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.6);
+        }
+        
+        .btn-secondary {
+            background: #1e40af;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .btn-secondary:hover {
+            background: #1e3a8a;
+            transform: translateY(-2px);
+        }
+        
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(10, 14, 20, 0.98) 0%, rgba(30, 37, 48, 0.95) 100%);
+            background-image: url('{% static "img/reciclaje/fondo_cataliticos_espacio.png" %}');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: overlay;
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(0, 242, 255, 0.08) 0%, transparent 60%);
+        }
+        
+        /* Search Panel */
+        .search-panel {
+            background: linear-gradient(145deg, #1e2530, #161b22);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+            height: fit-content;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(0, 242, 255, 0.1);
+        }
+        
+        .search-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #e0e0e0;
+            font-family: 'Archivo Black', 'Montserrat', sans-serif;
+        }
+        
+        .search-description {
+            color: #9ca3af;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .search-input-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-input {
+            width: 100%;
+            height: 60px;
+            min-height: 60px;
+            background: rgba(10, 14, 20, 0.9);
+            border: 2px solid rgba(0, 242, 255, 0.3);
+            border-radius: 12px;
+            padding: 0 1rem 0 3.5rem;
+            color: #00f2ff;
+            font-size: 1.1rem;
+            font-family: 'Roboto Mono', monospace;
+            transition: all 0.3s ease;
+            letter-spacing: 0.05em;
+        }
+        
+        .search-input::placeholder {
+            color: rgba(0, 242, 255, 0.5);
+            font-family: 'Roboto Mono', monospace;
+            letter-spacing: 0.1em;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #00f2ff;
+            box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.2), 0 0 25px rgba(0, 242, 255, 0.5);
+            background: rgba(10, 14, 20, 0.98);
+        }
+        .search-input-hero { height: 64px; min-height: 64px; font-size: 1.15rem; }
+        
+        /* Cursor parpadeante en placeholder */
+        @keyframes blink-cursor {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .search-input::placeholder::after {
+            content: '█';
+            animation: blink-cursor 1s infinite;
+            color: #00f2ff;
+        }
+        
+        .search-input-container:has(.search-input:focus) {
+            animation: glow-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow-pulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 5px rgba(0, 242, 255, 0.3));
+            }
+            50% {
+                filter: drop-shadow(0 0 15px rgba(0, 242, 255, 0.6));
+            }
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00f2ff;
+            width: 24px;
+            height: 24px;
+            filter: drop-shadow(0 0 5px rgba(0, 242, 255, 0.5));
+        }
+        
+        .scanner-icon, .search-icon-lupa {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            z-index: 2;
+        }
+        
+        .scanner-icon svg, .search-icon-lupa svg {
+            width: 100%;
+            height: 100%;
+            stroke: #00f2ff;
+            filter: drop-shadow(0 0 5px rgba(0, 242, 255, 0.8));
+        }
+        
+        .estado-sin-resultado {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .estado-sin-resultado .estado-icono { font-size: 1.5rem; display: block; margin-bottom: 0.5rem; }
+        .estado-sin-resultado p { color: #e0e0e0; margin-bottom: 1rem; }
+        .btn-whatsapp-consulta {
+            display: inline-block;
+            background: #25D366;
+            color: #fff !important;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn-whatsapp-consulta:hover { background: #1ebc59; transform: translateY(-2px); }
+        
+        /* Resultado UX - Layout conversión */
+        .resultado-card-ux {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: linear-gradient(145deg, #1e2530, #161b22);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        .resultado-identificacion { margin-bottom: 1.5rem; }
+        .resultado-codigo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #00f2ff;
+            font-family: 'Archivo Black', 'Montserrat', sans-serif;
+            margin-bottom: 0.25rem;
+        }
+        .resultado-descripcion { color: #9ca3af; font-size: 0.95rem; }
+        .resultado-precio-bloque {
+            margin-bottom: 1.5rem;
+            padding: 1.25rem;
+            background: rgba(0, 242, 255, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid #00f2ff;
+        }
+        .resultado-precio-label { display: block; color: #9ca3af; font-size: 0.9rem; margin-bottom: 0.25rem; }
+        .resultado-precio-valor {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #fff;
+            font-family: 'Roboto Mono', monospace;
+            letter-spacing: 0.02em;
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+            animation: precio-reveal 0.6s ease-out, precio-glow 3s ease-in-out 0.5s infinite;
+        }
+        .resultado-precio-valor .precio-miles { font-variant-numeric: tabular-nums; }
+        @keyframes precio-reveal {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes precio-glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(0, 242, 255, 0.3); }
+            50% { text-shadow: 0 0 30px rgba(0, 242, 255, 0.5); }
+        }
+        .resultado-precio-sin-valor { font-size: 1.1rem; animation: precio-reveal 0.6s ease-out; }
+        .resultado-contenido { margin-bottom: 1rem; }
+        .resultado-contenido-label { display: block; color: #9ca3af; font-size: 0.85rem; margin-bottom: 0.2rem; }
+        .resultado-contenido-valores { color: #e0e0e0; font-family: 'Roboto Mono', monospace; }
+        .resultado-microcopy {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        .resultado-microcopy p { margin: 0.2rem 0; }
+        .resultado-cta { display: flex; flex-direction: column; gap: 0.75rem; }
+        .btn-whatsapp-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #25D366;
+            color: #fff !important;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+        }
+        .btn-whatsapp-cta:hover { background: #1ebc59; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5); }
+        .btn-consultar-otro {
+            display: inline-block;
+            text-align: center;
+            color: #00f2ff;
+            font-size: 0.95rem;
+            text-decoration: none;
+            padding: 0.5rem 0;
+        }
+        .btn-consultar-otro:hover { text-decoration: underline; }
+        .resultado-imagen-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 120px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed rgba(0, 242, 255, 0.2);
+            border-radius: 12px;
+            color: #6b7280;
+            font-size: 0.85rem;
+            font-family: 'Roboto Mono', monospace;
+        }
+        .resultado-imagen-placeholder svg {
+            width: 36px;
+            height: 36px;
+            stroke: rgba(0, 242, 255, 0.4);
+        }
+
+        /* Búsqueda en tiempo real - dropdown */
+        .search-input-container { position: relative; }
+        .sugerencias-live {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 4px;
+            background: rgba(10, 14, 20, 0.98);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            border-radius: 12px;
+            max-height: 320px;
+            overflow-y: auto;
+            z-index: 200;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        .sugerencias-live .sugerencia-item {
+            display: block;
+            padding: 10px 14px;
+            color: #e0e0e0;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sugerencias-live .sugerencia-item:last-child { border-bottom: none; }
+        .sugerencias-live .sugerencia-item:hover,
+        .sugerencias-live .sugerencia-item:focus {
+            background: rgba(0, 242, 255, 0.12);
+        }
+        .sugerencias-live .sugerencia-codigo { font-weight: 700; color: #00f2ff; }
+        .sugerencias-live .sugerencia-desc { font-size: 0.9rem; color: #9ca3af; }
+        .sugerencias-live .sugerencia-precio { font-size: 0.85rem; margin-top: 4px; }
+
+        /* Múltiples resultados */
+        .resultados-multiples { margin-top: 1.5rem; }
+        .resultados-multiples-titulo {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #9ca3af;
+        }
+        .resultados-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .resultado-mini-card {
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(145deg, #1e2530, #161b22);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .resultado-mini-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 242, 255, 0.2);
+        }
+        .resultado-mini-imagen {
+            height: 100px;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .resultado-mini-imagen img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .resultado-mini-info {
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .resultado-mini-info strong { color: #00f2ff; }
+        .resultado-mini-precio { font-size: 0.9rem; font-weight: 600; }
+        
+        .search-results {
+            margin-top: 1.5rem;
+        }
+        
+        .resultado-catalitico {
+            background: linear-gradient(145deg, #1e2530, #161b22);
+            border-left: 4px solid #00f2ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .resultado-catalitico::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 242, 255, 0.05) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .resultado-catalitico:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+        }
+        
+        .resultado-catalitico:hover::before {
+            opacity: 1;
+        }
+        
+        .result-item {
+            background: linear-gradient(145deg, #1e2530, #161b22);
+            border-left: 4px solid #00f2ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 242, 255, 0.05) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .result-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+        }
+        
+        .result-item:hover::before {
+            opacity: 1;
+        }
+        
+        .result-code {
+            font-weight: 600;
+            color: #e0e0e0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.1rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .result-make {
+            color: #9ca3af;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 500;
+            font-family: 'Roboto Mono', monospace;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .result-make::before {
+            content: '⚙';
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+        
+        .btn-ver, .btn-tasacion {
+            background: linear-gradient(135deg, #00f2ff 0%, #0066ff 100%);
+            color: #0a0e14;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            font-family: 'Roboto Mono', monospace;
+            border: 1px solid rgba(0, 242, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .btn-ver:hover, .btn-tasacion:hover {
+            background: linear-gradient(135deg, #00d4ff 0%, #0052cc 100%);
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.6);
+            transform: scale(1.05) translateY(-2px);
+        }
+        
+        /* Etiqueta de trazabilidad */
+        .trazabilidad-badge {
+            display: inline-block;
+            background: rgba(0, 242, 255, 0.1);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            border-radius: 8px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            color: #00f2ff;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .search-note {
+            color: #6b7280;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            font-style: italic;
+        }
+        
+        /* Features Section */
+        .features-section {
+            background: linear-gradient(180deg, rgba(10, 14, 20, 0.8) 0%, rgba(30, 37, 48, 0.6) 100%);
+            padding: 4rem 2rem;
+            margin-top: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .features-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(145deg, #1e2530, #161b22);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 242, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            border-color: rgba(0, 242, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.3));
+        }
+        
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #e0e0e0;
+            font-family: 'Archivo Black', 'Montserrat', sans-serif;
+        }
+        
+        .feature-description {
+            color: #9ca3af;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        /* Floating WhatsApp Button - Industrial Premium */
+        .floating-whatsapp {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: #25d366;
+            border: 3px solid #25d366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(37, 211, 102, 0.5), inset 0 0 10px rgba(37, 211, 102, 0.1);
+            z-index: 1000;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .floating-whatsapp:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 30px rgba(37, 211, 102, 0.8), inset 0 0 15px rgba(37, 211, 102, 0.2);
+            border-color: #1ebc59;
+            background: #1ebc59;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .features-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .search-panel {
+                padding: 1.5rem;
+            }
+        }
+        
+        
+        .result-card {
+            background: linear-gradient(145deg, #1e2530, #161b22);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-left: 4px solid #00f2ff;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+        }
+        
+        .result-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #00f2ff;
+            font-family: 'Archivo Black', 'Montserrat', sans-serif;
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+        }
+        
+        .result-card p {
+            margin-bottom: 0.75rem;
+            color: #e0e0e0;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .result-card strong {
+            color: #00f2ff;
+        }
+        
+        .alert-error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            border-left: 4px solid #ef4444;
+            color: #fca5a5;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        /* ============================================
+           MEJORAS AVANZADAS - NIVEL DIOS DE LA WEB
+           ============================================ */
+        
+        /* 1. TICKER DE METALES - LA BARRA DE AUTORIDAD (Cyber-Industrial) */
+        .ticker-metales {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 1px solid rgba(0, 242, 255, 0.3);
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 8px 0;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            z-index: 998;
+        }
+        
+        .ticker-wrapper {
+            display: inline-block;
+            animation: ticker-scroll 30s linear infinite;
+        }
+        
+        .ticker-item {
+            display: inline-block;
+            padding: 0 40px;
+            color: #e0e0e0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .ticker-item span {
+            color: #00f2ff; /* Tu cian de marca */
+            font-weight: bold;
+        }
+        
+        .ticker-item small {
+            margin-left: 8px;
+        }
+        
+        .ticker-item small.up {
+            color: #00ff88;
+        }
+        
+        .ticker-item small.down {
+            color: #ff4444;
+        }
+        
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        /* 2. BUSCADOR "CIBER-INDUSTRIAL" - BORDE DINÁMICO CON DEGRADADO ANIMADO */
+        .scanner-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .scanner-wrapper {
+            position: relative;
+            border-radius: 12px;
+            overflow: visible;
+        }
+        
+        /* Efecto border-beam animado */
+        .scanner-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 12px;
+            padding: 2px;
+            background: linear-gradient(45deg, #00f2ff, #0066ff, #00f2ff, #00d4ff);
+            background-size: 300% 300%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            animation: border-beam 3s linear infinite;
+            z-index: -1;
+        }
+        
+        @keyframes border-beam {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .scanner-wrapper.active::before {
+            animation: border-beam 1.5s linear infinite;
+        }
+        
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* Líneas de escaneo animadas */
+        .scan-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00f2ff, transparent);
+            animation: scan-move 2s linear infinite;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.8);
+        }
+        
+        @keyframes scan-move {
+            0% { top: 0; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        
+        /* Números decorativos flotantes */
+        .data-stream {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+        
+        .data-bit {
+            position: absolute;
+            color: rgba(0, 242, 255, 0.3);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            animation: float-data 4s ease-in-out infinite;
+        }
+        
+        @keyframes float-data {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            50% { transform: translateY(-20px) translateX(10px); opacity: 0.6; }
+        }
+        
+        /* Efecto de borde pulsante cuando está activo */
+        .scanner-wrapper.active::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00f2ff, #00d4ff, #00f2ff);
+            border-radius: 12px;
+            z-index: -1;
+            animation: border-glow 2s linear infinite;
+            background-size: 200% 200%;
+        }
+        
+        @keyframes border-glow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* 3. TARJETAS "GRADO CERTIFICADO" CON GLASSMORPHISM - EFECTO CRISTAL NEÓN */
+        .certified-card {
+            background: linear-gradient(135deg, rgba(20, 26, 35, 0.8), rgba(10, 14, 20, 0.9));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 242, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+        }
+        
+        .certified-card:hover {
+            border: 1px solid #00f2ff;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4), 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            transform: translateY(-5px);
+        }
+        
+        /* Tarjetas de resultados mejoradas */
+        .card-catalitico {
+            background: linear-gradient(135deg, rgba(20, 26, 35, 0.8), rgba(10, 14, 20, 0.9));
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            transition: all 0.4s ease;
+        }
+        
+        .card-catalitico:hover {
+            border: 1px solid #00f2ff;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            transform: translateY(-5px);
+        }
+        
+        .resultado-catalitico, .result-item {
+            background: linear-gradient(135deg, rgba(20, 26, 35, 0.8), rgba(10, 14, 20, 0.9));
+            backdrop-filter: blur(4px);
+        }
+        
+        .certified-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00f2ff, #00d4ff, #00f2ff);
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .certified-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(0, 242, 255, 0.2), rgba(0, 212, 255, 0.1));
+            border: 1px solid rgba(0, 242, 255, 0.4);
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            color: #00f2ff;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+        }
+        
+        .btn-vender-ahora {
+            background: linear-gradient(135deg, #00f2ff 0%, #0066ff 100%);
+            color: #0a0e14;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+            font-family: 'Roboto Mono', monospace;
+            border: 1px solid rgba(0, 242, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            margin-top: 1rem;
+        }
+        
+        .btn-vender-ahora:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            background: linear-gradient(135deg, #00d4ff 0%, #0052cc 100%);
+        }
+        
+        /* 4. EFECTO PARALLAX PARA IMÁGENES */
+        .parallax-image {
+            transition: transform 0.3s ease-out;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        /* 5. BORDER-RADIUS MÍNIMO 12px EN TODO */
+        .header {
+            border-radius: 0 0 12px 12px;
+        }
+        
+        .logo-ar {
+            border-radius: 12px;
+        }
+        
+        .btn-whatsapp-header {
+            border-radius: 12px;
+        }
+        
+        .btn-primary, .btn-secondary {
+            border-radius: 12px;
+        }
+        
+        .search-panel {
+            border-radius: 16px;
+        }
+        
+        .resultado-catalitico, .result-item {
+            border-radius: 12px;
+        }
+        
+        .btn-ver {
+            border-radius: 12px;
+        }
+        
+        /* 6. SOMBRAS DE NEÓN EN CONTENEDORES PRINCIPALES */
+        .search-panel {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 242, 255, 0.2), inset 0 1px 0 rgba(0, 242, 255, 0.1);
+        }
+        
+        .hero-left {
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
+        }
+        
+        .feature-card {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 242, 255, 0.1);
+        }
+        
+        /* 7. MICRO-ANIMACIONES EN BOTONES */
+        .btn-primary, .btn-secondary, .btn-ver, .btn-vender-ahora {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .btn-primary:hover, .btn-secondary:hover, .btn-ver:hover, .btn-vender-ahora:hover {
+            transform: scale(1.05);
+        }
+        
+        .resultado-catalitico:hover, .result-item:hover {
+            transform: scale(1.02);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+        
+        /* Ajuste de padding para el ticker superior */
+        body {
+            padding-top: 118px;
+        }
+        
+        /* ============================================
+           EFECTOS AVANZADOS - NIVEL INIGUALABLE
+           ============================================ */
+        
+        /* 1. BUSCADOR HOLOGRÁFICO - GLASSMORPHISM EXTREMO */
+        .reactor-core {
+            position: relative;
+            background: radial-gradient(circle, rgba(0,242,255,0.05) 0%, rgba(0,0,0,1) 70%);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            overflow: hidden;
+        }
+        
+        .reactor-core::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.1) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .reactor-core:hover::before {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.2) 0%, transparent 70%);
+        }
+        
+        /* Efecto de brillo que sigue al cursor */
+        .holographic-glow {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            filter: blur(20px);
+            z-index: 1;
+        }
+        
+        .reactor-core:hover .holographic-glow {
+            opacity: 1;
+        }
+        
+        /* Pulso de luz al escribir */
+        .search-input:focus {
+            animation: pulse-light 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-light {
+            0%, 100% { box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.2), 0 0 25px rgba(0, 242, 255, 0.5); }
+            50% { box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.4), 0 0 40px rgba(0, 242, 255, 0.8); }
+        }
+        
+        /* 2. SCANNER-OVERLAY EN RESULTADOS - LÍNEA LÁSER */
+        .scanner-overlay-result {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scanner-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #00f2ff;
+            box-shadow: 0 0 15px #00f2ff, 0 0 30px #00f2ff;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            opacity: 0;
+        }
+        
+        @keyframes scanning {
+            0% { top: 0%; opacity: 1; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        
+        .is-scanning .scanner-line {
+            animation: scanning 2s ease-in-out;
+        }
+        
+        /* Números que cambian rápidamente durante el escaneo */
+        .price-roller {
+            display: inline-block;
+            min-width: 100px;
+            text-align: center;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.5rem;
+            color: #00f2ff;
+            font-weight: 700;
+        }
+        
+        .price-roller.rolling {
+            animation: number-roll 1.5s ease-out;
+        }
+        
+        @keyframes number-roll {
+            0% { transform: translateY(0); opacity: 1; }
+            25% { transform: translateY(-20px); opacity: 0.5; }
+            50% { transform: translateY(-40px); opacity: 0.3; }
+            75% { transform: translateY(-20px); opacity: 0.5; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* 3. TARJETA "NIVEL PLATINO" - ACERO CEPILLADO */
+        .card-platinum {
+            background: linear-gradient(135deg, 
+                rgba(200, 200, 200, 0.1) 0%, 
+                rgba(100, 100, 100, 0.05) 25%,
+                rgba(200, 200, 200, 0.1) 50%,
+                rgba(100, 100, 100, 0.05) 75%,
+                rgba(200, 200, 200, 0.1) 100%);
+            background-size: 200% 200%;
+            animation: brushed-steel 3s linear infinite;
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        @keyframes brushed-steel {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        
+        /* Insignia 3D Dinámica */
+        .lme-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700, #ffed4e, #ffd700);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.85rem;
+            color: #000;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate-3d 10s linear infinite;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+        
+        @keyframes rotate-3d {
+            0%, 100% { transform: perspective(500px) rotateY(0deg) rotateX(5deg); }
+            25% { transform: perspective(500px) rotateY(90deg) rotateX(5deg); }
+            50% { transform: perspective(500px) rotateY(180deg) rotateX(5deg); }
+            75% { transform: perspective(500px) rotateY(270deg) rotateX(5deg); }
+        }
+        
+        /* Botón con flujo de corriente eléctrica */
+        .btn-tasacion-pro {
+            position: relative;
+            padding: 15px 30px;
+            background: #000;
+            color: #00f2ff;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 1px solid #00f2ff;
+            overflow: hidden;
+            transition: 0.5s;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+            font-family: 'Roboto Mono', monospace;
+            border-radius: 12px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-tasacion-pro:hover {
+            color: #000;
+            background: #00f2ff;
+            box-shadow: 0 0 50px #00f2ff;
+        }
+        
+        .btn-tasacion-pro::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-tasacion-pro:hover::before {
+            left: 100%;
+        }
+        
+        /* Efecto de corriente eléctrica en los bordes */
+        .btn-tasacion-pro::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00f2ff, #0066ff, #00f2ff, #00d4ff);
+            background-size: 400% 400%;
+            border-radius: 12px;
+            z-index: -1;
+            opacity: 0;
+            animation: electric-flow 2s linear infinite;
+            filter: blur(4px);
+        }
+        
+        .btn-tasacion-pro:hover::after {
+            opacity: 1;
+        }
+        
+        @keyframes electric-flow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        
+        /* 4. CÁMARA DE TASACIÓN - WIDGET FICHA TÉCNICA */
+        .metal-composition {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+        }
+        
+        .metal-item {
+            margin-bottom: 1rem;
+        }
+        
+        .metal-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .metal-name {
+            color: #00f2ff;
+            font-weight: 700;
+        }
+        
+        .metal-amount {
+            color: #e0e0e0;
+        }
+        
+        .metal-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 242, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .metal-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f2ff, #00d4ff);
+            border-radius: 4px;
+            transition: width 1s ease-out;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+        }
+        
+        /* Código de Bloqueo de Precio - Golden Ticket */
+        .golden-ticket {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .golden-ticket::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            animation: golden-shine 3s linear infinite;
+        }
+        
+        @keyframes golden-shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .price-lock-code {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            margin: 1rem 0;
+            letter-spacing: 0.2em;
+        }
+        
+        .lock-message {
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            font-family: 'Roboto Mono', monospace;
+            margin-top: 0.5rem;
+        }
+        
+        .features-section {
+            margin-bottom: 3rem;
+        }
+        
+        /* 5. GLOW AMBIENTAL - CÍRCULOS DE LUZ DESENFOCADOS */
+        .ambient-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+            animation: float-glow 20s ease-in-out infinite;
+        }
+        
+        .glow-cyan {
+            background: radial-gradient(circle, #00f2ff 0%, transparent 70%);
+            top: 20%;
+            left: 10%;
+        }
+        
+        .glow-blue {
+            background: radial-gradient(circle, #0066ff 0%, transparent 70%);
+            bottom: 20%;
+            right: 10%;
+            animation-delay: -10s;
+        }
+        
+        @keyframes float-glow {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        
+        /* ============================================
+           TOQUE FINAL - INSIGNIA ATLANTA SHIELD
+           ============================================ */
+        
+        /* Insignia de Certificación "Atlanta Shield" */
+        .insignia-atlanta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 20px;
+            background: rgba(0, 242, 255, 0.1);
+            border: 2px solid #00f2ff;
+            border-radius: 50px;
+            color: #00f2ff;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2), inset 0 0 10px rgba(0, 242, 255, 0.1);
+            animation: glow-pulse 2s infinite alternate;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Roboto Mono', monospace;
+            margin-bottom: 1rem;
+        }
+        
+        /* Doble borde neón */
+        .insignia-atlanta::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border: 1px solid rgba(0, 242, 255, 0.5);
+            border-radius: 50px;
+            z-index: -1;
+            animation: neon-pulse 2s infinite alternate;
+        }
+        
+        @keyframes glow-pulse {
+            from { 
+                box-shadow: 0 0 5px rgba(0, 242, 255, 0.2), inset 0 0 10px rgba(0, 242, 255, 0.1);
+            }
+            to { 
+                box-shadow: 0 0 15px rgba(0, 242, 255, 0.5), inset 0 0 15px rgba(0, 242, 255, 0.2);
+            }
+        }
+        
+        @keyframes neon-pulse {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+        
+        /* Brillo metálico circular en el texto */
+        .insignia-atlanta::after {
+            content: 'PRECIO GARANTIZADO - ATLANTA RECICLAJES';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.3) 25%, 
+                rgba(255, 255, 255, 0.5) 50%, 
+                rgba(255, 255, 255, 0.3) 75%, 
+                transparent 100%);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: metallic-shine 3s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes metallic-shine {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        /* Cursor Personalizado - Mira Telescópica Cian (Desktop) */
+        body {
+            cursor: default;
+        }
+        
+        /* Cursor personalizado para la sección de catalíticos (solo desktop) */
+        @media (hover: hover) and (pointer: fine) {
+            .hero-section *,
+            .search-panel *,
+            .resultado-catalitico *,
+            .certified-card *,
+            .card-catalitico *,
+            .btn-tasacion,
+            .btn-tasacion-pro,
+            .btn-vender-ahora,
+            .search-input,
+            .scanner-wrapper,
+            .reactor-core * {
+                cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="%2300f2ff" stroke-width="2" opacity="0.8"/><circle cx="12" cy="12" r="3" fill="none" stroke="%2300f2ff" stroke-width="1.5" opacity="0.9"/><line x1="12" y1="4" x2="12" y2="1" stroke="%2300f2ff" stroke-width="2" opacity="0.8"/><line x1="12" y1="23" x2="12" y2="20" stroke="%2300f2ff" stroke-width="2" opacity="0.8"/><line x1="4" y1="12" x2="1" y2="12" stroke="%2300f2ff" stroke-width="2" opacity="0.8"/><line x1="23" y1="12" x2="20" y2="12" stroke="%2300f2ff" stroke-width="2" opacity="0.8"/></svg>') 12 12, crosshair;
+            }
+        }
+        
+        /* Cursor pointer para botones y enlaces */
+        a, button, .btn-tasacion, .btn-tasacion-pro, .btn-vender-ahora {
+            cursor: pointer !important;
+        }
+        
+        /* 1. TOQUE DE REALIDAD AUMENTADA - MOBILE FIRST */
+        /* Anillo de pulsación para pantallas táctiles */
+        .touch-pulse-ring {
+            position: absolute;
+            border: 3px solid #00f2ff;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .touch-pulse-ring.active {
+            opacity: 1;
+            transform: scale(2);
+            animation: touch-pulse 0.6s ease-out;
+        }
+        
+        @keyframes touch-pulse {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+        
+        /* Pulso de luz más intenso en móvil */
+        @media (max-width: 768px) {
+            .search-input:focus,
+            .scanner-wrapper.active {
+                box-shadow: 0 0 0 4px rgba(0, 242, 255, 0.4), 0 0 40px rgba(0, 242, 255, 0.8), 0 0 60px rgba(0, 242, 255, 0.6) !important;
+            }
+            
+            .reactor-core:hover::before {
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, rgba(0, 242, 255, 0.3) 0%, transparent 70%);
+            }
+        }
+        
+        /* Filtro de Contraste y Afilado para Imágenes */
+        .parallax-image img,
+        .certified-card img,
+        .result-card img {
+            filter: contrast(1.2) brightness(1.1) saturate(1.3);
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        
+        /* Efecto de afilado adicional con CSS */
+        .parallax-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, 
+                rgba(0, 242, 255, 0.05) 0%, 
+                transparent 50%, 
+                rgba(0, 242, 255, 0.05) 100%);
+            pointer-events: none;
+            mix-blend-mode: overlay;
+            border-radius: 12px;
+        }
+        
+        /* 3. OPTIMIZACIÓN DE CARGA - PERFORMANCE HERO */
+        /* GPU Acceleration para elementos animados */
+        .scanner-wrapper,
+        .scanner-line,
+        .price-roller,
+        .metal-bar-fill,
+        .ambient-glow,
+        .ticker-wrapper,
+        .lme-badge,
+        .insignia-atlanta,
+        .parallax-image,
+        .certified-card,
+        .card-platinum {
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+        
+        /* Optimizar backdrop-filter solo cuando sea necesario */
+        @media (prefers-reduced-motion: no-preference) {
+            .search-panel,
+            .certified-card,
+            .card-catalitico {
+                will-change: transform, opacity;
+            }
+        }
+        
+        /* Reducir efectos en dispositivos de bajo rendimiento */
+        @media (prefers-reduced-motion: reduce) {
+            .scanner-line,
+            .price-roller,
+            .metal-bar-fill,
+            .ambient-glow,
+            .ticker-wrapper,
+            .lme-badge,
+            .insignia-atlanta {
+                animation: none !important;
+            }
+        }
+        
+        /* Etiqueta de tiempo real LME */
+        .lme-timestamp {
+            display: inline-block;
+            font-size: 0.7rem;
+            color: rgba(0, 242, 255, 0.7);
+            font-family: 'Roboto Mono', monospace;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(0, 242, 255, 0.05);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 8px;
+            letter-spacing: 0.05em;
+        }
     </style>
 </head>
-<body class="min-h-screen text-white font-sans">
-  <div class="max-w-3xl mx-auto py-12 px-4">
-    <div class="text-center mb-8">
-      <a href="{% url 'reciclaje:catalogo_chatarra' %}" class="text-cyan-300 text-sm">&larr; Volver</a>
-      <h1 class="text-3xl md:text-4xl font-bold neon mt-4 mb-2">Precio de tu Catalítico</h1>
-      <p class="text-cyan-200">Ingresa el código, marca o modelo para consultar el precio referencial de compra.</p>
-    </div>
-
-    <form method="get" class="glass p-6 mb-8">
-      <div class="flex flex-col sm:flex-row gap-3">
-        <input
-          type="text"
-          name="codigo"
-          value="{{ codigo }}"
-          placeholder="Código, marca o modelo del catalítico"
-          class="search-input flex-1 rounded-lg px-4 py-3 text-lg"
-          autofocus
-        >
-        <button type="submit" class="futur-btn rounded-lg px-6 py-3 text-lg">Buscar</button>
-      </div>
-    </form>
-
-    {% if resultado %}
-      <div class="glass p-8 mb-6">
-        <div class="text-2xl font-bold neon mb-1">{{ resultado.codigo }}</div>
-        <div class="text-cyan-300 mb-4">{{ resultado.nombre }} {% if resultado.marca_vehiculo %}&mdash; {{ resultado.marca_vehiculo }} {{ resultado.modelo_vehiculo }}{% endif %}</div>
-        <div class="border-l-4 border-cyan-400 pl-4 mb-6">
-          <div class="text-cyan-300 text-sm">Precio referencial de compra</div>
-          {% if resultado.precio_venta %}
-            <div class="text-4xl font-bold">${{ resultado.precio_venta|floatformat:0 }}</div>
-          {% else %}
-            <div class="text-xl">Precio a convenir &mdash; consúltanos por WhatsApp</div>
-          {% endif %}
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-container">
+                <img src="{% static 'img/reciclaje/logo_atlanta.png' %}" alt="Atlanta Reciclajes" style="height: 50px; width: auto;">
+                <span class="logo-text">Atlanta Reciclajes</span>
+            </div>
+            <nav class="nav-links">
+                <a href="/">Inicio</a>
+                <a href="{% url 'reciclaje:consulta_catalitico' %}">Catalíticos</a>
+                <a href="{% url 'reciclaje:catalogo_chatarra' %}">Chatarra electrónica</a>
+                <a href="#">Contacto</a>
+                <a href="/accounts/login/" class="btn-empleados">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                    Ingreso Empleados
+                </a>
+                <a href="https://wa.me/56963607348?text=¡Hola!%20Quiero%20cotizar%20mi%20catalítico" target="_blank" class="btn-whatsapp-header">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                    Cotiza por WhatsApp
+                </a>
+            </nav>
         </div>
-        <a href="https://wa.me/56963607348?text=Hola,%20quiero%20vender%20mi%20catalítico%20{{ resultado.codigo }}" class="whatsapp-btn inline-block rounded-lg px-6 py-3 font-bold">
-          📱 Cotizar por WhatsApp
-        </a>
-      </div>
-    {% elif resultados %}
-      <div class="mb-4 text-cyan-200">Se encontraron {{ resultados|length }} catalíticos:</div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {% for c in resultados %}
-        <a href="{% url 'reciclaje:detalle_catalitico' c.pk %}" class="glass p-4 block hover:scale-105 transition-transform">
-          <div class="font-bold neon">{{ c.codigo }}</div>
-          <div class="text-cyan-300 text-sm">{{ c.nombre }} {% if c.marca_vehiculo %}&mdash; {{ c.marca_vehiculo }} {{ c.modelo_vehiculo }}{% endif %}</div>
-          {% if c.precio_venta %}<div class="mt-2 font-semibold">${{ c.precio_venta|floatformat:0 }}</div>{% endif %}
-        </a>
-        {% endfor %}
-      </div>
-    {% elif sin_resultado %}
-      <div class="glass p-6 text-center">
-        <p class="mb-4">No encontramos ese código en nuestro catálogo. Aún así, podemos cotizar tu catalítico directamente.</p>
-        <a href="https://wa.me/56963607348?text=Hola,%20quiero%20cotizar%20un%20catalítico" class="whatsapp-btn inline-block rounded-lg px-6 py-3 font-bold">
-          📱 Cotizar por WhatsApp
-        </a>
-      </div>
-    {% endif %}
-  </div>
+        
+        <!-- Ticker de Metales Futurista -->
+        <div class="ticker-metales-container">
+            <div class="ticker-wrapper" id="ticker-wrapper">
+                {% if precio_metal_actual and precio_metal_actual.platino_clp_gramo > 0 %}
+                    <!-- Primera pasada -->
+                    <div class="ticker-item">
+                        <span>PLATINO</span>
+                        <span class="ticker-precio" data-precio="{{ precio_metal_actual.platino_clp_gramo }}">${{ precio_metal_actual.platino_clp_gramo|floatformat:0|intcomma }}/gr</span>
+                        <span class="ticker-variacion up" data-metal="platino">
+                            <span class="variacion-simbolo">▲</span>
+                            <span class="variacion-valor">0.00%</span>
+                        </span>
+                    </div>
+                    <span class="ticker-separator">|</span>
+                    <div class="ticker-item">
+                        <span>PALADIO</span>
+                        <span class="ticker-precio" data-precio="{{ precio_metal_actual.paladio_clp_gramo }}">${{ precio_metal_actual.paladio_clp_gramo|floatformat:0|intcomma }}/gr</span>
+                        <span class="ticker-variacion up" data-metal="paladio">
+                            <span class="variacion-simbolo">▲</span>
+                            <span class="variacion-valor">0.00%</span>
+                        </span>
+                    </div>
+                    <span class="ticker-separator">|</span>
+                    {% if precio_metal_actual.rodio_clp_gramo and precio_metal_actual.rodio_clp_gramo > 0 %}
+                    <div class="ticker-item">
+                        <span>RODIO</span>
+                        <span class="ticker-precio" data-precio="{{ precio_metal_actual.rodio_clp_gramo }}">${{ precio_metal_actual.rodio_clp_gramo|floatformat:0|intcomma }}/gr</span>
+                        <span class="ticker-variacion up" data-metal="rodio">
+                            <span class="variacion-simbolo">▲</span>
+                            <span class="variacion-valor">0.00%</span>
+                        </span>
+                    </div>
+                    <span class="ticker-separator">|</span>
+                    {% endif %}
+                    <!-- Duplicar para scroll infinito -->
+                    <div class="ticker-item">
+                        <span>PLATINO</span>
+                        <span class="ticker-precio" data-precio="{{ precio_metal_actual.platino_clp_gramo }}">${{ precio_metal_actual.platino_clp_gramo|floatformat:0|intcomma }}/gr</span>
+                        <span class="ticker-variacion up" data-metal="platino">
+                            <span class="variacion-simbolo">▲</span>
+                            <span class="variacion-valor">0.00%</span>
+                        </span>
+                    </div>
+                    <span class="ticker-separator">|</span>
+                    <div class="ticker-item">
+                        <span>PALADIO</span>
+                        <span class="ticker-precio" data-precio="{{ precio_metal_actual.paladio_clp_gramo }}">${{ precio_metal_actual.paladio_clp_gramo|floatformat:0|intcomma }}/gr</span>
+                        <span class="ticker-variacion up" data-metal="paladio">
+                            <span class="variacion-simbolo">▲</span>
+                            <span class="variacion-valor">0.00%</span>
+                        </span>
+                    </div>
+                    <span class="ticker-separator">|</span>
+                    {% if precio_metal_actual.rodio_clp_gramo and precio_metal_actual.rodio_clp_gramo > 0 %}
+                    <div class="ticker-item">
+                        <span>RODIO</span>
+                        <span class="ticker-precio" data-precio="{{ precio_metal_actual.rodio_clp_gramo }}">${{ precio_metal_actual.rodio_clp_gramo|floatformat:0|intcomma }}/gr</span>
+                        <span class="ticker-variacion up" data-metal="rodio">
+                            <span class="variacion-simbolo">▲</span>
+                            <span class="variacion-valor">0.00%</span>
+                        </span>
+                    </div>
+                    <span class="ticker-separator">|</span>
+                    {% endif %}
+                {% else %}
+                    <!-- Valores de ejemplo cuando no hay datos (actualizados según precios spot enero 2026) -->
+                    <div class="ticker-item">
+                        <span>PLATINO</span>
+                        <span class="ticker-precio" data-precio="70250">$70,250/gr</span>
+                        <span class="ticker-variacion up" data-metal="platino">
+                            <span class="variacion-simbolo">▲</span>
+                            <span class="variacion-valor">0.00%</span>
+                        </span>
+                    </div>
+                    <span class="ticker-separator">|</span>
+                    <div class="ticker-item">
+                        <span>PALADIO</span>
+                        <span class="ticker-precio" data-precio="56200">$56,200/gr</span>
+                        <span class="ticker-variacion up" data-metal="paladio">
+                            <span class="variacion-simbolo">▲</span>
+                            <span class="variacion-valor">0.00%</span>
+                        </span>
+                    </div>
+                    <span class="ticker-separator">|</span>
+                    <div class="ticker-item">
+                        <span>RODIO</span>
+                        <span class="ticker-precio" data-precio="299000">$299,000/gr</span>
+                        <span class="ticker-variacion up" data-metal="rodio">
+                            <span class="variacion-simbolo">▲</span>
+                            <span class="variacion-valor">0.00%</span>
+                        </span>
+                    </div>
+                    <span class="ticker-separator">|</span>
+                    <!-- Duplicar para scroll infinito -->
+                    <div class="ticker-item">
+                        <span>PLATINO</span>
+                        <span class="ticker-precio" data-precio="70250">$70,250/gr</span>
+                        <span class="ticker-variacion up" data-metal="platino">
+                            <span class="variacion-simbolo">▲</span>
+                            <span class="variacion-valor">0.00%</span>
+                        </span>
+                    </div>
+                    <span class="ticker-separator">|</span>
+                    <div class="ticker-item">
+                        <span>PALADIO</span>
+                        <span class="ticker-precio" data-precio="56200">$56,200/gr</span>
+                        <span class="ticker-variacion up" data-metal="paladio">
+                            <span class="variacion-simbolo">▲</span>
+                            <span class="variacion-valor">0.00%</span>
+                        </span>
+                    </div>
+                    <span class="ticker-separator">|</span>
+                    <div class="ticker-item">
+                        <span>RODIO</span>
+                        <span class="ticker-precio" data-precio="299000">$299,000/gr</span>
+                        <span class="ticker-variacion up" data-metal="rodio">
+                            <span class="variacion-simbolo">▲</span>
+                            <span class="variacion-valor">0.00%</span>
+                        </span>
+                    </div>
+                    <span class="ticker-separator">|</span>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Glow Ambiental - Círculos de Luz -->
+    <div class="ambient-glow glow-cyan"></div>
+    <div class="ambient-glow glow-blue"></div>
+
+    <!-- Hero Section -->
+    <div class="hero-bg"></div>
+    <section class="hero-section">
+        <div class="hero-left">
+            <p class="hero-subtitle">Convertidores Catalíticos • Tasación transparente desde 2005</p>
+            <h1 class="hero-title">
+                Compra inmediata con<br><span class="highlight">precios reales.</span>
+            </h1>
+            <p class="hero-description" style="color: #ffffff; font-size: 1rem;">
+                Tasamos justa y transparentemente desde 2005
+            </p>
+            <div class="hero-buttons">
+                <a href="#buscar" class="btn-primary">Consultar precios Ahora</a>
+                <a href="/" class="btn-secondary" style="display: none;">Conocer más</a>
+            </div>
+        </div>
+
+        <!-- Search Panel - Cámara de Tasación -->
+        <div class="search-panel reactor-core" id="buscar">
+            <div class="holographic-glow" id="holographic-glow"></div>
+            <h2 class="search-title">🔍 Ingresa código o modelo de catalítico</h2>
+            <p class="search-description" id="search-hint">
+                {% if sin_resultado %}
+                    Intenta con otro código o escríbenos para evaluarlo.
+                {% elif resultado %}
+                    Resultado para tu consulta.
+                {% else %}
+                    Busca por código, marca, modelo o descripción para ver el valor referencial.
+                {% endif %}
+            </p>
+            
+            <form method="get" action="{% url 'reciclaje:consulta_catalitico' %}" id="search-form">
+                <div class="scanner-container" style="position: relative;">
+                    <div class="touch-pulse-ring" id="touch-pulse-ring"></div>
+                    <div class="scanner-wrapper" id="scanner-wrapper">
+                        <div class="scanner-overlay">
+                            <div class="scan-line"></div>
+                            <div class="data-stream" id="data-stream"></div>
+                        </div>
+                        <div class="search-input-container">
+                            <div class="search-icon-lupa">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                            </div>
+                            <input 
+                                type="text" 
+                                name="codigo" 
+                                id="codigo" 
+                                class="search-input search-input-hero" 
+                                placeholder="Ej: GM-123, Ford Ranger 2018, Peugeot"
+                                value="{{ codigo|default:'' }}"
+                                autocomplete="off"
+                                autofocus
+                                aria-autocomplete="list"
+                                aria-controls="sugerencias-live"
+                                role="combobox"
+                            >
+                            <div id="sugerencias-live" class="sugerencias-live" role="listbox" aria-label="Sugerencias de búsqueda" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            {% if sin_resultado %}
+                <div class="estado-sin-resultado">
+                    <span class="estado-icono">❌</span>
+                    <p>No encontramos ese catalítico. Escríbenos y lo evaluamos.</p>
+                    <a href="https://wa.me/56963607348?text=Hola%20Atlanta%20Reciclajes%2C%20tengo%20un%20catal%C3%ADtico%20que%20no%20aparece%20en%20la%20web.%20%C2%BFC%C3%B3mo%20lo%20puedo%20evaluar%3F" target="_blank" class="btn-whatsapp-consulta">Consultar por WhatsApp</a>
+                </div>
+            {% endif %}
+
+            {% if resultados and not resultado %}
+                <div class="resultados-multiples" id="resultados-multiples">
+                    <p class="resultados-multiples-titulo">Se encontraron {{ resultados|length }} resultado{{ resultados|length|pluralize }}</p>
+                    <div class="resultados-grid">
+                        {% for r in resultados %}
+                        <a href="{% url 'reciclaje:consulta_catalitico' %}?codigo={{ r.codigo|urlencode }}" class="resultado-mini-card">
+                            <div class="resultado-mini-imagen">
+                                {% if r.imagen %}
+                                <img src="{{ r.imagen.url }}" alt="{{ r.codigo }}" loading="lazy">
+                                {% else %}
+                                <div class="resultado-imagen-placeholder"><span>Sin imagen</span></div>
+                                {% endif %}
+                            </div>
+                            <div class="resultado-mini-info">
+                                <strong>{{ r.codigo }}</strong>
+                                <span>{{ r.nombre|default:"Catalizador"|truncatewords:6 }}</span>
+                                {% if r.precio_venta %}
+                                <span class="resultado-mini-precio">${{ r.precio_venta|floatformat:0|intcomma }} CLP</span>
+                                {% endif %}
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% elif resultado %}
+                <div class="resultado-card-ux" id="result-card">
+                    <!-- 1. Identificación -->
+                    <div class="resultado-identificacion">
+                        <h3 class="resultado-codigo">{{ resultado.codigo }}</h3>
+                        <p class="resultado-descripcion">{{ resultado.nombre|default:"Catalizador" }}</p>
+                    </div>
+
+                    <!-- 2. Precio de compra (lo que se paga al cliente) -->
+                    <div class="resultado-precio-bloque">
+                        <span class="resultado-precio-label">💰 Precio de compra</span>
+                        <span class="resultado-precio-valor {% if not resultado.precio_venta %}resultado-precio-sin-valor{% endif %}" id="price-roller">
+                            {% if resultado.precio_venta %}
+                                $<span class="precio-miles">{{ resultado.precio_venta|floatformat:0|intcomma }}</span> CLP
+                            {% else %}
+                                Precio a confirmar según estado y mercado
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <!-- 3. Contenido estimado -->
+                    <div class="resultado-contenido">
+                        <span class="resultado-contenido-label">📊 Contenido estimado</span>
+                        <span class="resultado-contenido-valores">Pt / Pd / Rh</span>
+                    </div>
+                    
+                    <!-- 4. Micro-copy confianza -->
+                    <div class="resultado-microcopy">
+                        <p>✔ Empresa con base en Santiago – 10 de Julio</p>
+                        <p>✔ Compra directa – pago seguro</p>
+                        <p>✔ Precio sujeto a mercado internacional de metales</p>
+                    </div>
+                    
+                    <!-- 5. CTA WhatsApp dominante -->
+                    <div class="resultado-cta">
+                        {% if resultado.precio_venta %}
+                        <a href="https://wa.me/56963607348?text=Hola%2C%20quiero%20vender%20el%20catal%C3%ADtico%20{{ resultado.codigo|urlencode }}.%20%C2%BFMe%20puedes%20confirmar%20el%20valor%20actual%3F%20Vi%20que%20el%20precio%20de%20compra%20es%20%24{{ resultado.precio_venta|floatformat:0 }}%20CLP." target="_blank" class="btn-whatsapp-cta" id="whatsapp-link">
+                            Vender este catalítico por WhatsApp
+                        </a>
+                        {% else %}
+                        <a href="https://wa.me/56963607348?text=Hola%2C%20quiero%20vender%20el%20catal%C3%ADtico%20{{ resultado.codigo|urlencode }}.%20Este%20catal%C3%ADtico%20requiere%20evaluaci%C3%B3n.%20%C2%BFPueden%20cotizarlo%3F" target="_blank" class="btn-whatsapp-cta" id="whatsapp-link">
+                            Vender este catalítico por WhatsApp
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'reciclaje:consulta_catalitico' %}" class="btn-consultar-otro">Consultar otro código</a>
+                    </div>
+                    
+                    <div class="resultado-imagen" style="margin-top: 1rem;">
+                        {% if resultado.imagen %}
+                        <img src="{{ resultado.imagen.url }}" alt="{{ resultado.codigo }}" loading="lazy" style="max-width:100%; max-height:140px; object-fit:contain; border-radius:12px;">
+                        {% else %}
+                        <div class="resultado-imagen-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            <span>Imagen referencial</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="features-container">
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3 class="feature-title">Pago al Contado</h3>
+                <p class="feature-description">
+                    Transferencia inmediata con trazabilidad y guía de despacho.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Precios Reales</h3>
+                <p class="feature-description">
+                    Tasación basada en cotizaciones internacionales y mercado actual.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <h3 class="feature-title">Cobertura Nacional</h3>
+                <p class="feature-description">
+                    Logística flexible y servicio en todo Chile con retiro a domicilio.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/56963607348?text=¡Hola!%20Quiero%20cotizar%20mi%20catalítico" target="_blank" class="floating-whatsapp" title="Cotizar por WhatsApp">
+        <svg width="32" height="32" fill="white" viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+        </svg>
+    </a>
+
+
+    <script>
+        // Búsqueda en tiempo real (sin pulsar Enter)
+        (function() {
+            var input = document.getElementById('codigo');
+            var dropdown = document.getElementById('sugerencias-live');
+            var baseUrl = '{% url "reciclaje:consulta_catalitico" %}';
+            var apiUrl = '{% url "reciclaje:api_consulta_sugerencias" %}';
+            var debounceTimer = null;
+
+            function hideSuggestions() {
+                if (dropdown) dropdown.style.display = 'none';
+            }
+
+            function showSuggestions(items) {
+                if (!dropdown) return;
+                dropdown.innerHTML = '';
+                if (!items || items.length === 0) { hideSuggestions(); return; }
+                items.forEach(function(r) {
+                    var a = document.createElement('a');
+                    a.href = baseUrl + '?codigo=' + encodeURIComponent(r.codigo);
+                    a.className = 'sugerencia-item';
+                    a.setAttribute('role', 'option');
+                    var html = '<span class="sugerencia-codigo">' + escapeHtml(r.codigo) + '</span>';
+                    if (r.nombre) html += '<div class="sugerencia-desc">' + escapeHtml(r.nombre) + '</div>';
+                    if (r.precio_referencia != null) html += '<div class="sugerencia-precio">$' + formatNumber(Math.round(r.precio_referencia)) + ' CLP</div>';
+                    a.innerHTML = html;
+                    dropdown.appendChild(a);
+                });
+                dropdown.style.display = 'block';
+            }
+
+            function escapeHtml(s) {
+                var div = document.createElement('div');
+                div.textContent = s;
+                return div.innerHTML;
+            }
+            function formatNumber(n) {
+                return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+
+            function fetchSuggestions(term) {
+                if (!term || term.length < 2) { hideSuggestions(); return; }
+                fetch(apiUrl + '?term=' + encodeURIComponent(term))
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        showSuggestions(data.results || []);
+                    })
+                    .catch(function() { hideSuggestions(); });
+            }
+
+            if (input && dropdown) {
+                input.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    var term = input.value.trim();
+                    debounceTimer = setTimeout(function() { fetchSuggestions(term); }, 280);
+                });
+                input.addEventListener('focus', function() {
+                    if (input.value.trim().length >= 2 && dropdown.innerHTML) dropdown.style.display = 'block';
+                });
+                input.addEventListener('blur', function() {
+                    setTimeout(hideSuggestions, 180);
+                });
+            }
+        })();
+
+        // Auto-submit form on Enter
+        document.getElementById('codigo')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('search-form').submit();
+            }
+        });
+
+        // Smooth scroll to search panel
+        document.querySelectorAll('a[href="#buscar"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('buscar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // Scroll automático al resultado o a la lista de resultados si está fuera del viewport
+        var resultCard = document.getElementById('result-card');
+        var resultadosMultiples = document.getElementById('resultados-multiples');
+        var target = resultCard || resultadosMultiples;
+        if (target) {
+            var rect = target.getBoundingClientRect();
+            if (rect.bottom > window.innerHeight || rect.top < 0) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // ============================================
+        // EFECTOS AVANZADOS - ESCÁNER TIPO JARVIS
+        // ============================================
+        
+        const scannerWrapper = document.getElementById('scanner-wrapper');
+        const searchInput = document.getElementById('codigo');
+        const dataStream = document.getElementById('data-stream');
+        
+        // Generar números decorativos flotantes
+        function generateDataBits() {
+            if (!dataStream) return;
+            
+            const bits = ['00101101', '11010010', '01010101', '10101010', '11100011', '00011100'];
+            const positions = [
+                { top: '10%', left: '5%' },
+                { top: '30%', left: '85%' },
+                { top: '50%', left: '10%' },
+                { top: '70%', left: '90%' },
+                { top: '20%', left: '50%' },
+                { top: '80%', left: '40%' }
+            ];
+            
+            bits.forEach((bit, index) => {
+                const dataBit = document.createElement('div');
+                dataBit.className = 'data-bit';
+                dataBit.textContent = bit;
+                dataBit.style.top = positions[index].top;
+                dataBit.style.left = positions[index].left;
+                dataBit.style.animationDelay = `${index * 0.5}s`;
+                dataStream.appendChild(dataBit);
+            });
+        }
+        
+        // Activar escáner cuando el input está enfocado
+        if (searchInput && scannerWrapper) {
+            searchInput.addEventListener('focus', function() {
+                scannerWrapper.classList.add('active');
+                generateDataBits();
+            });
+            
+            searchInput.addEventListener('blur', function() {
+                if (!searchInput.value) {
+                    scannerWrapper.classList.remove('active');
+                }
+            });
+            
+            // Mantener activo si hay valor
+            if (searchInput.value) {
+                scannerWrapper.classList.add('active');
+                generateDataBits();
+            }
+        }
+        
+        // ============================================
+        // EFECTO PARALLAX PARA IMÁGENES
+        // ============================================
+        
+        const parallaxImages = document.querySelectorAll('.parallax-image');
+        
+        parallaxImages.forEach(img => {
+            img.addEventListener('mousemove', function(e) {
+                const rect = img.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const moveX = (x - centerX) / 20;
+                const moveY = (y - centerY) / 20;
+                
+                img.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            });
+            
+            img.addEventListener('mouseleave', function() {
+                img.style.transform = 'translate(0, 0)';
+            });
+        });
+        
+        // Parallax en scroll (opcional)
+        window.addEventListener('scroll', function() {
+            parallaxImages.forEach(img => {
+                const rect = img.getBoundingClientRect();
+                const scrolled = window.pageYOffset;
+                const rate = scrolled * -0.1;
+                img.style.transform = `translateY(${rate}px)`;
+            });
+        });
+        
+        // ============================================
+        // BUSCADOR HOLOGRÁFICO - BRILLO QUE SIGUE AL CURSOR
+        // ============================================
+        
+        const reactorCore = document.querySelector('.reactor-core');
+        const holographicGlow = document.getElementById('holographic-glow');
+        
+        if (reactorCore && holographicGlow) {
+            reactorCore.addEventListener('mousemove', function(e) {
+                const rect = reactorCore.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                holographicGlow.style.left = (x - 50) + 'px';
+                holographicGlow.style.top = (y - 50) + 'px';
+            });
+            
+            reactorCore.addEventListener('mouseleave', function() {
+                holographicGlow.style.opacity = '0';
+            });
+            
+            reactorCore.addEventListener('mouseenter', function() {
+                holographicGlow.style.opacity = '1';
+            });
+        }
+        
+        // ============================================
+        // SCANNER-OVERLAY Y ANIMACIÓN DE PRECIO
+        // ============================================
+        
+        const resultCard = document.getElementById('result-card');
+        const priceRoller = document.getElementById('price-roller');
+        
+        // ============================================
+        // SONIDO DE INTERFAZ - FEEDBACK AUDITIVO
+        // ============================================
+        
+        function playInterfaceSound(type) {
+            // Crear contexto de audio
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            if (type === 'scan') {
+                // Sonido de escaneo - "hum" electrónico
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.3);
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } else if (type === 'success') {
+                // Sonido de éxito - "click" metálico
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            }
+        }
+        
+        if (resultCard && priceRoller) {
+            // Activar animación de escaneo al cargar
+            setTimeout(() => {
+                // Reproducir sonido de escaneo
+                try {
+                    playInterfaceSound('scan');
+                } catch(e) {
+                    // Silenciar error si el navegador no soporta audio
+                }
+                
+                resultCard.classList.add('is-scanning');
+                priceRoller.classList.add('rolling');
+                
+                // Simular números cambiando durante el escaneo
+                const finalPrice = priceRoller.textContent;
+                const numbers = ['$125,000', '$98,500', '$142,300', '$156,800', finalPrice];
+                let currentIndex = 0;
+                
+                const numberInterval = setInterval(() => {
+                    if (currentIndex < numbers.length - 1) {
+                        priceRoller.textContent = numbers[currentIndex];
+                        currentIndex++;
+                    } else {
+                        clearInterval(numberInterval);
+                        priceRoller.textContent = finalPrice;
+                        priceRoller.classList.remove('rolling');
+                    }
+                }, 300);
+                
+                // Remover clase de escaneo después de la animación
+                setTimeout(() => {
+                    resultCard.classList.remove('is-scanning');
+                    // Reproducir sonido de éxito
+                    try {
+                        playInterfaceSound('success');
+                    } catch(e) {
+                        // Silenciar error si el navegador no soporta audio
+                    }
+                }, 2000);
+            }, 100);
+        }
+        
+        // Sonido al hacer clic en botones de tasación
+        document.querySelectorAll('.btn-tasacion, .btn-tasacion-pro, .btn-vender-ahora').forEach(btn => {
+            btn.addEventListener('click', function() {
+                try {
+                    playInterfaceSound('success');
+                } catch(e) {
+                    // Silenciar error
+                }
+            });
+        });
+        
+        // ============================================
+        // ANIMACIÓN DE BARRAS DE METALES
+        // ============================================
+        
+        const metalBars = document.querySelectorAll('.metal-bar-fill');
+        if (metalBars.length > 0) {
+            setTimeout(() => {
+                metalBars.forEach((bar, index) => {
+                    setTimeout(() => {
+                        const width = bar.style.width;
+                        bar.style.width = '0%';
+                        setTimeout(() => {
+                            bar.style.width = width;
+                        }, 100);
+                    }, index * 200);
+                });
+            }, 500);
+        }
+        
+        // ============================================
+        // 1. TOQUE DE REALIDAD AUMENTADA - MOBILE FIRST
+        // ============================================
+        
+        const touchPulseRing = document.getElementById('touch-pulse-ring');
+        const scannerContainer = document.querySelector('.scanner-container');
+        
+        // Anillo de pulsación para pantallas táctiles
+        if (touchPulseRing && scannerContainer) {
+            scannerContainer.addEventListener('touchstart', function(e) {
+                const rect = scannerContainer.getBoundingClientRect();
+                const touch = e.touches[0];
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                touchPulseRing.style.left = (x - 30) + 'px';
+                touchPulseRing.style.top = (y - 30) + 'px';
+                touchPulseRing.classList.add('active');
+                
+                setTimeout(() => {
+                    touchPulseRing.classList.remove('active');
+                }, 600);
+            });
+            
+            // También para clicks en móvil
+            scannerContainer.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    const rect = scannerContainer.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    touchPulseRing.style.left = (x - 30) + 'px';
+                    touchPulseRing.style.top = (y - 30) + 'px';
+                    touchPulseRing.classList.add('active');
+                    
+                    setTimeout(() => {
+                        touchPulseRing.classList.remove('active');
+                    }, 600);
+                }
+            });
+        }
+        
+        // ============================================
+        // 2. VALIDACIÓN DE DATOS VIVOS - HORA ACTUAL LME
+        // ============================================
+        
+        function updateLMETimestamp() {
+            const timestampElement = document.getElementById('current-time');
+            if (timestampElement) {
+                const now = new Date();
+                // Convertir a hora de Londres (UTC+0 o UTC+1 según DST)
+                const londonTime = new Date(now.toLocaleString("en-US", {timeZone: "Europe/London"}));
+                const hours = String(londonTime.getHours()).padStart(2, '0');
+                const minutes = String(londonTime.getMinutes()).padStart(2, '0');
+                timestampElement.textContent = `${hours}:${minutes} (Londres)`;
+            }
+        }
+        
+        // Actualizar cada minuto
+        updateLMETimestamp();
+        setInterval(updateLMETimestamp, 60000);
+        
+        // ============================================
+        // 4. MOMENTO DE LA VERDAD - MEJORAR MENSAJE WHATSAPP
+        // ============================================
+        
+        const whatsappLink = document.getElementById('whatsapp-link');
+        const lockCode = document.getElementById('lock-code');
+        const goldenTicket = document.getElementById('golden-ticket');
+        
+        // Agregar evento de clic al Golden Ticket
+        if (goldenTicket && whatsappLink) {
+            goldenTicket.style.cursor = 'pointer';
+            goldenTicket.title = 'Haz clic para contactar por WhatsApp';
+            goldenTicket.addEventListener('click', function() {
+                window.open(whatsappLink.href, '_blank');
+            });
+        }
+        
+        // ============================================
+        // BÚSQUEDA EN TIEMPO REAL - DISPARA DESDE 2DO CARÁCTER
+        // ============================================
+        
+        const codigoInput = document.getElementById('codigo');
+        let searchTimeout;
+        
+        if (codigoInput) {
+            codigoInput.addEventListener('input', function() {
+                const v = this.value.trim();
+                
+                // Limpiar timeout anterior
+                clearTimeout(searchTimeout);
+                
+                // Disparar búsqueda desde el 2do carácter (no el 3ro)
+                if (v.length < 2) {
+                    return;
+                }
+                
+                // Agregar delay para no hacer muchas peticiones
+                searchTimeout = setTimeout(() => {
+                    if (v.length >= 2) {
+                        // Redirigir a la misma página con el parámetro codigo
+                        window.location.href = '?codigo=' + encodeURIComponent(v) + '#buscar';
+                    }
+                }, 300); // 300ms de delay
+            });
+        }
+        
+        // Nota: el ticker de metales (platino/paladio/rodio) no tiene actualización
+        // en vivo en eGarage — no existe un modelo de precios de metales para este
+        // tenant todavía, así que se muestran los valores estáticos de respaldo ya
+        // renderizados en el HTML del ticker, sin refresco periódico.
+    </script>
 </body>
 </html>
