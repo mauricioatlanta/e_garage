@@ -29,6 +29,7 @@ COUNTRY_CONTENT = {
             "salvage": "desarmadurias",
             "tire": "vulcanizaciones",
             "carwash": "lavado",
+            "recycling": "reciclaje",
         },
         "testimonials": {
             "workshop": {

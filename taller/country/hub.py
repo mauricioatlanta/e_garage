@@ -16,6 +16,7 @@ COUNTRY_HUB = {
         "bodyshop_name": "Hojalatería y Pintura",
         "electric_name": "Electricidad Automotriz",
         "fleet_name": "Flotas",
+        "recycling_name": "Reciclaje",
         "soon_label": "Pronto",
     },
 
