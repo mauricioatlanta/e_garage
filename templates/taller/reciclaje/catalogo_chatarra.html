@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatarra Electrónica | Atlanta Reciclajes</title>
+    <meta name="description" content="Catálogo de precios de compra de chatarra electrónica: placas madre, procesadores, cables y componentes. Atlanta Reciclajes.">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+      body {
+        min-height: 100vh;
+        background: #0f2027;
+        background: linear-gradient(120deg, #0f2027 0%, #2c5364 100%);
+      }
+      .glass {
+        background: rgba(20, 30, 60, 0.15) !important;
+        border-radius: 1.25rem;
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+      .neon { color: #00fff7; text-shadow: 0 0 12px #00fff7a0; }
+      .whatsapp-btn { background: #25D366; color: #fff !important; }
+    </style>
+</head>
+<body class="min-h-screen text-white font-sans">
+  <div class="max-w-5xl mx-auto py-12 px-4">
+    <div class="text-center mb-10">
+      <a href="/" class="text-cyan-300 text-sm">&larr; Volver al inicio</a>
+      <h1 class="text-3xl md:text-4xl font-bold neon mt-4 mb-2">Chatarra Electrónica</h1>
+      <p class="text-cyan-200">Compramos placas madre, procesadores, cables y toda clase de componentes electrónicos por kilo o por unidad.</p>
+    </div>
+
+    {% if page_obj.object_list %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-10">
+      {% for producto in page_obj %}
+      <div class="glass p-5">
+        <div class="font-bold text-lg neon">{{ producto.nombre }}</div>
+        {% if producto.categoria %}<div class="text-cyan-300 text-sm mb-2">{{ producto.categoria.nombre }}</div>{% endif %}
+        <div class="text-2xl font-bold mt-2">
+          ${{ producto.precio_compra|floatformat:0 }}
+          <span class="text-sm font-normal text-cyan-300">/ {{ producto.get_unidad_medida_display }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center gap-4 mb-10">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="text-cyan-300">&larr; Anterior</a>
+      {% endif %}
+      <span class="text-cyan-200">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="text-cyan-300">Siguiente &rarr;</a>
+      {% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="glass p-8 text-center mb-10">
+      <p>Aún no tenemos catálogo publicado &mdash; escríbenos directamente y te cotizamos.</p>
+    </div>
+    {% endif %}
+
+    <div class="text-center">
+      <a href="https://wa.me/56963607348?text=Hola,%20quiero%20cotizar%20chatarra%20electrónica" class="whatsapp-btn inline-block rounded-lg px-6 py-3 font-bold">
+        📱 Cotizar por WhatsApp
+      </a>
+    </div>
+  </div>
+</body>
+</html>

@@ -10,6 +10,14 @@ from taller.models.public_page_view import PublicPageView
 
 def landing_home(request):
     if getattr(request, "is_custom_domain", False):
+        config = getattr(request.empresa, "config", None)
+        if config and config.rubro_principal == "RECYCLING":
+            company_settings = getattr(request.empresa.user, "company_settings", None)
+            logo_url = company_settings.logo.url if company_settings and company_settings.logo else None
+            return render(request, "taller/reciclaje/bienvenida_atlanta.html", {
+                "empresa": request.empresa,
+                "logo_url": logo_url,
+            })
         return catalog_home(request)
 
     track_public_page(

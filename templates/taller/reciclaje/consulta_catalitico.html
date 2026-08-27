@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precio de Catalíticos | Atlanta Reciclajes</title>
+    <meta name="description" content="Consulta el precio referencial de tu catalítico por código, marca o modelo. Compra directa, pago seguro. Atlanta Reciclajes.">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+      body {
+        min-height: 100vh;
+        background: #0f2027;
+        background: linear-gradient(120deg, #0f2027 0%, #2c5364 100%);
+      }
+      .glass {
+        background: rgba(20, 30, 60, 0.15) !important;
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.15);
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+      .neon {
+        color: #00fff7;
+        text-shadow: 0 0 12px #00fff7a0;
+      }
+      .search-input {
+        background: rgba(10, 14, 20, 0.9);
+        border: 2px solid rgba(0, 255, 247, 0.3);
+        color: #00fff7;
+      }
+      .search-input:focus {
+        outline: none;
+        border-color: #00fff7;
+        box-shadow: 0 0 0 3px rgba(0, 255, 247, 0.2);
+      }
+      .futur-btn {
+        background: linear-gradient(90deg, #00fff7 0%, #0ff 100%);
+        color: #0f2027 !important;
+        font-weight: bold;
+      }
+      .whatsapp-btn { background: #25D366; color: #fff !important; }
+    </style>
+</head>
+<body class="min-h-screen text-white font-sans">
+  <div class="max-w-3xl mx-auto py-12 px-4">
+    <div class="text-center mb-8">
+      <a href="{% url 'reciclaje:catalogo_chatarra' %}" class="text-cyan-300 text-sm">&larr; Volver</a>
+      <h1 class="text-3xl md:text-4xl font-bold neon mt-4 mb-2">Precio de tu Catalítico</h1>
+      <p class="text-cyan-200">Ingresa el código, marca o modelo para consultar el precio referencial de compra.</p>
+    </div>
+
+    <form method="get" class="glass p-6 mb-8">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <input
+          type="text"
+          name="codigo"
+          value="{{ codigo }}"
+          placeholder="Código, marca o modelo del catalítico"
+          class="search-input flex-1 rounded-lg px-4 py-3 text-lg"
+          autofocus
+        >
+        <button type="submit" class="futur-btn rounded-lg px-6 py-3 text-lg">Buscar</button>
+      </div>
+    </form>
+
+    {% if resultado %}
+      <div class="glass p-8 mb-6">
+        <div class="text-2xl font-bold neon mb-1">{{ resultado.codigo }}</div>
+        <div class="text-cyan-300 mb-4">{{ resultado.nombre }} {% if resultado.marca_vehiculo %}&mdash; {{ resultado.marca_vehiculo }} {{ resultado.modelo_vehiculo }}{% endif %}</div>
+        <div class="border-l-4 border-cyan-400 pl-4 mb-6">
+          <div class="text-cyan-300 text-sm">Precio referencial de compra</div>
+          {% if resultado.precio_venta %}
+            <div class="text-4xl font-bold">${{ resultado.precio_venta|floatformat:0 }}</div>
+          {% else %}
+            <div class="text-xl">Precio a convenir &mdash; consúltanos por WhatsApp</div>
+          {% endif %}
+        </div>
+        <a href="https://wa.me/56963607348?text=Hola,%20quiero%20vender%20mi%20catalítico%20{{ resultado.codigo }}" class="whatsapp-btn inline-block rounded-lg px-6 py-3 font-bold">
+          📱 Cotizar por WhatsApp
+        </a>
+      </div>
+    {% elif resultados %}
+      <div class="mb-4 text-cyan-200">Se encontraron {{ resultados|length }} catalíticos:</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {% for c in resultados %}
+        <a href="{% url 'reciclaje:detalle_catalitico' c.pk %}" class="glass p-4 block hover:scale-105 transition-transform">
+          <div class="font-bold neon">{{ c.codigo }}</div>
+          <div class="text-cyan-300 text-sm">{{ c.nombre }} {% if c.marca_vehiculo %}&mdash; {{ c.marca_vehiculo }} {{ c.modelo_vehiculo }}{% endif %}</div>
+          {% if c.precio_venta %}<div class="mt-2 font-semibold">${{ c.precio_venta|floatformat:0 }}</div>{% endif %}
+        </a>
+        {% endfor %}
+      </div>
+    {% elif sin_resultado %}
+      <div class="glass p-6 text-center">
+        <p class="mb-4">No encontramos ese código en nuestro catálogo. Aún así, podemos cotizar tu catalítico directamente.</p>
+        <a href="https://wa.me/56963607348?text=Hola,%20quiero%20cotizar%20un%20catalítico" class="whatsapp-btn inline-block rounded-lg px-6 py-3 font-bold">
+          📱 Cotizar por WhatsApp
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>
