@@ -24,7 +24,7 @@ def test_reciclaje_slug_mapea_a_vertical_recycling():
 def test_get_landing_context_recycling_chile():
     ctx = get_landing_context("cl", "recycling")
     assert ctx["rubro_key"] == "RECICLAJE"
-    assert "Reciclaje" in ctx["hero_h1"] or "catalítico" in ctx["hero_h1"].lower()
+    assert "metal" in ctx["hero_h1"].lower()
     assert ctx["language"] == "es"
 
 
