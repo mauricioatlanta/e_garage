@@ -64,9 +64,10 @@ def test_chile_hub_terminology(rf):
     html = _get_html(hub_chile, rf)
     assert "Vulcanización" in html
     assert "Lavado de Autos" in html
-    assert "Hojalatería y Pintura" in html
-    assert "Electricidad Automotriz" in html
-    assert "Flotas" in html
+    # "Pronto" rubros (Hojalatería / Electricidad / Flotas) removed from the hub grid.
+    assert "Hojalatería y Pintura" not in html
+    assert "Electricidad Automotriz" not in html
+    assert "Flotas" not in html
 
 
 @pytest.mark.django_db
@@ -74,8 +75,6 @@ def test_argentina_hub_terminology(rf):
     html = _get_html(hub_argentina, rf)
     assert "Gomería" in html
     assert "Lavadero" in html
-    assert "Chapa y Pintura" in html
-    assert "Electricidad del Automotor" in html
     assert "Desarmadero" in html
 
 
@@ -83,7 +82,6 @@ def test_argentina_hub_terminology(rf):
 def test_peru_hub_terminology(rf):
     html = _get_html(hub_peru, rf)
     assert "Llantería" in html
-    assert "Planchado y Pintura" in html
     assert "Desarmadero" in html
 
 
@@ -94,8 +92,6 @@ def test_mexico_hub_terminology(rf):
     assert "Refaccionaria" in html
     assert "Llantera" in html
     assert "Autolavado" in html
-    assert "Eléctrico Automotriz" in html
-    assert "Flotillas" in html
 
 
 @pytest.mark.django_db
@@ -103,9 +99,6 @@ def test_usa_en_hub_terminology(rf):
     html = _get_html(hub_usa_en, rf)
     assert "Tire Shop" in html
     assert "Car Wash" in html
-    assert "Body Shop" in html
-    assert "Auto Electrical" in html
-    assert "Fleet Management" in html
     assert "Salvage Yard" in html
     assert "Auto Repair Shop" in html
 
@@ -115,8 +108,6 @@ def test_usa_es_hub_terminology(rf):
     html = _get_html(hub_usa_es, rf)
     assert "Llantera" in html
     assert "Lavado de Autos" in html
-    assert "Hojalatería y Pintura" in html
-    assert "Electricidad Automotriz" in html
     assert "Yonke" in html
 
 
@@ -192,7 +183,6 @@ def test_ecuador_hub_terminology(rf):
     assert "Llantera" in html
     assert "Chatarrería" in html
     assert "Almacén de Repuestos" in html
-    assert "Enderezada y Pintura" in html
 
 
 @pytest.mark.django_db
@@ -200,7 +190,6 @@ def test_venezuela_hub_terminology(rf):
     html = _get_html(hub_venezuela, rf)
     assert "Cauchera" in html
     assert "Desarmadero" in html
-    assert "Latonería y Pintura" in html
 
 
 @pytest.mark.django_db
@@ -209,8 +198,6 @@ def test_brasil_hub_terminology(rf):
     assert "Oficina Mecânica" in html
     assert "Borracharia" in html
     assert "Desmanche" in html
-    assert "Funilaria e Pintura" in html
-    assert "Frotas" in html
 
 
 @pytest.mark.django_db
