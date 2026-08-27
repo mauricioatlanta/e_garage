@@ -19,12 +19,15 @@ Cubre:
       catalogo_chatarra): una empresa nunca ve datos de otra.
 """
 
+from decimal import Decimal
+
 import pytest
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import Client
 
 from taller.models.empresa_dominio import EmpresaDominio
+from taller.models.reciclaje import PrecioMetal
 from taller.tests.factories import (
     CataliticoFactory,
     ConfiguracionEmpresaFactory,
@@ -108,8 +111,9 @@ def test_landing_home_dominio_no_recycling_sigue_usando_catalog_home(empresa_wor
 @pytest.mark.django_db
 def test_landing_cataliticos_responde_200_con_contenido_y_cta(empresa_recycling):
     """La 'sección Catalíticos' es una bienvenida propia con contenido real
-    (qué compramos, cómo funciona) y un CTA hacia la consulta de precio —
-    no debe saltar directo a la búsqueda."""
+    (qué es un catalítico, cómo funciona la compra, cómo se recuperan los
+    metales) y un CTA hacia la consulta de precio — no debe saltar directo
+    a la búsqueda ni quedar pobre en contenido."""
     client = Client(HTTP_HOST="landing-recycling.example.cl")
     response = client.get("/reciclaje/cataliticos/")
 
@@ -117,9 +121,56 @@ def test_landing_cataliticos_responde_200_con_contenido_y_cta(empresa_recycling)
     content = response.content.decode()
     assert "Catalíticos" in content
     assert "Pago al Contado" in content
-    assert "¿Cómo funciona?" in content
+    assert "¿Qué es un catalítico" in content
+    assert "¿Cómo funciona la compra?" in content
+    assert "¿Cómo se recuperan los metales?" in content
     assert "/reciclaje/consulta-catalitico/" in content
     assert "/accounts/login/" in content
+
+
+@pytest.mark.django_db
+def test_landing_cataliticos_sin_precios_metal_no_muestra_seccion(empresa_recycling):
+    client = Client(HTTP_HOST="landing-recycling.example.cl")
+    response = client.get("/reciclaje/cataliticos/")
+
+    assert response.status_code == 200
+    assert "Valor Referencial de Metales Preciosos" not in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_landing_cataliticos_con_precios_metal_los_muestra(empresa_recycling):
+    PrecioMetal.objects.create(
+        empresa=empresa_recycling,
+        platino=Decimal("30000.00"),
+        paladio=Decimal("25000.00"),
+        rodio=Decimal("120000.00"),
+    )
+    client = Client(HTTP_HOST="landing-recycling.example.cl")
+    response = client.get("/reciclaje/cataliticos/")
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert "Valor Referencial de Metales Preciosos" in content
+    assert "Platino" in content
+    assert "30.000" in content or "30000" in content
+
+
+@pytest.mark.django_db
+def test_landing_cataliticos_precios_metal_de_otra_empresa_no_se_filtran(empresa_recycling):
+    """Aislamiento multi-tenant: los precios de metales de otra empresa
+    RECYCLING nunca deben aparecer en la landing de esta."""
+    otra_empresa = _empresa_con_dominio(
+        username="reciclaje_otro_precio_metal",
+        dominio="otro-precio-metal.example.cl",
+        rubro_principal="RECYCLING",
+    )
+    PrecioMetal.objects.create(empresa=otra_empresa, platino=Decimal("99999.00"))
+
+    client = Client(HTTP_HOST="landing-recycling.example.cl")
+    response = client.get("/reciclaje/cataliticos/")
+
+    assert response.status_code == 200
+    assert "99.999" not in response.content.decode() and "99999" not in response.content.decode()
 
 
 @pytest.mark.django_db

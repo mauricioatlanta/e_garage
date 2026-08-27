@@ -188,6 +188,37 @@ class Catalitico(TenantScoped):
         return f"{self.nombre or 'Catalítico'} ({self.codigo})"
 
 
+class PrecioMetal(TenantScoped):
+    """Valor referencial (CLP por gramo) de los metales preciosos que
+    contiene un catalítico — platino, paladio, rodio. Un único registro por
+    empresa, actualizado a mano desde el admin (no hay feed de mercado en
+    vivo integrado); se muestra en la landing pública de Catalíticos."""
+
+    platino = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text="CLP por gramo.",
+    )
+    paladio = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text="CLP por gramo.",
+    )
+    rodio = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text="CLP por gramo.",
+    )
+    actualizado_en = models.DateTimeField(auto_now=True)
+
+    class Meta(TenantScoped.Meta):
+        verbose_name = "Precio de Metal"
+        verbose_name_plural = "Precios de Metales"
+        constraints = [
+            UniqueConstraint(fields=["empresa"], name="uq_precio_metal_empresa"),
+        ]
+
+    def __str__(self):
+        return f"Precios de metales — {self.empresa}"
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Compra / Venta — el corazón del negocio: adquirir material de un cliente que
 # llega con catalíticos/chatarra, y luego revenderlo.
