@@ -14,7 +14,7 @@ from django.db import IntegrityError
 
 from taller.constants.product_profiles import PRODUCT_PROFILES, RUBRO_TO_PRODUCT
 from taller.models.configuracion import ConfiguracionEmpresa
-from taller.models.reciclaje import Catalitico, CategoriaChatarra, ProductoChatarra
+from taller.models.reciclaje import Catalitico, CategoriaChatarra, PrecioMetal, ProductoChatarra
 from taller.tests.factories import (
     CataliticoFactory,
     CategoriaChatarraFactory,
@@ -129,3 +129,27 @@ class TestCatalitico:
         """Fase 1: no se importan las 146 imágenes huérfanas todavía."""
         catalitico = CataliticoFactory()
         assert not catalitico.imagen
+
+
+# ---------------------------------------------------------------------------
+# PrecioMetal
+# ---------------------------------------------------------------------------
+
+@pytest.mark.django_db
+class TestPrecioMetal:
+    def test_requiere_empresa(self):
+        with pytest.raises(IntegrityError):
+            PrecioMetal.objects.create(platino=Decimal("30000.00"))
+
+    def test_un_solo_registro_por_empresa(self):
+        empresa = EmpresaFactory()
+        PrecioMetal.objects.create(empresa=empresa, platino=Decimal("30000.00"))
+        with pytest.raises(IntegrityError):
+            PrecioMetal.objects.create(empresa=empresa, platino=Decimal("31000.00"))
+
+    def test_empresas_distintas_pueden_tener_su_propio_registro(self):
+        empresa_a = EmpresaFactory()
+        empresa_b = EmpresaFactory()
+        PrecioMetal.objects.create(empresa=empresa_a, platino=Decimal("30000.00"))
+        PrecioMetal.objects.create(empresa=empresa_b, platino=Decimal("31000.00"))
+        assert PrecioMetal.objects.count() == 2

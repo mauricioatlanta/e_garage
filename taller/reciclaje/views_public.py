@@ -11,7 +11,7 @@ from django.db.models import Q
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, render
 
-from taller.models.reciclaje import Catalitico, ProductoChatarra
+from taller.models.reciclaje import Catalitico, PrecioMetal, ProductoChatarra
 from taller.reciclaje.views_staff import _reciclaje_url
 
 
@@ -24,12 +24,14 @@ def _empresa_publica(request):
 
 def landing_cataliticos(request):
     """Bienvenida de la sección Catalíticos: qué compramos, cómo funciona el
-    proceso y el CTA hacia la consulta de precio por código."""
-    _empresa_publica(request)
+    proceso, valor referencial de metales y el CTA hacia la consulta de
+    precio por código."""
+    empresa = _empresa_publica(request)
+    precios_metal = PrecioMetal.objects.filter(empresa=empresa).first()
     return render(
         request,
         "taller/reciclaje/landing_cataliticos.html",
-        {"dashboard_url": _reciclaje_url("")},
+        {"dashboard_url": _reciclaje_url(""), "precios_metal": precios_metal},
     )
 
 

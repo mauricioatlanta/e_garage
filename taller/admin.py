@@ -22,6 +22,7 @@ from taller.models.reciclaje import (
     CategoriaChatarra,
     ProductoChatarra,
     Catalitico,
+    PrecioMetal,
     CompraReciclaje,
     DetalleCompraCatalitico,
     DetalleCompraChatarra,
@@ -496,6 +497,12 @@ class CataliticoAdmin(admin.ModelAdmin):
     search_fields = ("codigo", "nombre", "marca_vehiculo", "modelo_vehiculo")
     list_select_related = ("empresa",)
     ordering = ("-created_at",)
+
+
+@admin.register(PrecioMetal, site=admin_site)
+class PrecioMetalAdmin(admin.ModelAdmin):
+    list_display = ("empresa", "platino", "paladio", "rodio", "actualizado_en")
+    list_select_related = ("empresa",)
 
 
 class DetalleCompraCataliticoInline(admin.TabularInline):

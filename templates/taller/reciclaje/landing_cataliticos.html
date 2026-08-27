@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catalíticos | Atlanta Reciclajes</title>
-    <meta name="description" content="Compra de convertidores catalíticos con tasación transparente desde 2005. Pago al contado, precios reales, cobertura nacional. Consulta el precio de tu catalítico.">
+    <meta name="description" content="Compra de convertidores catalíticos con tasación transparente desde 2005. Qué es un catalítico, cómo se recuperan sus metales preciosos, y el precio referencial de platino, paladio y rodio.">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
       body {
@@ -45,6 +45,15 @@
         font-weight: bold;
         flex-shrink: 0;
       }
+      .metal-card {
+        background: rgba(0,0,0,0.25);
+        border-radius: 1rem;
+        border: 1px solid rgba(0,255,247,0.2);
+        padding: 1.25rem;
+        text-align: center;
+      }
+      .metal-name { color: #9ca3af; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+      .metal-price { font-size: 1.5rem; font-weight: bold; color: #00fff7; margin-top: 0.25rem; }
     </style>
 </head>
 <body class="min-h-screen text-white font-sans">
@@ -59,6 +68,36 @@
         que contiene tu catalítico usado.
       </p>
     </div>
+
+    {% if precios_metal.platino or precios_metal.paladio or precios_metal.rodio %}
+    <div class="glass p-8 mb-10">
+      <h2 class="text-2xl neon font-bold mb-1 text-center">Valor Referencial de Metales Preciosos</h2>
+      <p class="text-cyan-300 text-sm text-center mb-6">
+        Precios en CLP por gramo, actualizados por nuestro equipo el {{ precios_metal.actualizado_en|date:"d/m/Y" }}.
+        Referenciales — el valor final depende de la pureza y el estado de tu catalítico.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {% if precios_metal.platino %}
+        <div class="metal-card">
+          <div class="metal-name">Platino</div>
+          <div class="metal-price">${{ precios_metal.platino|floatformat:0 }}<span class="text-sm font-normal text-cyan-300">/g</span></div>
+        </div>
+        {% endif %}
+        {% if precios_metal.paladio %}
+        <div class="metal-card">
+          <div class="metal-name">Paladio</div>
+          <div class="metal-price">${{ precios_metal.paladio|floatformat:0 }}<span class="text-sm font-normal text-cyan-300">/g</span></div>
+        </div>
+        {% endif %}
+        {% if precios_metal.rodio %}
+        <div class="metal-card">
+          <div class="metal-name">Rodio</div>
+          <div class="metal-price">${{ precios_metal.rodio|floatformat:0 }}<span class="text-sm font-normal text-cyan-300">/g</span></div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
       <div class="glass p-6 text-center">
@@ -79,7 +118,24 @@
     </div>
 
     <div class="glass p-8 mb-10">
-      <h2 class="text-2xl neon font-bold mb-6 text-center">¿Cómo funciona?</h2>
+      <h2 class="text-2xl neon font-bold mb-4 text-center">¿Qué es un catalítico y por qué tiene valor?</h2>
+      <p class="text-cyan-200 mb-4">
+        El convertidor catalítico es la pieza del escape que transforma los gases tóxicos de la
+        combustión (monóxido de carbono, óxidos de nitrógeno e hidrocarburos no quemados) en
+        gases menos dañinos antes de salir del vehículo. Para lograrlo, su núcleo cerámico o
+        metálico está recubierto de una capa microscópica de <strong class="text-cyan-100">platino,
+        paladio y rodio</strong> — los mismos metales preciosos que se cotizan en los mercados
+        internacionales, y que son los que le dan valor real a un catalítico usado.
+      </p>
+      <p class="text-cyan-200">
+        A diferencia de la chatarra común, un catalítico no vale por su peso en metal base, sino
+        por la cantidad y pureza de esos metales preciosos que contiene — por eso el precio varía
+        según el código, marca y modelo del vehículo del que proviene.
+      </p>
+    </div>
+
+    <div class="glass p-8 mb-10">
+      <h2 class="text-2xl neon font-bold mb-6 text-center">¿Cómo funciona la compra?</h2>
       <div class="space-y-5">
         <div class="flex items-start gap-4">
           <span class="step-number">1</span>
@@ -92,6 +148,28 @@
         <div class="flex items-start gap-4">
           <span class="step-number">3</span>
           <p class="text-cyan-200 pt-1">Coordinamos la entrega o retiro y recibes tu pago al contado.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass p-8 mb-10">
+      <h2 class="text-2xl neon font-bold mb-6 text-center">¿Cómo se recuperan los metales?</h2>
+      <div class="space-y-5">
+        <div class="flex items-start gap-4">
+          <span class="step-number">1</span>
+          <p class="text-cyan-200 pt-1"><strong class="text-cyan-100">Trituración:</strong> el núcleo cerámico o metálico del catalítico se muele hasta convertirlo en un polvo fino, separándolo de la carcasa metálica exterior (que se recicla aparte como chatarra de acero/aluminio).</p>
+        </div>
+        <div class="flex items-start gap-4">
+          <span class="step-number">2</span>
+          <p class="text-cyan-200 pt-1"><strong class="text-cyan-100">Fundición:</strong> el polvo se envía a fundiciones y refinerías certificadas, donde se funde a altas temperaturas junto con otros materiales.</p>
+        </div>
+        <div class="flex items-start gap-4">
+          <span class="step-number">3</span>
+          <p class="text-cyan-200 pt-1"><strong class="text-cyan-100">Refinación química:</strong> mediante procesos de disolución y precipitación selectiva, se separan y purifican el platino, paladio y rodio de forma individual.</p>
+        </div>
+        <div class="flex items-start gap-4">
+          <span class="step-number">4</span>
+          <p class="text-cyan-200 pt-1"><strong class="text-cyan-100">Reingreso al mercado:</strong> los metales recuperados vuelven a fabricar catalíticos nuevos, joyería o componentes electrónicos — cerrando el ciclo sin necesidad de nueva minería.</p>
         </div>
       </div>
     </div>
