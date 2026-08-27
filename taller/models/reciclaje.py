@@ -9,6 +9,7 @@ en un vehículo. No comparten tabla ni FK con el flujo de desarmaduría.
 
 from decimal import Decimal
 
+from django.conf import settings
 from django.db import models
 from django.db.models import Index, Q, UniqueConstraint
 
@@ -185,3 +186,180 @@ class Catalitico(TenantScoped):
 
     def __str__(self):
         return f"{self.nombre or 'Catalítico'} ({self.codigo})"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Compra / Venta — el corazón del negocio: adquirir material de un cliente que
+# llega con catalíticos/chatarra, y luego revenderlo.
+#
+# Catalitico y ProductoChatarra son, ambos, SKU con cantidad_stock — no hay una
+# fila por unidad física única. Comprar INCREMENTA cantidad_stock (creando el
+# SKU si el código todavía no existe); vender DECREMENTA cantidad_stock y, si
+# llega a 0, marca el Catalitico como VENDIDO (ProductoChatarra no tiene ese
+# concepto de estado, solo cantidad). Por eso los 4 modelos de detalle son
+# simétricos: compra/venta × catalítico/chatarra, cada uno con FK al SKU +
+# cantidad + precio_unitario.
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class CompraReciclaje(TenantScoped):
+    """Encabezado de una compra de material reciclable a un cliente (walk-in
+    o registrado). Las líneas viven en DetalleCompraCatalitico/Chatarra."""
+
+    cliente = models.ForeignKey(
+        "taller.Cliente",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="compras_reciclaje",
+        help_text="Vacío = cliente de mostrador (Cliente.get_or_create_mostrador).",
+    )
+    region = models.ForeignKey(
+        "taller.Estado", on_delete=models.SET_NULL, null=True, blank=True
+    )
+    ciudad = models.ForeignKey(
+        "taller.Ciudad", on_delete=models.SET_NULL, null=True, blank=True
+    )
+    creado_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="compras_reciclaje_creadas",
+    )
+    notas = models.TextField(blank=True, default="")
+
+    class Meta(TenantScoped.Meta):
+        verbose_name = "Compra de Reciclaje"
+        verbose_name_plural = "Compras de Reciclaje"
+        indexes = [Index(fields=["empresa", "created_at"])]
+
+    def total(self) -> Decimal:
+        total_catalitico = sum(
+            (d.subtotal() for d in self.detalles_catalitico.all()), Decimal("0")
+        )
+        total_chatarra = sum(
+            (d.subtotal() for d in self.detalles_chatarra.all()), Decimal("0")
+        )
+        return total_catalitico + total_chatarra
+
+    def __str__(self):
+        return f"Compra #{self.pk} — {self.cliente or 'Mostrador'}"
+
+
+class DetalleCompraCatalitico(models.Model):
+    """Una línea de compra = cantidad de un Catalitico (SKU) adquirida
+    (incrementa cantidad_stock del catalítico; lo crea si el código es nuevo)."""
+
+    compra = models.ForeignKey(
+        CompraReciclaje, on_delete=models.CASCADE, related_name="detalles_catalitico"
+    )
+    catalitico = models.ForeignKey(
+        Catalitico, on_delete=models.PROTECT, related_name="compras_detalle"
+    )
+    cantidad = models.PositiveIntegerField(default=1)
+    precio_unitario = models.DecimalField(max_digits=12, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.catalitico.codigo} x{self.cantidad}"
+
+    def subtotal(self) -> Decimal:
+        return self.cantidad * self.precio_unitario
+
+
+class DetalleCompraChatarra(models.Model):
+    """Una línea de compra = cantidad de un ProductoChatarra adquirida
+    (incrementa cantidad_stock del producto)."""
+
+    compra = models.ForeignKey(
+        CompraReciclaje, on_delete=models.CASCADE, related_name="detalles_chatarra"
+    )
+    producto = models.ForeignKey(
+        ProductoChatarra, on_delete=models.PROTECT, related_name="compras_detalle"
+    )
+    cantidad = models.DecimalField(max_digits=12, decimal_places=3)
+    precio_unitario = models.DecimalField(max_digits=12, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.producto.nombre} x{self.cantidad}"
+
+    def subtotal(self) -> Decimal:
+        return self.cantidad * self.precio_unitario
+
+
+class VentaReciclaje(TenantScoped):
+    """Encabezado de una venta de material reciclable (reventa de catalíticos
+    ya comprados / chatarra en stock a un comprador externo)."""
+
+    comprador = models.ForeignKey(
+        "taller.Cliente",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="ventas_reciclaje",
+    )
+    creado_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="ventas_reciclaje_creadas",
+    )
+    notas = models.TextField(blank=True, default="")
+
+    class Meta(TenantScoped.Meta):
+        verbose_name = "Venta de Reciclaje"
+        verbose_name_plural = "Ventas de Reciclaje"
+        indexes = [Index(fields=["empresa", "created_at"])]
+
+    def total(self) -> Decimal:
+        total_catalitico = sum(
+            (d.subtotal() for d in self.detalles_catalitico.all()), Decimal("0")
+        )
+        total_chatarra = sum(
+            (d.subtotal() for d in self.detalles_chatarra.all()), Decimal("0")
+        )
+        return total_catalitico + total_chatarra
+
+    def __str__(self):
+        return f"Venta #{self.pk} — {self.comprador or 'Sin comprador'}"
+
+
+class DetalleVentaCatalitico(models.Model):
+    """Una línea de venta = cantidad de un Catalitico (SKU) vendida
+    (decrementa cantidad_stock; si llega a 0, el catalítico pasa a VENDIDO)."""
+
+    venta = models.ForeignKey(
+        VentaReciclaje, on_delete=models.CASCADE, related_name="detalles_catalitico"
+    )
+    catalitico = models.ForeignKey(
+        Catalitico, on_delete=models.PROTECT, related_name="ventas_detalle"
+    )
+    cantidad = models.PositiveIntegerField(default=1)
+    precio_unitario = models.DecimalField(max_digits=12, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.catalitico.codigo} x{self.cantidad}"
+
+    def subtotal(self) -> Decimal:
+        return self.cantidad * self.precio_unitario
+
+
+class DetalleVentaChatarra(models.Model):
+    """Una línea de venta = cantidad de un ProductoChatarra vendida
+    (decrementa cantidad_stock del producto)."""
+
+    venta = models.ForeignKey(
+        VentaReciclaje, on_delete=models.CASCADE, related_name="detalles_chatarra"
+    )
+    producto = models.ForeignKey(
+        ProductoChatarra, on_delete=models.PROTECT, related_name="ventas_detalle"
+    )
+    cantidad = models.DecimalField(max_digits=12, decimal_places=3)
+    precio_unitario = models.DecimalField(max_digits=12, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.producto.nombre} x{self.cantidad}"
+
+    def subtotal(self) -> Decimal:
+        return self.cantidad * self.precio_unitario

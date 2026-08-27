@@ -18,7 +18,17 @@ from taller.models.extras_vehiculo import CajaVehiculoEmpresa, MotorVehiculoEmpr
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.interchange_pieza import InterchangePieza
 from taller.models.pieza_desarme import PiezaDesarme, PiezaDesarmeCompanyLabel
-from taller.models.reciclaje import CategoriaChatarra, ProductoChatarra, Catalitico
+from taller.models.reciclaje import (
+    CategoriaChatarra,
+    ProductoChatarra,
+    Catalitico,
+    CompraReciclaje,
+    DetalleCompraCatalitico,
+    DetalleCompraChatarra,
+    VentaReciclaje,
+    DetalleVentaCatalitico,
+    DetalleVentaChatarra,
+)
 from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculo_desarme_event import VehiculoDesarmeEvent
 from taller.models.public_page_view import PublicPageView
@@ -486,6 +496,44 @@ class CataliticoAdmin(admin.ModelAdmin):
     search_fields = ("codigo", "nombre", "marca_vehiculo", "modelo_vehiculo")
     list_select_related = ("empresa",)
     ordering = ("-created_at",)
+
+
+class DetalleCompraCataliticoInline(admin.TabularInline):
+    model = DetalleCompraCatalitico
+    extra = 0
+
+
+class DetalleCompraChatarraInline(admin.TabularInline):
+    model = DetalleCompraChatarra
+    extra = 0
+
+
+@admin.register(CompraReciclaje, site=admin_site)
+class CompraReciclajeAdmin(admin.ModelAdmin):
+    list_display = ("id", "cliente", "empresa", "created_at")
+    list_filter = ("empresa",)
+    list_select_related = ("empresa", "cliente")
+    ordering = ("-created_at",)
+    inlines = [DetalleCompraCataliticoInline, DetalleCompraChatarraInline]
+
+
+class DetalleVentaCataliticoInline(admin.TabularInline):
+    model = DetalleVentaCatalitico
+    extra = 0
+
+
+class DetalleVentaChatarraInline(admin.TabularInline):
+    model = DetalleVentaChatarra
+    extra = 0
+
+
+@admin.register(VentaReciclaje, site=admin_site)
+class VentaReciclajeAdmin(admin.ModelAdmin):
+    list_display = ("id", "comprador", "empresa", "created_at")
+    list_filter = ("empresa",)
+    list_select_related = ("empresa", "comprador")
+    ordering = ("-created_at",)
+    inlines = [DetalleVentaCataliticoInline, DetalleVentaChatarraInline]
 
 
 # === ADMINISTRACIÓN DE SERVICIOS MULTILENGUAJE ===

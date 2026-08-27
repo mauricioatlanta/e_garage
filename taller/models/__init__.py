@@ -56,7 +56,17 @@ from .smart_yard_global import SmartYardGlobalMetric
 from .vendedor_desarme import VendedorDesarme
 
 # Modelos de reciclaje (Atlanta Reciclajes — chatarra electrónica y catalíticos)
-from .reciclaje import CategoriaChatarra, ProductoChatarra, Catalitico
+from .reciclaje import (
+    CategoriaChatarra,
+    ProductoChatarra,
+    Catalitico,
+    CompraReciclaje,
+    DetalleCompraCatalitico,
+    DetalleCompraChatarra,
+    VentaReciclaje,
+    DetalleVentaCatalitico,
+    DetalleVentaChatarra,
+)
 from .venta_desarme import VentaDesarme, LineaVentaDesarme
 
 # Modelos de ubicación
@@ -158,6 +168,12 @@ __all__ = [
     "CategoriaChatarra",
     "ProductoChatarra",
     "Catalitico",
+    "CompraReciclaje",
+    "DetalleCompraCatalitico",
+    "DetalleCompraChatarra",
+    "VentaReciclaje",
+    "DetalleVentaCatalitico",
+    "DetalleVentaChatarra",
     # Ubicación
     "Estado",
     "Ciudad",

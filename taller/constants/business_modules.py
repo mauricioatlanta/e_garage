@@ -13,6 +13,7 @@ MOD_DOCUMENTOS = "documentos"
 MOD_REPUESTOS = "repuestos"
 MOD_SERVICIOS = "servicios"
 MOD_DESARME = "desarme"
+MOD_RECICLAJE = "reciclaje"
 MOD_FLOTA = "flota"
 MOD_REPORTES = "reportes"
 MOD_CONFIGURACION = "configuracion"
@@ -27,6 +28,7 @@ NAV_ITEMS = {
     MOD_REPUESTOS:     {"label": "Repuestos",     "path": "repuestos/",       "icon": "fas fa-cogs",         "order": 5},
     MOD_SERVICIOS:     {"label": "Servicios",     "path": "servicios/",       "icon": "fas fa-tools",        "order": 6},
     MOD_DESARME:       {"label": "Desarme",       "path": "desarme/",         "icon": "fas fa-car-crash",    "order": 7},
+    MOD_RECICLAJE:     {"label": "Reciclaje",     "path": "reciclaje/",       "icon": "fas fa-recycle",      "order": 10},
     MOD_FLOTA:         {"label": "Flota",         "path": "flota/",           "icon": "fas fa-truck",        "order": 8},
     MOD_REPORTES:      {"label": "Reportes",      "path": "reportes/",        "icon": "fas fa-chart-bar",    "order": 9},
     MOD_CONFIGURACION: {"label": "Configuración", "path": "settings/",        "icon": "fas fa-cog",          "order": 99},
@@ -44,6 +46,7 @@ PATH_HINTS = {
     MOD_REPUESTOS:     "/repuestos",
     MOD_SERVICIOS:     "/servicios",
     MOD_DESARME:       "/desarme",
+    MOD_RECICLAJE:     "/reciclaje",
     MOD_FLOTA:         "/flota",
     MOD_REPORTES:      "/reportes",
     MOD_CONFIGURACION: "/settings",
@@ -56,7 +59,7 @@ MODULES_BY_RUBRO = {
     "WORKSHOP_HEAVY":      frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS}),
     "EXHAUST":             frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS}),
     "PARTS":               frozenset({MOD_REPUESTOS}),
-    "RECYCLING":           frozenset({MOD_REPUESTOS}),
+    "RECYCLING":           frozenset({MOD_RECICLAJE}),
     "TIRE":                frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS}),
     "BODYSHOP":            frozenset({MOD_VEHICULOS, MOD_SERVICIOS}),
     "DETAILING":           frozenset({MOD_VEHICULOS, MOD_SERVICIOS}),

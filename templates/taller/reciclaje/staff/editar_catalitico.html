@@ -1,0 +1,39 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load country_url %}
+
+{% block page_title %}Editar {{ catalitico.codigo }}{% endblock %}
+{% block page_icon %}✏️{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .rec-card { background: rgba(0,0,0,0.7); border: 1px solid rgba(0,255,255,0.3); border-radius: 10px; padding: 20px; max-width: 480px; }
+  .rec-input { background: rgba(10,14,20,0.9); border: 1px solid rgba(0,255,255,0.3); color: #e5e7eb; border-radius: 6px; padding: 0.4rem 0.6rem; width: 100%; }
+  .rec-field-label { color: #9ca3af; font-size: 0.85rem; display: block; margin: 0.75rem 0 0.25rem; }
+  .rec-btn { background: #00fff7; color: #0f2027; font-weight: bold; border: none; border-radius: 8px; padding: 0.6rem 1.5rem; cursor: pointer; margin-top: 1rem; }
+</style>
+{% endblock %}
+
+{% block panel_content %}
+<div class="rec-card">
+  <form method="post">
+    {% csrf_token %}
+    <label class="rec-field-label">Nombre</label>
+    <input type="text" name="nombre" class="rec-input" value="{{ catalitico.nombre }}">
+
+    <label class="rec-field-label">Marca</label>
+    <input type="text" name="marca_vehiculo" class="rec-input" value="{{ catalitico.marca_vehiculo }}">
+
+    <label class="rec-field-label">Modelo</label>
+    <input type="text" name="modelo_vehiculo" class="rec-input" value="{{ catalitico.modelo_vehiculo }}">
+
+    <label class="rec-field-label">Precio de venta</label>
+    <input type="number" name="precio_venta" class="rec-input" step="any" value="{{ catalitico.precio_venta }}">
+
+    <label class="rec-field-label">
+      <input type="checkbox" name="activo" {% if catalitico.activo %}checked{% endif %}> Activo
+    </label>
+
+    <button type="submit" class="rec-btn">Guardar</button>
+  </form>
+</div>
+{% endblock %}

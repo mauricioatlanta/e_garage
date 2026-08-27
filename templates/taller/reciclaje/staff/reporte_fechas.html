@@ -1,0 +1,70 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load country_url %}
+
+{% block page_title %}Reporte de reciclaje{% endblock %}
+{% block page_subtitle %}Compras, ventas y margen por rango de fechas{% endblock %}
+{% block page_icon %}📊{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .rec-card { background: rgba(0,0,0,0.7); border: 1px solid rgba(0,255,255,0.3); border-radius: 10px; padding: 20px; margin-bottom: 1.5rem; }
+  .rec-input { background: rgba(10,14,20,0.9); border: 1px solid rgba(0,255,255,0.3); color: #e5e7eb; border-radius: 6px; padding: 0.4rem 0.6rem; }
+  .rec-btn { background: #00fff7; color: #0f2027; font-weight: bold; border: none; border-radius: 8px; padding: 0.5rem 1rem; text-decoration: none; display: inline-block; }
+  .rec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+  .rec-kpi { font-size: 1.8rem; font-weight: bold; color: #00fff7; }
+  .rec-label { color: #9ca3af; font-size: 0.85rem; }
+  .rec-table { width: 100%; border-collapse: collapse; color: #e5e7eb; }
+  .rec-table th, .rec-table td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+</style>
+{% endblock %}
+
+{% block panel_content %}
+<div class="rec-card">
+  <form method="get" style="display:flex;gap:0.75rem;align-items:end;flex-wrap:wrap;">
+    <div>
+      <label style="color:#9ca3af;font-size:0.85rem;display:block;">Desde</label>
+      <input type="date" name="desde" value="{{ fecha_desde|date:'Y-m-d' }}" class="rec-input">
+    </div>
+    <div>
+      <label style="color:#9ca3af;font-size:0.85rem;display:block;">Hasta</label>
+      <input type="date" name="hasta" value="{{ fecha_hasta|date:'Y-m-d' }}" class="rec-input">
+    </div>
+    <button type="submit" class="rec-btn">Filtrar</button>
+    <a href="?desde={{ fecha_desde|date:'Y-m-d' }}&hasta={{ fecha_hasta|date:'Y-m-d' }}&formato=pdf" class="rec-btn">Descargar PDF</a>
+  </form>
+</div>
+
+<div class="rec-card">
+  <div class="rec-grid">
+    <div><div class="rec-kpi">${{ total_compras|floatformat:0 }}</div><div class="rec-label">Total comprado</div></div>
+    <div><div class="rec-kpi">${{ total_ventas|floatformat:0 }}</div><div class="rec-label">Total vendido</div></div>
+    <div><div class="rec-kpi">${{ margen|floatformat:0 }}</div><div class="rec-label">Margen</div></div>
+  </div>
+</div>
+
+<div class="rec-card">
+  <h3>Compras ({{ fecha_desde|date:"d/m/Y" }} — {{ fecha_hasta|date:"d/m/Y" }})</h3>
+  <table class="rec-table">
+    <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Fecha</th></tr></thead>
+    <tbody>
+      {% for compra in compras %}
+      <tr><td>#{{ compra.pk }}</td><td>{{ compra.cliente|default:"Mostrador" }}</td><td>${{ compra.total|floatformat:0 }}</td><td>{{ compra.created_at|date:"d/m/Y" }}</td></tr>
+      {% empty %}<tr><td colspan="4">Sin compras en el período.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="rec-card">
+  <h3>Ventas ({{ fecha_desde|date:"d/m/Y" }} — {{ fecha_hasta|date:"d/m/Y" }})</h3>
+  <table class="rec-table">
+    <thead><tr><th>#</th><th>Comprador</th><th>Total</th><th>Fecha</th></tr></thead>
+    <tbody>
+      {% for venta in ventas %}
+      <tr><td>#{{ venta.pk }}</td><td>{{ venta.comprador|default:"—" }}</td><td>${{ venta.total|floatformat:0 }}</td><td>{{ venta.created_at|date:"d/m/Y" }}</td></tr>
+      {% empty %}<tr><td colspan="4">Sin ventas en el período.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

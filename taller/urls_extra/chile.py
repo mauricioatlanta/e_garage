@@ -200,6 +200,10 @@ urlpatterns = [
         include(("taller.repuestos.urls", "repuestos"), namespace="repuestos"),
     ),
     path(
+        "reciclaje/",
+        include(("taller.reciclaje.urls_staff", "reciclaje_staff"), namespace="reciclaje_staff"),
+    ),
+    path(
         "servicios/",
         include(("taller.servicios.urls", "servicios"), namespace="servicios"),
     ),
