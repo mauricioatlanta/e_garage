@@ -1,0 +1,62 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load country_url %}
+
+{% block page_title %}Compra #{{ compra.pk }}{% endblock %}
+{% block page_icon %}🧾{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .rec-card { background: rgba(0,0,0,0.7); border: 1px solid rgba(0,255,255,0.3); border-radius: 10px; padding: 20px; margin-bottom: 1.5rem; }
+  .rec-table { width: 100%; border-collapse: collapse; color: #e5e7eb; }
+  .rec-table th, .rec-table td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+</style>
+{% endblock %}
+
+{% block panel_content %}
+<div class="rec-card">
+  <p><strong>Cliente:</strong> {{ compra.cliente|default:"Mostrador" }}</p>
+  <p><strong>Fecha:</strong> {{ compra.created_at|date:"d/m/Y H:i" }}</p>
+  <p><strong>Registrado por:</strong> {{ compra.creado_por|default:"—" }}</p>
+  {% if compra.notas %}<p><strong>Notas:</strong> {{ compra.notas }}</p>{% endif %}
+  <p><strong>Total:</strong> ${{ compra.total|floatformat:0 }}</p>
+</div>
+
+{% if detalles_catalitico %}
+<div class="rec-card">
+  <h3>Catalíticos</h3>
+  <table class="rec-table">
+    <thead><tr><th>Código</th><th>Nombre</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th></tr></thead>
+    <tbody>
+      {% for d in detalles_catalitico %}
+      <tr>
+        <td>{{ d.catalitico.codigo }}</td>
+        <td>{{ d.catalitico.nombre }}</td>
+        <td>{{ d.cantidad }}</td>
+        <td>${{ d.precio_unitario|floatformat:0 }}</td>
+        <td>${{ d.subtotal|floatformat:0 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if detalles_chatarra %}
+<div class="rec-card">
+  <h3>Chatarra</h3>
+  <table class="rec-table">
+    <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th></tr></thead>
+    <tbody>
+      {% for d in detalles_chatarra %}
+      <tr>
+        <td>{{ d.producto.nombre }}</td>
+        <td>{{ d.cantidad }}</td>
+        <td>${{ d.precio_unitario|floatformat:0 }}</td>
+        <td>${{ d.subtotal|floatformat:0 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

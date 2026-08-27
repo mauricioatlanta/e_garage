@@ -1,0 +1,126 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load country_url %}
+
+{% block page_title %}Nueva compra de reciclaje{% endblock %}
+{% block page_subtitle %}Registra catalíticos y/o chatarra comprados a un cliente{% endblock %}
+{% block page_icon %}🧾{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .rec-card { background: rgba(0,0,0,0.7); border: 1px solid rgba(0,255,255,0.3); border-radius: 10px; padding: 20px; margin-bottom: 1.5rem; }
+  .rec-alert { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; }
+  .rec-input, .rec-select { background: rgba(10,14,20,0.9); border: 1px solid rgba(0,255,255,0.3); color: #e5e7eb; border-radius: 6px; padding: 0.4rem 0.6rem; }
+  .rec-btn { background: #00fff7; color: #0f2027; font-weight: bold; border: none; border-radius: 8px; padding: 0.6rem 1.5rem; cursor: pointer; }
+  .rec-btn-sm { background: transparent; color: #00fff7; border: 1px solid #00fff7; border-radius: 6px; padding: 0.25rem 0.75rem; cursor: pointer; }
+  .rec-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+  .rec-table th { text-align: left; color: #9ca3af; font-size: 0.8rem; padding: 0.4rem; }
+  .rec-table td { padding: 0.3rem 0.4rem; }
+  .rec-field-label { color: #9ca3af; font-size: 0.85rem; display: block; margin-bottom: 0.25rem; }
+</style>
+{% endblock %}
+
+{% block panel_content %}
+{% if messages %}
+  {% for message in messages %}<div class="rec-alert">{{ message }}</div>{% endfor %}
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+
+  <div class="rec-card">
+    <h3>Cliente</h3>
+    <label class="rec-field-label">Cliente registrado (opcional)</label>
+    <select name="cliente_id" class="rec-select" style="width:100%;margin-bottom:0.75rem;">
+      <option value="">— Cliente de mostrador —</option>
+      {% for c in clientes %}
+      <option value="{{ c.pk }}">{{ c.nombre }} {{ c.apellido }} {% if c.tax_id %}({{ c.tax_id }}){% endif %}</option>
+      {% endfor %}
+    </select>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;">
+      <div>
+        <label class="rec-field-label">o cliente nuevo — nombre</label>
+        <input type="text" name="cliente_nuevo_nombre" class="rec-input" style="width:100%;">
+      </div>
+      <div>
+        <label class="rec-field-label">Apellido</label>
+        <input type="text" name="cliente_nuevo_apellido" class="rec-input" style="width:100%;">
+      </div>
+      <div>
+        <label class="rec-field-label">Teléfono</label>
+        <input type="text" name="cliente_nuevo_telefono" class="rec-input" style="width:100%;">
+      </div>
+      <div>
+        <label class="rec-field-label">RUT</label>
+        <input type="text" name="cliente_nuevo_rut" class="rec-input" style="width:100%;">
+      </div>
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <h3>Catalíticos</h3>
+    <table class="rec-table" id="tabla-catalitico">
+      <thead>
+        <tr><th>Código</th><th>Nombre</th><th>Marca</th><th>Modelo</th><th>Cantidad</th><th>Precio unitario</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="text" name="catalitico_codigo[]" class="rec-input"></td>
+          <td><input type="text" name="catalitico_nombre[]" class="rec-input"></td>
+          <td><input type="text" name="catalitico_marca[]" class="rec-input" style="width:100px;"></td>
+          <td><input type="text" name="catalitico_modelo[]" class="rec-input" style="width:100px;"></td>
+          <td><input type="number" name="catalitico_cantidad[]" class="rec-input" value="1" min="1" style="width:70px;"></td>
+          <td><input type="number" name="catalitico_precio[]" class="rec-input" step="any" style="width:110px;"></td>
+          <td><button type="button" class="rec-btn-sm" onclick="agregarFila('tabla-catalitico', this)">+ fila</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rec-card">
+    <h3>Chatarra electrónica</h3>
+    <table class="rec-table" id="tabla-chatarra">
+      <thead>
+        <tr><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <select name="chatarra_producto_id[]" class="rec-select">
+              <option value="">— Seleccionar —</option>
+              {% for p in catalogo_chatarra %}
+              <option value="{{ p.pk }}">{{ p.nombre }} ({{ p.get_unidad_medida_display }})</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td><input type="number" name="chatarra_cantidad[]" class="rec-input" step="any" style="width:90px;"></td>
+          <td><input type="number" name="chatarra_precio[]" class="rec-input" step="any" style="width:110px;"></td>
+          <td><button type="button" class="rec-btn-sm" onclick="agregarFila('tabla-chatarra', this)">+ fila</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rec-card">
+    <label class="rec-field-label">Notas</label>
+    <textarea name="notas" class="rec-input" style="width:100%;" rows="2"></textarea>
+  </div>
+
+  <button type="submit" class="rec-btn">Guardar compra</button>
+</form>
+
+<script>
+function agregarFila(tablaId, boton) {
+  const tabla = document.getElementById(tablaId).querySelector('tbody');
+  const fila = boton.closest('tr').cloneNode(true);
+  fila.querySelectorAll('input').forEach(function (input) {
+    if (input.type === 'number' && input.name.includes('cantidad')) {
+      input.value = 1;
+    } else {
+      input.value = '';
+    }
+  });
+  fila.querySelectorAll('select').forEach(function (select) { select.selectedIndex = 0; });
+  tabla.appendChild(fila);
+}
+</script>
+{% endblock %}

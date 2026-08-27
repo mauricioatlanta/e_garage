@@ -1,0 +1,41 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load country_url %}
+
+{% block page_title %}Compras de reciclaje{% endblock %}
+{% block page_icon %}🧾{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .rec-table { width: 100%; border-collapse: collapse; color: #e5e7eb; }
+  .rec-table th, .rec-table td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .rec-btn { background: #00fff7; color: #0f2027; font-weight: bold; border: none; border-radius: 8px; padding: 0.5rem 1rem; text-decoration: none; display: inline-block; margin-bottom: 1rem; }
+</style>
+{% endblock %}
+
+{% block panel_content %}
+<a href="{% country_url 'reciclaje_staff:crear_compra' %}" class="rec-btn">+ Nueva compra</a>
+
+<table class="rec-table">
+  <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Fecha</th></tr></thead>
+  <tbody>
+    {% for compra in page_obj %}
+    <tr>
+      <td><a href="{% country_url 'reciclaje_staff:detalle_compra' compra.pk %}" style="color:#00fff7;">#{{ compra.pk }}</a></td>
+      <td>{{ compra.cliente|default:"Mostrador" }}</td>
+      <td>${{ compra.total|floatformat:0 }}</td>
+      <td>{{ compra.created_at|date:"d/m/Y H:i" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">Sin compras registradas.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if page_obj.has_other_pages %}
+<div style="margin-top:1rem;">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" style="color:#00fff7;">&larr; Anterior</a>{% endif %}
+  <span style="color:#9ca3af;margin:0 1rem;">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" style="color:#00fff7;">Siguiente &rarr;</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

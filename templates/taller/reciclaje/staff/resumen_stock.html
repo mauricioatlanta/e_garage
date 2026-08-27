@@ -1,0 +1,61 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load country_url %}
+
+{% block page_title %}Stock de reciclaje{% endblock %}
+{% block page_icon %}📦{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .rec-card { background: rgba(0,0,0,0.7); border: 1px solid rgba(0,255,255,0.3); border-radius: 10px; padding: 20px; margin-bottom: 1.5rem; }
+  .rec-table { width: 100%; border-collapse: collapse; color: #e5e7eb; }
+  .rec-table th, .rec-table td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .rec-link { color: #00fff7; text-decoration: none; margin-right: 0.75rem; }
+  .rec-warn { color: #f59e0b; }
+</style>
+{% endblock %}
+
+{% block panel_content %}
+<div class="rec-card">
+  <h3>Catalíticos disponibles</h3>
+  <table class="rec-table">
+    <thead><tr><th>Código</th><th>Nombre</th><th>Marca / Modelo</th><th>Stock</th><th>Precio venta</th><th></th></tr></thead>
+    <tbody>
+      {% for c in catalogo_disponible %}
+      <tr>
+        <td>{{ c.codigo }}</td>
+        <td>{{ c.nombre }}</td>
+        <td>{{ c.marca_vehiculo }} {{ c.modelo_vehiculo }}</td>
+        <td>{{ c.cantidad_stock }}</td>
+        <td>${{ c.precio_venta|floatformat:0 }}</td>
+        <td>
+          <a href="{% country_url 'reciclaje_staff:editar_catalitico' c.pk %}" class="rec-link">Editar</a>
+          <a href="{% country_url 'reciclaje_staff:eliminar_catalitico' c.pk %}" class="rec-link">Eliminar</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">Sin catalíticos en stock.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="rec-card">
+  <h3>Chatarra electrónica</h3>
+  <table class="rec-table">
+    <thead><tr><th>Producto</th><th>Categoría</th><th>Stock</th><th>Precio compra</th><th>Precio venta</th></tr></thead>
+    <tbody>
+      {% for p in chatarra %}
+      <tr {% if p.stock_minimo and p.cantidad_stock < p.stock_minimo %}class="rec-warn"{% endif %}>
+        <td>{{ p.nombre }}</td>
+        <td>{{ p.categoria|default:"—" }}</td>
+        <td>{{ p.cantidad_stock }} {{ p.get_unidad_medida_display }}{% if p.stock_minimo and p.cantidad_stock < p.stock_minimo %} ⚠️ bajo mínimo{% endif %}</td>
+        <td>${{ p.precio_compra|floatformat:0 }}</td>
+        <td>${{ p.precio_venta|floatformat:0 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">Sin productos de chatarra.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

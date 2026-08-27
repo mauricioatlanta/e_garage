@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Reciclaje — {{ empresa.nombre_taller }}</title>
+    <style>
+        @page { size: A4; margin: 2cm; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #111; }
+        h1 { font-size: 16pt; margin-bottom: 0; }
+        .subtitle { color: #555; margin-top: 4px; margin-bottom: 20px; }
+        .kpis { display: flex; gap: 24px; margin-bottom: 24px; }
+        .kpi { border: 1px solid #ccc; border-radius: 6px; padding: 10px 16px; }
+        .kpi .value { font-size: 14pt; font-weight: bold; }
+        .kpi .label { font-size: 8pt; color: #555; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+        th, td { text-align: left; padding: 4px 8px; border-bottom: 1px solid #ddd; font-size: 9pt; }
+        th { background: #f0f0f0; }
+        .footer { margin-top: 24px; font-size: 8pt; color: #888; }
+    </style>
+</head>
+<body>
+    <h1>Reporte de Reciclaje</h1>
+    <div class="subtitle">
+        {{ empresa.nombre_taller }} · {{ fecha_desde|date:"d/m/Y" }} — {{ fecha_hasta|date:"d/m/Y" }}
+    </div>
+
+    <div class="kpis">
+        <div class="kpi"><div class="value">${{ total_compras|floatformat:0 }}</div><div class="label">Total comprado</div></div>
+        <div class="kpi"><div class="value">${{ total_ventas|floatformat:0 }}</div><div class="label">Total vendido</div></div>
+        <div class="kpi"><div class="value">${{ margen|floatformat:0 }}</div><div class="label">Margen</div></div>
+    </div>
+
+    <h3>Compras</h3>
+    <table>
+        <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th>Fecha</th></tr></thead>
+        <tbody>
+            {% for compra in compras %}
+            <tr><td>#{{ compra.pk }}</td><td>{{ compra.cliente|default:"Mostrador" }}</td><td>${{ compra.total|floatformat:0 }}</td><td>{{ compra.created_at|date:"d/m/Y" }}</td></tr>
+            {% empty %}<tr><td colspan="4">Sin compras en el período.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Ventas</h3>
+    <table>
+        <thead><tr><th>#</th><th>Comprador</th><th>Total</th><th>Fecha</th></tr></thead>
+        <tbody>
+            {% for venta in ventas %}
+            <tr><td>#{{ venta.pk }}</td><td>{{ venta.comprador|default:"—" }}</td><td>${{ venta.total|floatformat:0 }}</td><td>{{ venta.created_at|date:"d/m/Y" }}</td></tr>
+            {% empty %}<tr><td colspan="4">Sin ventas en el período.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">Generado el {{ fecha_generacion|date:"d/m/Y H:i" }} por eGarage.</div>
+</body>
+</html>
