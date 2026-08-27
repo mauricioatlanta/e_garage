@@ -153,6 +153,10 @@ def test_landing_cataliticos_con_precios_metal_los_muestra(empresa_recycling):
     assert "Valor Referencial de Metales Preciosos" in content
     assert "Platino" in content
     assert "30.000" in content or "30000" in content
+    # Rodio es el mayor (120000) -> su barra debe ir al 100%; platino
+    # (30000/120000) -> 25%.
+    assert 'class="metal-bar rodio" style="width: 100%;"' in content
+    assert 'class="metal-bar" style="width: 25%;"' in content
 
 
 @pytest.mark.django_db
