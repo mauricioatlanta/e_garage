@@ -349,7 +349,7 @@ def test_sitemap_contains_complete_uruguay_surface(rf):
 
     import re
     locs = re.findall(r"<loc>(.*?)</loc>", content)
-    assert len(locs) == 62
+    assert len(locs) == 63  # +1: /cl/reciclaje/ (vertical RECYCLING, Fase 358)
 
 
 # ---------------------------------------------------------------------------

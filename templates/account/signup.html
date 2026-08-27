@@ -284,11 +284,13 @@
                 'TALLER_MECANICO':  'Estás a un paso de registrar tu primer vehículo.',
                 'DESARMADURIA':     'Estás a un paso de publicar tus primeras piezas.',
                 'CASA_REPUESTOS':   'Estás a un paso de poner tu catálogo en línea.',
+                'RECICLAJE':        'Estás a un paso de publicar tu catálogo de precios.',
             };
             var leads = {
                 'TALLER_MECANICO':  'Crea tu cuenta y el primer vehículo puede estar registrado en menos de un minuto.',
                 'DESARMADURIA':     'Crea tu cuenta y las primeras piezas pueden estar publicadas en menos de un minuto.',
                 'CASA_REPUESTOS':   'Crea tu cuenta y el catálogo empieza a trabajar por ti desde hoy.',
+                'RECICLAJE':        'Crea tu cuenta y tu catálogo de catalíticos y chatarra queda publicado hoy.',
             };
             if (rubro && headlines[rubro]) {
                 document.getElementById('signup-headline').textContent = headlines[rubro];
@@ -376,6 +378,12 @@
                         <span class="rubro-card-label">Especialista</span>
                         <span class="rubro-card-desc">Electricidad, escapes…</span>
                     </div>
+                    <div class="rubro-card" data-rubro="RECICLAJE" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">♻️</span>
+                        <span class="rubro-card-label">Reciclaje</span>
+                        <span class="rubro-card-desc">Catalíticos, chatarra</span>
+                    </div>
                     <div class="rubro-card" data-rubro="OTRO" data-section="principal" role="radio" tabindex="0">
                         <span class="rubro-badge" style="display:none">Principal</span>
                         <span class="rubro-card-icon">⊞</span>
@@ -428,6 +436,12 @@
                             <span class="rubro-card-icon">⚡</span>
                             <span class="rubro-card-label">Especialista</span>
                             <span class="rubro-card-desc">Electricidad, escapes…</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="RECICLAJE" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">♻️</span>
+                            <span class="rubro-card-label">Reciclaje</span>
+                            <span class="rubro-card-desc">Catalíticos, chatarra</span>
                         </div>
                         <div class="rubro-card" data-rubro="OTRO" data-section="adicional" role="checkbox" tabindex="0">
                             <span class="rubro-badge badge-adicional" style="display:none">+</span>
@@ -595,7 +609,7 @@
 
                 // Prefill desde la landing: reutiliza el mismo flujo de selección manual.
                 var rubroFromUrl = new URLSearchParams(window.location.search).get('rubro') || '';
-                var allowedRubros = ['TALLER_MECANICO', 'DESARMADURIA', 'CASA_REPUESTOS'];
+                var allowedRubros = ['TALLER_MECANICO', 'DESARMADURIA', 'CASA_REPUESTOS', 'RECICLAJE'];
 
                 if (allowedRubros.indexOf(rubroFromUrl) !== -1) {
                     selectPrincipalCard(rubroFromUrl);

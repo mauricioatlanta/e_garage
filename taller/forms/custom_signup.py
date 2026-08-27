@@ -71,6 +71,15 @@ SIGNUP_RUBRO_GROUPS = [
         "rubros": ["BODYSHOP", "DETAILING"],
     },
     {
+        "key": "RECICLAJE",
+        "label": "Reciclaje",
+        "label_en": "Recycling",
+        "description": "Compra y reventa de catalíticos y chatarra electrónica",
+        "description_en": "Catalytic converter and e-scrap buying and resale",
+        "icon": "♻️",
+        "rubros": ["RECYCLING"],
+    },
+    {
         "key": "ESPECIALISTA",
         "label": "Especialista",
         "label_en": "Specialist",

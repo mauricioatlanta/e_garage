@@ -276,6 +276,16 @@
         <span class="hub-card-name">{{ carwash_name }}</span>
       </a>
 
+      {% if landing_urls.recycling %}
+      <a href="{{ landing_urls.recycling }}" class="hub-card" role="listitem">
+        <img class="hub-card-image"
+             src="{% static 'img/welcome/scenes/placeholder.webp' %}"
+             alt="{{ recycling_name }}">
+        <span class="hub-card-icon" aria-hidden="true">♻️</span>
+        <span class="hub-card-name">{{ recycling_name }}</span>
+      </a>
+      {% endif %}
+
       <div class="hub-card-soon" role="listitem" aria-label="{{ bodyshop_name }}">
         <span class="hub-badge-soon">{{ soon_label }}</span>
         <span class="hub-card-icon" aria-hidden="true">🎨</span>
