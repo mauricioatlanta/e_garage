@@ -43,6 +43,21 @@ server {{
     ssl_certificate_key /etc/letsencrypt/live/{domain}/privkey.pem;
     ssl_protocols       TLSv1.2 TLSv1.3;
     ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    location /static/ {{
+        alias /srv/egarage/staticfiles/;
+        expires max;
+        add_header Cache-Control "public, max-age=31536000";
+        access_log off;
+    }}
+
+    location /media/ {{
+        alias /srv/egarage/media/;
+        expires 7d;
+        add_header Cache-Control "public";
+        access_log off;
+    }}
+
     location / {{
         proxy_pass http://unix:/run/gunicorn/gunicorn.sock;
         proxy_set_header Host              $host;

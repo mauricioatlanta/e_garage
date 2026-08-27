@@ -720,7 +720,11 @@ def test_escribir_nginx_conf_contiene_dominio_y_rutas(tmp_path, svc):
     assert "server_name taller.example.cl" in conf
     assert "/etc/letsencrypt/live/taller.example.cl/fullchain.pem" in conf
     assert "/etc/letsencrypt/live/taller.example.cl/privkey.pem" in conf
-    assert "proxy_pass http://127.0.0.1:8000" in conf
+    assert "proxy_pass http://unix:/run/gunicorn/gunicorn.sock" in conf
+    assert "location /static/" in conf
+    assert "alias /srv/egarage/staticfiles/" in conf
+    assert "location /media/" in conf
+    assert "alias /srv/egarage/media/" in conf
 
 
 def test_nginx_conf_path_usa_prefijo_tenant(svc):
