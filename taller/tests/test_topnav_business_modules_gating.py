@@ -94,3 +94,36 @@ def test_topnav_workshop_sigue_mostrando_boton_documentos(empresa_workshop):
     content = response.content.decode()
     assert ">Documentos<" in content
     assert ">Compras<" not in content
+
+
+@pytest.mark.django_db
+def test_topnav_recycling_boton_reportes_va_al_reporte_de_reciclaje(empresa_recycling):
+    """El botón "Reportes" para el resto de rubros lleva a un hub de 13+
+    tarjetas de taller mecánico (reportes por técnico, recordatorios de
+    mantención, vehículos atendidos, agenda...) — ninguna aplica a
+    RECYCLING. Debe llevar directo al reporte de fechas del panel de
+    reciclaje."""
+    client = Client()
+    client.force_login(empresa_recycling.user)
+
+    response = client.get("/cl/es/reciclaje/")
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert "/cl/es/reciclaje/reportes/" in content
+    assert "reportes/reportes_dashboard" not in content
+
+
+@pytest.mark.django_db
+def test_topnav_workshop_sigue_mostrando_hub_de_reportes_generico(empresa_workshop):
+    """Regresión: el rubro WORKSHOP no debe perder el link al hub de
+    reportes genérico."""
+    client = Client()
+    client.force_login(empresa_workshop.user)
+
+    response = client.get("/cl/es/centro-operaciones/")
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert "/cl/es/reportes/" in content
+    assert "/cl/es/reciclaje/reportes/" not in content
