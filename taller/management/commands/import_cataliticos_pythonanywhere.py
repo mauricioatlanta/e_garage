@@ -6,6 +6,7 @@ SQLite del proyecto original (PythonAnywhere, "cataliticos"), cuya cuenta
 fue cerrada por falta de pago. Migra:
 
     - cataliticos_catalitico     -> taller.Catalitico       (catálogo actual)
+    - cataliticos_productochatarra -> taller.ProductoChatarra (catálogo de chatarra)
     - cataliticos_cliente        -> taller.Cliente           (vendedores)
     - cataliticos_compracatalitico
       + cataliticos_detallecatalitico
@@ -47,8 +48,10 @@ from taller.models.clientes import Cliente
 from taller.models.empresa import Empresa
 from taller.models.reciclaje import (
     Catalitico,
+    CategoriaChatarra,
     CompraReciclaje,
     DetalleCompraCatalitico,
+    ProductoChatarra,
 )
 
 IMPORT_TAG_PREFIX = "[pythonanywhere:compra:"
@@ -138,6 +141,7 @@ class Command(BaseCommand):
         stats = {
             "catalitico_creado": 0, "catalitico_actualizado": 0,
             "catalitico_con_imagen": 0, "catalitico_sin_imagen": 0,
+            "chatarra_creado": 0, "chatarra_actualizado": 0,
             "cliente_creado": 0, "cliente_actualizado": 0,
             "compra_creada": 0, "compra_saltada": 0,
             "detalle_creado": 0,
@@ -186,6 +190,43 @@ class Command(BaseCommand):
                         warnings.append(f"Catalítico {row['codigo']}: imagen no encontrada ({imagen_rel}).")
                 elif imagen_rel:
                     stats["catalitico_sin_imagen"] += 1
+
+            categoria_cache: dict[str, CategoriaChatarra] = {}
+            try:
+                chatarra_rows = list(src.execute("SELECT * FROM cataliticos_productochatarra"))
+            except sqlite3.OperationalError:
+                chatarra_rows = []
+                warnings.append(
+                    "Tabla cataliticos_productochatarra no encontrada en el "
+                    "origen — no se importó catálogo de chatarra."
+                )
+            for row in chatarra_rows:
+                categoria = None
+                categoria_nombre = (row["categoria"] or "").strip()
+                if categoria_nombre:
+                    categoria = categoria_cache.get(categoria_nombre)
+                    if categoria is None:
+                        categoria, _ = CategoriaChatarra.objects.get_or_create(
+                            empresa=empresa, nombre=categoria_nombre
+                        )
+                        categoria_cache[categoria_nombre] = categoria
+
+                precio = _to_decimal(row["precio_kg"])
+                obj, created = ProductoChatarra.objects.update_or_create(
+                    empresa=empresa,
+                    codigo=row["codigo"],
+                    defaults={
+                        "nombre": row["nombre"] or row["codigo"],
+                        "categoria": categoria,
+                        "unidad_medida": ProductoChatarra.UNIDAD_KG,
+                        "precio_compra": precio,
+                        "precio_venta": precio,
+                        "cantidad_stock": _to_decimal(row["cantidad"]),
+                        "origen_importacion": "pythonanywhere",
+                        "activo": True,
+                    },
+                )
+                stats["chatarra_creado" if created else "chatarra_actualizado"] += 1
 
             cliente_by_old_id: dict[int, Cliente] = {}
             for row in src.execute("SELECT * FROM cataliticos_cliente"):
@@ -274,6 +315,10 @@ class Command(BaseCommand):
             f"{stats['catalitico_actualizado']} actualizados "
             f"({stats['catalitico_con_imagen']} con imagen, "
             f"{stats['catalitico_sin_imagen']} sin imagen)."
+        ))
+        self.stdout.write(self.style.SUCCESS(
+            f"{prefix}Chatarra: {stats['chatarra_creado']} creados, "
+            f"{stats['chatarra_actualizado']} actualizados."
         ))
         self.stdout.write(self.style.SUCCESS(
             f"{prefix}Clientes: {stats['cliente_creado']} creados, "

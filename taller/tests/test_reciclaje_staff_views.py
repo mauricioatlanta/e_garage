@@ -202,6 +202,53 @@ def test_crear_compra_catalitico_existente_hace_restock(cliente_owner, empresa_a
 
 
 @pytest.mark.django_db
+def test_api_catalitico_por_codigo_devuelve_datos_para_autocompletar(cliente_owner, empresa_a):
+    CataliticoFactory(
+        empresa=empresa_a,
+        codigo="AUTO-1",
+        nombre="Toyota Corolla",
+        marca_vehiculo="Toyota",
+        modelo_vehiculo="Corolla",
+        precio_compra=Decimal("15000.00"),
+        cantidad_stock=3,
+    )
+
+    response = cliente_owner.get(
+        "/cl/es/reciclaje/api/catalitico-por-codigo/", {"codigo": "auto-1"}
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["found"] is True
+    assert data["nombre"] == "Toyota Corolla"
+    assert data["marca_vehiculo"] == "Toyota"
+    assert data["modelo_vehiculo"] == "Corolla"
+    assert data["precio_compra"] == "15000.00"
+    assert data["cantidad_stock"] == 3
+
+
+@pytest.mark.django_db
+def test_api_catalitico_por_codigo_no_encontrado(cliente_owner, empresa_a):
+    response = cliente_owner.get(
+        "/cl/es/reciclaje/api/catalitico-por-codigo/", {"codigo": "NO-EXISTE"}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"found": False}
+
+
+@pytest.mark.django_db
+def test_api_catalitico_por_codigo_aislado_por_empresa(cliente_owner, empresa_a, empresa_b):
+    CataliticoFactory(empresa=empresa_b, codigo="OTRA-EMPRESA")
+
+    response = cliente_owner.get(
+        "/cl/es/reciclaje/api/catalitico-por-codigo/", {"codigo": "OTRA-EMPRESA"}
+    )
+
+    assert response.json() == {"found": False}
+
+
+@pytest.mark.django_db
 def test_crear_compra_codigos_duplicados_en_envio_se_rechaza(cliente_owner, empresa_a):
     response = cliente_owner.post(
         "/cl/es/reciclaje/compras/nueva/",

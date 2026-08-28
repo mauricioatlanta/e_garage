@@ -21,7 +21,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import F, Sum
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -218,6 +218,31 @@ def dashboard(request):
 
 
 # ── Compra ────────────────────────────────────────────────────────────────────
+
+
+@login_required
+@role_required("Owner", "Admin")
+def api_catalitico_por_codigo(request):
+    """Autocompleta nombre/marca/modelo/precio al escribir un código de
+    catalítico ya catalogado, para no tener que retipearlos en cada
+    restock. Nunca crea nada — solo lectura."""
+    empresa = _empresa_o_403(request)
+    codigo = (request.GET.get("codigo") or "").strip()
+    if not codigo:
+        return JsonResponse({"found": False})
+
+    catalitico = Catalitico.objects.filter(empresa=empresa, codigo__iexact=codigo).first()
+    if catalitico is None:
+        return JsonResponse({"found": False})
+
+    return JsonResponse({
+        "found": True,
+        "nombre": catalitico.nombre,
+        "marca_vehiculo": catalitico.marca_vehiculo,
+        "modelo_vehiculo": catalitico.modelo_vehiculo,
+        "precio_compra": str(catalitico.precio_compra),
+        "cantidad_stock": catalitico.cantidad_stock,
+    })
 
 
 @login_required

@@ -6,6 +6,11 @@ app_name = "reciclaje_staff"
 
 urlpatterns = [
     path("", views_staff.dashboard, name="dashboard"),
+    path(
+        "api/catalitico-por-codigo/",
+        views_staff.api_catalitico_por_codigo,
+        name="api_catalitico_por_codigo",
+    ),
     path("compras/nueva/", views_staff.crear_compra, name="crear_compra"),
     path("compras/", views_staff.listado_compras, name="listado_compras"),
     path("compras/<int:pk>/", views_staff.detalle_compra, name="detalle_compra"),
