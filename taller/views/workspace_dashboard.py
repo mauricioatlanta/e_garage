@@ -1,8 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from taller.auth.decorators import country_login_required
-from taller.constants.product_profiles import PRODUCT_CASA_REPUESTOS, PRODUCT_DESARMADURIA
+from taller.constants.product_profiles import (
+    PRODUCT_CASA_REPUESTOS,
+    PRODUCT_DESARMADURIA,
+    PRODUCT_RECYCLING,
+)
 from taller.constants.workspaces import (
     WGT_KPI_DESARM_AVAIL,
     WGT_KPI_DESARM_DEPLETED,
@@ -60,8 +64,16 @@ def workspace_dashboard(request):
     empresa = get_or_create_empresa(request)
     config = getattr(empresa, "config", None)
     ws_def = WorkspaceService.get_workspace_def(config)
-    dashboard_data = WorkspaceDashboardService.resolve(ws_def, empresa)
     prefix = _workspace_prefix_from_request(request)
+
+    if ws_def.product_key == PRODUCT_RECYCLING:
+        # RECYCLING has its own fully-built dashboard (KPIs, charts, recent
+        # compras/ventas) at taller/reciclaje/ — the generic widget system
+        # below only knows about Documento/Repuesto/VehiculoDesarme, none of
+        # which apply to a reciclaje business.
+        return redirect(f"{prefix}/reciclaje/")
+
+    dashboard_data = WorkspaceDashboardService.resolve(ws_def, empresa)
     docs_ns = _docs_ns_from_request(request)
 
     if ws_def.product_key == PRODUCT_CASA_REPUESTOS:

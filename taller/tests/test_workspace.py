@@ -20,6 +20,7 @@ from taller.constants.business_modules import (
     MOD_DESARME,
     MOD_DOCUMENTOS,
     MOD_INICIO,
+    MOD_RECICLAJE,
     MOD_REPUESTOS,
     MOD_REPORTES,
     MOD_SERVICIOS,
@@ -160,6 +161,15 @@ class WorkspaceBrandTests(TestCase):
         ws = WorkspaceService.resolve(config)
         self.assertEqual(ws["brand"]["color_class"], "lime")
 
+    def test_recycling_has_its_own_brand_not_parts(self):
+        """Regresión: RECYCLING compartía por completo la marca/KPIs de
+        Casa de Repuestos ("eGarage Repuestos") — debe tener la suya."""
+        config = _make_config("RECYCLING")
+        ws = WorkspaceService.resolve(config)
+        self.assertEqual(ws["brand"]["product_name"], "eGarage Reciclaje")
+        self.assertEqual(ws["brand"]["icon"], "fas fa-recycle")
+        self.assertNotEqual(ws["brand"]["product_name"], "eGarage Repuestos")
+
 
 class WorkspaceNavTests(TestCase):
     """Resolved nav list respects active modules and product ordering."""
@@ -187,6 +197,23 @@ class WorkspaceNavTests(TestCase):
         ws = WorkspaceService.resolve(config, "/cl/es", "")
         keys = [item["key"] for item in ws["nav"]]
         self.assertNotIn(MOD_VEHICULOS, keys)
+
+    def test_recycling_nav_excludes_vehiculos_repuestos_servicios(self):
+        config = _make_config("RECYCLING")
+        ws = WorkspaceService.resolve(config, "/cl/es", "")
+        keys = [item["key"] for item in ws["nav"]]
+        self.assertIn(MOD_RECICLAJE, keys)
+        self.assertNotIn(MOD_VEHICULOS, keys)
+        self.assertNotIn(MOD_REPUESTOS, keys)
+        self.assertNotIn(MOD_SERVICIOS, keys)
+        self.assertNotIn(MOD_DESARME, keys)
+
+    def test_recycling_nav_urls_point_into_reciclaje_panel(self):
+        config = _make_config("RECYCLING")
+        ws = WorkspaceService.resolve(config, "/cl/es", "")
+        urls = {item["key"]: item["url"] for item in ws["nav"]}
+        self.assertEqual(urls[MOD_INICIO], "/cl/es/reciclaje/")
+        self.assertEqual(urls[MOD_REPORTES], "/cl/es/reciclaje/reportes/")
 
     def test_desarm_nav_includes_desarme(self):
         config = _make_config("MIXED")
