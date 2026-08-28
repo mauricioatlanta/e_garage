@@ -94,7 +94,7 @@
           </svg>
         </span>
         <div>
-          <h1 data-i18n="{% if es_edicion %}editar_documento{% else %}crear_documento{% endif %}">{% if es_edicion %}EDITAR DOCUMENTO{% else %}CREAR DOCUMENTO{% endif %}</h1>
+          <h1 data-i18n="{% if es_edicion %}editar_documento{% else %}crear_documento{% endif %}">{% if es_edicion %}EDITAR {{ ui_config.document_noun|default:"DOCUMENTO"|upper }}{% else %}CREAR {{ ui_config.document_noun|default:"DOCUMENTO"|upper }}{% endif %}</h1>
           <span id="draft-indicator" class="doc-draft-indicator hidden" role="status" aria-live="polite" data-i18n="borrador_guardado">Borrador guardado</span>
         </div>
         <div class="doc-lang-toggle" id="doc-lang-toggle" role="group" aria-label="Idioma / Language">
@@ -105,7 +105,7 @@
 
       <div class="doc-top-grid">
         <div class="doc-field-card doc-field-card--number">
-          <label data-i18n="doc_numero">Documento N°</label>
+          <label data-i18n="doc_numero">{{ ui_config.document_noun|default:"Documento" }} N°</label>
           <span id="id_numero" class="doc-field-display" data-placeholder="Se generará automáticamente">
             {% if es_edicion %}
               {{ documento.numero|default:form.numero.value|default:"-" }}
@@ -823,9 +823,9 @@ if (window.DESARME_PREFILL) {
 (function() {
   var T = {
     es: {
-      crear_documento: 'CREAR DOCUMENTO', editar_documento: 'EDITAR DOCUMENTO',
+      crear_documento: 'CREAR {{ ui_config.document_noun|default:"DOCUMENTO"|upper }}', editar_documento: 'EDITAR {{ ui_config.document_noun|default:"DOCUMENTO"|upper }}',
       borrador_guardado: 'Borrador guardado',
-      doc_numero: 'Documento N°', fecha: 'Fecha', tipo_doc: 'Tipo de documento',
+      doc_numero: '{{ ui_config.document_noun|default:"Documento" }} N°', fecha: 'Fecha', tipo_doc: 'Tipo de documento',
       estado_pago: 'Estado de pago', operacion: 'Operación',
       op_servicios: 'Servicios', op_solo_repuestos: 'Solo venta de repuestos',
       tipo_opts: { OT: 'Orden de Trabajo', PRES: 'Presupuesto', FAC: 'Comprobante', PTS: 'Venta Repuestos' },
@@ -860,9 +860,9 @@ if (window.DESARME_PREFILL) {
       agregar_video: 'Video',
     },
     en: {
-      crear_documento: 'CREATE DOCUMENT', editar_documento: 'EDIT DOCUMENT',
+      crear_documento: 'CREATE {{ ui_config.document_noun_en|default:"DOCUMENT"|upper }}', editar_documento: 'EDIT {{ ui_config.document_noun_en|default:"DOCUMENT"|upper }}',
       borrador_guardado: 'Draft saved',
-      doc_numero: 'Document No.', fecha: 'Date', tipo_doc: 'Document type',
+      doc_numero: '{{ ui_config.document_noun_en|default:"Document" }} No.', fecha: 'Date', tipo_doc: 'Document type',
       estado_pago: 'Payment status', operacion: 'Operation',
       op_servicios: 'Services', op_solo_repuestos: 'Parts only',
       tipo_opts: { OT: 'Work Order', PRES: 'Estimate', FAC: 'Invoice', PTS: 'Parts Sale' },

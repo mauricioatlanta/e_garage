@@ -340,3 +340,37 @@ def test_servicios_menu_data_api_get_no_crea_servicio(auth_client, user_cl):
     payload = response.json()
     assert payload["total"] > 0
     assert not Servicio.objects.filter(empresa=empresa, categoria__country="CL").exists()
+
+
+@pytest.mark.django_db
+def test_document_form_recycling_dice_compra_no_documento(client):
+    """El rubro RECYCLING no debe hablar de "Documento" (lenguaje de taller
+    mecánico) — la única operación posible ahí es una compra de material."""
+    from taller.models.configuracion import ConfiguracionEmpresa
+    from taller.tests.factories import EmpresaFactory
+
+    user = User.objects.create_user(username="doc-recycling", password="pass")
+    empresa = EmpresaFactory(user=user, nombre_taller="Reciclaje Doc", pais="CL")
+    ConfiguracionEmpresa.objects.create(empresa=empresa, rubro_principal="RECYCLING")
+    client.force_login(user)
+
+    response = client.get("/cl/documentos/form/")
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert "CREAR COMPRA" in content
+    assert "Compra N°" in content
+    assert "CREAR DOCUMENTO" not in content
+    assert ">Documento N°<" not in content
+
+
+@pytest.mark.django_db
+def test_document_form_workshop_sigue_diciendo_documento(auth_client):
+    """Regresión: el rubro por defecto (sin config explícita, como
+    user_cl) no debe perder el texto "Documento" al agregar el rename
+    para RECYCLING."""
+    response = auth_client.get("/cl/documentos/form/")
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert "CREAR DOCUMENTO" in content

@@ -362,12 +362,19 @@ class ConfiguracionEmpresa(models.Model):
         Retorna configuración de UI para el formulario de documentos.
         """
         secciones = self.get_secciones_visibles()
+        es_recycling = self.rubro_principal == "RECYCLING"
         return {
             "show_vehicle": secciones.get("vehiculo", True),
             "show_services": secciones.get("servicios", True),
             "show_otros_servicios": secciones.get("otros_servicios", False),
             "show_repuestos": secciones.get("repuestos", True),
             "show_kilometraje": secciones.get("kilometraje", False),
+            # Rubro RECYCLING: el "documento" es siempre una compra de
+            # material (catalíticos, chatarra u otro), nunca una cotización
+            # ni orden de trabajo de taller — se renombra en la UI para que
+            # no confunda con lenguaje de taller mecánico.
+            "document_noun": "Compra" if es_recycling else "Documento",
+            "document_noun_en": "Purchase" if es_recycling else "Document",
         }
 
     class Meta:
