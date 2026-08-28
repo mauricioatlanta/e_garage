@@ -851,10 +851,17 @@
           <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Parts{% else %}Repuestos{% endif %}</span>
         </a>
         {% endif %}
+        {% if 'reciclaje' in business_modules %}
+        <a href="{% country_url 'reciclaje_staff:reporte_fechas' %}" class="nav-button-standard">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Reportes</span>
+        </a>
+        {% else %}
         <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
           <span class="nav-icon">📊</span>
           <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Reports{% else %}Reportes{% endif %}</span>
         </a>
+        {% endif %}
         {% if 'servicios' in business_modules %}
         <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
           <span class="nav-icon">🛠️</span>
