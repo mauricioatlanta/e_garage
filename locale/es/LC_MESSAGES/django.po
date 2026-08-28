@@ -746,6 +746,39 @@ msgstr "Agregar Repuesto"
 msgid "workspace.parts.action.view_inventory"
 msgstr "Ver Inventario"
 
+# -- Reciclaje: marca --
+msgid "workspace.recycling.brand.name"
+msgstr "eGarage Reciclaje"
+
+msgid "workspace.recycling.brand.tagline"
+msgstr "Compra y control de catalíticos, chatarra y metales"
+
+# -- Reciclaje: navegación --
+msgid "workspace.recycling.nav.home"
+msgstr "Inicio"
+
+msgid "workspace.recycling.nav.purchases"
+msgstr "Compras"
+
+msgid "workspace.recycling.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.recycling.nav.reports"
+msgstr "Reportes"
+
+msgid "workspace.recycling.nav.settings"
+msgstr "Configuración"
+
+# -- Reciclaje: acciones --
+msgid "workspace.recycling.action.new_purchase"
+msgstr "Nueva Compra"
+
+msgid "workspace.recycling.action.view_stock"
+msgstr "Ver Stock"
+
+msgid "workspace.recycling.action.view_reports"
+msgstr "Reportes"
+
 # -- Carwash: marca --
 msgid "workspace.carwash.brand.name"
 msgstr "eGarage Carwash"
@@ -875,6 +908,30 @@ msgstr "Servicios rápidos"
 
 msgid "workspace.carwash.texts.activity_feed"
 msgstr "Servicios del día"
+
+msgid "workspace.recycling.texts.search_title"
+msgstr "Buscar catalítico"
+
+msgid "workspace.recycling.texts.search_label"
+msgstr "Código, marca o modelo"
+
+msgid "workspace.recycling.texts.search_placeholder"
+msgstr "Busca por código, marca o modelo"
+
+msgid "workspace.recycling.texts.search_hint"
+msgstr "tu catálogo de catalíticos y chatarra"
+
+msgid "workspace.recycling.texts.live_title"
+msgstr "centro de reciclaje"
+
+msgid "workspace.recycling.texts.live_metric"
+msgstr "chatarra bajo stock mínimo"
+
+msgid "workspace.recycling.texts.quick_actions"
+msgstr "Acciones rápidas"
+
+msgid "workspace.recycling.texts.activity_feed"
+msgstr "Compras recientes"
 
 # -- Títulos de widgets (dashboard_service) --
 msgid "OT Abiertas"

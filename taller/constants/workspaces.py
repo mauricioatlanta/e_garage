@@ -35,6 +35,7 @@ from taller.constants.business_modules import (
     MOD_DOCUMENTOS,
     MOD_FLOTA,
     MOD_INICIO,
+    MOD_RECICLAJE,
     MOD_REPORTES,
     MOD_REPUESTOS,
     MOD_SERVICIOS,
@@ -45,6 +46,7 @@ from taller.constants.product_profiles import (
     PRODUCT_CARWASH,
     PRODUCT_CASA_REPUESTOS,
     PRODUCT_DESARMADURIA,
+    PRODUCT_RECYCLING,
     PRODUCT_TALLER,
     RUBRO_TO_PRODUCT,
 )
@@ -182,6 +184,20 @@ TERMINOLOGY: dict[str, object] = {
     "workspace.parts.action.add_part":        _("workspace.parts.action.add_part"),
     "workspace.parts.action.view_inventory":  _("workspace.parts.action.view_inventory"),
 
+    # -- Reciclaje: brand --
+    "workspace.recycling.brand.name":    _("workspace.recycling.brand.name"),
+    "workspace.recycling.brand.tagline": _("workspace.recycling.brand.tagline"),
+    # -- Reciclaje: nav --
+    "workspace.recycling.nav.home":      _("workspace.recycling.nav.home"),
+    "workspace.recycling.nav.purchases": _("workspace.recycling.nav.purchases"),
+    "workspace.recycling.nav.clients":   _("workspace.recycling.nav.clients"),
+    "workspace.recycling.nav.reports":   _("workspace.recycling.nav.reports"),
+    "workspace.recycling.nav.settings":  _("workspace.recycling.nav.settings"),
+    # -- Reciclaje: actions --
+    "workspace.recycling.action.new_purchase": _("workspace.recycling.action.new_purchase"),
+    "workspace.recycling.action.view_stock":   _("workspace.recycling.action.view_stock"),
+    "workspace.recycling.action.view_reports": _("workspace.recycling.action.view_reports"),
+
     # -- Carwash: brand --
     "workspace.carwash.brand.name":    _("workspace.carwash.brand.name"),
     "workspace.carwash.brand.tagline": _("workspace.carwash.brand.tagline"),
@@ -235,6 +251,16 @@ TERMINOLOGY: dict[str, object] = {
     "workspace.carwash.texts.live_metric":        _("workspace.carwash.texts.live_metric"),
     "workspace.carwash.texts.quick_actions":      _("workspace.carwash.texts.quick_actions"),
     "workspace.carwash.texts.activity_feed":      _("workspace.carwash.texts.activity_feed"),
+
+    # -- Reciclaje: texts --
+    "workspace.recycling.texts.search_title":       _("workspace.recycling.texts.search_title"),
+    "workspace.recycling.texts.search_label":       _("workspace.recycling.texts.search_label"),
+    "workspace.recycling.texts.search_placeholder": _("workspace.recycling.texts.search_placeholder"),
+    "workspace.recycling.texts.search_hint":        _("workspace.recycling.texts.search_hint"),
+    "workspace.recycling.texts.live_title":         _("workspace.recycling.texts.live_title"),
+    "workspace.recycling.texts.live_metric":        _("workspace.recycling.texts.live_metric"),
+    "workspace.recycling.texts.quick_actions":      _("workspace.recycling.texts.quick_actions"),
+    "workspace.recycling.texts.activity_feed":      _("workspace.recycling.texts.activity_feed"),
 }
 
 
@@ -406,6 +432,40 @@ WORKSPACE_CARWASH = WorkspaceDef(
     ),
 )
 
+WORKSPACE_RECYCLING = WorkspaceDef(
+    product_key=PRODUCT_RECYCLING,
+    brand=WorkspaceBrand(
+        name_key="workspace.recycling.brand.name",
+        tagline_key="workspace.recycling.brand.tagline",
+        icon="fas fa-recycle",
+        color_class="cyan",
+    ),
+    nav=(
+        WorkspaceNavDef(MOD_INICIO,        "workspace.recycling.nav.home",      "fas fa-home",        nav_key="recycling_home",      path="reciclaje/"),
+        WorkspaceNavDef(MOD_RECICLAJE,     "workspace.recycling.nav.purchases", "fas fa-recycle",     nav_key="recycling_purchases", path="reciclaje/compras/"),
+        WorkspaceNavDef(MOD_CLIENTES,      "workspace.recycling.nav.clients",   "fas fa-users",       nav_key="recycling_clients"),
+        WorkspaceNavDef(MOD_REPORTES,      "workspace.recycling.nav.reports",   "fas fa-chart-bar",   nav_key="recycling_reports",   path="reciclaje/reportes/"),
+        WorkspaceNavDef(MOD_CONFIGURACION, "workspace.recycling.nav.settings",  "fas fa-cog",         nav_key="recycling_config"),
+    ),
+    widget_keys=(),
+    quick_actions=(
+        WorkspaceActionDef("workspace.recycling.action.new_purchase", "fas fa-recycle",   "reciclaje/compras/nueva/"),
+        WorkspaceActionDef("workspace.recycling.action.view_stock",   "fas fa-boxes",     "reciclaje/stock/"),
+        WorkspaceActionDef("workspace.recycling.action.view_reports", "fas fa-chart-bar", "reciclaje/reportes/"),
+    ),
+    theme={"--eg-primary": "#00fff7", "--eg-accent": "#0891b2"},
+    texts=WorkspaceTextsDef(
+        search_title_key="workspace.recycling.texts.search_title",
+        search_label_key="workspace.recycling.texts.search_label",
+        search_placeholder_key="workspace.recycling.texts.search_placeholder",
+        search_hint_key="workspace.recycling.texts.search_hint",
+        live_feed_title_key="workspace.recycling.texts.live_title",
+        live_feed_metric_key="workspace.recycling.texts.live_metric",
+        quick_actions_label_key="workspace.recycling.texts.quick_actions",
+        activity_feed_title_key="workspace.recycling.texts.activity_feed",
+    ),
+)
+
 
 # ---------------------------------------------------------------------------
 # Registry — maps product key to its WorkspaceDef.
@@ -417,6 +477,7 @@ WORKSPACE_DEFINITIONS: dict[str, WorkspaceDef] = {
     PRODUCT_DESARMADURIA:   WORKSPACE_DESARMADURIA,
     PRODUCT_CASA_REPUESTOS: WORKSPACE_CASA_REPUESTOS,
     PRODUCT_CARWASH:        WORKSPACE_CARWASH,
+    PRODUCT_RECYCLING:      WORKSPACE_RECYCLING,
 }
 
 

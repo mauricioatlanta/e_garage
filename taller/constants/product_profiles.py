@@ -18,6 +18,7 @@ from taller.constants.business_modules import (
     MOD_DOCUMENTOS,
     MOD_FLOTA,
     MOD_INICIO,
+    MOD_RECICLAJE,
     MOD_REPORTES,
     MOD_REPUESTOS,
     MOD_SERVICIOS,
@@ -28,6 +29,7 @@ PRODUCT_TALLER         = "TALLER"
 PRODUCT_DESARMADURIA   = "DESARMADURIA"
 PRODUCT_CASA_REPUESTOS = "CASA_REPUESTOS"
 PRODUCT_CARWASH        = "CARWASH"
+PRODUCT_RECYCLING      = "RECYCLING"
 
 # Maps every rubro_principal value to a product family.
 RUBRO_TO_PRODUCT = {
@@ -53,7 +55,7 @@ RUBRO_TO_PRODUCT = {
     "PARTS":               PRODUCT_CASA_REPUESTOS,
     "TIRE":                PRODUCT_CASA_REPUESTOS,
     "DETAILING":           PRODUCT_CARWASH,
-    "RECYCLING":           PRODUCT_CASA_REPUESTOS,
+    "RECYCLING":           PRODUCT_RECYCLING,
 }
 
 PRODUCT_PROFILES = {
@@ -124,6 +126,27 @@ PRODUCT_PROFILES = {
             {"label": "Nueva Venta",      "icon": "fas fa-shopping-cart", "path": "documentos/form/"},
             {"label": "Agregar Repuesto", "icon": "fas fa-plus",          "path": "repuestos/crear/"},
             {"label": "Ver Inventario",   "icon": "fas fa-boxes",         "path": "repuestos/"},
+        ],
+    },
+
+    PRODUCT_RECYCLING: {
+        "name":          "eGarage Reciclaje",
+        "tagline":       "Compra y control de catalíticos, chatarra y metales",
+        "icon":          "fas fa-recycle",
+        "color_class":   "lime",
+        "default_rubro": "RECYCLING",
+        "nav": [
+            {"key": MOD_INICIO,        "label": "Inicio",        "icon": "fas fa-home"},
+            {"key": MOD_RECICLAJE,     "label": "Compras",       "icon": "fas fa-recycle"},
+            {"key": MOD_CLIENTES,      "label": "Clientes",      "icon": "fas fa-users"},
+            {"key": MOD_REPORTES,      "label": "Reportes",      "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": "Configuración", "icon": "fas fa-cog"},
+        ],
+        "kpi_labels": ["Compras hoy", "Catalíticos en stock", "Margen del mes", "Chatarra bajo stock mínimo"],
+        "quick_access": [
+            {"label": "Nueva Compra",     "icon": "fas fa-recycle",       "path": "reciclaje/compras/nueva/"},
+            {"label": "Ver Stock",        "icon": "fas fa-boxes",         "path": "reciclaje/stock/"},
+            {"label": "Reportes",         "icon": "fas fa-chart-bar",     "path": "reciclaje/reportes/"},
         ],
     },
 
