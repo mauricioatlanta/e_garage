@@ -838,18 +838,22 @@
 
       <!-- Row 2: Parts, Reports, Services, Disassembly, Vehicles, Logout -->
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
+        {% if 'repuestos' in business_modules %}
         <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
           <span class="nav-icon">🔧</span>
           <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Parts{% else %}Repuestos{% endif %}</span>
         </a>
+        {% endif %}
         <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
           <span class="nav-icon">📊</span>
           <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Reports{% else %}Reportes{% endif %}</span>
         </a>
+        {% if 'servicios' in business_modules %}
         <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
           <span class="nav-icon">🛠️</span>
           <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Services{% else %}Servicios{% endif %}</span>
         </a>
+        {% endif %}
         {% if 'desarme' in business_modules %}
         {% country_url 'desarme:index' as desarme_url %}
         <a href="{% if desarme_url %}{{ desarme_url }}{% else %}#{% endif %}" class="nav-button-standard">
@@ -857,6 +861,7 @@
           <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Disassembly{% else %}Desarme{% endif %}</span>
         </a>
         {% endif %}
+        {% if 'vehiculos' in business_modules %}
         {% country_url 'vehiculos:lista_vehiculos' as vehiculos_url %}
         {% if vehiculos_url %}
         <a href="{{ vehiculos_url }}" class="nav-button-standard">
@@ -868,6 +873,7 @@
           <span class="nav-icon">🚗</span>
           <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Vehicles{% else %}Vehículos{% endif %}</span>
         </a>
+        {% endif %}
         {% endif %}
         <form action="{% url 'account_logout' %}" method="post" class="inline-block">
           {% csrf_token %}
