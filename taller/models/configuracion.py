@@ -304,6 +304,7 @@ class ConfiguracionEmpresa(models.Model):
                 'servicios': bool,
                 'otros_servicios': bool,
                 'kilometraje': bool,
+                'vehiculo': bool,
             }
         """
         secciones = {
@@ -311,6 +312,7 @@ class ConfiguracionEmpresa(models.Model):
             "servicios": getattr(self, "usa_servicios", True),
             "otros_servicios": getattr(self, "usa_otros_servicios", False),
             "kilometraje": getattr(self, "usa_kilometraje", False),
+            "vehiculo": getattr(self, "usa_vehiculos", True),
         }
 
         # Ajustes según rubro
@@ -319,6 +321,15 @@ class ConfiguracionEmpresa(models.Model):
             secciones["servicios"] = False
             secciones["otros_servicios"] = False
             secciones["kilometraje"] = False
+        elif self.rubro_principal == "RECYCLING":
+            # Reciclaje (catalíticos, chatarra u otros materiales): la compra
+            # nunca está asociada a un vehículo del cliente ni a servicios
+            # internos — el formulario de documento se usa solo para
+            # registrar líneas de material comprado.
+            secciones["servicios"] = False
+            secciones["otros_servicios"] = False
+            secciones["kilometraje"] = False
+            secciones["vehiculo"] = False
         elif self.rubro_principal == "TIRE":
             # Vulcanización: servicios y repuestos, con kilometraje
             secciones["repuestos"] = True
@@ -352,7 +363,7 @@ class ConfiguracionEmpresa(models.Model):
         """
         secciones = self.get_secciones_visibles()
         return {
-            "show_vehicle": getattr(self, "usa_vehiculos", True),
+            "show_vehicle": secciones.get("vehiculo", True),
             "show_services": secciones.get("servicios", True),
             "show_otros_servicios": secciones.get("otros_servicios", False),
             "show_repuestos": secciones.get("repuestos", True),
