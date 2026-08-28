@@ -64,7 +64,7 @@
       </thead>
       <tbody>
         <tr>
-          <td><input type="text" name="catalitico_codigo[]" class="rec-input"></td>
+          <td><input type="text" name="catalitico_codigo[]" class="rec-input rec-linea-codigo"></td>
           <td><input type="text" name="catalitico_nombre[]" class="rec-input"></td>
           <td><input type="text" name="catalitico_marca[]" class="rec-input" style="width:100px;"></td>
           <td><input type="text" name="catalitico_modelo[]" class="rec-input" style="width:100px;"></td>
@@ -122,6 +122,36 @@
 </form>
 
 <script>
+var URL_CATALITICO_POR_CODIGO = "{% country_url 'reciclaje_staff:api_catalitico_por_codigo' %}";
+
+function autocompletarCatalitico(inputCodigo) {
+  var codigo = inputCodigo.value.trim();
+  if (!codigo) return;
+  var fila = inputCodigo.closest('tr');
+
+  fetch(URL_CATALITICO_POR_CODIGO + '?codigo=' + encodeURIComponent(codigo))
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (!data.found) return;
+      var campoNombre = fila.querySelector('[name="catalitico_nombre[]"]');
+      var campoMarca = fila.querySelector('[name="catalitico_marca[]"]');
+      var campoModelo = fila.querySelector('[name="catalitico_modelo[]"]');
+      var campoPrecio = fila.querySelector('[name="catalitico_precio[]"]');
+      if (campoNombre && !campoNombre.value) campoNombre.value = data.nombre || '';
+      if (campoMarca && !campoMarca.value) campoMarca.value = data.marca_vehiculo || '';
+      if (campoModelo && !campoModelo.value) campoModelo.value = data.modelo_vehiculo || '';
+      if (campoPrecio && !campoPrecio.value) campoPrecio.value = data.precio_compra || '';
+      recalcularTotales();
+    })
+    .catch(function () { /* código nuevo o error de red: se deja en blanco para completar a mano */ });
+}
+
+document.addEventListener('focusout', function (event) {
+  if (event.target.classList && event.target.classList.contains('rec-linea-codigo')) {
+    autocompletarCatalitico(event.target);
+  }
+});
+
 function agregarFila(tablaId, boton) {
   const tabla = document.getElementById(tablaId).querySelector('tbody');
   const fila = boton.closest('tr').cloneNode(true);

@@ -62,3 +62,35 @@ def test_topnav_workshop_sigue_mostrando_repuestos_vehiculos_servicios(empresa_w
     assert ">Repuestos<" in content
     assert ">Vehículos<" in content
     assert ">Servicios<" in content
+
+
+@pytest.mark.django_db
+def test_topnav_recycling_boton_compras_va_al_panel_de_reciclaje(empresa_recycling):
+    """El botón que para el resto de rubros dice "Documentos" y lleva al
+    formulario genérico (sin autocompletado ni catálogo de chatarra) debe
+    decir "Compras" y llevar directo al panel de reciclaje para RECYCLING."""
+    client = Client()
+    client.force_login(empresa_recycling.user)
+
+    response = client.get("/cl/es/reciclaje/")
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert ">Compras<" in content
+    assert "/cl/es/reciclaje/" in content
+    assert ">Documentos<" not in content
+
+
+@pytest.mark.django_db
+def test_topnav_workshop_sigue_mostrando_boton_documentos(empresa_workshop):
+    """Regresión: el rubro WORKSHOP no debe perder el botón "Documentos"
+    apuntando al formulario genérico."""
+    client = Client()
+    client.force_login(empresa_workshop.user)
+
+    response = client.get("/cl/es/centro-operaciones/")
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert ">Documentos<" in content
+    assert ">Compras<" not in content

@@ -14,7 +14,12 @@ import pytest
 from django.core.management import call_command
 
 from taller.models.clientes import Cliente
-from taller.models.reciclaje import Catalitico, CompraReciclaje, DetalleCompraCatalitico
+from taller.models.reciclaje import (
+    Catalitico,
+    CompraReciclaje,
+    DetalleCompraCatalitico,
+    ProductoChatarra,
+)
 from taller.tests.factories import EmpresaFactory
 
 
@@ -26,6 +31,10 @@ def _crear_sqlite_fixture(path: Path) -> None:
             id INTEGER PRIMARY KEY, codigo TEXT, descripcion TEXT,
             valor_compra REAL, valor_venta REAL, cantidad INTEGER,
             vendido INTEGER, imagen_principal TEXT
+        );
+        CREATE TABLE cataliticos_productochatarra (
+            id INTEGER PRIMARY KEY, nombre TEXT, codigo TEXT,
+            precio_kg INTEGER, categoria TEXT, cantidad REAL
         );
         CREATE TABLE cataliticos_cliente (
             id INTEGER PRIMARY KEY, nombre TEXT, apellido TEXT, rut TEXT,
@@ -43,6 +52,10 @@ def _crear_sqlite_fixture(path: Path) -> None:
         INSERT INTO cataliticos_catalitico VALUES
             (1, 'K181', 'Peugeot', 35662, 74400, 1, 0, 'cataliticos/K181.jpeg'),
             (2, 'K357', 'Peugeot' || char(10) || 'Citroen', 49035.25, 129300, 0, 1, NULL);
+
+        INSERT INTO cataliticos_productochatarra VALUES
+            (1, 'Placa madre A', 'PMC0001-A', 2430, '', 0),
+            (2, 'Fuentes 300', 'SCR0004', 1000, 'fuente', 0);
 
         INSERT INTO cataliticos_cliente VALUES
             (1, 'Ruben', 'Jara', '77.323.929-0', '+56954156132', 'ruben@example.com', 'Calle 1'),
@@ -91,6 +104,14 @@ class TestImportCataliticosPythonanywhere:
         assert k357.marca_vehiculo == "Peugeot"  # solo la primera marca de la línea
         assert k357.estado == Catalitico.ESTADO_VENDIDO
 
+        assert ProductoChatarra.objects.filter(empresa=empresa).count() == 2
+        placa = ProductoChatarra.objects.get(empresa=empresa, codigo="PMC0001-A")
+        assert placa.nombre == "Placa madre A"
+        assert placa.precio_compra == 2430
+        assert placa.categoria is None
+        fuentes = ProductoChatarra.objects.get(empresa=empresa, codigo="SCR0004")
+        assert fuentes.categoria.nombre == "fuente"
+
         assert Cliente.objects.filter(empresa=empresa).count() == 2
         ruben = Cliente.objects.get(empresa=empresa, tax_id="77.323.929-0")
         assert ruben.nombre == "Ruben"
@@ -118,6 +139,7 @@ class TestImportCataliticosPythonanywhere:
         )
 
         assert Catalitico.objects.filter(empresa=empresa).count() == 2
+        assert ProductoChatarra.objects.filter(empresa=empresa).count() == 2
         assert Cliente.objects.filter(empresa=empresa).count() == 2
         assert CompraReciclaje.objects.filter(empresa=empresa).count() == 2
         assert DetalleCompraCatalitico.objects.count() == 2
@@ -131,6 +153,7 @@ class TestImportCataliticosPythonanywhere:
         )
 
         assert Catalitico.objects.filter(empresa=empresa).count() == 0
+        assert ProductoChatarra.objects.filter(empresa=empresa).count() == 0
         assert Cliente.objects.filter(empresa=empresa).count() == 0
         assert CompraReciclaje.objects.filter(empresa=empresa).count() == 0
 
