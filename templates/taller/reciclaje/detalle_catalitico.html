@@ -35,8 +35,8 @@
       </p>
       <div class="border-l-4 border-cyan-400 pl-4 mb-8 text-left inline-block">
         <div class="text-cyan-300 text-sm">Precio referencial de compra</div>
-        {% if catalitico.precio_venta %}
-          <div class="text-4xl font-bold">${{ catalitico.precio_venta|floatformat:0 }}</div>
+        {% if catalitico.precio_compra %}
+          <div class="text-4xl font-bold">${{ catalitico.precio_compra|floatformat:0 }}</div>
         {% else %}
           <div class="text-xl">Precio a convenir</div>
         {% endif %}

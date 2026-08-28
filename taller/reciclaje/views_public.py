@@ -48,7 +48,12 @@ def landing_cataliticos(request):
 
 def consulta_catalitico(request):
     """Consulta pública de precio de compra de un catalítico por código,
-    marca o modelo. Nunca expone precio_compra — solo precio_venta."""
+    marca o modelo.
+
+    Expone únicamente precio_compra, que representa la oferta que Atlanta
+    realiza al cliente. precio_venta es información interna de reventa y no
+    debe exponerse públicamente.
+    """
     empresa = _empresa_publica(request)
     codigo = request.GET.get("codigo", "").strip()
     resultados = []
@@ -105,7 +110,7 @@ def api_consulta_sugerencias(request):
             "id": c.pk,
             "codigo": c.codigo,
             "nombre": c.nombre,
-            "precio_referencia": float(c.precio_venta) if c.precio_venta else None,
+            "precio_referencia": float(c.precio_compra) if c.precio_compra else None,
         }
         for c in cataliticos
     ]

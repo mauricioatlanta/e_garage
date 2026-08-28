@@ -2255,8 +2255,8 @@
                             <div class="resultado-mini-info">
                                 <strong>{{ r.codigo }}</strong>
                                 <span>{{ r.nombre|default:"Catalizador"|truncatewords:6 }}</span>
-                                {% if r.precio_venta %}
-                                <span class="resultado-mini-precio">${{ r.precio_venta|floatformat:0|intcomma }} CLP</span>
+                                {% if r.precio_compra %}
+                                <span class="resultado-mini-precio">${{ r.precio_compra|floatformat:0|intcomma }} CLP</span>
                                 {% endif %}
                             </div>
                         </a>
@@ -2274,9 +2274,9 @@
                     <!-- 2. Precio de compra (lo que se paga al cliente) -->
                     <div class="resultado-precio-bloque">
                         <span class="resultado-precio-label">💰 Precio de compra</span>
-                        <span class="resultado-precio-valor {% if not resultado.precio_venta %}resultado-precio-sin-valor{% endif %}" id="price-roller">
-                            {% if resultado.precio_venta %}
-                                $<span class="precio-miles">{{ resultado.precio_venta|floatformat:0|intcomma }}</span> CLP
+                        <span class="resultado-precio-valor {% if not resultado.precio_compra %}resultado-precio-sin-valor{% endif %}" id="price-roller">
+                            {% if resultado.precio_compra %}
+                                $<span class="precio-miles">{{ resultado.precio_compra|floatformat:0|intcomma }}</span> CLP
                             {% else %}
                                 Precio a confirmar según estado y mercado
                             {% endif %}
@@ -2298,8 +2298,8 @@
                     
                     <!-- 5. CTA WhatsApp dominante -->
                     <div class="resultado-cta">
-                        {% if resultado.precio_venta %}
-                        <a href="https://wa.me/56963607348?text=Hola%2C%20quiero%20vender%20el%20catal%C3%ADtico%20{{ resultado.codigo|urlencode }}.%20%C2%BFMe%20puedes%20confirmar%20el%20valor%20actual%3F%20Vi%20que%20el%20precio%20de%20compra%20es%20%24{{ resultado.precio_venta|floatformat:0 }}%20CLP." target="_blank" class="btn-whatsapp-cta" id="whatsapp-link">
+                        {% if resultado.precio_compra %}
+                        <a href="https://wa.me/56963607348?text=Hola%2C%20quiero%20vender%20el%20catal%C3%ADtico%20{{ resultado.codigo|urlencode }}.%20%C2%BFMe%20puedes%20confirmar%20el%20valor%20actual%3F%20Vi%20que%20el%20precio%20de%20compra%20es%20%24{{ resultado.precio_compra|floatformat:0 }}%20CLP." target="_blank" class="btn-whatsapp-cta" id="whatsapp-link">
                             Vender este catalítico por WhatsApp
                         </a>
                         {% else %}

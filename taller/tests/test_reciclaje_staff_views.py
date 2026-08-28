@@ -458,6 +458,37 @@ def test_editar_catalitico_404_para_catalitico_de_otra_empresa(cliente_owner, em
 
 
 @pytest.mark.django_db
+def test_editar_catalitico_permite_editar_compra_y_venta(
+    cliente_owner, empresa_a
+):
+    catalitico = CataliticoFactory(
+        empresa=empresa_a,
+        codigo="CAT-PRECIOS",
+        precio_compra=Decimal("10000"),
+        precio_venta=Decimal("30000"),
+    )
+
+    response = cliente_owner.post(
+        f"/cl/es/reciclaje/catalitico/{catalitico.pk}/editar/",
+        {
+            "nombre": catalitico.nombre,
+            "marca_vehiculo": catalitico.marca_vehiculo,
+            "modelo_vehiculo": catalitico.modelo_vehiculo,
+            "precio_compra": "12000",
+            "precio_venta": "35000",
+            "activo": "on",
+        },
+    )
+
+    assert response.status_code == 302
+
+    catalitico.refresh_from_db()
+
+    assert catalitico.precio_compra == Decimal("12000")
+    assert catalitico.precio_venta == Decimal("35000")
+
+
+@pytest.mark.django_db
 def test_eliminar_catalitico_bloqueado_si_tiene_compra(cliente_owner, empresa_a):
     catalitico = CataliticoFactory(empresa=empresa_a)
     compra = CompraReciclaje.objects.create(empresa=empresa_a)

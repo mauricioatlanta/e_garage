@@ -245,7 +245,7 @@ def test_api_consulta_sugerencias_aislada_por_empresa(empresa_a, empresa_b):
 
 
 @pytest.mark.django_db
-def test_api_consulta_sugerencias_no_expone_precio_compra(empresa_a):
+def test_api_consulta_sugerencias_expone_compra_y_oculta_venta(empresa_a):
     from decimal import Decimal
 
     CataliticoFactory(
@@ -261,8 +261,8 @@ def test_api_consulta_sugerencias_no_expone_precio_compra(empresa_a):
     )
 
     body = response.content.decode()
-    assert "10000" not in body
-    assert response.json()["results"][0]["precio_referencia"] == 30000.0
+    assert "30000" not in body
+    assert response.json()["results"][0]["precio_referencia"] == 10000.0
 
 
 @pytest.mark.django_db
