@@ -610,6 +610,10 @@ def editar_catalitico(request, pk):
         catalitico.modelo_vehiculo = (
             request.POST.get("modelo_vehiculo") or catalitico.modelo_vehiculo
         ).strip()
+        precio_compra = _parse_decimal(request.POST.get("precio_compra"))
+        if precio_compra is not None:
+            catalitico.precio_compra = precio_compra
+
         precio_venta = _parse_decimal(request.POST.get("precio_venta"))
         if precio_venta is not None:
             catalitico.precio_venta = precio_venta
