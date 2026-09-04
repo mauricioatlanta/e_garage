@@ -77,6 +77,7 @@ from django.views.generic import RedirectView, TemplateView
 from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
 
 from taller.views.country_aware_auth import country_aware_login
+from taller.urls_extra.usa import usa_login_view, usa_signup_view, usa_signup_view_es
 from taller.views_extra.custom_signup import CustomSignupView
 from taller.views_extra.lang_switch import set_language_us
 from taller.views_extra.bienvenida import bienvenida_usa_en, bienvenida_usa_es
@@ -490,11 +491,19 @@ urlpatterns = [
     # 🇺🇸 USA - Login explícito: nunca debe caer al /accounts/login/ global (Chile).
     path(
         "us/en/accounts/login/",
-        lambda r: redirect("/us/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        usa_login_view,
     ),
     path(
         "us/es/accounts/login/",
-        country_aware_login,
+        usa_login_view,
+    ),
+    path(
+        "us/en/accounts/signup/",
+        usa_signup_view,
+    ),
+    path(
+        "us/es/accounts/signup/",
+        usa_signup_view_es,
     ),
     # Resto de /us/<lang>/accounts/* mantiene compatibilidad con namespace USA.
     path("us/en/accounts/", lambda r: redirect("/us/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))),

@@ -94,6 +94,19 @@ def _usa_login_form(request):
     return LoginForm(request=request)
 
 
+def _usa_lang_from_request(request):
+    path = (request.path or "").lower()
+    if path.startswith("/us/es/"):
+        return "es"
+    if path.startswith("/us/en/"):
+        return "en"
+
+    lang = getattr(request, "LANGUAGE_CODE", "en")
+    if lang in ("en", "es"):
+        return lang
+    return "en"
+
+
 @ensure_csrf_cookie
 def usa_login_view(request):
     """
@@ -109,9 +122,7 @@ def usa_login_view(request):
     request.country = "US"
     request.country_code = "US"
 
-    lang = getattr(request, "LANGUAGE_CODE", "en")
-    if lang not in ("en", "es"):
-        lang = "en"
+    lang = _usa_lang_from_request(request)
 
     template_name = f"us/{lang}/account/login.html"
     # Canonical workspace para USA: /us/en/workspace/ (evita loop; usa:centro_trabajo → /us/workspace/ redirige)
