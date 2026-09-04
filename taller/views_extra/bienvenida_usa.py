@@ -41,7 +41,9 @@ def _render_bienvenida_usa(request, forced_lang=None):
 
 
 def bienvenida_usa(request):
-    return _render_bienvenida_usa(request)
+    # Entrada canónica al mercado USA: siempre inglés.
+    # El español sigue disponible explícitamente en /us/es/bienvenida/.
+    return _render_bienvenida_usa(request, forced_lang="en")
 
 
 def bienvenida_usa_es(request):

@@ -160,9 +160,11 @@ def get_landing_context(country_key: str, vertical_key: str) -> dict:
         # ── Language ─────────────────────────────────────────────────────
         "language": language,
 
-        # ── Nav labels ───────────────────────────────────────────────────
+        # ── Nav labels / auth URLs ───────────────────────────────────────
         "nav_login":   _NAV.get(language, _NAV["es"])[0],
         "nav_signup":  _NAV.get(language, _NAV["es"])[1],
+        "login_url":   f"/{url_prefix}/accounts/login/" if country_key in ("us_en", "us_es") else "",
+        "signup_url":  f"/{url_prefix}/accounts/signup/" if country_key in ("us_en", "us_es") else "",
         "footer_home": _FOOTER_HOME.get(language, "Inicio"),
 
         # ── Footer links: one per vertical with name + country URL + color ─

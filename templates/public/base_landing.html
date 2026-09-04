@@ -129,8 +129,8 @@
       <span class="font-orbitron text-cyan-300 text-sm font-bold hidden sm:block">eGarage</span>
     </a>
     <div class="flex items-center gap-3">
-      <a href="{% url 'account_login' %}" class="text-sm text-slate-400 hover:text-cyan-300 transition-colors">{{ nav_login }}</a>
-      <a href="{% url 'account_signup' %}" class="text-sm px-4 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 transition-all">{{ nav_signup }}</a>
+      {% if login_url %}<a href="{{ login_url }}" class="text-sm text-slate-400 hover:text-cyan-300 transition-colors">{{ nav_login }}</a>{% else %}<a href="/accounts/login/" class="text-sm text-slate-400 hover:text-cyan-300 transition-colors">{{ nav_login }}</a>{% endif %}
+      {% if signup_url %}<a href="{{ signup_url }}" class="text-sm px-4 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 transition-all">{{ nav_signup }}</a>{% else %}<a href="/accounts/signup/" class="text-sm px-4 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 transition-all">{{ nav_signup }}</a>{% endif %}
     </div>
   </nav>
 
