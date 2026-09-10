@@ -31,6 +31,16 @@
                     </span>
                 </div>
                 <div>
+                    <span class="text-gray-400">Rubro:</span>
+                    <span class="text-white font-medium ml-2">
+                        {% if empresa.config %}
+                            {{ empresa.config.get_rubro_principal_display }}
+                        {% else %}
+                            No configurado
+                        {% endif %}
+                    </span>
+                </div>
+                <div>
                     <span class="text-gray-400">Email:</span>
                     <span class="text-white font-medium ml-2">{{ empresa.user.email }}</span>
                 </div>
