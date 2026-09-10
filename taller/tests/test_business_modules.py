@@ -216,6 +216,9 @@ class OnboardingIdentidadFormTests(TestCase):
         form = OnboardingIdentidadForm(
             data={
                 "nombre_taller": "Empresa Actualizada",
+                "telefono": "+56912345678",
+                "email": "contacto@empresa.test",
+                "direccion": "Av Test 123",
                 "lema": "Servicio automotriz profesional",
                 "rubro_principal": "PARTS",
             },

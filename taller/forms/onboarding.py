@@ -3,26 +3,34 @@ from django.utils import timezone
 from django import forms
 from taller.models.empresa import Empresa
 from taller.models.configuracion import ConfiguracionEmpresa
+from taller.models.tecnico import ROL_SUGERENCIAS, Tecnico
+from taller.services.onboarding_service import OnboardingService
 
 
 class OnboardingIdentidadForm(forms.ModelForm):
     """Paso 1: Identidad de la empresa"""
 
-    nombre_taller = forms.CharField(required=False, label=_("Nombre del Taller"))
+    nombre_taller = forms.CharField(required=True, label=_("Nombre del Taller"))
     lema = forms.CharField(required=False, label=_("Lema"))
+    telefono = forms.CharField(required=True, label=_("Teléfono"))
+    email = forms.EmailField(required=True, label=_("Email de contacto"))
+    direccion = forms.CharField(required=True, label=_("Dirección"))
     rubro_principal = forms.ChoiceField(
         choices=ConfiguracionEmpresa.RUBRO_CHOICES,
         initial="WORKSHOP",
-        required=False,
+        required=True,
         label=_("Tipo de negocio"),
         widget=forms.Select(attrs={"class": "form-control onb-control"}),
     )
 
     class Meta:
         model = Empresa
-        fields = ["nombre_taller", "logo"]
+        fields = ["nombre_taller", "telefono", "email", "direccion", "logo"]
         labels = {
             "nombre_taller": _("Nombre del Taller"),
+            "telefono": _("Teléfono"),
+            "email": _("Email de contacto"),
+            "direccion": _("Dirección"),
             "logo": _("Logo"),
         }
         widgets = {
@@ -48,22 +56,134 @@ class OnboardingIdentidadForm(forms.ModelForm):
             except Exception:
                 pass
 
-    def save(self, commit=True):
-        nombre_taller = (self.cleaned_data.get("nombre_taller") or "").strip()
-        if not nombre_taller and self.instance and getattr(self.instance, "pk", None):
-            self.cleaned_data["nombre_taller"] = self.instance.nombre_taller
+    def clean_nombre_taller(self):
+        nombre = (self.cleaned_data.get("nombre_taller") or "").strip()
+        empresa = self.instance
+        if empresa is not None:
+            empresa.nombre_taller = nombre
+        user = getattr(empresa, "user", None)
+        if not nombre or OnboardingService.is_placeholder_business_name(empresa, user=user):
+            raise forms.ValidationError(
+                _("Ingresa el nombre real de tu negocio, no un nombre genérico.")
+            )
+        return nombre
 
+    def clean_telefono(self):
+        telefono = (self.cleaned_data.get("telefono") or "").strip()
+        if not OnboardingService.is_valid_phone(telefono):
+            raise forms.ValidationError(
+                _(
+                    "El teléfono es obligatorio y debe tener al menos 8 caracteres. "
+                    "Solo números, espacios, guiones, + y paréntesis."
+                )
+            )
+        return telefono
+
+    def clean_direccion(self):
+        direccion = (self.cleaned_data.get("direccion") or "").strip()
+        if not direccion:
+            raise forms.ValidationError(_("La dirección es obligatoria."))
+        return direccion
+
+    def save(self, commit=True):
         empresa = super().save(commit=commit)
         lema = (self.cleaned_data.get("lema") or "").strip()
-        rubro = self.cleaned_data.get("rubro_principal") or "WORKSHOP"
+        rubro = self.cleaned_data.get("rubro_principal")
         if commit:
             config, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
             config.tagline = lema
             config.rubro_principal = rubro
+            config.telefono = empresa.telefono
+            config.email_contacto = empresa.email
+            config.direccion = empresa.direccion
+            if rubro and rubro not in (config.rubros or []):
+                config.rubros = [rubro] + list(config.rubros or [])
             if config.modules_configured_at is None:
                 config.modules_configured_at = timezone.now()
-            config.save(update_fields=["tagline", "rubro_principal", "modules_configured_at"])
+            config.save(
+                update_fields=[
+                    "tagline",
+                    "rubro_principal",
+                    "rubros",
+                    "telefono",
+                    "email_contacto",
+                    "direccion",
+                    "modules_configured_at",
+                ]
+            )
         return empresa
+
+
+class OnboardingEquipoForm(forms.ModelForm):
+    """Paso 2: personal operativo mínimo."""
+
+    rol = forms.CharField(
+        required=True,
+        label=_("Rol"),
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control onb-control",
+                "placeholder": _("Ej: Técnico, Vendedor, Mecánico General"),
+                "list": "rol-sugerencias",
+            }
+        ),
+    )
+
+    class Meta:
+        model = Tecnico
+        fields = ["nombre", "telefono", "direccion", "rol"]
+        labels = {
+            "nombre": _("Nombre completo"),
+            "telefono": _("Teléfono"),
+            "direccion": _("Dirección"),
+            "rol": _("Rol"),
+        }
+        widgets = {
+            "nombre": forms.TextInput(attrs={"class": "form-control onb-control"}),
+            "telefono": forms.TextInput(attrs={"class": "form-control onb-control"}),
+            "direccion": forms.TextInput(attrs={"class": "form-control onb-control"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.empresa = kwargs.pop("empresa", None)
+        super().__init__(*args, **kwargs)
+        if self.empresa is not None:
+            self.instance.empresa = self.empresa
+        self.rol_sugerencias = ROL_SUGERENCIAS
+
+    def clean(self):
+        cleaned_data = super().clean()
+        nombre = cleaned_data.get("nombre")
+        telefono = cleaned_data.get("telefono")
+        try:
+            OnboardingService.validate_tecnico_data(nombre, telefono)
+        except forms.ValidationError as exc:
+            for field, messages in exc.message_dict.items():
+                for message in messages:
+                    self.add_error(field, message)
+        rol = (cleaned_data.get("rol") or "").strip()
+        if not rol:
+            self.add_error("rol", _("El rol es obligatorio."))
+        if self.empresa and nombre:
+            qs = Tecnico.objects.filter(empresa=self.empresa, nombre__iexact=nombre.strip())
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                self.add_error(
+                    "nombre",
+                    _("Ya existe un técnico con ese nombre en tu empresa."),
+                )
+        return cleaned_data
+
+    def save(self, commit=True):
+        tecnico = super().save(commit=False)
+        if self.empresa is not None:
+            tecnico.empresa = self.empresa
+        tecnico.activo = True
+        if commit:
+            tecnico.full_clean()
+            tecnico.save()
+        return tecnico
 
 
 class OnboardingFiscalForm(forms.ModelForm):

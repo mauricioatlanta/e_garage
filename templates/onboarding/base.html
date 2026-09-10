@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Onboarding - {{ empresa.nombre_taller }}{% endblock %}
+{% block title %}{% trans "Onboarding" %} - {{ empresa.nombre_taller }}{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -261,7 +261,7 @@
         <div class="d-flex justify-content-between">
             {% if paso_actual > 1 %}
             <button type="button" class="btn onb-btn-secondary" onclick="irAPasoAnterior()">
-                ← Anterior
+                {% trans "Anterior" %}
             </button>
             {% else %}
             <div></div>
@@ -270,11 +270,11 @@
             <div>
                 {% if paso_actual < 3 %}
                 <button type="button" class="btn btn-onboarding" onclick="guardarYSiguiente()">
-                    Siguiente →
+                    {% trans "Siguiente" %}
                 </button>
                 {% else %}
                 <button type="button" class="btn btn-success btn-onboarding" onclick="finalizarOnboarding()">
-                    ¡Comenzar a usar eGarage!
+                    {% trans "Comenzar a usar eGarage" %}
                 </button>
                 {% endif %}
             </div>
@@ -343,7 +343,7 @@ function ocultarLoading() {
 function irAPaso(paso) {
     const stepMap = {
         1: 'identidad',
-        2: 'fiscal',
+        2: 'equipo',
         3: 'finalizar'
     };
 

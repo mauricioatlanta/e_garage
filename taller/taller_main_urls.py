@@ -269,7 +269,6 @@ us_patterns = [
     ),
     # === ONBOARDING WIZARD ===
     path("onboarding/", onboarding_wizard, name="onboarding_wizard"),
-    path("onboarding/<str:step>/", onboarding_wizard, name="onboarding_step"),
     path("onboarding/guardar/<int:paso>/", onboarding_guardar_paso, name="onboarding_guardar_paso"),
     path(
         "onboarding/agregar-tecnico/", onboarding_agregar_tecnico, name="onboarding_agregar_tecnico"
@@ -279,6 +278,7 @@ us_patterns = [
         onboarding_preview_documento,
         name="onboarding_preview_documento",
     ),
+    path("onboarding/<str:step>/", onboarding_wizard, name="onboarding_step"),
 ]
 
 urlpatterns += us_patterns

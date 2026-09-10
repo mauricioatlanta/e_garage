@@ -82,6 +82,7 @@ MIDDLEWARE = [
     # "taller.middleware.country_url_migration.CountryURLRedirectMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.force_home_test.ForceHomeTestMiddleware",  # DESHABILITADO - Ya verificamos que funciona
     "taller.middleware.empresa_resolver.EmpresaResolverMiddleware",
+    "taller.middleware.onboarding_middleware.OnboardingMiddleware",
     # Trust & Security — Phase 1: session tracking (needs request.user + request.empresa)
     "taller.middleware.trust.TrustMiddleware",
     # "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",  # DESHABILITADO - Causa bucles infinitos

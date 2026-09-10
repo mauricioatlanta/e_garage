@@ -1,6 +1,7 @@
 import subprocess
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -11,10 +12,10 @@ from django.views.decorators.http import require_POST
 
 from taller.forms.onboarding import (
     OnboardingIdentidadForm,
+    OnboardingEquipoForm,
     OnboardingFiscalForm,
     OnboardingContactoForm,
 )
-from taller.forms.tecnico import TecnicoForm
 from taller.models.clientes import Cliente
 from taller.models.configuracion import ConfiguracionEmpresa
 from taller.models.documento import Documento
@@ -25,6 +26,12 @@ from taller.utils.country_config import get_country_config
 from taller.templatetags.role_tags import is_owner
 from taller.utils.empresa import get_active_empresa
 from taller.services.company_defaults_service import CompanyDefaultsService
+from taller.services.onboarding_service import (
+    OnboardingService,
+    language_code_for_request,
+    onboarding_step_url,
+    workspace_url,
+)
 
 
 def owner_required(view_func):
@@ -53,17 +60,15 @@ def onboarding_wizard(request, step=None):
 
     # Si ya completó el onboarding, redirigir a Ajustes
     if getattr(empresa, "onboarding_completado", False):
-        return redirect("taller:company_settings")
-
-    if step == "identidad" and getattr(empresa, "onboarding_step", 1) > 1:
-        return redirect("taller:company_settings")
+        return redirect(workspace_url(request, empresa))
 
     if step == "fiscal":
-        return redirect("taller:onboarding_step", step="finalizar")
+        return redirect(onboarding_step_url(request, empresa, "equipo"))
 
     # Mapear nombres de pasos a números (wizard simplificado)
     step_map = {
         "identidad": 1,
+        "equipo": 2,
         "fiscal": 2,
         "finalizar": 3,
     }
@@ -75,30 +80,24 @@ def onboarding_wizard(request, step=None):
         paso_actual = step_map.get(step, getattr(empresa, "onboarding_step", 1))
 
     if paso_actual == 2:
-        config, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
-        CompanyDefaultsService.apply_defaults_to_configuracion(config, empresa=empresa, commit=True)
-        if getattr(empresa, "onboarding_step", 1) == 2:
-            empresa.onboarding_step = 3
-            empresa.save(update_fields=["onboarding_step"])
-        return redirect("taller:onboarding_step", step="finalizar")
+        pass
 
     # SEGURIDAD: No permitir saltar pasos adelante si el anterior no está completo
     if paso_actual > getattr(empresa, "onboarding_step", 1):
-        # Redirigir al paso que realmente le corresponde
-        rev_step_map = {v: k for k, v in step_map.items()}
-        return redirect(
-            "taller:onboarding_step",
-            step=rev_step_map.get(getattr(empresa, "onboarding_step", 1), "identidad"),
+        step_name = OnboardingService.STEP_NAMES.get(
+            getattr(empresa, "onboarding_step", 1),
+            "identidad",
         )
+        return redirect(onboarding_step_url(request, empresa, step_name))
 
     # Compatibilidad: si llegan pasos antiguos, redirigir al flujo simplificado
-    if step in {"contacto", "equipo"}:
-        return redirect("taller:onboarding_step", step="finalizar")
+    if step == "contacto":
+        return redirect(onboarding_step_url(request, empresa, "equipo"))
 
     # Determinar template según paso
     templates = {
         1: "onboarding/paso_identidad.html",
-        2: "onboarding/paso_fiscal.html",
+        2: "onboarding/paso_equipo.html",
         3: "onboarding/paso_finalizar.html",
     }
 
@@ -106,7 +105,7 @@ def onboarding_wizard(request, step=None):
 
     # Configurar país e idioma
     country_config = get_country_config(empresa.pais)
-    activate(country_config.get("lang", "es"))
+    activate(language_code_for_request(request, empresa))
 
     # Preparar contexto según paso
     context = {
@@ -115,29 +114,22 @@ def onboarding_wizard(request, step=None):
         "total_pasos": 3,
         "progreso": (paso_actual / 3) * 100,
         "country_config": country_config,
+        "validation_status": OnboardingService.validation_status(empresa, user=request.user),
     }
 
     # Agregar formularios según paso
     if paso_actual == 1:
         config = getattr(empresa, "config", None)
-        # Si el rubro ya fue capturado en signup, saltar directamente a finalizar
-        if config is not None and config.has_completed_business_setup():
-            messages.info(
-                request,
-                "Tu negocio ya está configurado como "
-                f"{config.get_rubro_principal_display()}. "
-                "Puedes ajustarlo en Configuración cuando quieras.",
-            )
-            if empresa.onboarding_step <= 1:
-                empresa.onboarding_step = 3
-                empresa.save(update_fields=["onboarding_step"])
-            return redirect("taller:onboarding_step", step="finalizar")
-
         context["form"] = OnboardingIdentidadForm(instance=empresa)
         context["rubro_choices"] = ConfiguracionEmpresa.RUBRO_CHOICES
         context["rubro_actual"] = getattr(config, "rubro_principal", "WORKSHOP") if config else "WORKSHOP"
     elif paso_actual == 2:
-        return redirect("taller:onboarding_step", step="finalizar")
+        context["form"] = OnboardingEquipoForm(empresa=empresa)
+        context["tecnicos"] = Tecnico.objects.filter(empresa=empresa).order_by("-activo", "nombre")
+        context["rol_sugerencias"] = getattr(context["form"], "rol_sugerencias", [])
+    elif paso_actual == 3:
+        context["tecnicos"] = Tecnico.objects.filter(empresa=empresa, activo=True).order_by("nombre")
+        context["validation_status"] = OnboardingService.validation_status(empresa, user=request.user)
 
     return render(request, template, context)
 
@@ -159,7 +151,10 @@ def onboarding_guardar_paso(request, paso):
 
     # SEGURIDAD: Validar que el paso que intenta guardar es el que le corresponde o anterior
     if paso > empresa.onboarding_step:
-        return JsonResponse({"success": False, "message": "No puedes saltar pasos."})
+        return JsonResponse(
+            {"success": False, "message": "No puedes saltar pasos."},
+            status=400,
+        )
 
     try:
         with transaction.atomic():
@@ -176,25 +171,23 @@ def onboarding_guardar_paso(request, paso):
                     )
 
                     if empresa.onboarding_step == 1:
-                        empresa.onboarding_step = 3
+                        empresa.onboarding_step = 2
                         empresa.save(update_fields=["onboarding_step"])
                     return JsonResponse(
                         {
                             "success": True,
-                            "next_step": 3,
-                            "next_step_url": reverse(
-                                "taller:onboarding_step", kwargs={"step": "finalizar"}
-                            ),
+                            "next_step": 2,
+                            "next_step_url": onboarding_step_url(request, empresa, "equipo"),
                             "message": "Información básica guardada correctamente",
                         }
                     )
                 return JsonResponse({"success": False, "errors": form.errors})
 
-            elif paso == 2:  # Configuración fiscal (deprecated: se autocompleta por país)
-                config, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
-                CompanyDefaultsService.apply_defaults_to_configuracion(
-                    config, empresa=empresa, commit=True
-                )
+            elif paso == 2:  # Equipo operativo mínimo
+                form = OnboardingEquipoForm(request.POST, empresa=empresa)
+                if not form.is_valid():
+                    return JsonResponse({"success": False, "errors": form.errors})
+                form.save()
                 if empresa.onboarding_step == 2:
                     empresa.onboarding_step = 3
                     empresa.save(update_fields=["onboarding_step"])
@@ -202,14 +195,25 @@ def onboarding_guardar_paso(request, paso):
                     {
                         "success": True,
                         "next_step": 3,
-                        "next_step_url": reverse(
-                            "taller:onboarding_step", kwargs={"step": "finalizar"}
-                        ),
-                        "message": "Configuración fiscal aplicada automáticamente",
+                        "next_step_url": onboarding_step_url(request, empresa, "finalizar"),
+                        "message": "Equipo operativo guardado correctamente",
                     }
                 )
 
             elif paso == 3:  # Finalizar
+                try:
+                    OnboardingService.assert_can_complete(empresa, user=request.user)
+                except ValidationError as exc:
+                    return JsonResponse(
+                        {
+                            "success": False,
+                            "message": str(exc),
+                            "validation_status": OnboardingService.validation_status(
+                                empresa, user=request.user
+                            ),
+                        },
+                        status=400,
+                    )
 
                 cargar_demo = (
                     str(request.POST.get("cargar_demo", ""))
@@ -239,14 +243,12 @@ def onboarding_guardar_paso(request, paso):
                             }
                         )
 
-                empresa.onboarding_completado = True
-                empresa.onboarding_completed_at = timezone.now()
-                empresa.save(update_fields=["onboarding_completado", "onboarding_completed_at"])
+                OnboardingService.mark_completed(empresa)
                 return JsonResponse(
                     {
                         "success": True,
                         "completed": True,
-                        "redirect_url": reverse("taller:dashboard"),
+                        "redirect_url": workspace_url(request, empresa),
                         "message": "¡Onboarding completado! Bienvenido a eGarage",
                     }
                 )
@@ -260,6 +262,7 @@ def onboarding_guardar_paso(request, paso):
 
 
 @login_required
+@owner_required
 @require_POST
 def onboarding_agregar_tecnico(request):
     """
@@ -273,11 +276,9 @@ def onboarding_agregar_tecnico(request):
     if not empresa:
         return JsonResponse({"success": False, "error": "Empresa no encontrada"})
 
-    form = TecnicoForm(request.POST)
+    form = OnboardingEquipoForm(request.POST, empresa=empresa)
     if form.is_valid():
-        tecnico = form.save(commit=False)
-        tecnico.empresa = empresa
-        tecnico.save()
+        tecnico = form.save()
 
         return JsonResponse(
             {
@@ -285,7 +286,8 @@ def onboarding_agregar_tecnico(request):
                 "tecnico": {
                     "id": tecnico.id,
                     "nombre": tecnico.nombre,
-                    "especialidad": tecnico.especialidad or "General",
+                    "telefono": tecnico.telefono,
+                    "rol": tecnico.rol,
                 },
                 "message": "Técnico agregado correctamente",
             }

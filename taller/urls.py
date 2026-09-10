@@ -22,6 +22,12 @@ from taller.views_extra.views import dashboard
 from taller.views.dashboard_bi import DashboardHomeView
 from taller.views.workspace_dashboard import workspace_dashboard
 from taller.views.workspace_briefing import workspace_briefing
+from taller.views.onboarding_views import (
+    onboarding_agregar_tecnico,
+    onboarding_guardar_paso,
+    onboarding_preview_documento,
+    onboarding_wizard,
+)
 from taller.main_views import seleccionar_pais
 
 app_name = "taller"
@@ -92,6 +98,20 @@ urlpatterns = [
     path("workspace/live-feed/", workspace_live_feed, name="workspace_live_feed"),
     path("workspace/centro-de-mando/", centro_de_mando, name="centro_de_mando"),
     path("workspace/briefing/", workspace_briefing, name="workspace_briefing"),
+    # Onboarding obligatorio para empresas nuevas.
+    path("onboarding/", onboarding_wizard, name="onboarding_wizard"),
+    path("onboarding/guardar/<int:paso>/", onboarding_guardar_paso, name="onboarding_guardar_paso"),
+    path(
+        "onboarding/agregar-tecnico/",
+        onboarding_agregar_tecnico,
+        name="onboarding_agregar_tecnico",
+    ),
+    path(
+        "onboarding/preview-documento/",
+        onboarding_preview_documento,
+        name="onboarding_preview_documento",
+    ),
+    path("onboarding/<str:step>/", onboarding_wizard, name="onboarding_step"),
     # Desarmaduría: mapa interactivo, plantillas, piezas
     path("desarme/", include(("taller.urls_desarme", "desarme"), namespace="desarme")),
     # Centro de Ingreso Vehicular

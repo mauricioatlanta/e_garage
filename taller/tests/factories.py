@@ -117,6 +117,7 @@ def EmpresaFactory(*, with_config: bool = False, **kwargs) -> Empresa:
     defaults = dict(
         nombre_taller=f"Empresa {n}",
         pais="CL",
+        onboarding_completado=True,
     )
     defaults.update(kwargs)
     empresa = Empresa.objects.create(**defaults)

@@ -35,6 +35,7 @@ MIDDLEWARE = [
     'taller.middleware.host_tenant.HostTenantMiddleware',
     'commerce.middleware.CommerceTenantMiddleware',
     'taller.middleware.empresa_resolver.EmpresaResolverMiddleware',
+    'taller.middleware.onboarding_middleware.OnboardingMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware','allauth.account.middleware.AccountMiddleware'
 ]
