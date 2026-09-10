@@ -37,14 +37,6 @@ class CountryAwareLoginView(LoginView):
 
     def dispatch(self, request, *args, **kwargs):
         self._apply_country_context(request)
-        # En allauth 65+, si el usuario ya está autenticado el padre redirige
-        # a LOGIN_REDIRECT_URL. Lo evitamos para mostrar siempre el formulario.
-        if request.user.is_authenticated:
-            from django.shortcuts import redirect
-            next_url = request.GET.get('next', '')
-            if next_url:
-                return redirect(next_url)
-            return super(type(self).__mro__[2], self).get(request, *args, **kwargs)
         return super().dispatch(request, *args, **kwargs)
 
     # ------------------------------------------------------------------ #
