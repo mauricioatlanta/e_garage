@@ -19,6 +19,9 @@
 <body class="bg-slate-950 text-white min-h-screen">
     <main class="w-full">
         {% block content %}{% endblock %}
+        {% block ayuda_contextual %}
+        {% include "components/ayuda_contextual.html" %}
+        {% endblock %}
     </main>
 
     {% block extra_js %}{% endblock %}

@@ -1,1 +1,437 @@
-<!-- ayuda contextual placeholder -->
+{% if request.user.is_authenticated %}
+{% with match=request.resolver_match path=request.path|lower lang=request.LANGUAGE_CODE|default:LANGUAGE_CODE|default:"es" %}
+{% with namespace=match.namespace|default:"" view_name=match.view_name|default:"" url_name=match.url_name|default:"" %}
+<div id="help-fab" class="fixed bottom-6 right-6 z-[9999]"
+     data-help-path="{{ request.path }}"
+     data-help-namespace="{{ namespace }}"
+     data-help-view-name="{{ view_name }}"
+     data-help-url-name="{{ url_name }}"
+     data-help-language="{% if '/en/' in path %}en{% else %}{{ lang }}{% endif %}"
+     data-help-context="{% if 'otros_servicios' in url_name or 'otro_servicio' in url_name or 'otros-servicios' in path %}servicios_externos{% elif 'team' in namespace or 'team' in url_name or 'equipo' in path %}equipo{% elif 'clientes' in namespace or 'cliente' in url_name or '/clientes/' in path %}clientes{% elif 'vehiculos' in namespace or 'vehiculo' in url_name or '/vehiculos/' in path %}vehiculos{% elif 'documentos' in namespace or 'documento' in url_name or '/documentos/' in path %}documentos{% elif 'repuestos' in namespace or 'repuesto' in url_name or '/repuestos/' in path %}repuestos{% elif 'servicios' in namespace or 'servicio' in url_name or '/servicios/' in path %}servicios{% elif 'settings' in url_name or 'configuracion' in url_name or '/settings/' in path or '/configuracion/' in path %}configuracion{% elif 'inventario' in namespace or 'inventario' in url_name or '/inventario/' in path or '/desarme/piezas/' in path %}inventario{% elif 'ventas' in namespace or 'venta' in url_name or '/ventas/' in path %}ventas{% elif 'dashboard' in url_name or 'centro_operaciones' in url_name or '/dashboard/' in path or '/workspace/' in path or '/centro-operaciones/' in path %}general{% else %}general{% endif %}">
+  <button onclick="openContextualHelp()" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 focus:outline-none" title="Ayuda Contextual">
+    <span class="text-xl">❓</span>
+  </button>
+</div>
+
+<!-- 📋 Modal de Ayuda Contextual -->
+<div id="help-modal" class="hidden fixed inset-0 z-[10000] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div class="flex items-end justify-center min-height-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 bg-black bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeContextualHelp()"></div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    <div class="inline-block align-middle bg-[#101418] border border-cyan-500 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+            <h3 class="text-lg leading-6 font-bold text-cyan-400 glow-text mb-4" id="help-modal-title">
+              🚀 Ayuda de eGarage
+            </h3>
+            <div class="mt-2" id="help-modal-content">
+              <div class="animate-pulse flex space-y-4 flex-col">
+                <div class="h-4 bg-gray-700 rounded w-3/4"></div>
+                <div class="h-4 bg-gray-700 rounded"></div>
+                <div class="h-4 bg-gray-700 rounded w-5/6"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-[#0a0e14] px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button" onclick="closeContextualHelp()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+          <span data-help-label="close">Entendido</span>
+        </button>
+        <a id="help-center-link" href="/cl/es/help/" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-transparent text-base font-medium text-gray-300 hover:bg-gray-800 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+          <span data-help-label="center">Ver Centro de Ayuda completo</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const helpContent = {
+      es: {
+        labels: {
+          faq: 'Preguntas Frecuentes',
+          guide: 'Guía Rápida',
+          close: 'Entendido',
+          center: 'Ver Centro de Ayuda completo',
+          empty: 'No hay ayuda específica para esta sección todavía.',
+          error: 'Error al cargar la ayuda. Por favor intenta más tarde.'
+        },
+        contexts: {
+          clientes: {
+            title: 'Ayuda: Clientes',
+            faqs: [
+              ['Crear cliente', 'Usa el botón de nuevo cliente y completa los datos de contacto principales.'],
+              ['Buscar cliente', 'Filtra por nombre, teléfono, correo o identificador tributario cuando esté disponible.'],
+              ['Editar datos', 'Abre la ficha del cliente y actualiza la información antes de crear nuevos documentos.']
+            ],
+            guide: ['Relaciona cada cliente con sus vehículos y documentos para mantener historial comercial y operativo completo.']
+          },
+          vehiculos: {
+            title: 'Ayuda: Vehículos',
+            faqs: [
+              ['Crear vehículo', 'Registra patente o VIN, marca, modelo y año para identificarlo sin duplicados.'],
+              ['Asociarlo a cliente', 'Vincula el vehículo al cliente propietario para encontrarlo desde ambas fichas.'],
+              ['Historial del vehículo', 'Consulta documentos y trabajos anteriores desde el detalle del vehículo.']
+            ],
+            guide: ['Patente y VIN son las mejores llaves de búsqueda: completa al menos una de ellas cuando exista.']
+          },
+          documentos: {
+            title: 'Ayuda: Documentos',
+            faqs: [
+              ['Crear documento', 'Selecciona cliente y vehículo antes de agregar líneas de trabajo.'],
+              ['Presupuesto / OT / factura', 'Usa el tipo de documento que corresponda al flujo de tu país y negocio.'],
+              ['Repuestos y servicios', 'Agrega repuestos, servicios y responsable técnico para calcular totales correctamente.']
+            ],
+            guide: ['Revisa responsable, impuestos, descuentos y estado antes de enviar o imprimir el documento.']
+          },
+          repuestos: {
+            title: 'Ayuda: Repuestos',
+            faqs: [
+              ['Crear o buscar repuesto', 'Busca primero para evitar duplicados; si no existe, crea la ficha del repuesto.'],
+              ['Stock', 'Mantén unidades disponibles actualizadas para no vender por sobre inventario.'],
+              ['Precio', 'Define costo y precio de venta antes de usar el repuesto en documentos.']
+            ],
+            guide: ['Los repuestos se pueden usar en documentos para descontar stock y calcular margen.']
+          },
+          servicios: {
+            title: 'Ayuda: Servicios',
+            faqs: [
+              ['Crear servicio', 'Registra servicios frecuentes para reutilizarlos en documentos.'],
+              ['Precio', 'Mantén precios base actualizados y ajústalos en el documento cuando sea necesario.'],
+              ['Agregar a documento', 'Selecciona el servicio desde la línea correspondiente y asigna responsable si aplica.']
+            ],
+            guide: ['Un catálogo ordenado acelera la creación de presupuestos, OT y ventas.']
+          },
+          servicios_externos: {
+            title: 'Ayuda: Servicios externos',
+            faqs: [
+              ['Empresa externa', 'Indica quién realiza el trabajo subcontratado.'],
+              ['Costo interno', 'Registra cuánto te cobra el proveedor para medir margen real.'],
+              ['Precio cliente', 'Define cuánto pagará el cliente; la diferencia muestra la ganancia.']
+            ],
+            guide: ['Usa servicios externos para trabajos tercerizados como torno, pintura, grúa o diagnóstico especializado.']
+          },
+          equipo: {
+            title: 'Ayuda: Equipo',
+            faqs: [
+              ['Agregar miembro', 'Solo el dueño puede crear usuarios del equipo desde esta pantalla.'],
+              ['Rol', 'Asigna Owner, Admin, Vendedor, Técnico o Mixto según las tareas reales del usuario.'],
+              ['Permisos y límites', 'Los permisos dependen del rol y la cantidad de usuarios puede estar limitada por el plan.']
+            ],
+            guide: ['Mantén activos solo los usuarios que trabajan en la empresa para proteger acceso y cupos del plan.']
+          },
+          configuracion: {
+            title: 'Ayuda: Configuración',
+            faqs: [
+              ['Empresa', 'Actualiza nombre, datos de contacto y datos fiscales de tu negocio.'],
+              ['Logo', 'Sube el logo para personalizar encabezados, documentos y experiencia del sistema.'],
+              ['Impuestos y moneda', 'Revisa moneda, impuestos y opciones generales antes de emitir documentos.']
+            ],
+            guide: ['La configuración afecta documentos, reportes, datos visibles para clientes y formato local.']
+          },
+          inventario: {
+            title: 'Ayuda: Inventario',
+            faqs: [
+              ['Buscar inventario', 'Filtra por pieza, vehículo origen, código o estado para encontrar stock disponible.'],
+              ['Stock y costos', 'Revisa cantidad, costo y disponibilidad antes de confirmar una venta.'],
+              ['Movimientos', 'Mantén trazabilidad de entradas, reservas, ventas y bajas.']
+            ],
+            guide: ['Un inventario actualizado evita ventas duplicadas y mejora el control de margen.']
+          },
+          ventas: {
+            title: 'Ayuda: Ventas',
+            faqs: [
+              ['Crear venta', 'Selecciona los ítems vendidos y confirma cliente, vendedor y medio de pago.'],
+              ['Precio cliente', 'Verifica precios y descuentos antes de confirmar.'],
+              ['Recibo', 'Genera o revisa el comprobante después de cerrar la venta.']
+            ],
+            guide: ['Confirma stock, responsable y total antes de emitir la venta.']
+          },
+          general: {
+            title: 'Ayuda de eGarage',
+            faqs: [
+              ['Navegación', 'Usa el menú principal para moverte entre clientes, vehículos, documentos y configuración.'],
+              ['Flujo recomendado', 'Parte creando cliente y vehículo; luego genera documentos con servicios y repuestos.'],
+              ['Soporte', 'El Centro de Ayuda reúne guías y respuestas para las tareas comunes.']
+            ],
+            guide: ['eGarage organiza la operación desde clientes y vehículos hacia documentos, inventario, equipo y reportes.']
+          }
+        }
+      },
+      en: {
+        labels: {
+          faq: 'Frequently Asked Questions',
+          guide: 'Quick Guide',
+          close: 'Got it',
+          center: 'Open full Help Center',
+          empty: 'There is no specific help for this section yet.',
+          error: 'Error loading help. Please try again later.'
+        },
+        contexts: {
+          clientes: {
+            title: 'Help: Customers',
+            faqs: [
+              ['Create customer', 'Use the new customer button and fill in the main contact details.'],
+              ['Search customer', 'Filter by name, phone, email, or tax identifier when available.'],
+              ['Edit details', 'Open the customer record and update the data before creating new documents.']
+            ],
+            guide: ['Connect each customer with vehicles and documents to keep a complete business history.']
+          },
+          vehiculos: {
+            title: 'Help: Vehicles',
+            faqs: [
+              ['Create vehicle', 'Register plate or VIN, make, model, and year to identify it without duplicates.'],
+              ['Assign customer', 'Link the vehicle to the owner so it can be found from either record.'],
+              ['Vehicle history', 'Review previous documents and jobs from the vehicle detail page.']
+            ],
+            guide: ['Plate and VIN are the best search keys: complete at least one when possible.']
+          },
+          documentos: {
+            title: 'Help: Documents',
+            faqs: [
+              ['Create document', 'Select customer and vehicle before adding work lines.'],
+              ['Estimate / RO / invoice', 'Use the document type that matches your country and workflow.'],
+              ['Parts and labor', 'Add parts, services, and responsible technician to calculate totals correctly.']
+            ],
+            guide: ['Review assignee, taxes, discounts, and status before sending or printing the document.']
+          },
+          repuestos: {
+            title: 'Help: Parts',
+            faqs: [
+              ['Create or search part', 'Search first to avoid duplicates; create the part only if it does not exist.'],
+              ['Stock', 'Keep available units updated to avoid selling beyond inventory.'],
+              ['Price', 'Set cost and sale price before using the part in documents.']
+            ],
+            guide: ['Parts can be used in documents to update stock and calculate margin.']
+          },
+          servicios: {
+            title: 'Help: Services',
+            faqs: [
+              ['Create service', 'Register frequent services so they can be reused in documents.'],
+              ['Price', 'Keep base prices updated and adjust them in the document when needed.'],
+              ['Add to document', 'Select the service from the line item and assign a technician if applicable.']
+            ],
+            guide: ['A tidy service catalog speeds up estimates, repair orders, and sales.']
+          },
+          servicios_externos: {
+            title: 'Help: External services',
+            faqs: [
+              ['External company', 'Record who performs the subcontracted work.'],
+              ['Internal cost', 'Enter what the provider charges you to measure real margin.'],
+              ['Customer price', 'Set what the customer pays; the difference shows profit.']
+            ],
+            guide: ['Use external services for outsourced work such as machining, paint, towing, or specialized diagnostics.']
+          },
+          equipo: {
+            title: 'Help: Team',
+            faqs: [
+              ['Add member', 'Only the owner can create team users from this screen.'],
+              ['Role', 'Assign Owner, Admin, Sales, Technician, or Mixed according to the user tasks.'],
+              ['Permissions and limits', 'Permissions depend on role, and the number of users may be limited by plan.']
+            ],
+            guide: ['Keep only current staff active to protect access and plan seats.']
+          },
+          configuracion: {
+            title: 'Help: Settings',
+            faqs: [
+              ['Company', 'Update business name, contact details, and tax information.'],
+              ['Logo', 'Upload the logo to personalize headers, documents, and the system experience.'],
+              ['Taxes and currency', 'Review currency, taxes, and general options before issuing documents.']
+            ],
+            guide: ['Settings affect documents, reports, customer-facing data, and local formatting.']
+          },
+          inventario: {
+            title: 'Help: Inventory',
+            faqs: [
+              ['Search inventory', 'Filter by part, donor vehicle, code, or status to find available stock.'],
+              ['Stock and costs', 'Review quantity, cost, and availability before confirming a sale.'],
+              ['Movements', 'Keep traceability for entries, reservations, sales, and write-offs.']
+            ],
+            guide: ['Updated inventory avoids duplicate sales and improves margin control.']
+          },
+          ventas: {
+            title: 'Help: Sales',
+            faqs: [
+              ['Create sale', 'Select sold items and confirm customer, seller, and payment method.'],
+              ['Customer price', 'Check prices and discounts before confirming.'],
+              ['Receipt', 'Generate or review the receipt after closing the sale.']
+            ],
+            guide: ['Confirm stock, assignee, and total before issuing the sale.']
+          },
+          general: {
+            title: 'eGarage Help',
+            faqs: [
+              ['Navigation', 'Use the main menu to move between customers, vehicles, documents, and settings.'],
+              ['Recommended flow', 'Start with customer and vehicle, then create documents with services and parts.'],
+              ['Support', 'The Help Center brings together guides and answers for common tasks.']
+            ],
+            guide: ['eGarage organizes operations from customers and vehicles into documents, inventory, team, and reports.']
+          }
+        }
+      }
+    };
+
+    function normalizedLanguage(language) {
+      return String(language || '').toLowerCase().startsWith('en') ? 'en' : 'es';
+    }
+
+    function resolveHelpContext(metadata) {
+      const namespace = String(metadata.namespace || '').toLowerCase();
+      const viewName = String(metadata.viewName || '').toLowerCase();
+      const urlName = String(metadata.urlName || '').toLowerCase();
+      const path = String(metadata.path || window.location.pathname || '').toLowerCase();
+      const haystack = `${namespace} ${viewName} ${urlName}`;
+
+      if (urlName.includes('otros_servicios') || urlName.includes('otro_servicio') || path.includes('/otros-servicios/')) return 'servicios_externos';
+      if (haystack.includes('team') || path.includes('/equipo/')) return 'equipo';
+      if (namespace.includes('clientes') || urlName.includes('cliente') || path.includes('/clientes/')) return 'clientes';
+      if (namespace.includes('vehiculos') || urlName.includes('vehiculo') || path.includes('/vehiculos/')) return 'vehiculos';
+      if (namespace.includes('documentos') || urlName.includes('documento') || path.includes('/documentos/')) return 'documentos';
+      if (namespace.includes('repuestos') || urlName.includes('repuesto') || path.includes('/repuestos/')) return 'repuestos';
+      if (namespace.includes('servicios') || urlName.includes('servicio') || path.includes('/servicios/')) return 'servicios';
+      if (urlName.includes('settings') || urlName.includes('configuracion') || path.includes('/settings/') || path.includes('/configuracion/')) return 'configuracion';
+      if (haystack.includes('inventario') || path.includes('/inventario/') || path.includes('/desarme/piezas/')) return 'inventario';
+      if (haystack.includes('venta') || path.includes('/ventas/')) return 'ventas';
+      return 'general';
+    }
+
+    function helpRoot(path) {
+      const parts = String(path || window.location.pathname || '').split('/').filter(Boolean);
+      if (parts.length >= 2 && ['cl', 'us', 'ar', 'pe', 'mx', 'co', 'ec', 've', 'uy', 'br'].includes(parts[0]) && ['es', 'en', 'pt'].includes(parts[1])) {
+        return `/${parts[0]}/${parts[1]}/help/`;
+      }
+      if (parts.length >= 1 && ['cl', 'us', 'ar', 'pe', 'mx', 'co', 'ec', 've', 'uy', 'br'].includes(parts[0])) {
+        return `/${parts[0]}/help/`;
+      }
+      return '/cl/es/help/';
+    }
+
+    function resolveApiHelpContext(context) {
+      return context === 'documentos' ? 'taller' : context;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderLocalHelp(context, language) {
+      const bundle = helpContent[language] || helpContent.es;
+      const labels = bundle.labels;
+      const item = bundle.contexts[context] || bundle.contexts.general;
+      let html = `<h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">${labels.faq}</h4>`;
+
+      item.faqs.slice(0, 3).forEach(([question, answer]) => {
+        html += `<div class="mb-4">
+          <p class="text-cyan-300 font-semibold text-sm">${escapeHtml(question)}</p>
+          <p class="text-gray-400 text-sm mt-1">${escapeHtml(answer)}</p>
+        </div>`;
+      });
+
+      if (item.guide && item.guide.length) {
+        html += '<hr class="border-gray-800 my-4">';
+        html += `<h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">${labels.guide}</h4>`;
+        html += '<ul class="list-disc list-inside text-gray-400 text-sm space-y-1">';
+        item.guide.forEach(step => {
+          html += `<li>${escapeHtml(step)}</li>`;
+        });
+        html += '</ul>';
+      }
+
+      return { title: item.title, html };
+    }
+
+    function renderApiHelp(data, stepData, context, language) {
+      const bundle = helpContent[language] || helpContent.es;
+      const labels = bundle.labels;
+      const local = renderLocalHelp(context, language);
+      let html = '';
+
+      if (data.faqs && data.faqs.length > 0) {
+        html += `<h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">${labels.faq}</h4>`;
+        data.faqs.slice(0, 3).forEach(faq => {
+          html += `<div class="mb-4">
+            <p class="text-cyan-300 font-semibold text-sm">${escapeHtml(faq.pregunta || faq.question || '')}</p>
+            <p class="text-gray-400 text-sm mt-1">${escapeHtml(faq.respuesta || faq.answer || '')}</p>
+          </div>`;
+        });
+      }
+
+      if (stepData.pasos && stepData.pasos.length > 0) {
+        html += '<hr class="border-gray-800 my-4">';
+        html += `<h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">${labels.guide}</h4>`;
+        stepData.pasos.slice(0, 1).forEach(guia => {
+          html += `<p class="text-green-400 font-semibold text-sm mb-2">${escapeHtml(guia.titulo || guia.title || '')}:</p>`;
+          html += '<ul class="list-disc list-inside text-gray-400 text-sm space-y-1">';
+          (guia.pasos || guia.steps || []).forEach(paso => {
+            html += `<li>${escapeHtml(paso)}</li>`;
+          });
+          html += '</ul>';
+        });
+      }
+
+      return html ? { title: local.title, html } : local;
+    }
+
+    window.openContextualHelp = function() {
+      const modal = document.getElementById('help-modal');
+      const content = document.getElementById('help-modal-content');
+      const title = document.getElementById('help-modal-title');
+      const fab = document.getElementById('help-fab');
+      const language = normalizedLanguage(fab.dataset.helpLanguage);
+      const labels = (helpContent[language] || helpContent.es).labels;
+      const metadata = {
+        path: fab.dataset.helpPath,
+        namespace: fab.dataset.helpNamespace,
+        viewName: fab.dataset.helpViewName,
+        urlName: fab.dataset.helpUrlName
+      };
+      const context = resolveHelpContext(metadata);
+      const apiContext = resolveApiHelpContext(context);
+      const root = helpRoot(metadata.path);
+
+      fab.dataset.helpContext = context;
+      document.querySelector('[data-help-label="close"]').textContent = labels.close;
+      document.querySelector('[data-help-label="center"]').textContent = labels.center;
+      document.getElementById('help-center-link').setAttribute('href', root);
+      modal.classList.remove('hidden');
+
+      const local = renderLocalHelp(context, language);
+      title.textContent = local.title;
+      content.innerHTML = local.html || `<p class="text-gray-400">${labels.empty}</p>`;
+
+      fetch(`${root}api/faqs/${apiContext}/`)
+        .then(res => res.ok ? res.json() : Promise.reject(res))
+        .then(data => fetch(`${root}api/pasos/${apiContext}/`)
+          .then(res => res.ok ? res.json() : Promise.reject(res))
+          .then(stepData => renderApiHelp(data, stepData, context, language)))
+        .then(rendered => {
+          title.textContent = rendered.title;
+          content.innerHTML = rendered.html || `<p class="text-gray-400">${labels.empty}</p>`;
+        })
+        .catch(err => {
+          console.error(err);
+        });
+    };
+
+    window.closeContextualHelp = function() {
+      document.getElementById('help-modal').classList.add('hidden');
+    };
+
+    window.egContextualHelp = {
+      resolveHelpContext: resolveHelpContext,
+      resolveApiHelpContext: resolveApiHelpContext,
+      helpRoot: helpRoot
+    };
+  })();
+</script>
+{% endwith %}
+{% endwith %}
+{% endif %}

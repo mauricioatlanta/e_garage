@@ -97,5 +97,8 @@
 
   
   <script src="{% static 'js/servicios_menu.js' %}?v=20260508a"></script>
+  {% block ayuda_contextual %}
+  {% include "components/ayuda_contextual.html" %}
+  {% endblock %}
 </body>
 </html>
