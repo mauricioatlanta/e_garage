@@ -10,8 +10,8 @@ from taller.common.mixins.context_return import ContextReturnCreateMixin
 from taller.mixins import CountryLangTemplateMixin
 from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
+from taller.services.empresa_service import get_empresa_safe
 from taller.templatetags.country_url import reverse_country_url
-from taller.utils.empresa import get_user_empresa_safe
 
 STATE_CITY_COUNTRIES = {"US", "BR", "VE", "PE", "MX", "CO", "EC"}
 
@@ -53,7 +53,13 @@ class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMi
     context_object_name = "cliente_list"
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        empresa = get_empresa_safe(self.request)
+        if not empresa:
+            return Cliente.objects.none()
+        qs = Cliente.objects.filter(empresa=empresa)
+        if self.select_related_fields:
+            qs = qs.select_related(*self.select_related_fields)
+        qs = qs.order_by(*self.ordering)
         q = (self.request.GET.get("q") or "").strip()
         if q:
             qs = qs.filter(
@@ -67,7 +73,7 @@ class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = get_user_empresa_safe(self.request.user)
+        empresa = get_empresa_safe(self.request)
 
         if not empresa:
             return context
@@ -188,9 +194,11 @@ class ClienteDetailView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
     base_template_name = "clientes/ver_cliente.html"
 
     def get_queryset(self):
+        empresa = get_empresa_safe(self.request)
+        if not empresa:
+            return Cliente.objects.none()
         return (
-            super()
-            .get_queryset()
+            Cliente.objects.filter(empresa=empresa)
             .select_related("empresa", "estado_usa", "ciudad_usa", "region", "ciudad", "color")
         )
 
@@ -263,6 +271,10 @@ class ClienteCreateView(
     def form_valid(self, form):
         from django.db import IntegrityError
 
+        empresa = get_empresa_safe(self.request)
+        if empresa and not getattr(form.instance, "empresa_id", None):
+            form.instance.empresa = empresa
+
         try:
             return super().form_valid(form)
         except IntegrityError as e:
@@ -294,7 +306,7 @@ class ClienteCreateView(
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        empresa = get_user_empresa_safe(self.request.user)
+        empresa = get_empresa_safe(self.request)
         if empresa:
             kwargs["empresa"] = empresa
         kwargs["pais"] = _route_country(self.request, getattr(empresa, "pais", None))
@@ -302,7 +314,7 @@ class ClienteCreateView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = get_user_empresa_safe(self.request.user)
+        empresa = get_empresa_safe(self.request)
         context["empresa"] = empresa
         context["empresa_actual"] = empresa
 
@@ -345,6 +357,12 @@ class ClienteUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
     form_class = None  # Se setea en get_form_class
     base_template_name = "clientes/cliente_form.html"
 
+    def get_queryset(self):
+        empresa = get_empresa_safe(self.request)
+        if not empresa:
+            return Cliente.objects.none()
+        return Cliente.objects.filter(empresa=empresa)
+
     def get_form_class(self):
         from taller.clientes.forms import ClienteForm
 
@@ -352,7 +370,7 @@ class ClienteUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        empresa = get_user_empresa_safe(self.request.user)
+        empresa = get_empresa_safe(self.request)
         if empresa:
             kwargs["empresa"] = empresa
         kwargs["pais"] = _route_country(self.request, getattr(empresa, "pais", None))
@@ -360,7 +378,7 @@ class ClienteUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = get_user_empresa_safe(self.request.user)
+        empresa = get_empresa_safe(self.request)
         context["empresa"] = empresa
         context["empresa_actual"] = empresa
 

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Torre de Control QA{% endblock %}
+
+{% block content %}
+<section class="mx-auto w-full max-w-4xl px-4 py-8">
+  <div class="rounded-xl border border-amber-400/50 bg-slate-950/80 p-6 text-white shadow-xl">
+    <p class="text-xs font-bold uppercase tracking-[.2em] text-amber-300">Torre de Control QA</p>
+    <h1 class="mt-2 text-2xl font-bold">Seleccionar experiencia del suscriptor</h1>
+    <p class="mt-2 text-sm text-slate-300">El contexto reemplaza solamente la empresa activa del request. Tu empresa propietaria y tu sesión no cambian.</p>
+
+    {% if qa_error %}<div class="mt-5 rounded border border-red-400/60 bg-red-950/50 px-4 py-3 text-sm text-red-200">{{ qa_error }}</div>{% endif %}
+
+    <form method="post" class="mt-6 grid gap-4 sm:grid-cols-3">
+      {% csrf_token %}
+      <label class="grid gap-2 text-sm">País
+        <select name="country" required class="rounded border border-slate-600 bg-slate-900 px-3 py-2 text-white">
+          <option value="">Seleccionar</option>
+          {% for item in countries %}<option value="{{ item.value }}" {% if selected_country == item.value %}selected{% endif %}>{{ item.label }}</option>{% endfor %}
+        </select>
+      </label>
+      <label class="grid gap-2 text-sm">Rubro
+        <select name="rubro" required class="rounded border border-slate-600 bg-slate-900 px-3 py-2 text-white">
+          <option value="">Seleccionar</option>
+          {% for item in rubros %}<option value="{{ item.value }}" {% if selected_rubro == item.value %}selected{% endif %}>{{ item.label }}</option>{% endfor %}
+        </select>
+      </label>
+      <label class="grid gap-2 text-sm">Tenant QA existente
+        <select name="empresa_id" class="rounded border border-slate-600 bg-slate-900 px-3 py-2 text-white">
+          <option value="">Usar el primero compatible</option>
+          {% for empresa in candidates %}<option value="{{ empresa.pk }}">{{ empresa.nombre_taller }}</option>{% endfor %}
+        </select>
+      </label>
+      <button class="rounded bg-amber-400 px-4 py-2 font-bold text-slate-950 sm:col-span-3" type="submit">Activar contexto QA</button>
+    </form>
+
+    {% if qa_empresa %}
+      <div class="mt-6 border-t border-slate-700 pt-4 text-sm text-slate-300">Activo: <strong class="text-white">{{ qa_empresa.nombre_taller }}</strong></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

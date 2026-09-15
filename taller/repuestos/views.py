@@ -13,6 +13,7 @@ from django.views.decorators.http import require_GET
 
 from taller.models.empresa import Empresa
 from taller.models.repuesto import Repuesto
+from taller.services.empresa_service import get_empresa_safe
 
 from .views_cbv import (
     RepuestoCreateView,
@@ -49,7 +50,7 @@ def eliminar_repuesto(request, pk):
     if request.method == "POST":
         try:
             # 🔒 BLINDAJE MULTI-TENANT: SIEMPRE filtrar por empresa
-            empresa = getattr(request.user, "empresa", None)
+            empresa = get_empresa_safe(request)
             if not empresa:
                 return JsonResponse(
                     {"success": False, "error": "Usuario sin empresa asignada"}, status=403
@@ -82,7 +83,6 @@ def buscar_repuestos_workspace(request, *args, **kwargs):
       3. part_number icontains    /  nombre icontains    /  proveedor icontains
     Límite total: 10 resultados.
     """
-    from taller.utils.empresa import get_active_empresa, get_or_create_empresa, get_user_empresa_safe
     from taller.views_ingreso import _workspace_prefix_from_request
 
     q = (request.GET.get("q") or "").strip()
@@ -96,9 +96,7 @@ def buscar_repuestos_workspace(request, *args, **kwargs):
             "meta": {"min_chars": 2, "vehiculos": 0, "clientes": 0, "total": 0},
         })
 
-    empresa = get_active_empresa(request) or get_user_empresa_safe(request.user)
-    if not empresa:
-        empresa = get_or_create_empresa(request)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse({
             "query": q,
@@ -178,16 +176,10 @@ def buscar_repuestos_ajax(request):
             log.error(f"Método no permitido: {request.method}")
             return JsonResponse({"error": "Método no permitido"}, status=405)
 
-        # Obtener empresa del usuario
-        try:
-            empresa = Empresa.objects.get(user=request.user)
-            log.info(f"Empresa encontrada: {empresa}")
-        except Empresa.DoesNotExist:
-            empresa, created = Empresa.objects.get_or_create(
-                user=request.user,
-                defaults={"nombre_taller": f"Taller de {request.user.username}"},
-            )
-            log.info(f"Empresa {'creada' if created else 'encontrada'}: {empresa}")
+        empresa = get_empresa_safe(request)
+        if not empresa:
+            return JsonResponse({"error": "Usuario sin empresa asignada"}, status=403)
+        log.info(f"Empresa activa encontrada: {empresa}")
 
         # Obtener query desde el JSON del request
         data = json.loads(request.body)

@@ -9,15 +9,16 @@ from taller.models.vehiculos import CajaVehiculo, Modelo, MotorVehiculo, Vehicul
 
 class VehiculoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        # BLINDAJE MULTI-TENANT: Extraer user y filtrar por empresa
         self.user = kwargs.pop("user", None)
+        self.empresa = kwargs.pop("empresa", None)
+        self.request = kwargs.pop("request", None)
         super().__init__(*args, **kwargs)
 
-        if self.user and hasattr(self.user, "empresa"):
-            # Filtrar clientes por empresa del usuario
-            self.fields["cliente"].queryset = Cliente.objects.filter(empresa=self.user.empresa)
-            # Filtrar modelos por país de la empresa
-            country = getattr(self.user.empresa, "pais", "CL")
+        empresa = self.empresa if self.empresa is not None else getattr(self.user, "empresa", None)
+
+        if empresa:
+            self.fields["cliente"].queryset = Cliente.objects.filter(empresa=empresa)
+            country = getattr(empresa, "pais", "CL")
             self.fields["modelo"].queryset = Modelo.objects.filter(country=country)
             # Motores y cajas se cargan vía AJAX, iniciar vacíos
             self.fields["motor"].queryset = MotorVehiculo.objects.none()

@@ -14,6 +14,7 @@ from django.views.decorators.http import require_http_methods
 from taller.models.clientes import Cliente
 from taller.models.empresa import Empresa
 from taller.models.vehiculos import Vehiculo
+from taller.services.empresa_service import get_empresa_safe
 from taller.utils.pais_utils import get_configuracion_pais
 
 logger = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ def ingreso_vehiculo_foto(request):
     """
     Vista principal para el ingreso de vehículos mediante foto de patente.
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return render(
             request,
@@ -82,7 +83,7 @@ def api_procesar_foto_patente(request):
         "mensaje": "Vehículo encontrado"
     }
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse(
             {"success": False, "error": "No tienes una empresa asignada"}, status=400
@@ -124,7 +125,7 @@ def procesar_patente_identificada(request):
     1. Si el vehículo existe: mostrar info y preguntar si quiere crear documento
     2. Si no existe: redirigir a formulario para crear vehículo/cliente
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return render(
             request,

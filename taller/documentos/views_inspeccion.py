@@ -22,6 +22,7 @@ from taller.models.inspeccion_ingreso import (
     TIPOS_DANO,
     ESTADO_INSPECCION,
 )
+from taller.services.empresa_service import get_empresa_safe
 from taller.utils.email_helper import send_email_with_reply_to
 from taller.templatetags.country_url import reverse_country_url
 
@@ -97,7 +98,7 @@ def _generar_texto_inspeccion(inspeccion, empresa_nombre: str) -> str:
 
 @login_required
 def crear_inspeccion_ingreso(request, documento_id):
-    empresa = request.user.empresa
+    empresa = get_empresa_safe(request)
     documento = get_object_or_404(Documento, pk=documento_id, empresa=empresa)
 
     empresa_nombre = empresa.nombre_taller
@@ -189,7 +190,7 @@ def crear_inspeccion_ingreso(request, documento_id):
 
 @login_required
 def ver_inspeccion_ingreso(request, pk):
-    empresa = request.user.empresa
+    empresa = get_empresa_safe(request)
     inspeccion = get_object_or_404(InspeccionIngreso, pk=pk, empresa=empresa)
 
     cliente = inspeccion.documento.cliente if inspeccion.documento_id else None
@@ -219,7 +220,7 @@ def ver_inspeccion_ingreso(request, pk):
 @login_required
 @require_POST
 def marcar_firmada(request, pk):
-    empresa = request.user.empresa
+    empresa = get_empresa_safe(request)
     inspeccion = get_object_or_404(InspeccionIngreso, pk=pk, empresa=empresa)
     inspeccion.firma_cliente = True
     inspeccion.estado_inspeccion = "firmada"
@@ -232,7 +233,7 @@ def marcar_firmada(request, pk):
 @login_required
 @require_POST
 def enviar_inspeccion_email(request, pk):
-    empresa = request.user.empresa
+    empresa = get_empresa_safe(request)
     inspeccion = get_object_or_404(InspeccionIngreso, pk=pk, empresa=empresa)
 
     email_destino = request.POST.get("email", "").strip()
@@ -271,7 +272,7 @@ def enviar_reporte_previo(request):
     from datetime import datetime
     from django.http import JsonResponse
 
-    empresa = request.user.empresa
+    empresa = get_empresa_safe(request)
     email = request.POST.get("email", "").strip()
     if not email:
         return JsonResponse({"ok": False, "error": "Email requerido"})

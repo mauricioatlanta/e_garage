@@ -19,6 +19,7 @@ from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto, ORIGEN_DESARME
 from taller.models.pieza_desarme import ESTADO_DISPONIBLE, ESTADO_RESERVADA, ESTADO_VENDIDA, PiezaDesarme
 from taller.models.vehiculo_desarme import VehiculoDesarme
+from taller.services.empresa_service import get_empresa_safe
 
 from .forms_venta_inventario import ConfirmarVentaDesdeInventarioForm
 from .views import _desarme_url, _empresa_or_redirect
@@ -197,7 +198,7 @@ def _get_venta_session_data(request, vehiculo):
         return None
 
     ids = [row["id"] for row in items if "id" in row]
-    empresa = getattr(request.user, "empresa", None) if getattr(request, "user", None) else None
+    empresa = get_empresa_safe(request) if getattr(request, "user", None) else None
     piezas_qs = PiezaDesarme.objects.filter(
         empresa=empresa,
         vehiculo_desarme=vehiculo,

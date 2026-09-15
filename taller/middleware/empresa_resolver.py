@@ -42,25 +42,56 @@ class EmpresaResolverMiddleware:
         # ── A) Dominio personalizado ya resuelto ──────────────────────────────
         if getattr(request, "empresa", None) is not None:
             if request.user.is_authenticated:
+                qa_empresa = self._resolve_qa_empresa(request)
+                if qa_empresa is not None:
+                    self._apply_qa_context(request, qa_empresa)
+                    return self.get_response(request)
                 user_empresa = get_user_empresa_safe(request.user)
                 if user_empresa is None or user_empresa.pk != request.empresa.pk:
                     logout(request)
                     return redirect("account_login")
-            return self.get_response(request)
+            return self._continue_with_qa(request)
 
         # ── B) Ruta normal (egarage.cl): comportamiento original ──────────────
         if request.user.is_authenticated:
             empresa = get_user_empresa_safe(request.user)
             if empresa is not None:
-                request.empresa = empresa
-                request.company = empresa
-                request.country = getattr(empresa, "pais", None)
+                self._set_active_company(request, empresa)
             elif not self._is_exempt(request.path):
                 # Usuario autenticado sin empresa ni membership activo → logout.
                 logout(request)
                 return redirect("account_login")
 
+        return self._continue_with_qa(request)
+
+    def _continue_with_qa(self, request):
+        qa_empresa = self._resolve_qa_empresa(request)
+        if qa_empresa is not None:
+            self._apply_qa_context(request, qa_empresa)
+        else:
+            request.qa_control_context = None
         return self.get_response(request)
+
+    @classmethod
+    def _apply_qa_context(cls, request, empresa):
+        cls._set_active_company(request, empresa)
+        from taller.qa_control.context import get_qa_control_context
+
+        request.qa_control_context = get_qa_control_context(request)
+
+    @staticmethod
+    def _set_active_company(request, empresa):
+        request.empresa = empresa
+        request.company = empresa
+        request.country = getattr(empresa, "pais", None)
+
+    @staticmethod
+    def _resolve_qa_empresa(request):
+        if not getattr(request.user, "is_authenticated", False):
+            return None
+        from taller.qa_control.context import resolve_qa_empresa
+
+        return resolve_qa_empresa(request)
 
     @staticmethod
     def _is_exempt(path: str) -> bool:

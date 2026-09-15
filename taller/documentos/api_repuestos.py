@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 
 from taller.models.repuesto import Repuesto
+from taller.services.empresa_service import get_empresa_safe
 
 
 @login_required
@@ -37,11 +38,8 @@ def buscar_repuestos_api(request):
     if len(q) < 2:
         return JsonResponse([], safe=False)
 
-    try:
-        empresa = request.user.empresa
-        if not empresa:
-            return JsonResponse([], safe=False)
-    except AttributeError:
+    empresa = get_empresa_safe(request)
+    if not empresa:
         return JsonResponse([], safe=False)
 
     qs = (

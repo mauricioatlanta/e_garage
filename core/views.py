@@ -1,9 +1,9 @@
 from django.core.exceptions import PermissionDenied
 
 try:
-    from taller.utils.empresa import get_user_empresa_safe
+    from taller.services.empresa_service import get_empresa_safe
 except ImportError:
-    get_user_empresa_safe = None
+    get_empresa_safe = None
 
 
 class TenantViewMixin:
@@ -12,14 +12,15 @@ class TenantViewMixin:
     paginate_by = 50  # ajusta por vista si necesitas
 
     def get_queryset(self):
-        # BLINDAJE MULTI-TENANT: SIEMPRE filtrar por empresa del usuario
+        # BLINDAJE MULTI-TENANT: SIEMPRE filtrar por tenant activo del request.
         if not self.request.user.is_authenticated:
             return self.model.objects.none()
 
         empresa = (
-            get_user_empresa_safe(self.request.user)
-            if get_user_empresa_safe
-            else getattr(self.request.user, "empresa", None)
+            get_empresa_safe(self.request)
+            if get_empresa_safe
+            else getattr(self.request, "empresa", None)
+            or getattr(self.request.user, "empresa", None)
         )
         if not empresa:
             return self.model.objects.none()
@@ -50,11 +51,12 @@ class TenantViewMixin:
         return context
 
     def form_valid(self, form):
-        # BLINDAJE MULTI-TENANT: SIEMPRE asignar empresa del usuario
+        # BLINDAJE MULTI-TENANT: SIEMPRE asignar tenant activo del request.
         empresa = (
-            get_user_empresa_safe(self.request.user)
-            if get_user_empresa_safe
-            else getattr(self.request.user, "empresa", None)
+            get_empresa_safe(self.request)
+            if get_empresa_safe
+            else getattr(self.request, "empresa", None)
+            or getattr(self.request.user, "empresa", None)
         )
         if not empresa:
             raise PermissionDenied("Usuario sin empresa asignada")

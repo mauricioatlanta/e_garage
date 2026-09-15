@@ -10,6 +10,7 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from taller.models.clientes import Cliente
+from taller.services.empresa_service import get_empresa_safe
 from taller.templatetags.country_url import _country_ns_from_path
 from taller.utils.chile_locations import ensure_legacy_chile_locations
 from taller.utils.empresa import get_active_empresa, get_user_empresa_safe
@@ -24,7 +25,7 @@ def ajax_buscar_clientes(request):
     if not request.user.is_authenticated:
         return JsonResponse([], safe=False)
 
-    empresa = get_active_empresa(request)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse([], safe=False)
 
@@ -74,9 +75,7 @@ def obtener_ciudades(request):
     # Detectar país del usuario (OneToOne inversa puede lanzar DoesNotExist)
     pais_usuario = "CL"  # Por defecto Chile
     if hasattr(request, "user") and request.user.is_authenticated:
-        from taller.utils.empresa import get_user_empresa_safe
-
-        empresa = get_user_empresa_safe(request.user)
+        empresa = get_empresa_safe(request)
         if empresa and getattr(empresa, "pais", None):
             pais_usuario = empresa.pais
 
@@ -176,7 +175,7 @@ def cliente_delete(request, pk=None, cliente_id=None):
     if not request.user.is_authenticated:
         raise PermissionDenied("Usuario no autenticado")
 
-    empresa = get_active_empresa(request)
+    empresa = get_empresa_safe(request)
     if not empresa:
         messages.warning(
             request, "Tu usuario no tiene empresa activa. Crea o asigna una empresa primero."
@@ -240,7 +239,7 @@ def clientes_stats(request):
     if not request.user.is_authenticated:
         return JsonResponse({"labels": [], "counts": []})
 
-    empresa = get_active_empresa(request)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse({"labels": [], "counts": []})
 
@@ -275,7 +274,7 @@ def agregar_ciudad_usa(request):
         return JsonResponse({"success": False, "error": "User not authenticated"})
 
     # Verificar que el usuario tiene empresa
-    empresa = get_active_empresa(request)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse({"success": False, "error": "User without company"})
 
@@ -328,7 +327,7 @@ def agregar_ciudad(request):
         return JsonResponse({"success": False, "error": "Usuario no autenticado"})
 
     # Verificar que el usuario tiene empresa
-    empresa = get_active_empresa(request)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse({"success": False, "error": "Usuario sin empresa"})
 
@@ -403,7 +402,7 @@ def agregar_region(request):
     if not request.user.is_authenticated:
         return JsonResponse({"success": False, "error": "Usuario no autenticado"}, status=401)
 
-    empresa = get_active_empresa(request)
+    empresa = get_empresa_safe(request)
     if not empresa or getattr(empresa, "pais", "CL") != "CL":
         return JsonResponse({"success": False, "error": "Solo disponible para Chile"}, status=400)
 
@@ -432,7 +431,7 @@ def agregar_estado(request):
     if not request.user.is_authenticated:
         return JsonResponse({"success": False, "error": "Usuario no autenticado"}, status=401)
 
-    empresa = get_active_empresa(request)
+    empresa = get_empresa_safe(request)
     pais = getattr(empresa, "pais", None) if empresa else None
     if not empresa or not pais:
         return JsonResponse({"success": False, "error": "Empresa sin país configurado"}, status=400)

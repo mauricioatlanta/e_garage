@@ -12,6 +12,7 @@ from django.contrib import messages
 from django.db import transaction
 
 from taller.models.vehiculos import Vehiculo
+from taller.services.empresa_service import get_empresa_safe
 from taller.vehiculos.forms import VehiculoForm
 
 
@@ -73,7 +74,7 @@ def vehiculo_listar(request, country_code="cl", lang_code="es"):
         country_code: Código del país (cl, us, mx, pe, co, ec, ve, br)
         lang_code: Código del idioma (es, en)
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         messages.error(request, "Usuario sin empresa asignada")
         return redirect("/")
@@ -112,7 +113,7 @@ def vehiculo_crear(request, country_code="cl", lang_code="es"):
         country_code: Código del país (cl, us, mx, pe, co, ec, ve, br)
         lang_code: Código del idioma (es, en)
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         messages.error(request, "Usuario sin empresa asignada")
         return redirect("/")
@@ -193,7 +194,7 @@ def vehiculo_editar(request, pk, country_code="cl", lang_code="es"):
         country_code: Código del país (cl, us, mx, pe, co, ec, ve, br)
         lang_code: Código del idioma (es, en)
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     vehiculo = get_object_or_404(Vehiculo, pk=pk, empresa=empresa)
 
     if request.method == "POST":
@@ -263,7 +264,7 @@ def vehiculo_detalle(request, pk, country_code="cl", lang_code="es"):
         country_code: Código del país (cl, us, mx, pe, co, ec, ve, br)
         lang_code: Código del idioma (es, en)
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     vehiculo = get_object_or_404(Vehiculo, pk=pk, empresa=empresa)
 
     # Usar select_template con fallback a common

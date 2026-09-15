@@ -7,6 +7,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 from core.views import TenantViewMixin
 from taller.common.mixins.context_return import ContextReturnCreateMixin
 from taller.forms.servicio import ServicioForm
+from taller.services.empresa_service import get_empresa_safe
 from taller.servicios.models import CategoriaServicio, Servicio, SubcategoriaServicio
 from taller.templatetags.country_url import reverse_country_url
 
@@ -53,6 +54,7 @@ class ServicioCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantVie
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
+        kwargs["empresa"] = get_empresa_safe(self.request)
         return kwargs
 
     def get_template_names(self):
@@ -65,9 +67,7 @@ class ServicioCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantVie
         return initial
 
     def form_valid(self, form):
-        empresa = getattr(self.request, "empresa", None) or getattr(
-            self.request.user, "empresa", None
-        )
+        empresa = get_empresa_safe(self.request)
         if empresa and not getattr(form.instance, "empresa_id", None):
             form.instance.empresa = empresa
 
@@ -140,10 +140,30 @@ class ServicioCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantVie
 class ServicioUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
     model = Servicio
     template_name = "taller/common/servicios/editar_servicio.html"
-    fields = ["nombre", "categoria", "subcategoria"]
+    form_class = ServicioForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        kwargs["empresa"] = get_empresa_safe(self.request)
+        return kwargs
 
     def get_template_names(self):
         return ["taller/common/servicios/editar_servicio.html", "servicios/editar_servicio.html"]
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        from taller.servicios.views import _detectar_pais
+
+        country_code = _detectar_pais(self.request)
+        form.fields["categoria"].queryset = CategoriaServicio.objects.filter(
+            country=country_code
+        ).order_by("orden", "code")
+        if "subcategoria" in form.fields:
+            form.fields["subcategoria"].queryset = SubcategoriaServicio.objects.filter(
+                country=country_code
+            ).order_by("orden", "code")
+        return form
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

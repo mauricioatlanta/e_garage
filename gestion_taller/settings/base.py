@@ -52,6 +52,9 @@ INSTALLED_APPS = [
 
 COMMERCE_TENANT_MAP: dict = {}
 
+# Explicit QA tenant matrix. Populate only with audited existing tenant IDs.
+QA_CONTROL_TENANTS: dict = {}
+
 if importlib.util.find_spec("anymail") is not None:
     INSTALLED_APPS.insert(0, "anymail")
 
@@ -149,6 +152,7 @@ TEMPLATES = [
                 "taller.context_processors.ui_labels.ui_labels_context",
                 "taller.context_processors.subscription_notice.subscription_notice",
                 "taller.context_processors.business_modules.business_modules",
+                "taller.context_processors.qa_control.qa_control",
             ],
         },
     },

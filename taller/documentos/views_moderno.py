@@ -1091,8 +1091,11 @@ def api_buscar_servicios_inteligente(request):
     """
     from django.db.models import Q
 
-    emp = getattr(request.user, "empresa", None)
+    emp = get_empresa_safe(request)
     q = (request.GET.get("q") or "").strip()
+
+    if not emp:
+        return JsonResponse([], safe=False)
 
     qs = Servicio.objects.filter(empresa=emp)
 

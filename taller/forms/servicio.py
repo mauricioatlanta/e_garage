@@ -6,12 +6,12 @@ from taller.servicios.models import Servicio
 class ServicioForm(forms.ModelForm):
     class Meta:
         model = Servicio
-        fields = ["nombre", "categoria"]
+        fields = ["nombre", "categoria", "subcategoria"]
 
-    def __init__(self, *args, user=None, **kwargs):
+    def __init__(self, *args, user=None, empresa=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
-        self.empresa = getattr(user, "empresa", None) if user else None
+        self.empresa = empresa if empresa is not None else getattr(user, "empresa", None)
 
     def clean(self):
         cleaned_data = super().clean()

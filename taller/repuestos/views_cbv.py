@@ -19,10 +19,11 @@ from taller.common.mixins.context_return import (
 from taller.forms.repuesto import RepuestoForm
 from taller.mixins import CountryLangTemplateMixin
 from taller.models.repuesto import Repuesto
+from taller.services.empresa_service import get_empresa_safe
 
 
 def _get_country(request, default="CL"):
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     raw = getattr(empresa, "pais", None)
 
     if not raw:
@@ -109,7 +110,10 @@ class RepuestoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewM
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        empresa = get_empresa_safe(self.request)
+        if not empresa:
+            return Repuesto.objects.none()
+        qs = Repuesto.objects.filter(empresa=empresa).select_related("categoria")
         q = (self.request.GET.get("q") or "").strip()
         if q:
             qs = qs.filter(
@@ -190,6 +194,12 @@ class RepuestoDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
     model = Repuesto
     select_related_fields = ("categoria",)
 
+    def get_queryset(self):
+        empresa = get_empresa_safe(self.request)
+        if not empresa:
+            return Repuesto.objects.none()
+        return Repuesto.objects.filter(empresa=empresa).select_related("categoria")
+
 
 class RepuestoCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
     model = Repuesto
@@ -206,6 +216,7 @@ class RepuestoCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantVie
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
+        kwargs["empresa"] = get_empresa_safe(self.request)
         return kwargs
 
     def get_initial(self):
@@ -250,6 +261,12 @@ class RepuestoCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantVie
     def get_template_names(self):
         return ["taller/common/repuestos/repuesto_form.html", "taller/repuestos/repuesto_form.html"]
 
+    def form_valid(self, form):
+        empresa = get_empresa_safe(self.request)
+        if empresa and not getattr(form.instance, "empresa_id", None):
+            form.instance.empresa = empresa
+        return super().form_valid(form)
+
 
 class RepuestoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
     model = Repuesto
@@ -257,9 +274,16 @@ class RepuestoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
     template_name = "taller/common/repuestos/repuesto_form.html"
     success_url = reverse_lazy("taller:repuestos:lista_repuestos")
 
+    def get_queryset(self):
+        empresa = get_empresa_safe(self.request)
+        if not empresa:
+            return Repuesto.objects.none()
+        return Repuesto.objects.filter(empresa=empresa).select_related("categoria")
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
+        kwargs["empresa"] = get_empresa_safe(self.request)
         return kwargs
 
     def get_context_data(self, **kwargs):

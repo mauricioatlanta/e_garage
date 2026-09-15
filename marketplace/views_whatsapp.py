@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 
 from taller.models.documento import Documento
 from taller.models.clientes import Cliente
+from taller.services.empresa_service import get_empresa_safe
 from .whatsapp import WhatsAppGateway
 from .models import CasaRepuestos, WhatsAppEnvio
 
@@ -26,7 +27,9 @@ def enviar_whatsapp_cliente(request, documento_id):
     Endpoint: POST /marketplace/whatsapp/cliente/<documento_id>/
     """
     try:
-        empresa = request.user.empresa
+        empresa = get_empresa_safe(request)
+        if not empresa:
+            return JsonResponse({"success": False, "error": "Usuario sin empresa"}, status=400)
         documento = get_object_or_404(Documento, id=documento_id, empresa=empresa)
 
         # Obtener teléfono del cliente
@@ -120,7 +123,9 @@ def enviar_whatsapp_proveedor(request, casa_repuestos_id, part_number):
     Endpoint: POST /marketplace/whatsapp/proveedor/<casa_repuestos_id>/<part_number>/
     """
     try:
-        empresa = request.user.empresa
+        empresa = get_empresa_safe(request)
+        if not empresa:
+            return JsonResponse({"success": False, "error": "Usuario sin empresa"}, status=400)
         casa_repuestos = get_object_or_404(CasaRepuestos, id=casa_repuestos_id, empresa=empresa)
 
         # Obtener teléfono del proveedor

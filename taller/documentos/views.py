@@ -16,6 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from taller.models.tecnico import Tecnico
+from taller.services.empresa_service import get_empresa_safe
 
 
 # API para crear técnicos (SEGURO)
@@ -35,8 +36,7 @@ def api_crear_tecnico(request):
         if not nombre:
             return JsonResponse({"error": "Nombre requerido"}, status=400)
 
-        # Usar empresa del usuario autenticado (seguridad)
-        empresa = getattr(request.user, "empresa", None)
+        empresa = get_empresa_safe(request)
         if not empresa:
             return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
 
@@ -67,7 +67,12 @@ def autocomplete_repuesto(request):
     q = request.GET.get("q", "").strip()
     if not q:
         return JsonResponse({"results": []}, safe=False)
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return JsonResponse({"results": []}, safe=False)
     repuestos = Repuesto.objects.filter(
+        empresa=empresa
+    ).filter(
         models.Q(nombre__icontains=q) | models.Q(part_number__icontains=q)
     )[:20]
     data = {
@@ -86,15 +91,14 @@ def autocomplete_repuesto(request):
     return JsonResponse(data, safe=False)
 
 
-from taller.servicios.models import Servicio
+from taller.servicios.models import CategoriaServicio, CategoriaServicioName, Servicio
 
 
 # Autocompletado de servicios para documentos
 def autocomplete_servicio(request):
     q = request.GET.get("q", "").strip()
 
-    # Obtener empresa del usuario
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse([], safe=False)
 
@@ -160,6 +164,10 @@ def api_crear_servicio(request):
         return JsonResponse({"error": "Solo se permite POST"}, status=405)
 
     try:
+        empresa = get_empresa_safe(request)
+        if not empresa:
+            return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
+
         data = json.loads(request.body.decode())
         nombre = data.get("nombre", "").strip()
         precio = data.get("precio", 0)
@@ -168,28 +176,49 @@ def api_crear_servicio(request):
         if not nombre:
             return JsonResponse({"error": "El nombre del servicio es obligatorio"}, status=400)
 
-        # Verificar si ya existe
-        servicio_existente = Servicio.objects.filter(nombre__iexact=nombre).first()
+        country = (getattr(empresa, "pais", None) or "CL").strip().upper()
+        categoria, _ = CategoriaServicio.objects.get_or_create(
+            country=country,
+            code="CUSTOM",
+            defaults={"activo": True, "orden": 999},
+        )
+        CategoriaServicioName.objects.get_or_create(
+            categoria=categoria,
+            language="en" if country == "US" else "es",
+            is_default=True,
+            defaults={"label": "Custom Services" if country == "US" else "Servicios Personalizados"},
+        )
+
+        servicio_existente = Servicio.objects.filter(
+            empresa=empresa,
+            nombre__iexact=nombre,
+            categoria=categoria,
+        ).first()
         if servicio_existente:
             return JsonResponse(
                 {
                     "id": servicio_existente.pk,
                     "nombre": servicio_existente.nombre,
-                    "precio": float(getattr(servicio_existente, "precio", 0)),
+                    "precio": float(getattr(servicio_existente, "precio_base", 0) or 0),
                     "descripcion": getattr(servicio_existente, "descripcion", ""),
                     "creado": False,
                     "mensaje": "El servicio ya existía",
                 }
             )
 
-        # Crear nuevo servicio
-        servicio = Servicio.objects.create(nombre=nombre, precio=precio, descripcion=descripcion)
+        servicio = Servicio.objects.create(
+            empresa=empresa,
+            nombre=nombre,
+            categoria=categoria,
+            precio_base=precio or None,
+            descripcion=descripcion,
+        )
 
         return JsonResponse(
             {
                 "id": servicio.pk,
                 "nombre": servicio.nombre,
-                "precio": float(getattr(servicio, "precio", 0)),
+                "precio": float(getattr(servicio, "precio_base", 0) or 0),
                 "descripcion": getattr(servicio, "descripcion", ""),
                 "creado": True,
                 "mensaje": "Servicio creado exitosamente",
@@ -211,12 +240,7 @@ from taller.models.clientes import Cliente
 def autocomplete_cliente(request):
     q = request.GET.get("q", "").strip()
 
-    # Obtener empresa del usuario autenticado
-    empresa = None
-    if request.user.is_authenticated and hasattr(request.user, "empresa"):
-        empresa = request.user.empresa
-
-    # Si no hay empresa, retornar vacío
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse({"results": []})
 
@@ -260,10 +284,8 @@ def obtener_vehiculos_por_cliente(request):
     if not cliente_id:
         return JsonResponse([], safe=False)
 
-    # Obtener empresa del usuario autenticado
-    try:
-        empresa = request.user.empresa
-    except AttributeError:
+    empresa = get_empresa_safe(request)
+    if not empresa:
         return JsonResponse([], safe=False)
 
     # Filtrar vehículos por cliente y empresa
@@ -1080,7 +1102,7 @@ def exportar_documento_pdf(request, documento_id):
     Exporta un documento en PDF usando el nuevo template futurista y
     la utilería centralizada DocumentoPDFExporter.
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     # 🔒 SEGURIDAD: Filtrar por empresa desde el inicio para aislamiento multi-tenant
     if empresa is not None:
         queryset = Documento.objects.filter(empresa=empresa)
@@ -1142,7 +1164,10 @@ def enviar_documento_whatsapp(request, documento_id):
     # (the module-level import is present earlier in this file)
 
     try:
-        documento = Documento.objects.get(id=documento_id, empresa=request.user.empresa)
+        empresa = get_empresa_safe(request)
+        if not empresa:
+            return JsonResponse({"success": False, "error": "Usuario sin empresa asociada"}, status=400)
+        documento = Documento.objects.get(id=documento_id, empresa=empresa)
     except Documento.DoesNotExist:
         return JsonResponse({"success": False, "error": "Documento no encontrado"}, status=404)
 

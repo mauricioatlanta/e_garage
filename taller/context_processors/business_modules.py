@@ -10,6 +10,7 @@ dashboard_data NO se expone aquí; el dashboard view lo agrega al contexto
 """
 
 from taller.services.business_module_service import BusinessModuleService
+from taller.services.empresa_service import get_empresa_safe
 from taller.services.workspace_service import WorkspaceService
 
 
@@ -28,7 +29,7 @@ def business_modules(request):
         return {}
 
     try:
-        empresa = getattr(user, "empresa", None)
+        empresa = get_empresa_safe(request)
         if not empresa:
             return {}
         config = getattr(empresa, "config", None)

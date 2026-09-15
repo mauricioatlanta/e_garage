@@ -40,6 +40,7 @@ from taller.models.inspeccion_ingreso import DanoInspeccion, InspeccionIngreso
 from taller.models.vendedor_desarme import VendedorDesarme
 from taller.documentos.views_migrated import _reverse_with_request
 from taller.utils.empresa import get_user_empresa_safe
+from taller.services.empresa_service import get_empresa_safe
 from .forms import PiezaDesarmeForm, PiezaSueltaForm, VehiculoDesarmeForm
 from .services import _ensure_vehiculo_desarme
 from taller.services.desarme_financial_service import calcular_ganancia_vehiculo
@@ -188,7 +189,7 @@ def api_vendedor_crear(request):
 def _empresa_or_redirect(request):
     """Obtiene la empresa del usuario o redirige con error (acceso seguro a OneToOne)."""
     try:
-        empresa = request.user.empresa if getattr(request.user, "is_authenticated", False) else None
+        empresa = get_empresa_safe(request) if getattr(request.user, "is_authenticated", False) else None
     except Exception:
         empresa = None
     if not empresa:
@@ -1915,7 +1916,7 @@ def _revisar_finalizar_sesion(data, vehiculo, empresa, user, request):
 def avisar_owner_pieza(request, pk):
     """Genera redirect a wa.me para que Vendedor notifique al owner sobre una pieza."""
     pieza = get_object_or_404(PiezaDesarme, pk=pk)
-    empresa = get_user_empresa_safe(request.user)
+    empresa = get_empresa_safe(request)
 
     if not empresa or pieza.empresa_id != empresa.pk:
         messages.error(request, "No tienes acceso a esta pieza.")

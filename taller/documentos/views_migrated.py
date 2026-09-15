@@ -58,6 +58,7 @@ from taller.models.clientes import Cliente
 from taller.models.lineas_documento import LineaOtroServicio, LineaRepuesto, LineaServicio
 from taller.models.vehiculos import Vehiculo
 from taller.models.repuesto import Repuesto
+from taller.services.empresa_service import get_empresa_safe as get_active_empresa_safe
 from taller.servicios.models import Servicio, ServicioExterno
 from taller.auth.decorators_role import RoleRequiredMixin
 
@@ -120,14 +121,8 @@ def _get_document_ui_config(request, empresa):
 
 
 def _get_empresa_safe(request):
-    """Obtiene la empresa del usuario sin lanzar DoesNotExist (OneToOne reverse)."""
-    user = getattr(request, "user", None)
-    if not user or not getattr(user, "is_authenticated", False):
-        return None
-    try:
-        return user.empresa
-    except (AttributeError, ObjectDoesNotExist, Exception):
-        return None
+    """Obtiene el tenant activo del request, con fallback compatible al usuario."""
+    return get_active_empresa_safe(request)
 
 
 def _ensure_ui_config_tax_and_currency(request, ui_config, empresa):
@@ -941,7 +936,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
             self._document_form_initial_state = build_form_initial_state(
                 mode=self.get_form_mode(),
                 request=self.request,
-                empresa=getattr(self.request.user, "empresa", None),
+                empresa=_get_empresa_safe(self.request),
                 source_document=self.get_form_source_document(),
                 source_draft=self.get_form_source_draft(),
                 base_initial=super().get_initial() or {},
@@ -964,7 +959,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = self.request.empresa
+        empresa = _get_empresa_safe(self.request)
         form_mode = self.get_form_mode()
         initial_state = self.get_form_initial_state()
         source_document = self.get_form_source_document()
@@ -1311,12 +1306,10 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
     def get_form_kwargs(self):
         """Obtener argumentos para el formulario. Incluir initial explícito para preselección."""
         kwargs = super().get_form_kwargs()
+        empresa = _get_empresa_safe(self.request)
         kwargs["user"] = self.request.user
-        kwargs["empresa"] = getattr(self.request.user, "empresa", None)
-        kwargs["country"] = _get_request_country_code(
-            self.request,
-            getattr(self.request.user, "empresa", None),
-        )
+        kwargs["empresa"] = empresa
+        kwargs["country"] = _get_request_country_code(self.request, empresa)
         kwargs["language"] = LANGUAGE_BY_COUNTRY.get((kwargs["country"] or "CL").upper(), "es")
         if self.request.method == "GET":
             kwargs.setdefault("initial", self.get_initial())
@@ -1649,12 +1642,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
         if not self.request.user.is_authenticated:
             return Documento.objects.none()
 
-        # Obtener empresa de forma robusta
-        empresa = getattr(self.request.user, "empresa", None)
-        if not empresa:
-            # Intentar obtener empresa desde el middleware
-            empresa = getattr(self.request, "empresa", None)
-
+        empresa = _get_empresa_safe(self.request)
         if not empresa:
             return Documento.objects.none()
 
@@ -1672,9 +1660,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
         pk = self.kwargs.get("pk")
 
         # Obtener empresa para verificación
-        empresa_user = getattr(self.request.user, "empresa", None) or getattr(
-            self.request, "empresa", None
-        )
+        empresa_user = _get_empresa_safe(self.request)
 
         # Intentar obtener del queryset filtrado
         try:
@@ -1725,9 +1711,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
 
             raise Http404("Documento no encontrado")
 
-        empresa = getattr(self.request.user, "empresa", None) or getattr(
-            self.request, "empresa", None
-        )
+        empresa = _get_empresa_safe(self.request)
         if not empresa:
             from django.http import Http404
 
@@ -1919,7 +1903,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
         """Inyectar empresa/usuario en el formulario para aislar datos del tenant"""
         kwargs = super().get_form_kwargs()
 
-        empresa_usuario = getattr(self.request.user, "empresa", None)
+        empresa_usuario = _get_empresa_safe(self.request)
         empresa_documento = getattr(self.object, "empresa", None)
         empresa = empresa_documento or empresa_usuario
 
@@ -1937,7 +1921,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = _get_empresa_safe(self.request)
         cliente = getattr(form.instance, "cliente", None)
 
         if empresa and cliente:

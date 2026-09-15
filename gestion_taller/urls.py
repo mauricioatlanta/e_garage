@@ -151,28 +151,24 @@ from taller.views.landing_views import (
     landing_parts,
     landing_vertical,
 )
+from taller.services.empresa_service import get_empresa_safe
 
 # gestion_taller/urls.py — archivo raíz de URLs con migración a países
 
 
 def redirect_to_home(request):
-    """Redirige a la página principal basada en el país del usuario"""
+    """Redirige a la página principal basada en el país activo del request."""
 
-    # Si el usuario está autenticado, usar el país de su empresa
-    if request.user.is_authenticated:
-        try:
-            if hasattr(request.user, "empresa") and request.user.empresa:
-                pais = request.user.empresa.pais
-                if pais == "CL":
-                    return redirect("/cl/")
-                elif pais == "US":
-                    return redirect("/us/")
-                elif pais == "AR":
-                    return redirect("/ar/")
-                elif pais == "UY":
-                    return redirect("/uy/")
-        except Exception:
-            pass
+    empresa = get_empresa_safe(request)
+    pais = (getattr(empresa, "pais", None) or "").strip().upper()
+    if pais == "CL":
+        return redirect("/cl/")
+    elif pais == "US":
+        return redirect("/us/")
+    elif pais == "AR":
+        return redirect("/ar/")
+    elif pais == "UY":
+        return redirect("/uy/")
 
     # Si hay contexto de país en el request (desde middleware)
     if hasattr(request, "country"):
@@ -236,17 +232,13 @@ def redirect_cl_to_es(request, path=None):
 
 
 def country_aware_clientes_redirect(request):
-    """Redirect /cl/clientes/ to the correct country-specific URL based on user's company"""
-    # If user is authenticated and has a company, redirect to their country
-    if request.user.is_authenticated:
-        try:
-            if hasattr(request.user, "empresa") and request.user.empresa:
-                if request.user.empresa.pais == "US":
-                    return redirect("/us/clientes/")
-                elif request.user.empresa.pais == "CL":
-                    return redirect("/cl/es/clientes/")
-        except Exception:
-            pass
+    """Redirect /cl/clientes/ to the correct country-specific URL based on active company."""
+    empresa = get_empresa_safe(request)
+    pais = (getattr(empresa, "pais", None) or "").strip().upper()
+    if pais == "US":
+        return redirect("/us/clientes/")
+    elif pais == "CL":
+        return redirect("/cl/es/clientes/")
 
     # Fallback: redirect to Chile (original behavior)
     return redirect("/cl/es/clientes/")
@@ -254,20 +246,17 @@ def country_aware_clientes_redirect(request):
 
 def country_aware_workspace_redirect(request, subpath=""):
     """Redirect /workspace/ to country workspace. USA → /us/en/workspace/, Chile → /cl/es/workspace/."""
-    if request.user.is_authenticated:
-        try:
-            if hasattr(request.user, "empresa") and request.user.empresa:
-                pais = (getattr(request.user.empresa, "pais", None) or "").strip().upper()
-                if pais == "US":
-                    return redirect(f"/us/en/workspace/{subpath}".rstrip("/") + "/")
-                if pais == "CL":
-                    return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
-        except Exception:
-            pass
+    empresa = get_empresa_safe(request)
+    pais = (getattr(empresa, "pais", None) or "").strip().upper()
+    if pais == "US":
+        return redirect(f"/us/en/workspace/{subpath}".rstrip("/") + "/")
+    if pais == "CL":
+        return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
     return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
 
 
 urlpatterns = [
+    path("qa/control/", include(("taller.qa_control.urls", "qa_control"), namespace="qa_control")),
     path("healthz/", healthz, name="healthz"),
     path("robots.txt", robots_txt, name="robots_txt"),
     path("sitemap.xml", sitemap_xml, name="sitemap_xml"),

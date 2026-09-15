@@ -91,11 +91,12 @@ PART_NUMBER_EXIST_ERROR = {
 
 class RepuestoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        # Extraer usuario para obtener configuración de país
         self.user = kwargs.pop("user", None)
+        explicit_empresa = kwargs.pop("empresa", None)
+        self.empresa = explicit_empresa if explicit_empresa is not None else getattr(self.user, "empresa", None)
         super().__init__(*args, **kwargs)
 
-        empresa = getattr(self.user, "empresa", None) if self.user else None
+        empresa = self.empresa
         country = (getattr(empresa, "pais", "CL") or "CL").strip().upper() if empresa else "CL"
         lang, category_names = CATEGORY_MAP.get(country, ("es", SPANISH_CATEGORIES))
         self.language = lang
@@ -306,8 +307,8 @@ class RepuestoForm(forms.ModelForm):
         if not part_number:
             return part_number
 
-        if self.user and hasattr(self.user, "empresa"):
-            empresa = self.user.empresa
+        if self.empresa:
+            empresa = self.empresa
             existing_repuestos = Repuesto.objects.filter(empresa=empresa, part_number=part_number)
 
             if self.instance and self.instance.pk:

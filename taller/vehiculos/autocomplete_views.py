@@ -18,6 +18,7 @@ from taller.models.extras_vehiculo import (
     MotorVehiculoEmpresa,
 )
 from taller.models.modelo import Modelo
+from taller.services.empresa_service import get_empresa_safe
 
 logger = logging.getLogger(__name__)
 
@@ -35,8 +36,7 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
             logger.warning("[ClienteAutocomplete] Usuario no autenticado")
             return Cliente.objects.none()
 
-        # Obtener empresa del usuario
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = get_empresa_safe(self.request)
         if not empresa:
             logger.warning(
                 f"[ClienteAutocomplete] Usuario {self.request.user.username} no tiene empresa asignada"
@@ -144,7 +144,7 @@ class ClienteSimpleAutocomplete(autocomplete.Select2QuerySetView):
         if not self.request.user.is_authenticated:
             return Cliente.objects.none()
 
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = get_empresa_safe(self.request)
         if not empresa:
             return Cliente.objects.none()
 
@@ -158,7 +158,7 @@ class ClienteSimpleAutocomplete(autocomplete.Select2QuerySetView):
 
 def _get_country_from_request(request):
     """Helper para detectar país desde request"""
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     raw = getattr(empresa, "pais", None) if empresa else None
 
     if not raw:
@@ -193,7 +193,7 @@ class MotorAutocomplete(autocomplete.Select2ListView):
             return []
 
         country = _get_country_from_request(self.request)
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = get_empresa_safe(self.request)
         global_qs = MotorVehiculo.objects.filter(country=country)
 
         modelo_id = self.forwarded.get("modelo") or self.request.GET.get("modelo_id")
@@ -238,7 +238,7 @@ class CajaAutocomplete(autocomplete.Select2ListView):
             return []
 
         country = _get_country_from_request(self.request)
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = get_empresa_safe(self.request)
         global_qs = CajaVehiculo.objects.filter(country=country)
 
         modelo_id = self.forwarded.get("modelo") or self.request.GET.get("modelo_id")

@@ -5,11 +5,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 
 from taller.models.clientes import Cliente
+from taller.services.empresa_service import get_empresa_safe
 
 
 class _EmpresaMixin:
     def _qs_empresa(self, qs):
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = get_empresa_safe(self.request)
         return qs.filter(empresa=empresa) if empresa else qs.none()
 
 

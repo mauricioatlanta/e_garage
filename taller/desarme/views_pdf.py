@@ -283,9 +283,6 @@ def _get_documento_queryset():
 
 def _get_documento_for_request(request, documento_id):
     queryset = _get_documento_queryset()
-    if getattr(request.user, "is_staff", False) or getattr(request.user, "is_superuser", False):
-        return get_object_or_404(queryset, pk=documento_id)
-
     empresa = _empresa_or_redirect(request)
     if not empresa:
         raise Http404("Sin empresa.")

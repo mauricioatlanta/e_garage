@@ -4,6 +4,7 @@ Prioridad: request.country → request.user.empresa.pais → CL.
 """
 
 from taller.config.feature_flags import get_country_features
+from taller.services.empresa_service import get_empresa_safe
 
 
 def country_features(request):
@@ -15,7 +16,7 @@ def country_features(request):
         and getattr(request.user, "is_authenticated", False)
     ):
         try:
-            empresa = getattr(request.user, "empresa", None)
+            empresa = get_empresa_safe(request)
             if empresa:
                 country = getattr(empresa, "pais", None)
         except Exception:

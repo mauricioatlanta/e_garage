@@ -34,11 +34,12 @@ class VehiculoFormSimple(forms.ModelForm):
         self.empresa = kwargs.pop("empresa", None)
         super().__init__(*args, **kwargs)
 
-        if self.user and hasattr(self.user, "empresa"):
-            # Filtrar clientes por empresa del usuario
-            self.fields["cliente"].queryset = Cliente.objects.filter(empresa=self.user.empresa)
-            # Filtrar marcas por país de la empresa
-            country = getattr(self.user.empresa, "pais", "CL")
+        empresa = self.empresa if self.empresa is not None else getattr(self.user, "empresa", None)
+
+        if empresa:
+            self.empresa = empresa
+            self.fields["cliente"].queryset = Cliente.objects.filter(empresa=empresa)
+            country = getattr(empresa, "pais", "CL")
             self.fields["marca"].queryset = Marca.objects.filter(country=country)
             # Inicialmente no mostrar modelos hasta que se seleccione una marca
             # Modelo NO tiene campo empresa, solo country

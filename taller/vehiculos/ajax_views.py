@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 
 from taller.models.vehiculos import Modelo
+from taller.services.empresa_service import get_empresa_safe
 
 
 @login_required
@@ -10,8 +11,7 @@ def modelos_por_marca(request):
     marca_id = request.GET.get("marca")
     anio = request.GET.get("anio")
 
-    # Filtrar por empresa del usuario
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse({"results": []})
 

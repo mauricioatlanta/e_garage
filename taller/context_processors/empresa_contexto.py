@@ -2,7 +2,7 @@
 Context processor para exponer datos de Empresa en todas las plantillas.
 """
 
-from taller.models.empresa import Empresa
+from taller.services.empresa_service import get_empresa_safe
 
 
 def empresa_contexto(request):
@@ -12,12 +12,17 @@ def empresa_contexto(request):
     Si el usuario no está autenticado o no tiene empresa, devuelve None.
     Captura cualquier excepción para evitar Error 500.
     """
-    if not request.user.is_authenticated:
+    user = getattr(request, "user", None)
+    if not getattr(user, "is_authenticated", False):
         return {"empresa": None}
 
     try:
-        # Intentamos obtener la empresa vinculada al usuario
-        empresa = request.user.empresa
+        empresa = get_empresa_safe(request)
+        if empresa is None:
+            return {
+                "empresa": None,
+                "nombre_taller": None,
+            }
         return {
             "empresa": empresa,
             "nombre_taller": getattr(empresa, "nombre_taller", "eGarage"),

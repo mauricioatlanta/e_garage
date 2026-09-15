@@ -48,6 +48,7 @@ from taller.common.mixins.context_return import (
 )
 from taller.vehiculos.catalog_bootstrap import ensure_vehicle_catalog_for_country
 from taller.vehiculos.forms import VehiculoForm
+from taller.services.empresa_service import get_empresa_safe
 
 # CBVs "shim"
 # from .views_cbv import VehiculoDetailView, VehiculoListView, VehiculoUpdateView  # No utilizados
@@ -141,8 +142,8 @@ def _get_country_from_path(path: str) -> tuple[str, str]:
 
 def _get_country(request, default="CL"):
     """Detección robusta de país con fallback por path y normalización."""
-    # 1) user.empresa.pais
-    empresa = getattr(request.user, "empresa", None)
+    # 1) tenant activo del request
+    empresa = get_empresa_safe(request)
     raw = getattr(empresa, "pais", None)
 
     # 2) request.country si algún middleware/context processor lo define
@@ -310,7 +311,7 @@ def lista_vehiculos(request):
     if compat_redirect:
         return compat_redirect
 
-    empresa = _get_empresa_safe(request.user)
+    empresa = get_empresa_safe(request)
     if not empresa:
         messages.error(request, "Usuario sin empresa asignada")
         return redirect("/")
@@ -357,7 +358,7 @@ def crear_vehiculo(request, *args, **kwargs):
     if compat_redirect:
         return compat_redirect
 
-    empresa = _get_empresa_safe(request.user)
+    empresa = get_empresa_safe(request)
     country = _get_country(request)
     cliente_id = (request.GET.get("cliente_id") or request.GET.get("cliente") or "").strip()
 
@@ -366,7 +367,7 @@ def crear_vehiculo(request, *args, **kwargs):
         return redirect("/")
 
     if request.method == "POST":
-        form = VehiculoForm(request.POST, user=request.user, request=request)
+        form = VehiculoForm(request.POST, user=request.user, empresa=empresa, request=request)
 
         if form.is_valid():
             try:
@@ -452,7 +453,7 @@ def crear_vehiculo(request, *args, **kwargs):
         if cliente_id:
             initial_data["cliente"] = cliente_id
 
-        form = VehiculoForm(user=request.user, request=request, initial=initial_data)
+        form = VehiculoForm(user=request.user, empresa=empresa, request=request, initial=initial_data)
 
     if request.method == "POST":
         cliente_id = (
@@ -497,7 +498,7 @@ def ver_vehiculo(request, vehiculo_id):
     if compat_redirect:
         return compat_redirect
 
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id, empresa=empresa)
 
     # Usar template resolution en lugar de template hardcodeado
@@ -531,11 +532,17 @@ def editar_vehiculo(request, vehiculo_id):
     if compat_redirect:
         return compat_redirect
 
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id, empresa=empresa)
 
     if request.method == "POST":
-        form = VehiculoForm(request.POST, instance=vehiculo, user=request.user, request=request)
+        form = VehiculoForm(
+            request.POST,
+            instance=vehiculo,
+            user=request.user,
+            empresa=empresa,
+            request=request,
+        )
 
         if form.is_valid():
             try:
@@ -558,7 +565,7 @@ def editar_vehiculo(request, vehiculo_id):
         else:
             messages.error(request, "Por favor corrige los errores en el formulario")
     else:
-        form = VehiculoForm(instance=vehiculo, user=request.user, request=request)
+        form = VehiculoForm(instance=vehiculo, user=request.user, empresa=empresa, request=request)
 
     # Usar template resolution en lugar de template hardcodeado
     from taller.utils.templates import select_country_lang_template
@@ -586,7 +593,7 @@ def eliminar_vehiculo(request, vehiculo_id):
     if compat_redirect:
         return compat_redirect
 
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id, empresa=empresa)
 
     if request.method == "POST":
@@ -627,7 +634,7 @@ def eliminar_vehiculo(request, vehiculo_id):
 def api_marcas(request):
     """Marcas por país del usuario."""
     country = _get_country(request)
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     ensure_vehicle_catalog_for_country(country)
 
     qs = Marca.objects.filter(country=country)
@@ -643,7 +650,7 @@ def api_marcas(request):
 @login_required
 def api_busqueda_clientes(request):
     """Busca clientes solo de la empresa del usuario (top 20, orden determinista)."""
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse([], safe=False)
     q = (request.GET.get("q") or "").strip()
@@ -677,7 +684,7 @@ def api_busqueda_clientes(request):
 def api_colores(request):
     """Colores disponibles para el país del usuario."""
     country = _get_country(request)
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     colores = ColorVehiculo.get_colores_para_pais(country, empresa)
     data = [{"id": c.pk, "nombre": c.nombre} for c in colores]
     return JsonResponse(data, safe=False)
@@ -938,7 +945,7 @@ def ajax_motores_por_modelo(request):
 
         return JsonResponse({"success": True, "motores": list(motores)})
     except Exception as e:
-        empresa = getattr(request.user, "empresa", None)
+        empresa = get_empresa_safe(request)
         log.error(
             "Error en ajax_motores_por_modelo: %s",
             e,
@@ -1005,7 +1012,7 @@ def ajax_cajas_por_modelo(request):
 
         return JsonResponse({"success": True, "cajas": list(cajas)})
     except Exception as e:
-        empresa = getattr(request.user, "empresa", None)
+        empresa = get_empresa_safe(request)
         log.error(
             "Error en ajax_cajas_por_modelo: %s",
             e,
@@ -1028,7 +1035,7 @@ def ajax_agregar_marca(request):
             return JsonResponse({"success": False, "error": "Nombre requerido"}, status=400)
 
         country = _get_country(request)
-        empresa = getattr(request.user, "empresa", None)
+        empresa = get_empresa_safe(request)
 
         # Evitar duplicados por case
         try:
@@ -1046,7 +1053,7 @@ def ajax_agregar_marca(request):
             }
         )
     except Exception as e:
-        empresa = getattr(request.user, "empresa", None)
+        empresa = get_empresa_safe(request)
         log.error(
             "Error agregando marca: %s",
             e,
@@ -1073,7 +1080,7 @@ def ajax_agregar_modelo(request):
             )
 
         country = _get_country(request)
-        empresa = getattr(request.user, "empresa", None)
+        empresa = get_empresa_safe(request)
 
         # Validar que marca pertenece al país
         marca = get_object_or_404(Marca, id=marca_id, country=country)
@@ -1094,7 +1101,7 @@ def ajax_agregar_modelo(request):
             }
         )
     except Exception as e:
-        empresa = getattr(request.user, "empresa", None)
+        empresa = get_empresa_safe(request)
         log.error(
             "Error agregando modelo: %s",
             e,
@@ -1114,7 +1121,7 @@ def ajax_agregar_motor(request):
         data = json.loads(request.body)
         nombre = data.get("nombre", "").strip()
         modelo_id = data.get("modelo_id")
-        empresa = getattr(request.user, "empresa", None)
+        empresa = get_empresa_safe(request)
 
         if not nombre:
             return JsonResponse({"success": False, "error": "Nombre requerido"}, status=400)
@@ -1156,7 +1163,7 @@ def ajax_agregar_caja(request):
         data = json.loads(request.body)
         nombre = data.get("nombre", "").strip()
         modelo_id = data.get("modelo_id")
-        empresa = getattr(request.user, "empresa", None)
+        empresa = get_empresa_safe(request)
 
         if not nombre:
             return JsonResponse({"success": False, "error": "Nombre requerido"}, status=400)
@@ -1201,7 +1208,7 @@ def ajax_agregar_color(request):
             return JsonResponse({"success": False, "error": "Nombre requerido"}, status=400)
 
         country = _get_country(request)
-        empresa = getattr(request.user, "empresa", None)
+        empresa = get_empresa_safe(request)
 
         # Evitar duplicados por case
         try:
@@ -1219,7 +1226,7 @@ def ajax_agregar_color(request):
             }
         )
     except Exception as e:
-        empresa = getattr(request.user, "empresa", None)
+        empresa = get_empresa_safe(request)
         log.error(
             "Error agregando color: %s",
             e,
@@ -1234,7 +1241,7 @@ def ajax_agregar_color(request):
 @login_required
 @require_POST
 def subir_imagenes_vehiculo(request, vehiculo_id):
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
 
     vehiculo = get_object_or_404(
         Vehiculo,

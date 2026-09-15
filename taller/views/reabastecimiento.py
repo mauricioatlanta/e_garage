@@ -4,6 +4,7 @@ from django.views.generic import ListView
 
 from core.views import TenantViewMixin
 from taller.models.repuesto import Repuesto
+from taller.services.empresa_service import get_empresa_safe
 from taller.services.inventory_intelligence import InventoryIntelligenceService
 
 
@@ -28,7 +29,7 @@ class ReabastecimientoPanelView(LoginRequiredMixin, TenantViewMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = get_empresa_safe(self.request)
         status_filter = (self.request.GET.get("status") or "").strip().lower()
         panel = InventoryIntelligenceService.build_panel(
             empresa=empresa,

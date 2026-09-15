@@ -13,6 +13,7 @@ from taller.models.lineas_documento import ORIGEN_DESARME, ORIGEN_STOCK_BODEGA
 from taller.models.pieza_desarme import ESTADO_DISPONIBLE, PiezaDesarme
 from taller.models.repuesto import Repuesto
 from taller.services.inventory_service import InventoryService
+from taller.services.empresa_service import get_empresa_safe
 
 
 @login_required
@@ -27,7 +28,7 @@ def emitir_documento(request, documento_id):
       evitando TOCTOU entre emisiones concurrentes del mismo repuesto.
     - EXTERNO: no mueve stock, no requiere lock.
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         messages.error(request, "Usuario sin empresa asociada.")
         return redirect("documentos:lista_documentos")
@@ -128,7 +129,7 @@ def anular_documento(request, documento_id):
     # TODO: cuando exista DatosDTE, condicionar esta reversión al estado del DTE
     # (no revertir automáticamente si ya se emitió un documento fiscal real)
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         messages.error(request, "Usuario sin empresa asociada.")
         return redirect("documentos:lista_documentos")
@@ -168,7 +169,7 @@ def validar_stock_documento(request, documento_id):
     Vista para validar stock de un documento (sin emitirlo).
     Útil para mostrar warnings antes de emitir.
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         messages.error(request, "Usuario sin empresa asociada.")
         return redirect("documentos:lista_documentos")

@@ -9,6 +9,8 @@ from django.core.cache import cache
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 
+from taller.services.empresa_service import get_empresa_safe
+
 from .models import ProductoCatalogo
 
 
@@ -53,12 +55,9 @@ def api_buscar_precios_por_partnumber(request):
         )
 
     # Obtener empresa del usuario (multi-tenant)
-    try:
-        empresa = request.user.empresa
-        if not empresa:
-            return JsonResponse({"error": "Usuario sin empresa"}, status=400)
-    except AttributeError:
-        return JsonResponse({"error": "Usuario no autenticado"}, status=401)
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return JsonResponse({"error": "Usuario sin empresa"}, status=400)
 
     # Clave de caché única por empresa y part_number normalizado
     cache_key = f"marketplace_precios_{empresa.id}_{part_number_clean}"
@@ -124,12 +123,9 @@ def api_producto_por_id(request, producto_id):
     Endpoint para obtener un producto específico por ID.
     Útil cuando el usuario hace clic en una sugerencia de precio.
     """
-    try:
-        empresa = request.user.empresa
-        if not empresa:
-            return JsonResponse({"error": "Usuario sin empresa"}, status=400)
-    except AttributeError:
-        return JsonResponse({"error": "Usuario no autenticado"}, status=401)
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return JsonResponse({"error": "Usuario sin empresa"}, status=400)
 
     try:
         producto = ProductoCatalogo.objects.get(id=producto_id, empresa=empresa, activo=True)

@@ -68,8 +68,8 @@ class VehiculoForm(forms.ModelForm):
     )
 
     @staticmethod
-    def _resolve_country(user=None, request=None, default="CL"):
-        empresa = getattr(user, "empresa", None)
+    def _resolve_country(user=None, request=None, default="CL", empresa=None):
+        empresa = empresa if empresa is not None else getattr(user, "empresa", None)
         pais = (getattr(empresa, "pais", None) or default).strip().upper()
 
         if request:
@@ -129,7 +129,9 @@ class VehiculoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
+        explicit_empresa = kwargs.pop("empresa", None)
         self.request = kwargs.pop("request", None)
+        self.empresa = explicit_empresa if explicit_empresa is not None else getattr(self.user, "empresa", None)
         args_list = list(args)
         bound_data = kwargs.pop("data", None)
         if args_list:
@@ -147,9 +149,9 @@ class VehiculoForm(forms.ModelForm):
         self._motor_nuevo = bool(self._pending_motor_nombre)
         self._caja_nuevo = bool(self._pending_caja_nombre)
 
-        empresa = getattr(self.user, "empresa", None)
+        empresa = self.empresa
         # Detectar país: primero de empresa, luego de request.path
-        pais = self._resolve_country(self.user, self.request, default="CL")
+        pais = self._resolve_country(self.user, self.request, default="CL", empresa=empresa)
 
         # Si tenemos request, usar detección robusta del path
         if self.request:
@@ -392,7 +394,7 @@ class VehiculoForm(forms.ModelForm):
 
     def _configurar_color(self, pais):
         """Configurar campo color basado en el país y empresa"""
-        empresa = getattr(self.user, "empresa", None)
+        empresa = self.empresa
         qs = ColorVehiculo.get_colores_para_pais(pais)
         # Si tu modelo tiene FK a empresa, descomenta:
         # if hasattr(ColorVehiculo, "empresa") and empresa:
@@ -539,7 +541,7 @@ class VehiculoForm(forms.ModelForm):
 
         log = logging.getLogger(__name__)
 
-        empresa = getattr(self.user, "empresa", None)
+        empresa = self.empresa
 
         # Eliminar el campo marca si ya existe (del Meta) para reemplazarlo
         if "marca" in self.fields:
@@ -702,7 +704,7 @@ class VehiculoForm(forms.ModelForm):
         from taller.models.extras_vehiculo import CajaVehiculo, MotorVehiculo
 
         # Detectar país para filtrar queryset
-        empresa = getattr(self.user, "empresa", None)
+        empresa = self.empresa
         pais = (getattr(empresa, "pais", None) or "US").strip().upper()
         if self.request:
             path = (self.request.path or "").lower()
@@ -793,7 +795,7 @@ class VehiculoForm(forms.ModelForm):
         """Configurar campos específicos para usuarios de países Latinoamericanos (CL, MX, etc.)"""
         from taller.models.marca import Marca
 
-        empresa = getattr(self.user, "empresa", None)
+        empresa = self.empresa
         ensure_vehicle_catalog_for_country(pais)
 
         # Eliminar el campo marca si ya existe (del Meta) para reemplazarlo
@@ -1004,9 +1006,9 @@ class VehiculoForm(forms.ModelForm):
         # ✅ NO cortar validaciones cruzadas - ejecutarlas siempre
         # Permite que validaciones de coherencia se ejecuten incluso con errores previos
 
-        empresa = getattr(self.user, "empresa", None)
+        empresa = self.empresa
         # Detectar país: primero de empresa, luego de request.path
-        pais = self._resolve_country(self.user, self.request, default="CL")
+        pais = self._resolve_country(self.user, self.request, default="CL", empresa=empresa)
 
         # Si tenemos request, usar detección robusta del path
         if self.request:
@@ -1140,7 +1142,7 @@ class VehiculoForm(forms.ModelForm):
 
     def clean_marca(self):
         """Convertir ID/nombre de marca a instancia"""
-        empresa = getattr(self.user, "empresa", None)
+        empresa = self.empresa
         # Detectar país: primero de empresa, luego de request.path
         pais = (getattr(empresa, "pais", None) or "CL").strip().upper()
 
@@ -1233,7 +1235,7 @@ class VehiculoForm(forms.ModelForm):
 
     def clean_modelo(self):
         """Convertir ID de modelo a instancia (para USA y Chile)"""
-        empresa = getattr(self.user, "empresa", None)
+        empresa = self.empresa
         pais = (getattr(empresa, "pais", None) or "CL").strip().upper()
 
         # Si tenemos request, usar detección robusta del path
@@ -1445,8 +1447,8 @@ class VehiculoForm(forms.ModelForm):
     def clean_motor(self):
         """Aceptar motores globales o privados con prefijo empresa:<id>."""
         raw_value = (self.cleaned_data.get("motor") or "").strip()
-        empresa = getattr(self.user, "empresa", None)
-        pais = self._resolve_country(self.user, self.request, default="CL")
+        empresa = self.empresa
+        pais = self._resolve_country(self.user, self.request, default="CL", empresa=empresa)
         modelo = self.cleaned_data.get("modelo")
 
         if not raw_value:
@@ -1484,8 +1486,8 @@ class VehiculoForm(forms.ModelForm):
     def clean_caja(self):
         """Aceptar cajas globales o privadas con prefijo empresa:<id>."""
         raw_value = (self.cleaned_data.get("caja") or "").strip()
-        empresa = getattr(self.user, "empresa", None)
-        pais = self._resolve_country(self.user, self.request, default="CL")
+        empresa = self.empresa
+        pais = self._resolve_country(self.user, self.request, default="CL", empresa=empresa)
         modelo = self.cleaned_data.get("modelo")
 
         if not raw_value:
@@ -1524,8 +1526,8 @@ class VehiculoForm(forms.ModelForm):
         """Guardar el vehículo con manejo especial de campos personalizados"""
         vehiculo = super().save(commit=False)
         request = getattr(self, "request", None)
-        empresa = getattr(self.user, "empresa", None)
-        pais = self._resolve_country(self.user, self.request, default="CL")
+        empresa = self.empresa
+        pais = self._resolve_country(self.user, self.request, default="CL", empresa=empresa)
 
         modelo = self.cleaned_data.get("modelo")
         motor_nombre = (
