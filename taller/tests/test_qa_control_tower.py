@@ -202,7 +202,8 @@ class QAContextTests(TestCase):
         }
         session.save()
 
-        response = self.client.post(reverse("account_logout"))
+        with override_settings(SECURE_SSL_REDIRECT=False):
+            response = self.client.post(reverse("account_logout"))
         self.assertEqual(response.status_code, 302)
         self.assertNotIn(QA_SESSION_KEY, self.client.session)
         self.assertNotIn("_auth_user_id", self.client.session)
