@@ -8,20 +8,33 @@
   <style>
     .eg-visits {
       color: #e5eefb;
+      --eg-panel: rgba(10, 16, 30, .9);
+      --eg-panel-soft: rgba(15, 23, 42, .72);
+      --eg-line: rgba(148, 163, 184, .17);
+      --eg-cyan: #22d3ee;
+      --eg-green: #34d399;
+      --eg-amber: #fbbf24;
+      --eg-violet: #a78bfa;
     }
     .eg-visits .hero {
-      border: 1px solid rgba(45, 212, 191, .18);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(45, 212, 191, .22);
       background:
-        linear-gradient(135deg, rgba(8, 20, 36, .96), rgba(15, 23, 42, .98)),
-        radial-gradient(circle at 20% 0%, rgba(34, 211, 238, .12), transparent 35%);
+        linear-gradient(135deg, rgba(8, 18, 32, .98), rgba(13, 19, 35, .98)),
+        repeating-linear-gradient(90deg, rgba(148, 163, 184, .035) 0 1px, transparent 1px 72px);
       border-radius: 8px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, .28);
     }
     .eg-visits .panel {
-      border: 1px solid rgba(148, 163, 184, .16);
-      background: rgba(15, 23, 42, .88);
+      position: relative;
+      border: 1px solid var(--eg-line);
+      background:
+        linear-gradient(180deg, rgba(15, 23, 42, .93), rgba(8, 13, 24, .94)),
+        repeating-linear-gradient(0deg, rgba(148, 163, 184, .025) 0 1px, transparent 1px 44px);
       border-radius: 8px;
       min-height: 0;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .04);
     }
     .eg-visits .metric {
       border: 1px solid rgba(148, 163, 184, .16);
@@ -29,16 +42,79 @@
       border-radius: 8px;
       min-height: 74px;
     }
-    .eg-visits .bar-track {
-      height: 5px;
+    .eg-visits .module-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      border-bottom: 1px solid rgba(148, 163, 184, .12);
+      padding: .7rem .85rem;
+    }
+    .eg-visits .module-title {
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+      min-width: 0;
+    }
+    .eg-visits .module-icon {
+      display: inline-grid;
+      height: 1.75rem;
+      width: 1.75rem;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 1px solid rgba(34, 211, 238, .25);
+      border-radius: 7px;
+      background: rgba(34, 211, 238, .08);
+      color: #67e8f9;
+      font-size: .9rem;
+    }
+    .eg-visits .module-kicker {
+      font-size: .63rem;
+      line-height: 1rem;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: #94a3b8;
+    }
+    .eg-visits .module-subtitle {
+      margin-top: .05rem;
+      font-size: .68rem;
+      line-height: .95rem;
+      color: #64748b;
+    }
+    .eg-visits .data-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(34, 211, 238, .22);
       border-radius: 999px;
-      background: rgba(51, 65, 85, .8);
+      background: rgba(8, 47, 73, .36);
+      padding: .18rem .5rem;
+      color: #a5f3fc;
+      font-size: .68rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .eg-visits .bar-track {
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(30, 41, 59, .88);
       overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .08);
     }
     .eg-visits .bar-fill {
       height: 100%;
       border-radius: 999px;
       background: linear-gradient(90deg, #22d3ee, #34d399);
+      box-shadow: 0 0 18px rgba(34, 211, 238, .22);
+    }
+    .eg-visits .bar-fill.violet {
+      background: linear-gradient(90deg, #a78bfa, #22d3ee);
+    }
+    .eg-visits .bar-fill.amber {
+      background: linear-gradient(90deg, #fbbf24, #34d399);
+    }
+    .eg-visits .bar-fill.rose {
+      background: linear-gradient(90deg, #fb7185, #fbbf24);
     }
     .eg-visits select,
     .eg-visits input[type="checkbox"] {
@@ -59,6 +135,16 @@
       overflow: auto;
       scrollbar-width: thin;
     }
+    .eg-visits .compact-scroll::-webkit-scrollbar,
+    .eg-visits .compact-scroll-sm::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    .eg-visits .compact-scroll::-webkit-scrollbar-thumb,
+    .eg-visits .compact-scroll-sm::-webkit-scrollbar-thumb {
+      background: rgba(34, 211, 238, .24);
+      border-radius: 999px;
+    }
     .eg-visits table th {
       padding: .48rem .72rem;
     }
@@ -68,6 +154,78 @@
     .eg-visits .dense-list {
       display: grid;
       gap: .55rem;
+    }
+    .eg-visits .rank-row {
+      border: 1px solid rgba(148, 163, 184, .13);
+      background: rgba(2, 6, 23, .42);
+      border-radius: 7px;
+      padding: .55rem .65rem;
+    }
+    .eg-visits .rank-number {
+      display: inline-grid;
+      height: 1.35rem;
+      min-width: 1.35rem;
+      place-items: center;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, .95);
+      border: 1px solid rgba(148, 163, 184, .16);
+      color: #94a3b8;
+      font-size: .65rem;
+      font-weight: 800;
+    }
+    .eg-visits .funnel-card {
+      border: 1px solid rgba(34, 211, 238, .16);
+      background:
+        linear-gradient(135deg, rgba(8, 47, 73, .2), rgba(2, 6, 23, .46)),
+        linear-gradient(90deg, rgba(34, 211, 238, .06), transparent 42%);
+      border-radius: 8px;
+      padding: .65rem .72rem;
+    }
+    .eg-visits .insight-card {
+      border: 1px solid rgba(34, 211, 238, .18);
+      background: rgba(8, 47, 73, .22);
+      border-radius: 8px;
+      padding: .65rem .75rem;
+      color: #dbeafe;
+      font-size: .78rem;
+      line-height: 1.45rem;
+    }
+    .eg-visits .insight-card.warning {
+      border-color: rgba(251, 191, 36, .22);
+      background: rgba(120, 53, 15, .22);
+      color: #fef3c7;
+    }
+    .eg-visits .matrix-cell {
+      border: 1px solid rgba(148, 163, 184, .13);
+      background: rgba(2, 6, 23, .42);
+      border-radius: 8px;
+      padding: .58rem .68rem;
+    }
+    .eg-visits .table-wrap {
+      background: rgba(2, 6, 23, .28);
+    }
+    .eg-visits .table-modern thead {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: rgba(8, 13, 24, .96);
+      backdrop-filter: blur(10px);
+    }
+    .eg-visits .table-modern tbody tr {
+      transition: background-color .15s ease, box-shadow .15s ease;
+    }
+    .eg-visits .table-modern tbody tr:hover {
+      background: rgba(14, 165, 233, .08);
+      box-shadow: inset 3px 0 0 rgba(34, 211, 238, .75);
+    }
+    .eg-visits .path-pill {
+      display: inline-block;
+      max-width: 100%;
+      border: 1px solid rgba(148, 163, 184, .13);
+      border-radius: 6px;
+      background: rgba(15, 23, 42, .64);
+      padding: .16rem .42rem;
+      color: #dbeafe;
     }
     .eg-visits .channel-grid {
       display: grid;
@@ -119,10 +277,10 @@
   <section class="hero p-3">
     <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
       <div>
-        <div class="text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-300">Inteligencia de visitas</div>
+        <div class="text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-300">Inteligencia comercial validada</div>
         <h1 class="mt-1 text-xl font-bold text-white sm:text-2xl">Adquisición pública eGarage</h1>
         <p class="mt-1 max-w-3xl text-xs leading-5 text-slate-300">
-          Tráfico comercial limpio, eventos del embudo, campañas UTM y conversiones para decidir qué publicación genera empresas y suscriptores.
+          Separa páginas vistas, sesiones, prospectos de landings, eventos comerciales y conversiones atribuidas para evitar lecturas infladas.
         </p>
       </div>
 
@@ -163,16 +321,16 @@
 
   <section class="kpi-grid mt-2">
     <div class="metric p-3">
-      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-400">Visitas</div>
+      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-400">Páginas vistas limpias</div>
       <div class="mt-1 text-2xl font-bold text-white">{{ kpis.total_visits }}</div>
       <div class="mt-1 text-[11px] {% if kpis.trend_delta >= 0 %}text-emerald-300{% else %}text-rose-300{% endif %}">
-        {{ kpis.trend_delta }}% vs período anterior
+        {{ kpis.raw_visits }} brutas · {{ kpis.trend_delta }}% vs período anterior
       </div>
     </div>
     <div class="metric p-3">
-      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-400">Sesiones</div>
+      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-400">Sesiones válidas</div>
       <div class="mt-1 text-2xl font-bold text-white">{{ kpis.sessions }}</div>
-      <div class="mt-1 text-[11px] text-slate-400">{{ kpis.unique_visitors }} visitantes únicos</div>
+      <div class="mt-1 text-[11px] text-slate-400">{{ kpis.unique_visitors }} hashes · {{ kpis.visits_per_session }} pág./sesión</div>
     </div>
     <div class="metric p-3">
       <div class="text-[10px] uppercase tracking-[0.16em] text-slate-400">Mobile</div>
@@ -180,19 +338,19 @@
       <div class="mt-1 text-[11px] text-slate-400">{{ kpis.mobile_visits }} visitas móviles</div>
     </div>
     <div class="metric p-3">
-      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-400">Landings</div>
+      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-400">Landings comerciales</div>
       <div class="mt-1 text-2xl font-bold text-white">{{ kpis.landing_visits }}</div>
-      <div class="mt-1 text-[11px] text-slate-400">home {{ kpis.home_visits }} · bienvenida {{ kpis.welcome_visits }}</div>
+      <div class="mt-1 text-[11px] text-slate-400">{{ kpis.landing_unique_visitors }} prospectos · {{ kpis.landing_sessions }} sesiones</div>
     </div>
     <div class="metric p-3">
-      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-400">Empresas nuevas</div>
-      <div class="mt-1 text-2xl font-bold text-white">{{ kpis.new_companies }}</div>
-      <div class="mt-1 text-[11px] text-slate-400">trials {{ kpis.trials }} · pagas {{ kpis.paid }}</div>
+      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-400">Registros atribuidos</div>
+      <div class="mt-1 text-2xl font-bold text-white">{{ kpis.attributed_signups }}</div>
+      <div class="mt-1 text-[11px] text-slate-400">{{ kpis.unattributed_companies }} empresas no atribuidas</div>
     </div>
     <div class="metric p-3">
-      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-400">Conversión aprox.</div>
+      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-400">Conv. landing → registro</div>
       <div class="mt-1 text-2xl font-bold text-white">{{ kpis.visit_to_company_rate }}%</div>
-      <div class="mt-1 text-[11px] text-slate-400">empresas ÷ visitas limpias</div>
+      <div class="mt-1 text-[11px] text-slate-400">{{ kpis.attributed_paid }} pagos atribuidos · {{ kpis.unattributed_paid }} no atribuidos</div>
     </div>
   </section>
 
@@ -205,18 +363,24 @@
       <canvas id="trendChart" aria-label="Tendencia diaria de visitas"></canvas>
     </div>
 
-    <div class="panel p-3">
-      <div class="mb-2 flex items-center justify-between gap-3">
-        <h2 class="text-sm font-bold text-white">Embudo comercial</h2>
-        <span class="text-xs text-slate-400">base: visitantes únicos</span>
+    <div class="panel overflow-hidden">
+      <div class="module-header">
+        <div class="module-title">
+          <span class="module-icon">⌁</span>
+          <div>
+            <div class="module-kicker">Conversión atribuida</div>
+            <h2 class="text-sm font-bold text-white">Embudo comercial</h2>
+          </div>
+        </div>
+        <span class="data-chip">eventos reales</span>
       </div>
-      <div class="compact-scroll dense-list">
+      <div class="compact-scroll dense-list p-3">
         {% for row in funnel_rows %}
-        <div class="rounded border border-slate-700 bg-slate-950/50 px-2.5 py-2">
+        <div class="funnel-card">
           <div class="flex items-center justify-between gap-3">
-            <div>
-              <div class="text-xs font-semibold text-slate-100">{{ row.label }}</div>
-              <div class="mt-0.5 text-[11px] text-slate-500">Paso {{ row.step_rate }}% · total {{ row.share }}%</div>
+            <div class="min-w-0">
+              <div class="truncate text-xs font-semibold text-slate-100">{{ row.label }}</div>
+              <div class="mt-0.5 text-[11px] text-slate-500">Paso {{ row.step_rate }}% · vs prospectos landing {{ row.share }}%</div>
             </div>
             <div class="text-right">
               <div class="text-base font-bold text-white">{{ row.value }}</div>
@@ -231,27 +395,39 @@
   </section>
 
   <section class="panel-grid mt-2">
-    <div class="panel p-3">
-      <h2 class="text-sm font-bold text-white">Lecturas inteligentes</h2>
-      <div class="compact-scroll-sm mt-2 dense-list">
+    <div class="panel overflow-hidden">
+      <div class="module-header">
+        <div class="module-title">
+          <span class="module-icon">✦</span>
+          <div>
+            <div class="module-kicker">Señales</div>
+            <h2 class="text-sm font-bold text-white">Lecturas inteligentes</h2>
+          </div>
+        </div>
+        <span class="data-chip">IA operativa</span>
+      </div>
+      <div class="compact-scroll-sm dense-list p-3">
         {% for insight in insights %}
-        <div class="rounded border border-cyan-500/20 bg-cyan-500/8 px-2.5 py-2 text-xs leading-5 text-slate-200">
+        <div class="insight-card">
           {{ insight }}
         </div>
         {% endfor %}
-        <div class="rounded border border-amber-500/20 bg-amber-500/8 px-2.5 py-2 text-xs leading-5 text-amber-100">
+        <div class="insight-card warning">
           Calidad de datos: {{ kpis.bot_pressure }}% bots en tráfico bruto y {{ kpis.excluded_internal }} visitas internas/servidor excluidas.
         </div>
       </div>
     </div>
 
     <div class="panel overflow-hidden">
-      <div class="border-b border-slate-700 px-3 py-2">
-        <div class="flex items-center justify-between gap-2">
-          <h2 class="text-sm font-bold text-white">Seguimiento de campañas</h2>
-          <span class="text-[10px] uppercase tracking-wide text-cyan-300">visitas + UTM</span>
+      <div class="module-header">
+        <div class="module-title">
+          <span class="module-icon">◈</span>
+          <div>
+            <div class="module-kicker">Fuentes pagadas y orgánicas</div>
+            <h2 class="text-sm font-bold text-white">Seguimiento de campañas</h2>
+          </div>
         </div>
-        <p class="mt-0.5 text-[11px] text-slate-400">Canal de origen y campañas que generan registros y pagos.</p>
+        <span class="data-chip">visitas + UTM</span>
       </div>
       <div class="border-b border-slate-700/80 p-2">
         <div class="channel-grid">
@@ -266,8 +442,8 @@
           {% endfor %}
         </div>
       </div>
-      <div class="compact-scroll overflow-x-auto">
-        <table class="w-full min-w-[680px] text-left text-sm">
+      <div class="compact-scroll table-wrap overflow-x-auto">
+        <table class="table-modern w-full min-w-[680px] text-left text-sm">
           <thead class="bg-slate-900/90 text-xs uppercase tracking-wide text-slate-400">
             <tr>
               <th class="px-4 py-3">Campaña UTM</th>
@@ -295,16 +471,48 @@
         </table>
       </div>
     </div>
+
+    <div class="panel overflow-hidden">
+      <div class="module-header">
+        <div class="module-title">
+          <span class="module-icon">!</span>
+          <div>
+            <div class="module-kicker">Consistencia</div>
+            <h2 class="text-sm font-bold text-white">Alertas de medición</h2>
+          </div>
+        </div>
+        <span class="data-chip">{{ kpis.bot_pressure }}% bots detectados</span>
+      </div>
+      <div class="compact-scroll-sm dense-list p-3">
+        {% for warning in quality_warnings %}
+        <div class="insight-card warning">
+          {{ warning }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
   </section>
 
   <section class="panel-grid mt-2">
-    <div class="panel p-3">
-      <h2 class="text-sm font-bold text-white">Países</h2>
-      <div class="compact-scroll-sm mt-2 dense-list">
+    <div class="panel overflow-hidden">
+      <div class="module-header">
+        <div class="module-title">
+          <span class="module-icon">◎</span>
+          <div>
+            <div class="module-kicker">Distribución</div>
+            <h2 class="text-sm font-bold text-white">Países</h2>
+          </div>
+        </div>
+        <span class="data-chip">top 8</span>
+      </div>
+      <div class="compact-scroll-sm dense-list p-3">
         {% for row in countries|slice:":8" %}
-        <div>
-          <div class="mb-1 flex justify-between gap-3 text-xs">
-            <span class="text-slate-200">{{ row.label }}</span>
+        <div class="rank-row">
+          <div class="mb-1.5 flex items-center justify-between gap-3 text-xs">
+            <span class="flex min-w-0 items-center gap-2">
+              <span class="rank-number">{{ forloop.counter }}</span>
+              <span class="truncate text-slate-200">{{ row.label }}</span>
+            </span>
             <span class="font-semibold text-cyan-200">{{ row.total }} · {{ row.share }}%</span>
           </div>
           <div class="bar-track"><div class="bar-fill" style="width: {{ row.share }}%"></div></div>
@@ -315,16 +523,28 @@
       </div>
     </div>
 
-    <div class="panel p-3">
-      <h2 class="text-sm font-bold text-white">Rubros con intención</h2>
-      <div class="compact-scroll-sm mt-2 dense-list">
+    <div class="panel overflow-hidden">
+      <div class="module-header">
+        <div class="module-title">
+          <span class="module-icon">◇</span>
+          <div>
+            <div class="module-kicker">Demanda</div>
+            <h2 class="text-sm font-bold text-white">Rubros con intención</h2>
+          </div>
+        </div>
+        <span class="data-chip">landings</span>
+      </div>
+      <div class="compact-scroll-sm dense-list p-3">
         {% for row in rubros|slice:":8" %}
-        <div>
-          <div class="mb-1 flex justify-between gap-3 text-xs">
-            <span class="text-slate-200">{{ row.label }}</span>
+        <div class="rank-row">
+          <div class="mb-1.5 flex items-center justify-between gap-3 text-xs">
+            <span class="flex min-w-0 items-center gap-2">
+              <span class="rank-number">{{ forloop.counter }}</span>
+              <span class="truncate text-slate-200">{{ row.label }}</span>
+            </span>
             <span class="font-semibold text-emerald-200">{{ row.total }} · {{ row.share }}%</span>
           </div>
-          <div class="bar-track"><div class="bar-fill" style="width: {{ row.share }}%"></div></div>
+          <div class="bar-track"><div class="bar-fill amber" style="width: {{ row.share }}%"></div></div>
         </div>
         {% empty %}
         <p class="text-sm text-slate-400">Sin landings de rubro para este filtro.</p>
@@ -335,16 +555,28 @@
   </section>
 
   <section class="panel-grid mt-2">
-    <div class="panel p-3">
-      <h2 class="text-sm font-bold text-white">Fuentes</h2>
-      <div class="compact-scroll-sm mt-2 dense-list">
+    <div class="panel overflow-hidden">
+      <div class="module-header">
+        <div class="module-title">
+          <span class="module-icon">↗</span>
+          <div>
+            <div class="module-kicker">Origen</div>
+            <h2 class="text-sm font-bold text-white">Fuentes</h2>
+          </div>
+        </div>
+        <span class="data-chip">referrers</span>
+      </div>
+      <div class="compact-scroll-sm dense-list p-3">
         {% for row in sources|slice:":8" %}
-        <div>
-          <div class="mb-1 flex justify-between gap-3 text-xs">
-            <span class="truncate text-slate-200" title="{{ row.label }}">{{ row.label }}</span>
+        <div class="rank-row">
+          <div class="mb-1.5 flex items-center justify-between gap-3 text-xs">
+            <span class="flex min-w-0 items-center gap-2">
+              <span class="rank-number">{{ forloop.counter }}</span>
+              <span class="truncate text-slate-200" title="{{ row.label }}">{{ row.label }}</span>
+            </span>
             <span class="font-semibold text-violet-200">{{ row.total }} · {{ row.share }}%</span>
           </div>
-          <div class="bar-track"><div class="bar-fill" style="width: {{ row.share }}%"></div></div>
+          <div class="bar-track"><div class="bar-fill violet" style="width: {{ row.share }}%"></div></div>
         </div>
         {% empty %}
         <p class="text-sm text-slate-400">Sin referrers para este filtro.</p>
@@ -352,13 +584,25 @@
       </div>
     </div>
 
-    <div class="panel p-3">
-      <h2 class="text-sm font-bold text-white">Clics comerciales</h2>
-      <div class="compact-scroll-sm mt-2 dense-list">
+    <div class="panel overflow-hidden">
+      <div class="module-header">
+        <div class="module-title">
+          <span class="module-icon">＋</span>
+          <div>
+            <div class="module-kicker">Acción</div>
+            <h2 class="text-sm font-bold text-white">Clics comerciales</h2>
+          </div>
+        </div>
+        <span class="data-chip">CTA</span>
+      </div>
+      <div class="compact-scroll-sm dense-list p-3">
         {% for row in cta_breakdown %}
-        <div>
-          <div class="mb-1 flex justify-between gap-3 text-xs">
-            <span class="text-slate-200">{{ row.label }}</span>
+        <div class="rank-row">
+          <div class="mb-1.5 flex items-center justify-between gap-3 text-xs">
+            <span class="flex min-w-0 items-center gap-2">
+              <span class="rank-number">{{ forloop.counter }}</span>
+              <span class="truncate text-slate-200">{{ row.label }}</span>
+            </span>
             <span class="font-semibold text-emerald-200">{{ row.total }} · {{ row.share }}%</span>
           </div>
           <div class="bar-track"><div class="bar-fill" style="width: {{ row.share }}%"></div></div>
@@ -372,11 +616,18 @@
 
   <section class="panel-grid mt-2">
     <div class="panel overflow-hidden">
-      <div class="border-b border-slate-700 px-3 py-2">
-        <h2 class="text-sm font-bold text-white">Páginas principales</h2>
+      <div class="module-header">
+        <div class="module-title">
+          <span class="module-icon">▤</span>
+          <div>
+            <div class="module-kicker">Contenido</div>
+            <h2 class="text-sm font-bold text-white">Páginas principales</h2>
+          </div>
+        </div>
+        <span class="data-chip">rutas top</span>
       </div>
-      <div class="compact-scroll overflow-x-auto">
-        <table class="w-full min-w-[680px] text-left text-sm">
+      <div class="compact-scroll table-wrap overflow-x-auto">
+        <table class="table-modern w-full min-w-[680px] text-left text-sm">
           <thead class="bg-slate-900/90 text-xs uppercase tracking-wide text-slate-400">
             <tr>
               <th class="px-4 py-3">Ruta</th>
@@ -388,10 +639,10 @@
           <tbody class="divide-y divide-slate-800">
             {% for row in top_pages %}
             <tr class="hover:bg-slate-800/60">
-              <td class="px-4 py-3 text-slate-200"><span class="break-all">{{ row.path }}</span></td>
+              <td class="px-4 py-3 text-slate-200"><span class="path-pill break-all">{{ row.path }}</span></td>
               <td class="px-4 py-3 text-right font-semibold text-white">{{ row.total }}</td>
               <td class="px-4 py-3 text-right text-slate-300">{{ row.unique }}</td>
-              <td class="px-4 py-3 text-right text-cyan-200">{{ row.share }}%</td>
+              <td class="px-4 py-3 text-right"><span class="data-chip">{{ row.share }}%</span></td>
             </tr>
             {% empty %}
             <tr><td colspan="4" class="px-3 py-6 text-center text-slate-400">Sin páginas para mostrar.</td></tr>
@@ -402,11 +653,18 @@
     </div>
 
     <div class="panel overflow-hidden">
-      <div class="border-b border-slate-700 px-3 py-2">
-        <h2 class="text-sm font-bold text-white">Páginas de entrada</h2>
+      <div class="module-header">
+        <div class="module-title">
+          <span class="module-icon">⌖</span>
+          <div>
+            <div class="module-kicker">Primera impresión</div>
+            <h2 class="text-sm font-bold text-white">Páginas de entrada</h2>
+          </div>
+        </div>
+        <span class="data-chip">sesiones</span>
       </div>
-      <div class="compact-scroll overflow-x-auto">
-        <table class="w-full min-w-[620px] text-left text-sm">
+      <div class="compact-scroll table-wrap overflow-x-auto">
+        <table class="table-modern w-full min-w-[620px] text-left text-sm">
           <thead class="bg-slate-900/90 text-xs uppercase tracking-wide text-slate-400">
             <tr>
               <th class="px-4 py-3">Entrada inicial</th>
@@ -418,10 +676,10 @@
           <tbody class="divide-y divide-slate-800">
             {% for row in entry_pages %}
             <tr class="hover:bg-slate-800/60">
-              <td class="px-4 py-3 text-slate-200"><span class="break-all">{{ row.path }}</span></td>
+              <td class="px-4 py-3 text-slate-200"><span class="path-pill break-all">{{ row.path }}</span></td>
               <td class="px-4 py-3 text-right font-semibold text-white">{{ row.sessions }}</td>
               <td class="px-4 py-3 text-right text-slate-300">{{ row.visits }}</td>
-              <td class="px-4 py-3 text-right text-cyan-200">{{ row.share }}%</td>
+              <td class="px-4 py-3 text-right"><span class="data-chip">{{ row.share }}%</span></td>
             </tr>
             {% empty %}
             <tr><td colspan="4" class="px-3 py-6 text-center text-slate-400">Sin entradas para mostrar.</td></tr>
@@ -434,36 +692,64 @@
 
   <section class="panel-grid mt-2">
     <div class="panel overflow-hidden">
-      <div class="border-b border-slate-700 px-3 py-2">
-        <h2 class="text-sm font-bold text-white">País + rubro</h2>
+      <div class="module-header">
+        <div class="module-title">
+          <span class="module-icon">✣</span>
+          <div>
+            <div class="module-kicker">Cruce comercial</div>
+            <h2 class="text-sm font-bold text-white">País + rubro</h2>
+          </div>
+        </div>
+        <span class="data-chip">matriz</span>
       </div>
-      <div class="compact-scroll-sm overflow-x-auto">
-        <table class="w-full min-w-[560px] text-left text-sm">
-          <thead class="bg-slate-900/90 text-xs uppercase tracking-wide text-slate-400">
-            <tr>
-              <th class="px-4 py-3">País</th>
-              <th class="px-4 py-3">Rubro</th>
-              <th class="px-4 py-3 text-right">Visitas</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-800">
-            {% for row in country_rubro %}
-            <tr class="hover:bg-slate-800/60">
-              <td class="px-4 py-3 text-slate-200">{{ row.country_label }}</td>
-              <td class="px-4 py-3 text-slate-300">{{ row.rubro_label }}</td>
-              <td class="px-4 py-3 text-right font-semibold text-white">{{ row.total }}</td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="3" class="px-3 py-6 text-center text-slate-400">Sin cruces disponibles.</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <div class="compact-scroll-sm dense-list p-3">
+        {% for row in country_rubro %}
+        <div class="matrix-cell">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <div class="text-[10px] uppercase tracking-[0.14em] text-slate-500">{{ row.country_label }}</div>
+              <div class="mt-0.5 truncate text-xs font-semibold text-slate-100">{{ row.rubro_label }}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-base font-bold text-white">{{ row.total }}</div>
+              <div class="text-[10px] uppercase tracking-wide text-cyan-300">visitas</div>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <p class="px-3 py-6 text-center text-sm text-slate-400">Sin cruces disponibles.</p>
+        {% endfor %}
       </div>
     </div>
 
     <div class="panel p-3">
-      <h2 class="text-sm font-bold text-white">Calidad y dispositivo</h2>
+      <h2 class="text-sm font-bold text-white">Calidad, dispositivo y conciliación</h2>
       <div class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded border border-cyan-500/20 bg-cyan-950/30 p-2">
+          <div class="text-[10px] uppercase tracking-[0.14em] text-slate-500">Eventos comerciales</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ kpis.commercial_events_total }}</div>
+          <div class="mt-0.5 text-[11px] text-cyan-200">embudo atribuido</div>
+        </div>
+        <div class="rounded border border-amber-500/20 bg-amber-950/20 p-2">
+          <div class="text-[10px] uppercase tracking-[0.14em] text-slate-500">Empresas no atribuidas</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ kpis.unattributed_companies }}</div>
+          <div class="mt-0.5 text-[11px] text-amber-200">fuera del embudo</div>
+        </div>
+        <div class="rounded border border-amber-500/20 bg-amber-950/20 p-2">
+          <div class="text-[10px] uppercase tracking-[0.14em] text-slate-500">Pagos no atribuidos</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ kpis.unattributed_paid }}</div>
+          <div class="mt-0.5 text-[11px] text-amber-200">histórico/admin</div>
+        </div>
+        <div class="rounded border border-slate-700 bg-slate-950/70 p-2">
+          <div class="text-[10px] uppercase tracking-[0.14em] text-slate-500">Directo / sin referrer</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ kpis.direct_share }}%</div>
+          <div class="mt-0.5 text-[11px] text-cyan-200">{{ kpis.direct_visits }} visitas</div>
+        </div>
+        <div class="rounded border border-slate-700 bg-slate-950/70 p-2">
+          <div class="text-[10px] uppercase tracking-[0.14em] text-slate-500">Sin idioma</div>
+          <div class="mt-1 text-xl font-bold text-white">{{ kpis.unknown_language_share }}%</div>
+          <div class="mt-0.5 text-[11px] text-cyan-200">{{ kpis.unknown_language_visits }} visitas</div>
+        </div>
         {% for row in page_types %}
         <div class="rounded border border-slate-700 bg-slate-950/70 p-2">
           <div class="text-[10px] uppercase tracking-[0.14em] text-slate-500">{{ row.label }}</div>
@@ -483,14 +769,26 @@
   </section>
 
   <section class="mt-2 flex justify-start">
-    <div class="panel language-panel p-3">
-      <h2 class="text-sm font-bold text-white">Idiomas</h2>
-      <div class="compact-scroll-sm mt-2 dense-list">
+    <div class="panel language-panel overflow-hidden">
+      <div class="module-header">
+        <div class="module-title">
+          <span class="module-icon">Aa</span>
+          <div>
+            <div class="module-kicker">Localización</div>
+            <h2 class="text-sm font-bold text-white">Idiomas</h2>
+          </div>
+        </div>
+        <span class="data-chip">tráfico</span>
+      </div>
+      <div class="compact-scroll-sm dense-list p-3">
         {% for row in languages %}
-        <div>
-          <div class="mb-1 flex justify-between text-xs">
-            <span class="uppercase text-slate-200">{{ row.language }}</span>
-            <span class="text-cyan-200">{{ row.total }} · {{ row.share }}%</span>
+        <div class="rank-row">
+          <div class="mb-1.5 flex items-center justify-between gap-3 text-xs">
+            <span class="flex items-center gap-2">
+              <span class="rank-number">{{ forloop.counter }}</span>
+              <span class="uppercase text-slate-200">{{ row.language }}</span>
+            </span>
+            <span class="font-semibold text-cyan-200">{{ row.total }} · {{ row.share }}%</span>
           </div>
           <div class="bar-track"><div class="bar-fill" style="width: {{ row.share }}%"></div></div>
         </div>

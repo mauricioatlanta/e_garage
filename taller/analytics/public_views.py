@@ -78,6 +78,12 @@ def _percent(value, total):
     return round((value / total) * 100, 1)
 
 
+def _ratio(value, total):
+    if not total:
+        return 0
+    return round(value / total, 1)
+
+
 def _safe_days(raw_days):
     try:
         days = int(raw_days or 30)
@@ -230,9 +236,19 @@ def admin_visits_dashboard(request):
     unique_visitors = qs_scope.values("visitor_hash").distinct().count()
     sessions = qs_scope.exclude(session_key="").values("session_key").distinct().count()
     mobile_visits = qs_scope.filter(is_mobile=True).count()
-    landing_visits = qs_scope.filter(page_type=PublicPageView.PAGE_LANDING).count()
+    landing_qs = qs_scope.filter(page_type=PublicPageView.PAGE_LANDING)
+    landing_visits = landing_qs.count()
+    landing_unique_visitors = landing_qs.values("visitor_hash").distinct().count()
+    landing_sessions = landing_qs.exclude(session_key="").values("session_key").distinct().count()
     welcome_visits = qs_scope.filter(page_type=PublicPageView.PAGE_WELCOME).count()
     home_visits = qs_scope.filter(page_type=PublicPageView.PAGE_HOME).count()
+    raw_visits = qs_all_period.count()
+    raw_human_candidate_visits = qs_human_period.count()
+    unknown_language_visits = qs_scope.filter(language="").count()
+    direct_visits = qs_scope.filter(
+        Q(source_label="") | Q(source_label__icontains="directo") | Q(source_label__icontains="sin referrer")
+    ).count()
+    visits_per_session = _ratio(total_visits, sessions)
 
     # Contexto de negocio: empresas reales creadas en el mismo período.
     Empresa = apps.get_model("taller", "Empresa")
@@ -273,6 +289,13 @@ def admin_visits_dashboard(request):
     )
     if not include_bots:
         previous_events = previous_events.filter(is_bot=False)
+    if selected_country:
+        previous_event_country_filters = [selected_country]
+        if selected_country == "us":
+            previous_event_country_filters.extend(["us_en", "us_es"])
+        previous_events = previous_events.filter(country__in=previous_event_country_filters)
+    if selected_rubro:
+        previous_events = previous_events.filter(rubro=selected_rubro)
 
     country_counter = Counter()
     for row in qs_scope.exclude(country="").values("country").annotate(total=Count("id")):
@@ -426,6 +449,15 @@ def admin_visits_dashboard(request):
     human_total = qs_human_period.count()
     internal_total = qs_internal_period.count()
     bot_pressure = _percent(bot_total, human_total + bot_total)
+    commercial_event_types = (
+        PublicAnalyticsEvent.EVENT_LANDING_VIEW,
+        PublicAnalyticsEvent.EVENT_CTA_CLICK,
+        PublicAnalyticsEvent.EVENT_SIGNUP_START,
+        PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETE,
+        PublicAnalyticsEvent.EVENT_ONBOARDING_COMPLETE,
+        PublicAnalyticsEvent.EVENT_SUBSCRIPTION_PAID,
+    )
+    commercial_events_total = events_all.filter(event_type__in=commercial_event_types).count()
 
     event_counts = {
         row["event_type"]: row["total"]
@@ -473,15 +505,9 @@ def admin_visits_dashboard(request):
 
     funnel_rows = [
         {
-            "key": "visitors",
-            "label": "Visitantes humanos únicos",
-            "value": unique_visitors,
-            "previous": previous_qs.values("visitor_hash").distinct().count(),
-        },
-        {
             "key": PublicAnalyticsEvent.EVENT_LANDING_VIEW,
-            "label": "Visitaron landing comercial",
-            "value": event_counts.get(PublicAnalyticsEvent.EVENT_LANDING_VIEW, landing_visits),
+            "label": "Landing comercial registrada",
+            "value": event_counts.get(PublicAnalyticsEvent.EVENT_LANDING_VIEW, 0),
             "previous": previous_event_counts.get(PublicAnalyticsEvent.EVENT_LANDING_VIEW, 0),
         },
         {
@@ -499,29 +525,34 @@ def admin_visits_dashboard(request):
         {
             "key": PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETE,
             "label": "Completaron registro",
-            "value": event_counts.get(PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETE, empresas_period.count()),
+            "value": event_counts.get(PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETE, 0),
             "previous": previous_event_counts.get(PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETE, 0),
         },
         {
             "key": PublicAnalyticsEvent.EVENT_ONBOARDING_COMPLETE,
             "label": "Completaron onboarding",
-            "value": event_counts.get(PublicAnalyticsEvent.EVENT_ONBOARDING_COMPLETE, empresas_period.filter(onboarding_completado=True).count()),
+            "value": event_counts.get(PublicAnalyticsEvent.EVENT_ONBOARDING_COMPLETE, 0),
             "previous": previous_event_counts.get(PublicAnalyticsEvent.EVENT_ONBOARDING_COMPLETE, 0),
         },
         {
             "key": PublicAnalyticsEvent.EVENT_SUBSCRIPTION_PAID,
-            "label": "Suscriptores pagos",
-            "value": event_counts.get(PublicAnalyticsEvent.EVENT_SUBSCRIPTION_PAID, paid_period),
+            "label": "Pagos atribuidos",
+            "value": event_counts.get(PublicAnalyticsEvent.EVENT_SUBSCRIPTION_PAID, 0),
             "previous": previous_event_counts.get(PublicAnalyticsEvent.EVENT_SUBSCRIPTION_PAID, 0),
         },
     ]
-    baseline = funnel_rows[0]["value"] or 1
+    baseline = landing_unique_visitors or funnel_rows[0]["value"] or 1
     previous_step = baseline
     for row in funnel_rows:
         row["share"] = _percent(row["value"], baseline)
         row["step_rate"] = _percent(row["value"], previous_step)
         row["delta"] = _percent(row["value"] - row["previous"], row["previous"])
         previous_step = row["value"] or previous_step
+
+    attributed_signup_count = event_counts.get(PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETE, 0)
+    attributed_paid_count = event_counts.get(PublicAnalyticsEvent.EVENT_SUBSCRIPTION_PAID, 0)
+    unattributed_companies = max(empresas_period.count() - attributed_signup_count, 0)
+    unattributed_paid = max(paid_period - attributed_paid_count, 0)
 
     campaigns = [
         {
@@ -585,8 +616,36 @@ def admin_visits_dashboard(request):
         insights.append(
             f"La fuente principal es {top_source['label']} con {top_source['share']}% de las visitas."
         )
+    if unattributed_companies:
+        insights.append(
+            f"{unattributed_companies} empresa(s) del período no tienen evento de registro atribuido al embudo."
+        )
     if not insights:
         insights.append("Aún falta volumen para detectar patrones confiables.")
+
+    quality_warnings = []
+    if sessions and visits_per_session >= 20:
+        quality_warnings.append(
+            f"Promedio anómalo: {visits_per_session} páginas por sesión. Revisar bots, monitores o tráfico técnico."
+        )
+    if unique_visitors > sessions * 5 and sessions:
+        quality_warnings.append(
+            f"{unique_visitors} visitantes únicos frente a {sessions} sesiones: la identidad de visitantes está sobredimensionada."
+        )
+    if _percent(direct_visits, total_visits) >= 80 and total_visits:
+        quality_warnings.append(
+            f"{_percent(direct_visits, total_visits)}% figura como directo/sin referrer; faltan UTMs o hay tráfico no atribuible."
+        )
+    if _percent(unknown_language_visits, total_visits) >= 50 and total_visits:
+        quality_warnings.append(
+            f"{_percent(unknown_language_visits, total_visits)}% no trae idioma detectado; señal típica de solicitudes no comerciales o rutas sin localización."
+        )
+    if landing_visits and not event_counts.get(PublicAnalyticsEvent.EVENT_CTA_CLICK, 0):
+        quality_warnings.append(
+            "Hay landings vistas pero cero CTA registrados; revisar enlaces, script de eventos y propuesta de acción."
+        )
+    if not quality_warnings:
+        quality_warnings.append("La muestra filtrada no presenta alertas fuertes de consistencia.")
 
     context = {
         "days": days,
@@ -601,11 +660,15 @@ def admin_visits_dashboard(request):
         },
         "kpis": {
             "total_visits": total_visits,
+            "raw_visits": raw_visits,
+            "raw_human_candidate_visits": raw_human_candidate_visits,
             "unique_visitors": unique_visitors,
             "sessions": sessions,
             "mobile_visits": mobile_visits,
             "mobile_share": _percent(mobile_visits, total_visits),
             "landing_visits": landing_visits,
+            "landing_unique_visitors": landing_unique_visitors,
+            "landing_sessions": landing_sessions,
             "welcome_visits": welcome_visits,
             "home_visits": home_visits,
             "bot_pressure": bot_pressure,
@@ -613,9 +676,19 @@ def admin_visits_dashboard(request):
             "new_companies": empresas_period.count(),
             "trials": trials_period,
             "paid": paid_period,
-            "visit_to_company_rate": _percent(empresas_period.count(), total_visits),
+            "attributed_signups": attributed_signup_count,
+            "attributed_paid": attributed_paid_count,
+            "unattributed_companies": unattributed_companies,
+            "unattributed_paid": unattributed_paid,
+            "commercial_events_total": commercial_events_total,
+            "visit_to_company_rate": _percent(attributed_signup_count, landing_unique_visitors),
             "clean_traffic": human_total,
             "excluded_internal": internal_total,
+            "unknown_language_visits": unknown_language_visits,
+            "unknown_language_share": _percent(unknown_language_visits, total_visits),
+            "direct_visits": direct_visits,
+            "direct_share": _percent(direct_visits, total_visits),
+            "visits_per_session": visits_per_session,
         },
         "countries": countries,
         "rubros": rubros,
@@ -631,6 +704,7 @@ def admin_visits_dashboard(request):
         "campaigns": campaigns,
         "languages": languages,
         "insights": insights,
+        "quality_warnings": quality_warnings,
         "chart_data_json": json.dumps(chart_data),
     }
 

@@ -351,3 +351,45 @@ def test_admin_visits_dashboard_exposes_campaign_channels(rf, staff_user):
     assert channels["Instagram"] == 1
     assert channels["Google"] == 1
     assert channels["Directo"] == 1
+
+
+@pytest.mark.django_db
+def test_admin_visits_dashboard_funnel_uses_only_attributed_events(rf, staff_user):
+    from django.apps import apps
+
+    Empresa = apps.get_model("taller", "Empresa")
+    user_real = User.objects.create_user(
+        username="cliente_embudo", email="cliente-embudo@example.com", password="x"
+    )
+    Empresa.objects.create(
+        user=user_real,
+        nombre_taller="Taller Embudo Real",
+        suscripcion_activa=True,
+        is_trial=False,
+    )
+    PublicPageView.objects.create(
+        path="/cl/es/desarmadurias/",
+        landing_initial="/cl/es/desarmadurias/",
+        page_type=PublicPageView.PAGE_LANDING,
+        country="cl",
+        language="es",
+        visitor_hash="visitor-landing",
+        session_key="session-landing",
+        source_label="whatsapp / direct",
+        is_bot=False,
+        is_internal=False,
+        created_at=timezone.now(),
+    )
+
+    request = rf.get("/admin/visitas/?days=30")
+    request.user = staff_user
+    resp = admin_visits_dashboard(request)
+    funnel = {row["key"]: row["value"] for row in resp.context_data["funnel_rows"]}
+
+    assert resp.context_data["kpis"]["landing_visits"] == 1
+    assert resp.context_data["kpis"]["new_companies"] == 1
+    assert funnel[PublicAnalyticsEvent.EVENT_LANDING_VIEW] == 0
+    assert funnel[PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETE] == 0
+    assert funnel[PublicAnalyticsEvent.EVENT_SUBSCRIPTION_PAID] == 0
+    assert resp.context_data["kpis"]["unattributed_companies"] == 1
+    assert resp.context_data["kpis"]["unattributed_paid"] == 1
