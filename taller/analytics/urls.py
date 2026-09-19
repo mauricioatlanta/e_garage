@@ -27,6 +27,7 @@ app_name = "analytics"
 urlpatterns = [
     # Analytics público de landings — separado del dashboard AI legacy
     path("public/", public_views.public_analytics_dashboard, name="public"),
+    path("event/", public_views.track_public_event_api, name="event"),
     # Dashboard principal
     path("", views.dashboard_ai_view, name="dashboard"),
     # Redirect sin trailing slash a con trailing slash

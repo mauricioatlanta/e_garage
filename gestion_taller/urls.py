@@ -114,6 +114,7 @@ from taller.views_extra.admin_suscriptores import (
     eliminar_suscriptor_ajax,
     extender_suscripcion_ajax,
 )
+from taller.analytics.public_views import admin_visits_dashboard
 
 # Forzar importación del admin de WhatsApp (app top-level whatsapp) solo si está desplegado
 # Evita el warning "No se pudieron importar los modelos de WhatsApp" cuando la app no existe en el servidor
@@ -300,6 +301,7 @@ urlpatterns = [
     # Panel de administración de suscriptores (ANTES de admin.site.urls para que no sea capturado)
     path("cl/admin/subcriptores/", include("taller.urls_admin_suscriptores")),
     path("admin/suscriptores/", admin_suscriptores, name="admin_suscriptores"),
+    path("admin/visitas/", admin_visits_dashboard, name="admin_visitas"),
     path(
         "admin/suscriptores/<int:empresa_id>/", detalle_suscriptor, name="admin_detalle_suscriptor"
     ),

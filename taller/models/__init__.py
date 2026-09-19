@@ -100,7 +100,7 @@ from .sesion_usuario import SesionUsuario
 from .registro_embudo import RegistroEmbudoSuscriptor
 
 # Analytics público
-from .public_page_view import PublicPageView, is_probable_bot
+from .public_page_view import PublicAnalyticsEvent, PublicPageView, is_probable_bot
 
 # Sistema de notificaciones
 from .notificacion import (
@@ -214,6 +214,7 @@ __all__ = [
     "RegistroEmbudoSuscriptor",
     # Analytics público
     "PublicPageView",
+    "PublicAnalyticsEvent",
     # Notificaciones
     "TipoNotificacion",
     "NotificacionEnviada",

@@ -536,6 +536,27 @@ def approve_transaction(
         dias_renovados=dias_renovados,
         suscripcion_activa_anterior=suscripcion_activa_anterior,
     )
+    try:
+        from taller.models.public_page_view import PublicAnalyticsEvent
+        from taller.services.public_analytics import track_model_event
+
+        track_model_event(
+            event_type=PublicAnalyticsEvent.EVENT_SUBSCRIPTION_PAID,
+            empresa=empresa,
+            path="/subscription/paid/",
+            source_label="Pago aprobado",
+            value=locked.amount,
+            currency=locked.currency,
+            metadata={
+                "transaction_id": locked.pk,
+                "payment_method": locked.payment_method,
+                "billing_cycle": locked.billing_cycle,
+                "plan_code": normalized_plan,
+                "source_type": locked.source_type,
+            },
+        )
+    except Exception:
+        logger.exception("No se pudo registrar evento analytics subscription_paid")
     return locked
 
 

@@ -8,6 +8,8 @@ from django.utils.translation import activate
 
 from taller.config.country_settings import CountrySettings
 from taller.forms.custom_signup import CustomSignupForm
+from taller.models.public_page_view import PublicAnalyticsEvent
+from taller.services.public_analytics import create_public_event
 from taller.utils.country_config import get_country_config
 
 
@@ -47,6 +49,18 @@ class CustomSignupView(SignupView):
 
     form_class = CustomSignupForm
     template_name = "account/signup.html"
+
+    def get(self, request, *args, **kwargs):
+        create_public_event(
+            request,
+            PublicAnalyticsEvent.EVENT_SIGNUP_START,
+            metadata={
+                "from": request.GET.get("from", ""),
+                "rubro": request.GET.get("rubro", ""),
+                "plan": request.GET.get("plan", ""),
+            },
+        )
+        return super().get(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         """Pasa request, country_code y default_phone_prefix al formulario"""
@@ -126,6 +140,20 @@ class CustomSignupView(SignupView):
             # Email ya existía: allauth envió aviso al dueño. Mostrar respuesta de allauth.
             return resp
         _send_confirmation_compat(self.request, user, signup=True)
+
+        empresa = getattr(user, "empresa", None)
+        create_public_event(
+            self.request,
+            PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETE,
+            empresa=empresa,
+            country=country_code,
+            language=language,
+            rubro=self.request.GET.get("rubro", ""),
+            metadata={
+                "email_domain": (user.email or "").split("@")[-1],
+                "plan": self.request.GET.get("plan", ""),
+            },
+        )
 
         # Guardar contexto del signup para pantalla intermedia y reenvío de confirmación.
         country_path = country_code.lower()

@@ -151,6 +151,60 @@
   </footer>
 
   {% block extra_scripts %}{% endblock %}
+  <script>
+  (function () {
+    function ctaKind(link) {
+      if (!link || !link.href) return false;
+      var href = link.href.toLowerCase();
+      var text = (link.textContent || '').toLowerCase();
+      if (href.indexOf('wa.me/') !== -1 || href.indexOf('api.whatsapp.com/') !== -1 || text.indexOf('whatsapp') !== -1) {
+        return 'whatsapp_click';
+      }
+      if (text.indexOf('demo') !== -1 || text.indexOf('demostraci') !== -1 || href.indexOf('demo') !== -1) {
+        return 'demo_request_click';
+      }
+      if (href.indexOf('/accounts/signup/') !== -1 || href.indexOf('/signup') !== -1 || text.indexOf('prueba gratis') !== -1 || text.indexOf('free trial') !== -1) {
+        return 'free_trial_click';
+      }
+      return '';
+    }
+
+    document.addEventListener('click', function (event) {
+      var link = event.target && event.target.closest ? event.target.closest('a') : null;
+      var kind = ctaKind(link);
+      if (!kind) return;
+
+      var payload = {
+        event_type: 'cta_click',
+        label: (link.textContent || '').trim().slice(0, 120),
+        target: link.href,
+        rubro: (new URL(link.href, window.location.origin).searchParams.get('rubro') || ''),
+        country: (window.location.pathname.split('/').filter(Boolean)[0] || '').slice(0, 8),
+        language: (document.documentElement.lang || window.location.pathname.split('/').filter(Boolean)[1] || '').slice(0, 8),
+        metadata: {
+          cta_kind: kind,
+          page_language: document.documentElement.lang || '',
+          page_path: window.location.pathname
+        }
+      };
+      try {
+        var body = JSON.stringify(payload);
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon('/analytics/event/', new Blob([body], { type: 'application/json' }));
+        } else {
+          fetch('/analytics/event/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: body,
+            keepalive: true
+          });
+        }
+      } catch (e) {
+        return;
+      }
+    }, { passive: true });
+  })();
+  </script>
 
 </body>
 </html>
