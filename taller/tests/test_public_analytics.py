@@ -16,7 +16,15 @@ import pytest
 from django.contrib.auth.models import User
 from django.test import RequestFactory
 
-from taller.analytics.public_views import public_analytics_dashboard
+from django.utils import timezone
+
+from taller.analytics.public_views import admin_visits_dashboard, public_analytics_dashboard
+from taller.models.public_page_view import PublicAnalyticsEvent, PublicPageView
+from taller.services.public_analytics import track_public_page
+
+
+class MutableSession(dict):
+    modified = False
 
 
 @pytest.fixture
@@ -138,3 +146,208 @@ def test_empresas_por_dia_excludes_demo_companies(rf, staff_user):
     resp = public_analytics_dashboard(request)
 
     assert list(resp.context_data["empresas_por_dia"]) == []
+
+
+@pytest.mark.django_db
+def test_admin_visits_dashboard_returns_200_for_staff(rf, staff_user):
+    PublicPageView.objects.create(
+        path="/cl/talleres/",
+        page_type=PublicPageView.PAGE_LANDING,
+        country="cl",
+        language="es",
+        visitor_hash="visitor-1",
+        referrer="https://google.com/search",
+        user_agent="Mozilla/5.0",
+        is_mobile=True,
+        is_bot=False,
+        created_at=timezone.now(),
+    )
+
+    request = rf.get("/admin/visitas/?days=30")
+    request.user = staff_user
+    resp = admin_visits_dashboard(request)
+    resp.render()
+
+    assert resp.status_code == 200
+    assert b"Adquisici" in resp.content
+    assert resp.context_data["kpis"]["total_visits"] == 1
+    assert resp.context_data["countries"][0]["country"] == "cl"
+    assert resp.context_data["rubros"][0]["rubro"] == "workshop"
+
+
+@pytest.mark.django_db
+def test_admin_visits_dashboard_forbidden_for_regular_user(rf, regular_user):
+    request = rf.get("/admin/visitas/")
+    request.user = regular_user
+    resp = admin_visits_dashboard(request)
+    assert resp.status_code in (302, 403)
+
+
+@pytest.mark.django_db
+def test_admin_visits_dashboard_excludes_bots_by_default(rf, staff_user):
+    now = timezone.now()
+    PublicPageView.objects.create(
+        path="/",
+        page_type=PublicPageView.PAGE_HOME,
+        country="cl",
+        language="es",
+        visitor_hash="human",
+        is_bot=False,
+        created_at=now,
+    )
+    PublicPageView.objects.create(
+        path="/",
+        page_type=PublicPageView.PAGE_HOME,
+        country="cl",
+        language="es",
+        visitor_hash="bot",
+        is_bot=True,
+        created_at=now,
+    )
+
+    request = rf.get("/admin/visitas/?days=30")
+    request.user = staff_user
+    resp = admin_visits_dashboard(request)
+    assert resp.context_data["kpis"]["total_visits"] == 1
+
+    request = rf.get("/admin/visitas/?days=30&bots=1")
+    request.user = staff_user
+    resp = admin_visits_dashboard(request)
+    assert resp.context_data["kpis"]["total_visits"] == 2
+
+
+@pytest.mark.django_db
+def test_admin_visits_dashboard_excludes_internal_traffic(rf, staff_user):
+    PublicPageView.objects.create(
+        path="/",
+        page_type=PublicPageView.PAGE_HOME,
+        country="cl",
+        language="es",
+        visitor_hash="server",
+        is_internal=True,
+        is_server=True,
+        created_at=timezone.now(),
+    )
+
+    request = rf.get("/admin/visitas/?days=30")
+    request.user = staff_user
+    resp = admin_visits_dashboard(request)
+
+    assert resp.context_data["kpis"]["total_visits"] == 0
+    assert resp.context_data["kpis"]["excluded_internal"] == 1
+
+
+@pytest.mark.django_db
+def test_public_event_api_records_cta_click(client):
+    resp = client.post(
+        "/analytics/event/",
+        data='{"event_type":"cta_click","label":"Prueba gratis","target":"/mx/es/accounts/signup/?rubro=workshop","rubro":"workshop","metadata":{"cta_kind":"free_trial_click","page_path":"/mx/es/desarmadurias/"}}',
+        content_type="application/json",
+        HTTP_USER_AGENT="Mozilla/5.0",
+        HTTP_REFERER="https://facebook.com/post",
+    )
+
+    assert resp.status_code == 200
+    event = PublicAnalyticsEvent.objects.get(event_type=PublicAnalyticsEvent.EVENT_CTA_CLICK)
+    assert event.rubro == "workshop"
+    assert event.country == "mx"
+    assert event.language == "es"
+    assert event.metadata["label"] == "Prueba gratis"
+    assert event.metadata["cta_kind"] == "free_trial_click"
+
+
+@pytest.mark.django_db
+def test_track_public_page_infers_country_language_source_and_session(rf):
+    request = rf.get(
+        "/mx/es/desarmadurias/?utm_source=facebook&utm_medium=social&utm_campaign=fundadores_mx",
+        HTTP_USER_AGENT="Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)",
+        HTTP_ACCEPT_LANGUAGE="es-MX,es;q=0.9,en;q=0.6",
+        HTTP_REFERER="https://l.facebook.com/story.php",
+    )
+    request.session = MutableSession()
+    request.user = None
+    request.LANGUAGE_CODE = ""
+
+    page_view = track_public_page(
+        request,
+        page_type=PublicPageView.PAGE_LANDING,
+    )
+
+    assert page_view is not None
+    assert page_view.country == "mx"
+    assert page_view.language == "es"
+    assert page_view.source_label == "facebook / social"
+    assert page_view.utm_campaign == "fundadores_mx"
+    assert page_view.landing_initial == "/mx/es/desarmadurias/"
+    assert page_view.session_key
+    assert page_view.is_mobile is True
+
+    event = PublicAnalyticsEvent.objects.get(event_type=PublicAnalyticsEvent.EVENT_LANDING_VIEW)
+    assert event.country == "mx"
+    assert event.language == "es"
+    assert event.rubro == "salvage"
+
+
+@pytest.mark.django_db
+def test_admin_visits_dashboard_exposes_entry_pages_ctas_and_languages(rf, staff_user):
+    now = timezone.now()
+    PublicPageView.objects.create(
+        path="/cl/es/desarmadurias/",
+        landing_initial="/cl/es/desarmadurias/",
+        page_type=PublicPageView.PAGE_LANDING,
+        country="cl",
+        language="es",
+        visitor_hash="visitor-cta",
+        session_key="session-cta",
+        source_label="instagram / social",
+        is_mobile=True,
+        is_bot=False,
+        created_at=now,
+    )
+    PublicAnalyticsEvent.objects.create(
+        event_type=PublicAnalyticsEvent.EVENT_CTA_CLICK,
+        path="/cl/es/desarmadurias/",
+        session_key="session-cta",
+        visitor_hash="visitor-cta",
+        country="cl",
+        language="es",
+        source_label="instagram / social",
+        is_bot=False,
+        metadata={"cta_kind": "whatsapp_click", "label": "WhatsApp"},
+        created_at=now,
+    )
+
+    request = rf.get("/admin/visitas/?days=30")
+    request.user = staff_user
+    resp = admin_visits_dashboard(request)
+
+    assert resp.context_data["entry_pages"][0]["path"] == "/cl/es/desarmadurias/"
+    assert resp.context_data["cta_breakdown"][0]["label"] == "WhatsApp"
+    assert resp.context_data["languages"][0]["language"] == "es"
+    assert resp.context_data["device_rows"][0]["label"] == "Móvil"
+
+
+@pytest.mark.django_db
+def test_admin_visits_dashboard_exposes_campaign_channels(rf, staff_user):
+    now = timezone.now()
+    for source in ("facebook / social", "instagram / social", "Google", "Directo / sin referrer"):
+        PublicPageView.objects.create(
+            path="/cl/es/talleres/",
+            page_type=PublicPageView.PAGE_LANDING,
+            source_label=source,
+            visitor_hash=f"visitor-{source}",
+            session_key=f"session-{source}",
+            is_bot=False,
+            is_internal=False,
+            created_at=now,
+        )
+
+    request = rf.get("/admin/visitas/?days=30")
+    request.user = staff_user
+    resp = admin_visits_dashboard(request)
+    channels = {row["label"]: row["total"] for row in resp.context_data["campaign_channels"]}
+
+    assert channels["Facebook"] == 1
+    assert channels["Instagram"] == 1
+    assert channels["Google"] == 1
+    assert channels["Directo"] == 1

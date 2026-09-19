@@ -69,6 +69,22 @@
       display: grid;
       gap: .55rem;
     }
+    .eg-visits .channel-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .4rem;
+    }
+    .eg-visits .channel-card {
+      border: 1px solid rgba(148, 163, 184, .18);
+      background: rgba(2, 6, 23, .52);
+      border-radius: 6px;
+      padding: .45rem .55rem;
+    }
+    @media (min-width: 640px) {
+      .eg-visits .channel-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
     .eg-visits .panel-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
@@ -231,14 +247,31 @@
 
     <div class="panel overflow-hidden">
       <div class="border-b border-slate-700 px-3 py-2">
-        <h2 class="text-sm font-bold text-white">Campañas y publicaciones</h2>
+        <div class="flex items-center justify-between gap-2">
+          <h2 class="text-sm font-bold text-white">Seguimiento de campañas</h2>
+          <span class="text-[10px] uppercase tracking-wide text-cyan-300">visitas + UTM</span>
+        </div>
+        <p class="mt-0.5 text-[11px] text-slate-400">Canal de origen y campañas que generan registros y pagos.</p>
+      </div>
+      <div class="border-b border-slate-700/80 p-2">
+        <div class="channel-grid">
+          {% for row in campaign_channels %}
+          <div class="channel-card">
+            <div class="text-[10px] uppercase tracking-[0.12em] text-slate-400">{{ row.label }}</div>
+            <div class="mt-0.5 flex items-baseline justify-between gap-2">
+              <strong class="text-sm text-white">{{ row.total }}</strong>
+              <span class="text-[10px] text-cyan-200">{{ row.share }}%</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
       </div>
       <div class="compact-scroll overflow-x-auto">
         <table class="w-full min-w-[680px] text-left text-sm">
           <thead class="bg-slate-900/90 text-xs uppercase tracking-wide text-slate-400">
             <tr>
-              <th class="px-4 py-3">Campaña</th>
-              <th class="px-4 py-3">Fuente</th>
+              <th class="px-4 py-3">Campaña UTM</th>
+              <th class="px-4 py-3">Canal</th>
               <th class="px-4 py-3 text-right">Eventos</th>
               <th class="px-4 py-3 text-right">Registros</th>
               <th class="px-4 py-3 text-right">Pagos</th>
