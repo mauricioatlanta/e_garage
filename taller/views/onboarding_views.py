@@ -26,6 +26,8 @@ from taller.utils.country_config import get_country_config
 from taller.templatetags.role_tags import is_owner
 from taller.utils.empresa import get_active_empresa
 from taller.services.company_defaults_service import CompanyDefaultsService
+from taller.models.public_page_view import PublicAnalyticsEvent
+from taller.services.public_analytics import create_public_event
 from taller.services.onboarding_service import (
     OnboardingService,
     language_code_for_request,
@@ -244,6 +246,13 @@ def onboarding_guardar_paso(request, paso):
                         )
 
                 OnboardingService.mark_completed(empresa)
+                create_public_event(
+                    request,
+                    PublicAnalyticsEvent.EVENT_ONBOARDING_COMPLETE,
+                    empresa=empresa,
+                    country=empresa.pais,
+                    metadata={"cargar_demo": cargar_demo},
+                )
                 return JsonResponse(
                     {
                         "success": True,
