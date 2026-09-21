@@ -810,6 +810,23 @@
   {% if not eg_us_signup_slim_header|default:False and '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
   <div id="main-navigation" class="{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}flex flex-row flex-wrap items-center justify-center mt-1 gap-1{% else %}flex flex-col items-center justify-center mt-3 gap-2{% endif %}">
     {% if request.user.is_authenticated %}
+      {% if workspace.product_key == "DESARMADURIA" %}
+      <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
+        {% for item in workspace.nav %}
+        <a href="{{ item.url }}" class="nav-button-standard{% if item.is_active %} bg-gray-100 text-gray-900{% endif %}">
+          <span class="nav-icon"><i class="{{ item.icon }}"></i></span>
+          <span class="nav-text">{{ item.label }}</span>
+        </a>
+        {% endfor %}
+        <form action="{% url 'account_logout' %}" method="post" class="inline-block">
+          {% csrf_token %}
+          <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
+            <span class="nav-icon">🚪</span>
+            <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Logout{% else %}Salir{% endif %}</span>
+          </button>
+        </form>
+      </div>
+      {% else %}
       {# Fila 1: Settings, Equipo, Center, Clients, Documents, Extra #}
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
         <a href="{% country_url 'company_settings' %}" class="nav-button-standard">
@@ -822,6 +839,7 @@
           <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Team{% else %}Equipo{% endif %}</span>
         </a>
         {% endif %}
+        {% if not qa_control_is_cl_desarme %}
         <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
           <span class="nav-icon">🚀</span>
           <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Center{% else %}Centro{% endif %}</span>
@@ -845,10 +863,12 @@
           <span class="nav-icon">⭐</span>
           <span class="nav-text">Extra</span>
         </a>
+        {% endif %}
       </div>
 
       <!-- Row 2: Parts, Reports, Services, Disassembly, Vehicles, Logout -->
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
+        {% if not qa_control_is_cl_desarme %}
         {% if 'repuestos' in business_modules %}
         <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
           <span class="nav-icon">🔧</span>
@@ -872,6 +892,7 @@
           <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Services{% else %}Servicios{% endif %}</span>
         </a>
         {% endif %}
+        {% endif %}
         {% if 'desarme' in business_modules %}
         {% country_url 'desarme:index' as desarme_url %}
         <a href="{% if desarme_url %}{{ desarme_url }}{% else %}#{% endif %}" class="nav-button-standard">
@@ -879,6 +900,7 @@
           <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Disassembly{% else %}Desarme{% endif %}</span>
         </a>
         {% endif %}
+        {% if not qa_control_is_cl_desarme %}
         {% if 'vehiculos' in business_modules %}
         {% country_url 'vehiculos:lista_vehiculos' as vehiculos_url %}
         {% if vehiculos_url %}
@@ -893,6 +915,7 @@
         </a>
         {% endif %}
         {% endif %}
+        {% endif %}
         <form action="{% url 'account_logout' %}" method="post" class="inline-block">
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
@@ -901,6 +924,7 @@
           </button>
         </form>
       </div>
+      {% endif %}
 
     {% else %}
       <!-- Login button for non-authenticated users -->
