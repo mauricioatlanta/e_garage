@@ -729,6 +729,7 @@ class CustomSignupForm(SignupForm):
             obtuvo_trial=obtuvo_trial,
             trial_started_at=trial_started_at,
             trial_ends_at=trial_ends_at,
+            request=request,
         )
 
         return user

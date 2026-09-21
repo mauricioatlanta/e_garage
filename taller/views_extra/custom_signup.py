@@ -60,6 +60,11 @@ class CustomSignupView(SignupView):
                 "plan": request.GET.get("plan", ""),
             },
         )
+        create_public_event(
+            request,
+            PublicAnalyticsEvent.EVENT_SIGNUP_STARTED,
+            metadata={"source": "signup_view"},
+        )
         return super().get(request, *args, **kwargs)
 
     def get_form_kwargs(self):
@@ -153,6 +158,15 @@ class CustomSignupView(SignupView):
                 "email_domain": (user.email or "").split("@")[-1],
                 "plan": self.request.GET.get("plan", ""),
             },
+        )
+        create_public_event(
+            self.request,
+            PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETED,
+            empresa=empresa,
+            country=country_code,
+            language=language,
+            rubro=self.request.GET.get("rubro", ""),
+            metadata={"source": "signup_view"},
         )
 
         # Guardar contexto del signup para pantalla intermedia y reenvío de confirmación.

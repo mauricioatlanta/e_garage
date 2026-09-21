@@ -55,6 +55,12 @@ COMMERCE_TENANT_MAP: dict = {}
 # Explicit QA tenant matrix. Populate only with audited existing tenant IDs.
 QA_CONTROL_TENANTS: dict = {}
 
+# Optional analytics exclusion for controlled QA accounts. Keep the value
+# environment-driven so deployments can configure it without code changes.
+PUBLIC_ANALYTICS_QA_EMAIL_DOMAIN = (
+    os.getenv("PUBLIC_ANALYTICS_QA_EMAIL_DOMAIN") or ""
+).strip().lower().lstrip("@")
+
 if importlib.util.find_spec("anymail") is not None:
     INSTALLED_APPS.insert(0, "anymail")
 

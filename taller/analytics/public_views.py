@@ -234,12 +234,32 @@ def admin_visits_dashboard(request):
 
     total_visits = qs_scope.count()
     unique_visitors = qs_scope.values("visitor_hash").distinct().count()
-    sessions = qs_scope.exclude(session_key="").values("session_key").distinct().count()
+    sessions = (
+        qs_scope.filter(public_session__isnull=False)
+        .values("public_session_id")
+        .distinct()
+        .count()
+        + qs_scope.filter(public_session__isnull=True)
+        .exclude(session_key="")
+        .values("session_key")
+        .distinct()
+        .count()
+    )
     mobile_visits = qs_scope.filter(is_mobile=True).count()
     landing_qs = qs_scope.filter(page_type=PublicPageView.PAGE_LANDING)
     landing_visits = landing_qs.count()
     landing_unique_visitors = landing_qs.values("visitor_hash").distinct().count()
-    landing_sessions = landing_qs.exclude(session_key="").values("session_key").distinct().count()
+    landing_sessions = (
+        landing_qs.filter(public_session__isnull=False)
+        .values("public_session_id")
+        .distinct()
+        .count()
+        + landing_qs.filter(public_session__isnull=True)
+        .exclude(session_key="")
+        .values("session_key")
+        .distinct()
+        .count()
+    )
     welcome_visits = qs_scope.filter(page_type=PublicPageView.PAGE_WELCOME).count()
     home_visits = qs_scope.filter(page_type=PublicPageView.PAGE_HOME).count()
     raw_visits = qs_all_period.count()
@@ -378,7 +398,14 @@ def admin_visits_dashboard(request):
             qs_scope
             .values("landing_initial", "path")
             .annotate(
-                sessions=Count("session_key", distinct=True),
+                sessions=(
+                    Count("public_session", distinct=True)
+                    + Count(
+                        "session_key",
+                        distinct=True,
+                        filter=Q(public_session__isnull=True, session_key__gt=""),
+                    )
+                ),
                 visits=Count("id"),
             )
             .order_by("-sessions")[:15]

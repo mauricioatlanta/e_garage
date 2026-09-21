@@ -1,5 +1,7 @@
 import logging
+import hashlib
 import uuid
+from datetime import timedelta
 from urllib.parse import urlparse
 
 from django.conf import settings
@@ -7,6 +9,7 @@ from django.utils import timezone
 
 from taller.country.engine import URL_SLUG_TO_VERTICAL
 from taller.models.public_page_view import PublicAnalyticsEvent, PublicPageView, is_probable_bot
+from taller.models.public_analytics_session import PublicAnalyticsSession
 from taller.utils.smart_logging import get_client_ip
 
 
@@ -107,7 +110,68 @@ def _session_id(request) -> str:
         session_id = uuid.uuid4().hex
         request.session[ANALYTICS_SESSION_KEY] = session_id
         request.session.modified = True
+        if hasattr(request.session, "set_expiry"):
+            request.session.set_expiry(30 * 24 * 60 * 60)
     return session_id
+
+
+def _runtime_session_hash(session_key: str) -> str:
+    namespace = "runtime-public-analytics-session:v1:"
+    secret = getattr(settings, "PUBLIC_ANALYTICS_HASH_KEY", "") or ""
+    return hashlib.sha256(f"{namespace}{secret}:{session_key}".encode("utf-8")).hexdigest()
+
+
+def get_or_create_public_session(request, *, page_type="", country="", language="", now=None):
+    """Resolve the durable first-party session while retaining legacy fields."""
+    now = now or timezone.now()
+    session_key = _session_id(request)
+    attribution = _current_attribution(request, referrer=_clean_referrer(request))
+    user_agent = (request.META.get("HTTP_USER_AGENT") or "")[:500]
+    ip = get_client_ip(request) or ""
+    quality = _quality_flags(request, ip=ip, user_agent=user_agent)
+    country = _inferred_country(request, country)
+    language = _inferred_language(request, language)
+    visitor_hash = PublicPageView.build_visitor_hash(ip, user_agent, now.date().isoformat())
+    defaults = {
+        "anonymous_visitor_hash": visitor_hash,
+        "first_path": request.path[:255],
+        "last_path": request.path[:255],
+        "landing_path": attribution["landing_initial"][:255],
+        "country": country,
+        "language": language,
+        "vertical_key": _rubro_from_path(request.path)[:40],
+        "page_type": page_type,
+        "initial_referrer": attribution["referrer"],
+        "last_referrer": attribution["referrer"],
+        "utm_source": attribution["utm_source"][:100],
+        "utm_medium": attribution["utm_medium"][:100],
+        "utm_campaign": attribution["utm_campaign"][:150],
+        "utm_term": attribution["utm_term"][:150],
+        "utm_content": attribution["utm_content"][:150],
+        "attribution_type": "utm" if attribution["utm_source"] else ("referrer" if attribution["referrer"] else "direct"),
+        "user_agent": user_agent,
+        "is_mobile": _is_mobile(user_agent),
+        "is_bot": quality["is_bot"],
+        "is_internal": quality["is_internal"],
+        "ip_hash": "",
+        "first_seen_at": now,
+        "last_seen_at": now,
+        "expires_at": now + timedelta(days=30),
+    }
+    session, created = PublicAnalyticsSession.objects.get_or_create(
+        anonymous_session_hash=_runtime_session_hash(session_key),
+        defaults=defaults,
+    )
+    if not created:
+        PublicAnalyticsSession.objects.filter(pk=session.pk).update(
+            last_path=request.path[:255],
+            last_referrer=attribution["referrer"],
+            last_seen_at=now,
+        )
+        session.last_path = request.path[:255]
+        session.last_referrer = attribution["referrer"]
+        session.last_seen_at = now
+    return session
 
 
 def _path_should_be_ignored(path: str) -> bool:
@@ -279,8 +343,15 @@ def track_public_page(
         session_id = _session_id(request)
         inferred_country = _inferred_country(request, country)
         inferred_language = _inferred_language(request, language)
-
         now = timezone.now()
+        public_session = get_or_create_public_session(
+            request,
+            page_type=page_type,
+            country=inferred_country,
+            language=inferred_language,
+            now=now,
+        )
+
         visitor_hash = PublicPageView.build_visitor_hash(
             ip=ip,
             user_agent=user_agent,
@@ -294,6 +365,7 @@ def track_public_page(
             language=inferred_language,
             visitor_hash=visitor_hash,
             session_key=session_id,
+            public_session=public_session,
             referrer=referrer,
             user_agent=user_agent,
             is_mobile=_is_mobile(user_agent),
@@ -352,6 +424,12 @@ def create_public_event(
         quality = _quality_flags(request, ip=ip, user_agent=user_agent)
         session_id = _session_id(request)
         now = timezone.now()
+        public_session = getattr(page_view, "public_session", None) or get_or_create_public_session(
+            request,
+            country=country,
+            language=language,
+            now=now,
+        )
         visitor_hash = PublicPageView.build_visitor_hash(
             ip=ip,
             user_agent=user_agent,
@@ -363,6 +441,7 @@ def create_public_event(
         return PublicAnalyticsEvent.objects.create(
             event_type=event_type,
             page_view=page_view,
+            session=public_session,
             empresa=empresa,
             path=(getattr(request, "path", "") or "")[:255],
             session_key=session_id,
@@ -387,6 +466,7 @@ def create_public_event(
             currency=(currency or "")[:3],
             metadata=metadata or {},
             created_at=now,
+            occurred_at=now,
         )
     except Exception:
         logger.exception(

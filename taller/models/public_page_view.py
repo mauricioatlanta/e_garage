@@ -34,6 +34,13 @@ class PublicPageView(models.Model):
 
     visitor_hash = models.CharField(max_length=64, db_index=True)
     session_key = models.CharField(max_length=64, blank=True, db_index=True)
+    public_session = models.ForeignKey(
+        "taller.PublicAnalyticsSession",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="page_views",
+    )
 
     referrer = models.CharField(max_length=500, blank=True)
     user_agent = models.CharField(max_length=500, blank=True)
@@ -138,6 +145,15 @@ class PublicAnalyticsEvent(models.Model):
     EVENT_SIGNUP_COMPLETE = "signup_complete"
     EVENT_ONBOARDING_COMPLETE = "onboarding_complete"
     EVENT_SUBSCRIPTION_PAID = "subscription_paid"
+    EVENT_HUMAN_VISIT = "human_visit"
+    EVENT_SCROLL_50 = "scroll_50"
+    EVENT_SCROLL_90 = "scroll_90"
+    EVENT_CTA_WHATSAPP_CLICK = "cta_whatsapp_click"
+    EVENT_CTA_TRIAL_30_CLICK = "cta_trial_30_click"
+    EVENT_SIGNUP_STARTED = "signup_started"
+    EVENT_SIGNUP_COMPLETED = "signup_completed"
+    EVENT_COMPANY_CREATED = "company_created"
+    EVENT_FIRST_LOGIN = "first_login"
 
     EVENT_TYPE_CHOICES = [
         (EVENT_LANDING_VIEW, "Landing vista"),
@@ -146,7 +162,24 @@ class PublicAnalyticsEvent(models.Model):
         (EVENT_SIGNUP_COMPLETE, "Registro completado"),
         (EVENT_ONBOARDING_COMPLETE, "Onboarding completado"),
         (EVENT_SUBSCRIPTION_PAID, "Suscripción pagada"),
+        (EVENT_HUMAN_VISIT, "Visita humana"),
+        (EVENT_SCROLL_50, "Scroll 50%"),
+        (EVENT_SCROLL_90, "Scroll 90%"),
+        (EVENT_CTA_WHATSAPP_CLICK, "CTA WhatsApp"),
+        (EVENT_CTA_TRIAL_30_CLICK, "CTA prueba 30 días"),
+        (EVENT_SIGNUP_STARTED, "Registro iniciado canónico"),
+        (EVENT_SIGNUP_COMPLETED, "Registro completado canónico"),
+        (EVENT_COMPANY_CREATED, "Empresa creada"),
+        (EVENT_FIRST_LOGIN, "Primer login"),
     ]
+
+    session = models.ForeignKey(
+        "taller.PublicAnalyticsSession",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="events",
+    )
 
     event_type = models.CharField(max_length=40, choices=EVENT_TYPE_CHOICES, db_index=True)
     page_view = models.ForeignKey(
@@ -165,6 +198,7 @@ class PublicAnalyticsEvent(models.Model):
     )
 
     path = models.CharField(max_length=255, blank=True, db_index=True)
+    dedupe_key = models.CharField(max_length=120, null=True, blank=True, db_index=True)
     session_key = models.CharField(max_length=64, blank=True, db_index=True)
     visitor_hash = models.CharField(max_length=64, blank=True, db_index=True)
     country = models.CharField(max_length=8, blank=True, db_index=True)
@@ -189,6 +223,7 @@ class PublicAnalyticsEvent(models.Model):
     value = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     currency = models.CharField(max_length=3, blank=True)
     metadata = models.JSONField(default=dict, blank=True)
+    occurred_at = models.DateTimeField(null=True, blank=True, db_index=True)
     created_at = models.DateTimeField(default=timezone.now, db_index=True)
 
     class Meta:
@@ -199,6 +234,9 @@ class PublicAnalyticsEvent(models.Model):
             models.Index(fields=["utm_campaign", "created_at"]),
             models.Index(fields=["source_label", "created_at"]),
             models.Index(fields=["is_internal", "created_at"]),
+            models.Index(fields=["event_type", "occurred_at"]),
+            models.Index(fields=["path", "occurred_at"]),
+            models.Index(fields=["session", "event_type"]),
         ]
         verbose_name = "Evento de adquisición pública"
         verbose_name_plural = "Eventos de adquisición pública"

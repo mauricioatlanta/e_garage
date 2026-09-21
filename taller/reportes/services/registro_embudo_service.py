@@ -21,23 +21,9 @@ def registrar_signup(user, pais, obtuvo_trial=False, trial_started_at=None, tria
         trial_started_at: Fecha de inicio del trial (opcional)
         trial_ends_at: Fecha de fin del trial (opcional)
     """
-    try:
-        embudo, created = RegistroEmbudoSuscriptor.objects.get_or_create(
-            user=user,
-            defaults={
-                "pais": pais,
-                "fecha_registro": timezone.now(),
-                "obtuvo_trial": obtuvo_trial,
-                "trial_started_at": trial_started_at,
-                "trial_ends_at": trial_ends_at,
-            },
-        )
-        if created:
-            log.info(f"[Embudo] Signup registrado para {user.email} ({pais})")
-        else:
-            log.warning(f"[Embudo] Embudo ya existía para {user.email}")
-    except Exception as e:
-        log.error(f"[Embudo] Error registrando signup para {user.email}: {e}", exc_info=True)
+    from taller.services.registro_embudo_service import registrar_signup as canonical
+
+    return canonical(user, pais, obtuvo_trial, trial_started_at, trial_ends_at)
 
 
 def registrar_email_confirmado(user):
@@ -47,37 +33,21 @@ def registrar_email_confirmado(user):
     Args:
         user: Usuario que confirmó el email
     """
-    try:
-        embudo = RegistroEmbudoSuscriptor.objects.filter(user=user).first()
-        if embudo and not embudo.email_confirmado_at:
-            embudo.email_confirmado_at = timezone.now()
-            embudo.save(update_fields=["email_confirmado_at"])
-            log.info(f"[Embudo] Email confirmado para {user.email}")
-        elif not embudo:
-            log.warning(f"[Embudo] No se encontró embudo para {user.email} al confirmar email")
-    except Exception as e:
-        log.error(
-            f"[Embudo] Error registrando email confirmado para {user.email}: {e}", exc_info=True
-        )
+    from taller.services.registro_embudo_service import registrar_email_confirmado as canonical
+
+    return canonical(user)
 
 
-def registrar_primer_login(user):
+def registrar_primer_login(user, request=None):
     """
     Registra el primer login en el embudo.
 
     Args:
         user: Usuario que hizo login
     """
-    try:
-        embudo = RegistroEmbudoSuscriptor.objects.filter(user=user).first()
-        if embudo and not embudo.primer_login_at:
-            embudo.primer_login_at = timezone.now()
-            embudo.save(update_fields=["primer_login_at"])
-            log.info(f"[Embudo] Primer login registrado para {user.email}")
-        elif not embudo:
-            log.warning(f"[Embudo] No se encontró embudo para {user.email} al hacer login")
-    except Exception as e:
-        log.error(f"[Embudo] Error registrando primer login para {user.email}: {e}", exc_info=True)
+    from taller.services.registro_embudo_service import registrar_primer_login as canonical
+
+    return canonical(user, request=request)
 
 
 def registrar_empresa_creada(user):
@@ -87,15 +57,6 @@ def registrar_empresa_creada(user):
     Args:
         user: Usuario para el que se creó la empresa
     """
-    try:
-        embudo = RegistroEmbudoSuscriptor.objects.filter(user=user).first()
-        if embudo and not embudo.empresa_creada_at:
-            embudo.empresa_creada_at = timezone.now()
-            embudo.save(update_fields=["empresa_creada_at"])
-            log.info(f"[Embudo] Empresa creada registrada para {user.email}")
-        elif not embudo:
-            log.warning(f"[Embudo] No se encontró embudo para {user.email} al crear empresa")
-    except Exception as e:
-        log.error(
-            f"[Embudo] Error registrando empresa creada para {user.email}: {e}", exc_info=True
-        )
+    from taller.services.registro_embudo_service import registrar_empresa_creada as canonical
+
+    return canonical(user)

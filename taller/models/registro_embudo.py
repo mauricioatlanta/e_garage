@@ -21,6 +21,13 @@ class RegistroEmbudoSuscriptor(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="embudo_registro"
     )
+    public_session = models.ForeignKey(
+        "taller.PublicAnalyticsSession",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="registro_embudos",
+    )
     pais = models.CharField(max_length=5, help_text="Código de país (CL, US, MX, etc.)")
 
     # Fechas del embudo

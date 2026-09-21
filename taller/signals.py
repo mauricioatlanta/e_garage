@@ -132,7 +132,7 @@ def registrar_primer_login_embudo(sender, request, user, **kwargs):
     try:
         from taller.services.registro_embudo_service import registrar_primer_login
 
-        registrar_primer_login(user)
+        registrar_primer_login(user, request=request)
     except Exception as e:
         import logging
 
