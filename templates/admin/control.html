@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Centro de Administracion eGarage{% endblock %}
+
+{% block content %}
+<style>
+  .eg-admin-center { min-height:calc(100vh - 96px); background:linear-gradient(135deg,#020617 0%,#0f172a 48%,#111827 100%); color:#f8fafc; padding:2rem 1rem; }
+  .eg-admin-center__wrap { width:min(1120px,100%); margin:0 auto; }
+  .eg-admin-center__header { margin-bottom:1.5rem; }
+  .eg-admin-center__eyebrow { color:#22d3ee; font-size:.75rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; margin:0 0 .65rem; }
+  .eg-admin-center h1 { color:#fff; font-size:clamp(1.85rem,4vw,3rem); line-height:1.05; font-weight:900; margin:0; }
+  .eg-admin-center__subtitle { color:#cbd5e1; font-size:1rem; margin:.85rem 0 0; }
+  .eg-admin-center__grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+  .eg-admin-card { min-height:17rem; display:flex; flex-direction:column; gap:1rem; text-decoration:none; color:#f8fafc; background:rgba(15,23,42,.9); border:1px solid rgba(148,163,184,.28); border-radius:8px; padding:1.25rem; box-shadow:0 18px 38px rgba(0,0,0,.28); transition:transform .18s ease,border-color .18s ease,background .18s ease; }
+  .eg-admin-card:hover,.eg-admin-card:focus-visible { transform:translateY(-3px); border-color:#22d3ee; background:rgba(15,23,42,1); outline:none; }
+  .eg-admin-card:focus-visible { box-shadow:0 0 0 3px rgba(34,211,238,.35),0 18px 38px rgba(0,0,0,.28); }
+  .eg-admin-card__icon { width:3rem; height:3rem; display:inline-grid; place-items:center; border-radius:8px; background:#0e7490; color:#ecfeff; font-weight:900; letter-spacing:.02em; }
+  .eg-admin-card:nth-child(2) .eg-admin-card__icon { background:#6d28d9; }
+  .eg-admin-card:nth-child(3) .eg-admin-card__icon { background:#047857; }
+  .eg-admin-card h2 { color:#fff; font-size:1.3rem; line-height:1.2; margin:.25rem 0 0; }
+  .eg-admin-card p { color:#cbd5e1; line-height:1.55; margin:0; }
+  .eg-admin-card__button { margin-top:auto; display:inline-flex; align-items:center; justify-content:center; width:fit-content; min-height:2.5rem; border-radius:8px; background:#e2e8f0; color:#020617; font-weight:800; padding:.65rem .95rem; }
+  @media (max-width:900px) { .eg-admin-center__grid { grid-template-columns:1fr; } .eg-admin-card { min-height:13.5rem; } }
+</style>
+<section class="eg-admin-center">
+  <div class="eg-admin-center__wrap">
+    <header class="eg-admin-center__header">
+      <p class="eg-admin-center__eyebrow">eGarage interno</p>
+      <h1>Centro de Administración eGarage</h1>
+      <p class="eg-admin-center__subtitle">Accesos internos de supervisión y gestión</p>
+    </header>
+    <div class="eg-admin-center__grid" aria-label="Accesos administrativos">
+      {% for card in cards %}
+        <a class="eg-admin-card" href="{{ card.url }}">
+          <span class="eg-admin-card__icon" aria-hidden="true">{{ card.icon }}</span>
+          <h2>{{ card.title }}</h2>
+          <p>{{ card.description }}</p>
+          <span class="eg-admin-card__button">Acceder</span>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
