@@ -43,7 +43,7 @@ class AIReportEngine:
         from taller.models.clientes import Cliente
         from taller.models.documento import Documento
         from taller.models.repuesto import Repuesto
-        from taller.models.vehiculo import Vehiculo
+        from taller.models.vehiculos import Vehiculo
 
         # Métricas base por país
         documentos = Documento.objects.filter(
@@ -250,7 +250,7 @@ class AIReportEngine:
 
     def _get_vehicle_distribution(self):
         """Distribución de vehículos por marca"""
-        from taller.models.vehiculo import Vehiculo
+        from taller.models.vehiculos import Vehiculo
 
         distribution = (
             Vehiculo.objects.filter(empresa=self.empresa)

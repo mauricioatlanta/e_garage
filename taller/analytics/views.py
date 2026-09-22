@@ -42,9 +42,9 @@ def dashboard_ai_view(request):
 
         return render(
             request,
-            "error.html",
+            "analytics/error.html",
             {
-                "error": "No se encontró una empresa asociada a tu cuenta. Por favor, contacta al administrador.",
+                "error_message": "No se encontró una empresa asociada a tu cuenta. Por favor, contacta al administrador.",
             },
             status=404,
         )
@@ -70,9 +70,9 @@ def dashboard_ai_view(request):
 
         return render(
             request,
-            "error.html",
+            "analytics/error.html",
             {
-                "error": f"Error al cargar el dashboard: {str(e)}. Por favor, intenta nuevamente o contacta al soporte.",
+                "error_message": f"Error al cargar el dashboard: {str(e)}. Por favor, intenta nuevamente o contacta al soporte.",
             },
             status=500,
         )

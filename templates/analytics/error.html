@@ -1,0 +1,12 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Analytics | eGarage{% endblock %}
+
+{% block content %}
+<section class="admin-card" style="max-width: 760px; margin: 48px auto; padding: 32px;">
+    <p style="margin: 0 0 10px; color: #55e6f5; font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;">Analytics</p>
+    <h1 style="margin: 0; color: #fff; font-size: 30px;">No pudimos cargar el dashboard</h1>
+    <p style="margin: 16px 0 0; color: #cbd5e1; line-height: 1.6;">{{ error_message|default:"Intenta nuevamente en unos momentos." }}</p>
+    <a href="/admin/" style="display: inline-block; margin-top: 24px; padding: 11px 16px; border: 1px solid #55e6f5; border-radius: 8px; color: #55e6f5; text-decoration: none;">Volver al centro de control</a>
+</section>
+{% endblock %}
