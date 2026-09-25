@@ -9,9 +9,11 @@
     const content = root.querySelector("[data-search-content]");
     const liveRegion = root.querySelector("[data-search-live]");
     const shortcut = root.querySelector("[data-search-shortcut]");
+    const closeButton = root.querySelector("[data-search-close]");
     const searchUrl = root.dataset.searchUrl;
     const minChars = Number(root.dataset.minChars || "2");
     const i18n = window.workspaceSearchI18n || {};
+    const mobileQuery = window.matchMedia("(max-width: 720px)");
 
     let debounceTimer = null;
     let controller = null;
@@ -54,6 +56,7 @@
         dropdown.hidden = false;
         input.setAttribute("aria-expanded", "true");
         root.classList.add("is-open");
+        activateMobileSearch();
     }
 
     function closeDropdown() {
@@ -61,6 +64,20 @@
         input.setAttribute("aria-expanded", "false");
         root.classList.remove("is-open");
         setActiveIndex(-1);
+        deactivateMobileSearch();
+    }
+
+    function activateMobileSearch() {
+        if (!mobileQuery.matches) {
+            return;
+        }
+        root.classList.add("is-mobile-active");
+        document.body.classList.add("workspace-search-lock");
+    }
+
+    function deactivateMobileSearch() {
+        root.classList.remove("is-mobile-active");
+        document.body.classList.remove("workspace-search-lock");
     }
 
     function resetCards() {
@@ -95,7 +112,7 @@
         window.location.assign(url);
     }
 
-    function renderState(icon, title, body, isLoading) {
+    function renderState(icon, title, body, isLoading, shouldOpen) {
         content.innerHTML = [
             '<div class="workspace-search-state">',
             '  <div class="workspace-search-state-title">',
@@ -106,11 +123,13 @@
             "</div>",
         ].join("");
         resetCards();
-        openDropdown();
+        if (shouldOpen !== false) {
+            openDropdown();
+        }
     }
 
-    function renderHint() {
-        renderState("/", t("hintTitle", "Comienza a escribir"), t("hintBody", "Usa al menos 2 caracteres."), false);
+    function renderHint(shouldOpen) {
+        renderState("/", t("hintTitle", "Comienza a escribir"), t("hintBody", "Usa al menos 2 caracteres."), false, shouldOpen);
         announce(t("hintTitle", "Comienza a escribir"));
     }
 
@@ -262,6 +281,7 @@
     input.addEventListener("input", scheduleSearch);
 
     input.addEventListener("focus", function () {
+        activateMobileSearch();
         if (input.value.trim().length >= minChars && content.innerHTML.trim()) {
             openDropdown();
             return;
@@ -300,6 +320,7 @@
 
         if (event.key === "Escape") {
             closeDropdown();
+            input.blur();
         }
     });
 
@@ -330,5 +351,26 @@
         });
     }
 
-    renderHint();
+    if (closeButton) {
+        closeButton.addEventListener("click", function () {
+            closeDropdown();
+            input.blur();
+        });
+    }
+
+    function handleMobileQueryChange(event) {
+        if (!event.matches) {
+            deactivateMobileSearch();
+        } else if (document.activeElement === input && !dropdown.hidden) {
+            activateMobileSearch();
+        }
+    }
+
+    if (mobileQuery.addEventListener) {
+        mobileQuery.addEventListener("change", handleMobileQueryChange);
+    } else if (mobileQuery.addListener) {
+        mobileQuery.addListener(handleMobileQueryChange);
+    }
+
+    renderHint(false);
 })();

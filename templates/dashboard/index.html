@@ -10,19 +10,19 @@
 {% block content %}
 
 {# Product header #}
-<div style="margin-bottom: 28px;">
-  <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
-    <i class="{{ workspace.brand.icon }}" style="font-size:1.5rem; color:var(--eg-primary, #38bdf8);"></i>
-    <h2 style="margin:0; font-size:1.4rem; font-weight:800; letter-spacing:-.03em;">
+<div class="workspace-product-header">
+  <div class="workspace-product-heading">
+    <i class="{{ workspace.brand.icon }}" aria-hidden="true"></i>
+    <h2>
       {{ workspace.brand.product_name }}
     </h2>
   </div>
-  <p style="margin:0; color:#64748b; font-size:.9rem;">{{ workspace.brand.tagline }}</p>
+  <p>{{ workspace.brand.tagline }}</p>
 </div>
 
 {# KPI widget grid #}
 {% if dashboard_data.widgets %}
-<div class="grid grid-cols-4 gap-6 mb-8">
+<div class="workspace-kpi-grid">
   {% for widget in dashboard_data.widgets %}
     {% include "components/ui/kpi_card.html" with title=widget.title value=widget.value icon=widget.icon format=widget.format has_value=widget.has_value url=widget.url %}
   {% endfor %}
