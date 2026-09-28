@@ -23,9 +23,15 @@
   </div>
 
   <div class="workspace-search-panel">
-    <label class="workspace-search-label" for="workspace-live-search">
-      {{ workspace.texts.search_label }}
-    </label>
+    <div class="workspace-search-field-head">
+      <label class="workspace-search-label" for="workspace-live-search">
+        {{ workspace.texts.search_label }}
+      </label>
+      <button type="button" class="workspace-search-close" data-search-close
+              aria-label="{% if request.LANGUAGE_CODE == 'en' %}Close search{% else %}Cerrar búsqueda{% endif %}">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
     <div class="workspace-search-input-wrap">
       <span class="workspace-search-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none">
