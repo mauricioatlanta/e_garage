@@ -121,7 +121,20 @@ def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
         # Fallback conservador a chile
         country_ns = "chile"
     else:
-        country_ns = _country_ns_from_path(request.path or "/")
+        # A concrete object/company in the template wins over the path. This
+        # keeps links coherent when a CL document is viewed from a stale /uy/
+        # URL or when QA control changes the active tenant.
+        context_empresa = context.get("empresa")
+        documento = context.get("documento")
+        if not context_empresa and documento is not None:
+            context_empresa = getattr(documento, "empresa", None)
+        active_empresa = context_empresa or getattr(request, "empresa", None)
+        if active_empresa:
+            country_ns = _country_ns_from_empresa(active_empresa)
+            if country_ns == "us_es" and getattr(request, "LANGUAGE_CODE", "") == "en":
+                country_ns = "us_en"
+        else:
+            country_ns = _country_ns_from_path(request.path or "/")
 
     # Normalizar servicios: y repuestos: según el país
     # Chile/Uruguay: viven bajo country:taller: (chile:taller:servicios:...)

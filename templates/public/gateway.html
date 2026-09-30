@@ -822,7 +822,8 @@
         href="/cl/"
         class="gw-card"
         role="listitem"
-        aria-label="eGarage Chile">
+        aria-label="eGarage Chile"
+        data-public-gateway-cta="country_cl">
 
         <div class="gw-card-inner">
           <div class="gw-flag-shell">
@@ -840,6 +841,7 @@
         role="link"
         tabindex="0"
         aria-label="eGarage United States"
+        data-public-gateway-cta="country_us"
         data-url="/us/en/">
 
         <div class="gw-card-inner">
@@ -877,7 +879,8 @@
         href="/mx/"
         class="gw-card"
         role="listitem"
-        aria-label="eGarage México">
+        aria-label="eGarage México"
+        data-public-gateway-cta="country_mx">
 
         <div class="gw-card-inner">
           <div class="gw-flag-shell">
@@ -893,7 +896,8 @@
         href="/ar/"
         class="gw-card"
         role="listitem"
-        aria-label="eGarage Argentina">
+        aria-label="eGarage Argentina"
+        data-public-gateway-cta="country_ar">
 
         <div class="gw-card-inner">
           <div class="gw-flag-shell">
@@ -909,7 +913,8 @@
         href="/pe/"
         class="gw-card"
         role="listitem"
-        aria-label="eGarage Perú">
+        aria-label="eGarage Perú"
+        data-public-gateway-cta="country_pe">
 
         <div class="gw-card-inner">
           <div class="gw-flag-shell">
@@ -926,7 +931,8 @@
         href="/ec/"
         class="gw-card"
         role="listitem"
-        aria-label="eGarage Ecuador">
+        aria-label="eGarage Ecuador"
+        data-public-gateway-cta="country_ec">
 
         <div class="gw-card-inner">
           <div class="gw-flag-shell">
@@ -942,7 +948,8 @@
         href="/ve/"
         class="gw-card"
         role="listitem"
-        aria-label="eGarage Venezuela">
+        aria-label="eGarage Venezuela"
+        data-public-gateway-cta="country_ve">
 
         <div class="gw-card-inner">
           <div class="gw-flag-shell">
@@ -958,7 +965,8 @@
         href="/br/"
         class="gw-card"
         role="listitem"
-        aria-label="eGarage Brasil">
+        aria-label="eGarage Brasil"
+        data-public-gateway-cta="country_br">
 
         <div class="gw-card-inner">
           <div class="gw-flag-shell">
@@ -1010,6 +1018,7 @@
     }
 
     function navigateUsa() {
+      postGatewayCta(usaCard, usaCard.dataset.url || "/us/en/");
       window.location.href = usaCard.dataset.url || "/us/en/";
     }
 
@@ -1061,6 +1070,53 @@
     }
 
     setUsaLang(savedLang);
+
+    function getCookie(name) {
+      var prefix = name + "=";
+      var parts = document.cookie ? document.cookie.split(";") : [];
+      for (var i = 0; i < parts.length; i += 1) {
+        var value = parts[i].trim();
+        if (value.indexOf(prefix) === 0) {
+          return decodeURIComponent(value.slice(prefix.length));
+        }
+      }
+      return "";
+    }
+
+    function postGatewayCta(element, href) {
+      var csrfToken = getCookie("csrftoken");
+      if (!csrfToken || typeof window.fetch !== "function" || !element) {
+        return;
+      }
+      var ctaId = element.getAttribute("data-public-gateway-cta") || "gateway_cta";
+      window.fetch("/analytics/public/event/", {
+        method: "POST",
+        credentials: "same-origin",
+        keepalive: true,
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({
+          event_type: "cta_click",
+          path: "/",
+          dedupe_key: "/:" + ctaId,
+          metadata: {
+            cta_id: ctaId,
+            cta_label: (element.getAttribute("aria-label") || element.textContent || "").trim().slice(0, 120),
+            href: href || element.getAttribute("href") || ""
+          }
+        })
+      }).catch(function () {});
+    }
+
+    document.addEventListener("click", function (event) {
+      var link = event.target.closest("a[data-public-gateway-cta]");
+      if (!link) {
+        return;
+      }
+      postGatewayCta(link, link.getAttribute("href") || "");
+    });
 
     /* Tilt + luz siguiendo el cursor */
     var cards = document.querySelectorAll(".gw-card");

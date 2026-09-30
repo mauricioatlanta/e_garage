@@ -25,15 +25,15 @@
           <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-lg shadow-lg ring-2 ring-cyan-400/40">🔧</div>
           <div>
             <h1 class="text-2xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-lime-300 to-emerald-400">
-              {% trans "Servicios Mecánicos" %}
+              {% if language == 'en' %}External Services{% else %}Servicios Mecánicos{% endif %}
             </h1>
-            <p class="text-gray-400 text-xs">{% trans "Sistema de gestión de servicios avanzado" %}</p>
+            <p class="text-gray-400 text-xs">{% if language == 'en' %}Advanced services management system{% else %}Sistema de gestión de servicios avanzado{% endif %}</p>
           </div>
         </div>
         <div class="flex items-center space-x-4">
           <div class="flex items-center space-x-2 text-xs text-cyan-300">
             <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span>{% trans "Sistema activo" %}</span>
+            <span>{% if language == 'en' %}System active{% else %}Sistema activo{% endif %}</span>
           </div>
           <div class="relative group">
             <div class="absolute -inset-1 rounded-lg bg-gradient-to-r from-emerald-500 via-lime-500 to-green-500 opacity-30 blur group-hover:opacity-50 transition-opacity"></div>
@@ -42,7 +42,7 @@
               <div class="w-4 h-4 rounded-md bg-white/20 flex items-center justify-center">
                 <span class="text-sm">➕</span>
               </div>
-              <span>{% trans "Agregar Servicio" %}</span>
+              <span>{% if language == 'en' %}Add Service{% else %}Agregar Servicio{% endif %}</span>
             </a>
           </div>
         </div>
@@ -58,12 +58,12 @@
         <div class="flex-1 relative">
           <input type="search" id="searchInput" name="q" value="{{ request.GET.q }}"
                  data-endpoint="{% country_url 'servicios:buscar_servicios_api' %}"
-                 placeholder="{% trans 'Buscar por nombre, categoría o subcategoría...' %}"
+                 placeholder="{% if language == 'en' %}Search by name, category, or subcategory...{% else %}Buscar por nombre, categoría o subcategoría...{% endif %}"
                  class="w-full px-3 py-2 bg-transparent text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 text-sm">
           <div class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-400 text-sm">🔍</div>
         </div>
         <button type="button" id="searchBtn" class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold transition-all shadow-lg hover:shadow-cyan-500/25 text-xs">
-          {% trans "ESCANEAR" %}
+          {% if language == 'en' %}SEARCH{% else %}ESCANEAR{% endif %}
         </button>
       </div>
     </div>
@@ -77,14 +77,14 @@
   <div class="mb-4">
     <div class="flex flex-wrap gap-2">
       <select id="categoriaFilter" class="px-3 py-2 rounded-lg bg-black/40 border border-cyan-400/30 text-cyan-300 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
-        <option value="">{% trans "Todas las Categorías" %}</option>
+        <option value="">{% if language == 'en' %}All Categories{% else %}Todas las Categorías{% endif %}</option>
         {% for categoria in categorias %}
         <option value="{{ categoria.code }}">{{ categoria.label_localizado }}</option>
         {% endfor %}
       </select>
 
       <select id="subcategoriaFilter" class="px-3 py-2 rounded-lg bg-black/40 border border-cyan-400/30 text-cyan-300 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
-        <option value="">{% trans "Todas las Subcategorías" %}</option>
+        <option value="">{% if language == 'en' %}All Subcategories{% else %}Todas las Subcategorías{% endif %}</option>
         {% for subcategoria in subcategorias %}
         <option value="{{ subcategoria.code }}">{{ subcategoria.label_localizado }}</option>
         {% endfor %}
@@ -126,18 +126,18 @@
         <div class="p-3 space-y-2 flex-1">
           <!-- Nombre del servicio -->
           <div class="space-y-1">
-            <p class="text-xs text-gray-500 uppercase tracking-wider">{% trans "Servicio" %}</p>
+            <p class="text-xs text-gray-500 uppercase tracking-wider">{% if language == 'en' %}Service{% else %}Servicio{% endif %}</p>
             <p class="text-gray-200 font-medium text-sm truncate">{{ servicio.nombre_localizado|default:"-" }}</p>
           </div>
 
           <!-- Categoría y Subcategoría -->
           <div class="grid grid-cols-2 gap-2">
             <div class="space-y-1">
-              <p class="text-xs text-gray-500 uppercase tracking-wider">{% trans "Categoría" %}</p>
+              <p class="text-xs text-gray-500 uppercase tracking-wider">{% if language == 'en' %}Category{% else %}Categoría{% endif %}</p>
                 <p class="text-emerald-300 font-bold text-xs truncate">{{ servicio.categoria_label|default:"-" }}</p>
             </div>
             <div class="space-y-1">
-              <p class="text-xs text-gray-500 uppercase tracking-wider">{% trans "Subcategoría" %}</p>
+              <p class="text-xs text-gray-500 uppercase tracking-wider">{% if language == 'en' %}Subcategory{% else %}Subcategoría{% endif %}</p>
                 <p class="text-lime-300 font-semibold text-xs truncate">{{ servicio.subcategoria_label|default:"-" }}</p>
             </div>
           </div>
@@ -148,12 +148,12 @@
               <span class="text-fuchsia-300 text-xs">⚙️</span>
             </div>
             <div>
-              <p class="text-xs text-gray-500 uppercase tracking-wider">{% trans "Tipo" %}</p>
+              <p class="text-xs text-gray-500 uppercase tracking-wider">{% if language == 'en' %}Type{% else %}Tipo{% endif %}</p>
               <p class="text-fuchsia-300 font-bold text-sm">
                 {% if servicio.tipo_label %}
                   {{ servicio.tipo_label }}
                 {% else %}
-                  {% trans "Interno" %}
+                  {% if language == 'en' %}Internal{% else %}Interno{% endif %}
                 {% endif %}
               </p>
             </div>
@@ -167,7 +167,7 @@
                class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 hover:text-cyan-200 transition-all duration-200 text-xs font-medium text-center">
               <span class="relative z-10 flex items-center justify-center space-x-1">
                 <span>👁️</span>
-                <span>{% trans "Ver" %}</span>
+                <span>{% if language == 'en' %}View{% else %}Ver{% endif %}</span>
               </span>
               <div class="absolute inset-0 rounded-md bg-gradient-to-r from-cyan-600 to-blue-600 opacity-0 group-hover/btn:opacity-20 transition-opacity"></div>
             </a>
@@ -175,7 +175,7 @@
                class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-400/40 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 hover:text-emerald-200 transition-all duration-200 text-xs font-medium text-center">
               <span class="relative z-10 flex items-center justify-center space-x-1">
                 <span>⚙️</span>
-                <span>{% trans "Editar" %}</span>
+                <span>{% if language == 'en' %}Edit{% else %}Editar{% endif %}</span>
               </span>
               <div class="absolute inset-0 rounded-md bg-gradient-to-r from-emerald-600 to-green-600 opacity-0 group-hover/btn:opacity-20 transition-opacity"></div>
             </a>
@@ -183,7 +183,7 @@
                     class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-red-600/20 to-pink-600/20 border border-red-400/40 text-red-300 hover:from-red-500/30 hover:to-pink-500/30 hover:text-red-200 transition-all duration-200 text-xs font-medium text-center">
               <span class="relative z-10 flex items-center justify-center space-x-1">
                 <span>🗑️</span>
-                <span>{% trans "Eliminar" %}</span>
+                <span>{% if language == 'en' %}Delete{% else %}Eliminar{% endif %}</span>
               </span>
               <div class="absolute inset-0 rounded-md bg-gradient-to-r from-red-600 to-pink-600 opacity-0 group-hover/btn:opacity-20 transition-opacity"></div>
             </button>
@@ -199,8 +199,8 @@
           <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-500/20 to-gray-600/20 border border-gray-400/30 flex items-center justify-center text-2xl">
             🔧
           </div>
-          <h3 class="text-lg font-bold text-gray-300 mb-2">{% trans "No hay servicios registrados" %}</h3>
-          <p class="text-gray-500 text-sm">{% trans "Comienza agregando tu primer servicio al sistema" %}</p>
+          <h3 class="text-lg font-bold text-gray-300 mb-2">{% if language == 'en' %}No services registered{% else %}No hay servicios registrados{% endif %}</h3>
+          <p class="text-gray-500 text-sm">{% if language == 'en' %}Start by adding your first service to the system{% else %}Comienza agregando tu primer servicio al sistema{% endif %}</p>
         </div>
       </div>
     </div>
@@ -216,9 +216,9 @@
         <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
           <div class="flex items-center space-x-2 text-gray-400 text-sm">
             <span class="text-cyan-300">📊</span>
-            <span>{% trans "Página" %} {{ page_obj.number }} {% trans "de" %} {{ page_obj.paginator.num_pages }}</span>
+            <span>{% if language == 'en' %}Page{% else %}Página{% endif %} {{ page_obj.number }} {% if language == 'en' %}of{% else %}de{% endif %} {{ page_obj.paginator.num_pages }}</span>
             <span class="text-gray-600">•</span>
-            <span>{{ paginator.count }} {% trans "registros" %}</span>
+            <span>{{ paginator.count }} {% if language == 'en' %}records{% else %}registros{% endif %}</span>
           </div>
 
           <nav class="flex items-center space-x-2">
@@ -227,14 +227,14 @@
                  class="group px-3 py-1.5 rounded-md bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-200 text-xs font-medium">
                 <span class="flex items-center space-x-1">
                   <span>⏮️</span>
-                  <span class="hidden sm:inline">{% trans "Primera" %}</span>
+                  <span class="hidden sm:inline">{% if language == 'en' %}First{% else %}Primera{% endif %}</span>
                 </span>
               </a>
               <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                  class="group px-3 py-1.5 rounded-md bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-200 text-xs font-medium">
                 <span class="flex items-center space-x-1">
                   <span>⬅️</span>
-                  <span class="hidden sm:inline">{% trans "Anterior" %}</span>
+                  <span class="hidden sm:inline">{% if language == 'en' %}Previous{% else %}Anterior{% endif %}</span>
                 </span>
               </a>
             {% endif %}
@@ -243,14 +243,14 @@
               <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                  class="group px-3 py-1.5 rounded-md bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-200 text-xs font-medium">
                 <span class="flex items-center space-x-1">
-                  <span class="hidden sm:inline">{% trans "Siguiente" %}</span>
+                  <span class="hidden sm:inline">{% if language == 'en' %}Next{% else %}Siguiente{% endif %}</span>
                   <span>➡️</span>
                 </span>
               </a>
               <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                  class="group px-3 py-1.5 rounded-md bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-200 text-xs font-medium">
                 <span class="flex items-center space-x-1">
-                  <span class="hidden sm:inline">{% trans "Última" %}</span>
+                  <span class="hidden sm:inline">{% if language == 'en' %}Last{% else %}Última{% endif %}</span>
                   <span>⏭️</span>
                 </span>
               </a>
@@ -274,16 +274,16 @@
           <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-red-600/20 to-pink-600/20 border border-red-400/40 flex items-center justify-center">
             <span class="text-red-400 text-2xl">⚠️</span>
           </div>
-          <h3 class="text-xl font-bold text-gray-200 mb-2">{% trans "Confirmar Eliminación" %}</h3>
-          <p class="text-gray-400 mb-6">{% trans "¿Está seguro de que desea eliminar el servicio" %} <span id="nombreServicio" class="text-red-400 font-semibold"></span>?</p>
+          <h3 class="text-xl font-bold text-gray-200 mb-2">{% if language == 'en' %}Confirm Deletion{% else %}Confirmar Eliminación{% endif %}</h3>
+          <p class="text-gray-400 mb-6">{% if language == 'en' %}Are you sure you want to delete the service{% else %}¿Está seguro de que desea eliminar el servicio{% endif %} <span id="nombreServicio" class="text-red-400 font-semibold"></span>?</p>
           <div class="flex space-x-3">
             <button onclick="cerrarModal()"
                     class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-gray-600/20 to-gray-700/20 border border-gray-500/40 text-gray-300 hover:from-gray-500/30 hover:to-gray-600/30 transition-all duration-200 text-sm font-medium">
-              {% trans "Cancelar" %}
+              {% if language == 'en' %}Cancel{% else %}Cancelar{% endif %}
             </button>
             <button onclick="eliminarServicio()"
                     class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-red-600/20 to-pink-600/20 border border-red-400/40 text-red-300 hover:from-red-500/30 hover:to-pink-500/30 transition-all duration-200 text-sm font-medium">
-              {% trans "Eliminar" %}
+              {% if language == 'en' %}Delete{% else %}Eliminar{% endif %}
             </button>
           </div>
         </div>
@@ -423,19 +423,19 @@ document.addEventListener('DOMContentLoaded', function() {
   let abortController = null;
 
   const LABELS = {
-    view: "{% trans 'Ver' %}",
-    edit: "{% trans 'Editar' %}",
-    delete: "{% trans 'Eliminar' %}",
-    service: "{% trans 'Servicio' %}",
-    category: "{% trans 'Categoría' %}",
-    subcategory: "{% trans 'Subcategoría' %}",
-    type: "{% trans 'Tipo' %}",
-    defaultType: "{% trans 'Interno' %}",
-    noResultsTitle: "{% trans 'No se encontraron servicios' %}",
-    noResultsMessage: "{% trans 'Ajusta los filtros o crea un nuevo servicio.' %}",
-    resultsSingle: "{% trans '1 servicio encontrado' %}",
-    resultsPlural: "{% trans 'servicios encontrados' %}",
-    errorSearch: "{% trans 'No se pudo actualizar la búsqueda' %}",
+    view: "{% if language == 'en' %}View{% else %}Ver{% endif %}",
+    edit: "{% if language == 'en' %}Edit{% else %}Editar{% endif %}",
+    delete: "{% if language == 'en' %}Delete{% else %}Eliminar{% endif %}",
+    service: "{% if language == 'en' %}Service{% else %}Servicio{% endif %}",
+    category: "{% if language == 'en' %}Category{% else %}Categoría{% endif %}",
+    subcategory: "{% if language == 'en' %}Subcategory{% else %}Subcategoría{% endif %}",
+    type: "{% if language == 'en' %}Type{% else %}Tipo{% endif %}",
+    defaultType: "{% if language == 'en' %}Internal{% else %}Interno{% endif %}",
+    noResultsTitle: "{% if language == 'en' %}No services found{% else %}No se encontraron servicios{% endif %}",
+    noResultsMessage: "{% if language == 'en' %}Adjust the filters or create a new service.{% else %}Ajusta los filtros o crea un nuevo servicio.{% endif %}",
+    resultsSingle: "{% if language == 'en' %}1 service found{% else %}1 servicio encontrado{% endif %}",
+    resultsPlural: "{% if language == 'en' %}services found{% else %}servicios encontrados{% endif %}",
+    errorSearch: "{% if language == 'en' %}Could not update the search{% else %}No se pudo actualizar la búsqueda{% endif %}",
   };
 
   // =================== UTILIDADES ===================

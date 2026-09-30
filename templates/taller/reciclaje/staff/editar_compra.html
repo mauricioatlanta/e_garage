@@ -1,0 +1,38 @@
+{% extends "layouts/base_egarage_panel.html" %}
+
+{% block page_title %}Editar compra #{{ compra.pk }}{% endblock %}
+{% block page_icon %}✏️{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .rec-card { background: rgba(3,10,24,0.9); border: 1px solid rgba(0,255,255,0.28); border-radius: 12px; padding: 20px; max-width: 720px; }
+  .rec-label { color:#9ca3af; display:block; font-size:0.85rem; font-weight:800; margin:0.8rem 0 0.25rem; text-transform:uppercase; }
+  .rec-input, .rec-select { background:rgba(10,14,20,0.92); border:1px solid rgba(0,255,255,0.3); border-radius:8px; color:#f8fafc; padding:0.6rem 0.7rem; width:100%; }
+  .rec-actions { display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:1rem; }
+  .rec-btn { background:#00fff7; border:0; border-radius:8px; color:#0f2027; cursor:pointer; font-weight:900; padding:0.65rem 1rem; text-decoration:none; }
+  .rec-btn-secondary { background:transparent; border:1px solid rgba(0,255,255,0.5); color:#a5f3fc; }
+</style>
+{% endblock %}
+
+{% block panel_content %}
+<div class="rec-card">
+  <form method="post">
+    {% csrf_token %}
+    <label class="rec-label">Cliente / proveedor</label>
+    <select name="cliente_id" class="rec-select">
+      <option value="">Mostrador</option>
+      {% for cliente in clientes %}
+      <option value="{{ cliente.pk }}" {% if compra.cliente_id == cliente.pk %}selected{% endif %}>{{ cliente.nombre }} {{ cliente.apellido }}{% if cliente.tax_id %} ({{ cliente.tax_id }}){% endif %}</option>
+      {% endfor %}
+    </select>
+
+    <label class="rec-label">Notas internas</label>
+    <textarea name="notas" class="rec-input" rows="4">{{ compra.notas }}</textarea>
+
+    <div class="rec-actions">
+      <button type="submit" class="rec-btn">Guardar cambios</button>
+      <a href="../" class="rec-btn rec-btn-secondary">Volver</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -17,6 +17,7 @@ from taller.views_extra.centro_trabajo import (
     centro_trabajo_buscar,
     vehiculo_historial,
 )
+from taller.views_ingreso import panel_ingreso_vehiculo
 from taller.views.workspace_dashboard import workspace_dashboard
 from taller.views_extra.ai_lab import ai_lab_dashboard
 from taller.views_extra.views_configuracion import (
@@ -58,6 +59,7 @@ urlpatterns = [
     # Centro de Trabajo / Recepción Vehicular (nueva home post-login)
     path("workspace/", centro_trabajo, name="centro_trabajo"),
     path("workspace/buscar/", centro_trabajo_buscar, name="centro_trabajo_buscar"),
+    path("vehiculos/<int:pk>/panel-ingreso/", panel_ingreso_vehiculo, name="panel_ingreso"),
     path("vehiculos/<int:vehiculo_id>/historial/", vehiculo_historial, name="vehiculo_historial"),
     # Dashboard / Centro de Operaciones (métricas, reportes)
     path("dashboard/", workspace_dashboard, name="dashboard"),
@@ -86,6 +88,7 @@ urlpatterns = [
     # Login y password (allauth) bajo /cl/es/accounts/ para conservar país e idioma.
     # EXCEPCIÓN histórica: accounts/login/ aquí (no redirect) para evitar ERR_TOO_MANY_REDIRECTS.
     path("accounts/login/", country_aware_login, name="account_login"),
+    path("accounts/logout/", lambda r: redirect("/accounts/logout/"), name="account_logout"),
     # Misma superficie que allauth bajo /accounts/, sin 302 a /accounts/... (se pierde país/idioma).
     path(
         "accounts/password/reset/",

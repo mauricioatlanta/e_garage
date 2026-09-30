@@ -8,6 +8,7 @@ from taller.utils.smart_logging import get_client_ip
 
 
 logger = logging.getLogger(__name__)
+PUBLIC_ANALYTICS_ATTRIBUTION_PATHS = {"/", "/cl/desarmadurias/"}
 
 
 def _is_mobile(user_agent: str) -> bool:
@@ -57,6 +58,22 @@ def track_public_page(
 
         user_agent = (request.META.get("HTTP_USER_AGENT") or "")[:500]
         ip = get_client_ip(request) or ""
+        public_session = None
+        if request.path in PUBLIC_ANALYTICS_ATTRIBUTION_PATHS:
+            try:
+                from taller.services.public_attribution import get_or_create_public_session
+
+                public_session = get_or_create_public_session(
+                    request,
+                    page_type=page_type,
+                    country=country,
+                    language=language,
+                )
+            except Exception:
+                logger.exception(
+                    "public_analytics: error resolving session path=%s",
+                    getattr(request, "path", ""),
+                )
 
         now = timezone.now()
         visitor_hash = PublicPageView.build_visitor_hash(
@@ -65,18 +82,39 @@ def track_public_page(
             date_key=now.date().isoformat(),
         )
 
-        return PublicPageView.objects.create(
+        page_view = PublicPageView.objects.create(
             path=request.path[:255],
             page_type=page_type,
             country=(country or "").lower()[:8],
             language=(language or "").lower()[:8],
             visitor_hash=visitor_hash,
+            public_session=public_session,
             referrer=_clean_referrer(request),
             user_agent=user_agent,
             is_mobile=_is_mobile(user_agent),
             is_bot=is_probable_bot(user_agent),
+            is_internal=bool(public_session and public_session.is_internal),
             created_at=now,
         )
+        if public_session and not public_session.is_bot and not public_session.is_internal:
+            try:
+                from taller.models.public_analytics_event import PublicAnalyticsEvent
+                from taller.services.public_event_tracking import record_public_event
+
+                record_public_event(
+                    session=public_session,
+                    event_type=PublicAnalyticsEvent.EVENT_HUMAN_VISIT,
+                    path=page_view.path,
+                    dedupe_key="human_visit",
+                    metadata={"source": "backend"},
+                    page_view=page_view,
+                )
+            except Exception:
+                logger.exception(
+                    "public_analytics: error tracking human visit path=%s",
+                    getattr(request, "path", ""),
+                )
+        return page_view
     except Exception:
         logger.exception(
             "public_analytics: error tracking path=%s",

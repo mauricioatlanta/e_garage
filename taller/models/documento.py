@@ -51,6 +51,28 @@ class Documento(AuditMixin, models.Model):
     estado = models.CharField(
         max_length=12, choices=ESTADOS_DOC, default="EMITIDO", blank=True, db_index=True
     )
+    ESTADO_OT_INGRESADO = "INGRESADO"
+    ESTADO_OT_DIAGNOSTICO = "DIAGNOSTICO"
+    ESTADO_OT_ESPERANDO_REPUESTOS = "ESPERANDO_REPUESTOS"
+    ESTADO_OT_EN_REPARACION = "EN_REPARACION"
+    ESTADO_OT_LISTO = "LISTO"
+    ESTADO_OT_ENTREGADO = "ENTREGADO"
+    ESTADOS_OPERATIVOS_OT = (
+        (ESTADO_OT_INGRESADO, _("Vehículo Ingresado")),
+        (ESTADO_OT_DIAGNOSTICO, _("En Diagnóstico")),
+        (ESTADO_OT_ESPERANDO_REPUESTOS, _("Esperando Repuestos")),
+        (ESTADO_OT_EN_REPARACION, _("En Reparación")),
+        (ESTADO_OT_LISTO, _("Listo para Entrega")),
+        (ESTADO_OT_ENTREGADO, _("Entregado")),
+    )
+    estado_operativo_ot = models.CharField(
+        max_length=24,
+        choices=ESTADOS_OPERATIVOS_OT,
+        default="",
+        blank=True,
+        db_index=True,
+        help_text=_("Estado operativo del taller para órdenes de trabajo."),
+    )
     fecha_emision = models.DateField(default=timezone.now, editable=True, db_index=True)
     cliente = models.ForeignKey(
         Cliente, on_delete=models.PROTECT, related_name="documentos", db_index=True
@@ -558,7 +580,12 @@ class Documento(AuditMixin, models.Model):
 
         self.generar_numero_documento()
 
-        self.save(update_fields=["tipo", "numero"])
+        update_fields = ["tipo", "numero"]
+        if nuevo_tipo == "OT" and not self.estado_operativo_ot:
+            self.estado_operativo_ot = self.ESTADO_OT_INGRESADO
+            update_fields.append("estado_operativo_ot")
+
+        self.save(update_fields=update_fields)
 
         return True
 
@@ -575,6 +602,13 @@ class Documento(AuditMixin, models.Model):
             self.moneda = config["currency"]
         if getattr(self, "empresa", None) and getattr(self.empresa, "pais", None):
             self.country = self.empresa.pais
+        if self.tipo == "OT" and not self.estado_operativo_ot:
+            self.estado_operativo_ot = self.ESTADO_OT_INGRESADO
+            update_fields = kwargs.get("update_fields")
+            if update_fields is not None:
+                kwargs["update_fields"] = list(
+                    dict.fromkeys([*update_fields, "estado_operativo_ot"])
+                )
 
         # Inicializar campos de totales si no tienen valor
         if self.legacy_total_repuestos is None:

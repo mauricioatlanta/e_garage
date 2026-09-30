@@ -16,6 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from taller.models.tecnico import Tecnico
+from taller.services.empresa_service import get_empresa_safe
 
 
 # API para crear técnicos (SEGURO)
@@ -35,8 +36,7 @@ def api_crear_tecnico(request):
         if not nombre:
             return JsonResponse({"error": "Nombre requerido"}, status=400)
 
-        # Usar empresa del usuario autenticado (seguridad)
-        empresa = getattr(request.user, "empresa", None)
+        empresa = get_empresa_safe(request)
         if not empresa:
             return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
 
@@ -67,7 +67,12 @@ def autocomplete_repuesto(request):
     q = request.GET.get("q", "").strip()
     if not q:
         return JsonResponse({"results": []}, safe=False)
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return JsonResponse({"results": []}, safe=False)
     repuestos = Repuesto.objects.filter(
+        empresa=empresa
+    ).filter(
         models.Q(nombre__icontains=q) | models.Q(part_number__icontains=q)
     )[:20]
     data = {
@@ -93,8 +98,7 @@ from taller.servicios.models import Servicio
 def autocomplete_servicio(request):
     q = request.GET.get("q", "").strip()
 
-    # Obtener empresa del usuario
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse([], safe=False)
 
@@ -211,12 +215,7 @@ from taller.models.clientes import Cliente
 def autocomplete_cliente(request):
     q = request.GET.get("q", "").strip()
 
-    # Obtener empresa del usuario autenticado
-    empresa = None
-    if request.user.is_authenticated and hasattr(request.user, "empresa"):
-        empresa = request.user.empresa
-
-    # Si no hay empresa, retornar vacío
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse({"results": []})
 
@@ -260,10 +259,8 @@ def obtener_vehiculos_por_cliente(request):
     if not cliente_id:
         return JsonResponse([], safe=False)
 
-    # Obtener empresa del usuario autenticado
-    try:
-        empresa = request.user.empresa
-    except AttributeError:
+    empresa = get_empresa_safe(request)
+    if not empresa:
         return JsonResponse([], safe=False)
 
     # Filtrar vehículos por cliente y empresa
@@ -1080,7 +1077,7 @@ def exportar_documento_pdf(request, documento_id):
     Exporta un documento en PDF usando el nuevo template futurista y
     la utilería centralizada DocumentoPDFExporter.
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     # 🔒 SEGURIDAD: Filtrar por empresa desde el inicio para aislamiento multi-tenant
     if empresa is not None:
         queryset = Documento.objects.filter(empresa=empresa)
@@ -1142,7 +1139,10 @@ def enviar_documento_whatsapp(request, documento_id):
     # (the module-level import is present earlier in this file)
 
     try:
-        documento = Documento.objects.get(id=documento_id, empresa=request.user.empresa)
+        empresa = get_empresa_safe(request)
+        if not empresa:
+            return JsonResponse({"success": False, "error": "Usuario sin empresa asociada"}, status=400)
+        documento = Documento.objects.get(id=documento_id, empresa=empresa)
     except Documento.DoesNotExist:
         return JsonResponse({"success": False, "error": "Documento no encontrado"}, status=404)
 

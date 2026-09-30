@@ -10,7 +10,14 @@ from taller.models.registro_embudo import RegistroEmbudoSuscriptor
 log = logging.getLogger(__name__)
 
 
-def registrar_signup(user, pais, obtuvo_trial=False, trial_started_at=None, trial_ends_at=None):
+def registrar_signup(
+    user,
+    pais,
+    obtuvo_trial=False,
+    trial_started_at=None,
+    trial_ends_at=None,
+    public_session=None,
+):
     """
     Registra el signup en el embudo.
 
@@ -32,6 +39,9 @@ def registrar_signup(user, pais, obtuvo_trial=False, trial_started_at=None, tria
                 "trial_ends_at": trial_ends_at,
             },
         )
+        if public_session is not None and embudo.public_session_id is None:
+            embudo.public_session = public_session
+            embudo.save(update_fields=["public_session", "updated_at"])
         # La empresa puede haberse creado ANTES que el registro del embudo.
         # Sincronizar la etapa empresa de forma idempotente.
         try:
@@ -59,12 +69,19 @@ def registrar_signup(user, pais, obtuvo_trial=False, trial_started_at=None, tria
                 update_fields=["empresa_creada_at", "updated_at"]
             )
 
+        if embudo.empresa_creada_at and embudo.public_session_id:
+            from taller.services.public_event_tracking import record_company_created_for_user
+
+            record_company_created_for_user(user)
+
         if created:
             log.info(f"[Embudo] Signup registrado para {user.email} ({pais})")
         else:
             log.warning(f"[Embudo] Embudo ya existía para {user.email}")
+        return embudo
     except Exception as e:
         log.error(f"[Embudo] Error registrando signup para {user.email}: {e}", exc_info=True)
+        return None
 
 
 def registrar_email_confirmado(user):
@@ -88,7 +105,7 @@ def registrar_email_confirmado(user):
         )
 
 
-def registrar_primer_login(user):
+def registrar_primer_login(user, request=None):
     """
     Registra el primer login en el embudo.
 
@@ -96,13 +113,30 @@ def registrar_primer_login(user):
         user: Usuario que hizo login
     """
     try:
-        embudo = RegistroEmbudoSuscriptor.objects.filter(user=user).first()
-        if embudo and not embudo.primer_login_at:
-            embudo.primer_login_at = timezone.now()
-            embudo.save(update_fields=["primer_login_at"])
-            log.info(f"[Embudo] Primer login registrado para {user.email}")
-        elif not embudo:
-            log.warning(f"[Embudo] No se encontró embudo para {user.email} al hacer login")
+        from django.db import transaction
+        from taller.services.public_event_tracking import (
+            is_internal_first_login_request,
+            record_first_login_for_user,
+        )
+
+        if is_internal_first_login_request(user, request):
+            return
+
+        with transaction.atomic():
+            embudo = (
+                RegistroEmbudoSuscriptor.objects.select_for_update()
+                .filter(user=user)
+                .first()
+            )
+            if embudo and not embudo.primer_login_at:
+                embudo.primer_login_at = timezone.now()
+                embudo.save(update_fields=["primer_login_at"])
+                log.info(f"[Embudo] Primer login registrado para {user.email}")
+            elif not embudo:
+                log.warning(f"[Embudo] No se encontró embudo para {user.email} al hacer login")
+
+        if embudo:
+            record_first_login_for_user(user)
     except Exception as e:
         log.error(f"[Embudo] Error registrando primer login para {user.email}: {e}", exc_info=True)
 
@@ -122,6 +156,11 @@ def registrar_empresa_creada(user):
             log.info(f"[Embudo] Empresa creada registrada para {user.email}")
         elif not embudo:
             log.warning(f"[Embudo] No se encontró embudo para {user.email} al crear empresa")
+
+        if embudo and embudo.empresa_creada_at and embudo.public_session_id:
+            from taller.services.public_event_tracking import record_company_created_for_user
+
+            record_company_created_for_user(user)
     except Exception as e:
         log.error(
             f"[Embudo] Error registrando empresa creada para {user.email}: {e}", exc_info=True

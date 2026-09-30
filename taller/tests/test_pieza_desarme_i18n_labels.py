@@ -129,10 +129,8 @@ class TestInventarioInteligenteSerializaNombre:
         request.user = user
         request.LANGUAGE_CODE = "es"
         resp = inventario_inteligente(request, pk=vehiculo_desarme.pk)
-        assert resp.status_code == 200
-        content = resp.content.decode("utf-8")
-        # El template embebe el JSON via repuestos_json|escapejs; verificar el nombre visible
-        assert "Tapa de válvulas" in content
+        assert resp.status_code == 302
+        assert resp.url == f"/cl/es/desarme/piezas/?vehiculo={vehiculo_desarme.pk}&modo=venta"
 
 
 @pytest.mark.django_db

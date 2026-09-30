@@ -332,6 +332,11 @@ class RegistrationService:
         # rubros_list=[] → lista vacía inválida; no se persiste (no debería ocurrir desde el form).
         # rubros_list=[...] → lista válida; se persiste completa incluyendo rubro_principal.
         # Invariante garantizada: config.rubro_principal siempre está en config.rubros.
+        if not rubros_list:
+            raw_rubro = company_data.get("rubro_principal") or company_data.get("rubro")
+            if raw_rubro:
+                rubros_list = [str(raw_rubro).strip().upper()]
+
         if rubros_list:
             from taller.models.configuracion import ConfiguracionEmpresa as _Config
             config, _ = _Config.objects.get_or_create(empresa=empresa)

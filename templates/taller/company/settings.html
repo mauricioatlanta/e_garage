@@ -1395,16 +1395,16 @@
                                 
                                 <div class="subscription-flow-list" style="display:grid; gap:.65rem; margin:1rem 0;">
                                     <div style="display:flex; justify-content:space-between; gap:1rem; padding:.75rem 1rem; border:1px solid rgba(0,255,255,.16); border-radius:14px; background:rgba(255,255,255,.035);">
-                                        <span style="color:rgba(255,255,255,.62);">Periodo</span>
-                                        <strong style="color:rgba(255,255,255,.9);">Mensual o anual</strong>
+                                        <span style="color:rgba(255,255,255,.62);">{% if empresa_pais|default:'CL' == 'US' %}Period{% else %}Periodo{% endif %}</span>
+                                        <strong style="color:rgba(255,255,255,.9);">{% if empresa_pais|default:'CL' == 'US' %}Monthly or annual{% else %}Mensual o anual{% endif %}</strong>
                                     </div>
                                     <div style="display:flex; justify-content:space-between; gap:1rem; padding:.75rem 1rem; border:1px solid rgba(0,255,255,.16); border-radius:14px; background:rgba(255,255,255,.035);">
-                                        <span style="color:rgba(255,255,255,.62);">Pago</span>
-                                        <strong style="color:rgba(255,255,255,.9);">Tarjeta de Crédito / Débito · Transferencia</strong>
+                                        <span style="color:rgba(255,255,255,.62);">{% if empresa_pais|default:'CL' == 'US' %}Payment{% else %}Pago{% endif %}</span>
+                                        <strong style="color:rgba(255,255,255,.9);">{% if empresa_pais|default:'CL' == 'US' %}Credit / Debit Card · Bank Transfer{% else %}Tarjeta de Crédito / Débito · Transferencia{% endif %}</strong>
                                     </div>
                                     <div style="display:flex; justify-content:space-between; gap:1rem; padding:.75rem 1rem; border:1px solid rgba(0,255,255,.16); border-radius:14px; background:rgba(255,255,255,.035);">
-                                        <span style="color:rgba(255,255,255,.62);">Validación</span>
-                                        <strong style="color:rgba(255,255,255,.9);">Automática o administrativa</strong>
+                                        <span style="color:rgba(255,255,255,.62);">{% if empresa_pais|default:'CL' == 'US' %}Validation{% else %}Validación{% endif %}</span>
+                                        <strong style="color:rgba(255,255,255,.9);">{% if empresa_pais|default:'CL' == 'US' %}Automatic or administrative{% else %}Automática o administrativa{% endif %}</strong>
                                     </div>
                                 </div>
 
@@ -1534,30 +1534,30 @@
             <!-- Panel Usuarios del Sistema -->
             <div class="tab-pane fade" id="usuarios-sistema" role="tabpanel">
                 <div class="form-section">
-                    <h4><i class="fas fa-user-plus"></i> Registrar Usuario con Acceso (Login)</h4>
+                    <h4><i class="fas fa-user-plus"></i> {% if empresa_pais|default:'CL' == 'US' %}Register User with Login Access{% else %}Registrar Usuario con Acceso (Login){% endif %}</h4>
                     <div class="row g-3">
                         <div class="col-md-3">
-                            <label class="form-label">Nombre de Usuario (Email)</label>
-                            <input type="email" name="username" class="form-control" placeholder="ej: empleado@egarage.com">
+                            <label class="form-label">{% if empresa_pais|default:'CL' == 'US' %}Username (Email){% else %}Nombre de Usuario (Email){% endif %}</label>
+                            <input type="email" name="username" class="form-control" placeholder="{% if empresa_pais|default:'CL' == 'US' %}e.g. employee@egarage.com{% else %}ej: empleado@egarage.com{% endif %}">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Correo Electrónico</label>
-                            <input type="email" name="email" class="form-control" placeholder="ej: admin@egarage.com">
+                            <label class="form-label">{% if empresa_pais|default:'CL' == 'US' %}Email Address{% else %}Correo Electrónico{% endif %}</label>
+                            <input type="email" name="email" class="form-control" placeholder="{% if empresa_pais|default:'CL' == 'US' %}e.g. admin@egarage.com{% else %}ej: admin@egarage.com{% endif %}">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Contraseña</label>
+                            <label class="form-label">{% if empresa_pais|default:'CL' == 'US' %}Password{% else %}Contraseña{% endif %}</label>
                             <input type="password" name="password" class="form-control" placeholder="••••••••">
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Rol / Privilegios</label>
+                            <label class="form-label">{% if empresa_pais|default:'CL' == 'US' %}Role / Privileges{% else %}Rol / Privilegios{% endif %}</label>
                             <select name="rol" class="form-select">
-                                <option value="ADMIN">ADMINISTRADOR</option>
-                                <option value="VENDEDOR">VENDEDOR</option>
+                                <option value="ADMIN">{% if empresa_pais|default:'CL' == 'US' %}ADMINISTRATOR{% else %}ADMINISTRADOR{% endif %}</option>
+                                <option value="VENDEDOR">{% if empresa_pais|default:'CL' == 'US' %}SALES{% else %}VENDEDOR{% endif %}</option>
                             </select>
                         </div>
                         <div class="col-12 text-end mt-3">
                             <button type="submit" name="crear_usuario_sistema" value="1" class="btn btn-save btn-primary">
-                                <i class="fas fa-save"></i> Habilitar Cuenta
+                                <i class="fas fa-save"></i> {% if empresa_pais|default:'CL' == 'US' %}Enable Account{% else %}Habilitar Cuenta{% endif %}
                             </button>
                         </div>
                     </div>
@@ -1593,7 +1593,7 @@
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="3" class="text-center p-4 text-muted">No posees otros usuarios con acceso creados bajo tu suscripción.</td>
+                                    <td colspan="3" class="text-center p-4 text-muted">{% if empresa_pais|default:'CL' == 'US' %}No other users with access have been created under your subscription.{% else %}No posees otros usuarios con acceso creados bajo tu suscripción.{% endif %}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

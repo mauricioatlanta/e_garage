@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load country_url %}
+{% load money %}
 
 {% block title %}{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Maintenance History{% else %}Historial de Mantenimiento{% endif %} - {{ historial_data.vehiculo.patente }}{% endblock %}
 
@@ -54,11 +56,12 @@
     }
 
     .resumen-section {
-        background: white;
+        background: #f7e3bf;
+        border: 1px solid rgba(180, 113, 28, 0.26);
         border-radius: 10px;
         padding: 0.875rem 1rem;
         margin-bottom: 1rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 12px rgba(120, 76, 18, 0.14);
     }
 
     .resumen-grid {
@@ -87,18 +90,19 @@
     }
 
     .historial-table {
-        background: white;
+        background: #f9edda;
+        border: 1px solid rgba(180, 113, 28, 0.20);
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 12px rgba(120, 76, 18, 0.12);
     }
 
     .table-header {
-        background: #f9fafb;
+        background: #efd3a7;
         padding: 1rem;
-        border-bottom: 2px solid #e5e7eb;
+        border-bottom: 2px solid rgba(180, 113, 28, 0.22);
         display: grid;
-        grid-template-columns: 100px 120px 1fr 150px 120px;
+        grid-template-columns: 100px 120px 1fr 150px 120px 130px;
         gap: 1rem;
         font-weight: 600;
         color: #374151;
@@ -109,20 +113,42 @@
 
     .table-row {
         padding: 1rem;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid rgba(180, 113, 28, 0.16);
         display: grid;
-        grid-template-columns: 100px 120px 1fr 150px 120px;
+        grid-template-columns: 100px 120px 1fr 150px 120px 130px;
         gap: 1rem;
         align-items: center;
         transition: background 0.2s;
     }
 
     .table-row:hover {
-        background: #f9fafb;
+        background: #f3dfbf;
     }
 
     .table-row:last-child {
         border-bottom: none;
+    }
+
+    .btn-open-work {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 0.45rem 0.7rem;
+        border-radius: 8px;
+        border: 1px solid rgba(59, 130, 246, 0.35);
+        background: rgba(37, 99, 235, 0.12);
+        color: #1d4ed8;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .btn-open-work:hover {
+        background: rgba(37, 99, 235, 0.20);
+        border-color: rgba(37, 99, 235, 0.55);
+        color: #1e40af;
     }
 
     .doc-numero {
@@ -242,7 +268,7 @@
     <div class="header-section">
         <h1>📋 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Maintenance History{% else %}Historial de Mantenimiento{% endif %}</h1>
         <p>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Digital Maintenance Book - Complete and verifiable history{% else %}Libro de Mantenciones Digital - Historial completo y verificable{% endif %}</p>
-        
+
         <div class="vehiculo-info">
             <div class="info-item">
                 <div class="info-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Vehicle{% else %}Vehículo{% endif %}</div>
@@ -276,7 +302,7 @@
                 <div class="resumen-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Total Services{% else %}Total Servicios{% endif %}</div>
             </div>
             <div class="resumen-item">
-                <div class="resumen-value">${{ historial_data.resumen.total_gastado|intcomma }}</div>
+                <div class="resumen-value">{{ historial_data.resumen.total_gastado|money_by_country:empresa.pais }}</div>
                 <div class="resumen-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Total Invested{% else %}Total Invertido{% endif %}</div>
             </div>
             {% if historial_data.resumen.km_promedio_entre_servicios %}
@@ -314,6 +340,7 @@
             <div>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Work Performed{% else %}Trabajos Realizados{% endif %}</div>
             <div>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Mileage{% else %}Kilometraje{% endif %}</div>
             <div>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Amount{% else %}Monto{% endif %}</div>
+            <div>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Action{% else %}Acción{% endif %}</div>
         </div>
 
         {% if historial_data.historial %}
@@ -344,7 +371,12 @@
                     {% endif %}
                 </div>
                 <div>
-                    <span class="monto-value">${{ entrada.monto|intcomma }}</span>
+                    <span class="monto-value">{{ entrada.monto|money_by_country:empresa.pais }}</span>
+                </div>
+                <div>
+                    <a href="{% country_url 'documentos:ver_documento' entrada.documento.id %}" class="btn-open-work">
+                        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Open Work{% else %}Ver trabajo{% endif %}
+                    </a>
                 </div>
             </div>
             {% endfor %}
@@ -360,16 +392,16 @@
     <!-- Botones de Acción -->
     {% if historial_data.historial %}
     <div class="action-buttons">
-        <a href="{% url 'reportes:exportar_historial_pdf' historial_data.vehiculo.id %}" 
+        <a href="{% country_url 'reportes:exportar_historial_pdf' historial_data.vehiculo.id %}"
            class="btn-action btn-export-pdf">
             📄 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Export PDF{% else %}Exportar PDF{% endif %}
         </a>
-        <a href="{% url 'reportes:exportar_historial_excel' historial_data.vehiculo.id %}" 
+        <a href="{% country_url 'reportes:exportar_historial_excel' historial_data.vehiculo.id %}"
            class="btn-action btn-export-excel">
             📊 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Export Excel{% else %}Exportar Excel{% endif %}
         </a>
         {% if historial_data.vehiculo.cliente.telefono %}
-        <a href="#" 
+        <a href="#"
            onclick="sendWhatsAppReport('{{ historial_data.vehiculo.cliente.telefono|slice:"1:" }}', '{{ historial_data.vehiculo.cliente.nombre }}', '{{ historial_data.vehiculo.patente }}', '{{ request.build_absolute_uri }}'); return false;"
            class="btn-action btn-whatsapp">
             📱 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Send via WhatsApp{% else %}Enviar por WhatsApp{% endif %}
@@ -382,19 +414,18 @@
 <script>
 function sendWhatsAppReport(telefono, nombreCliente, patente, urlReporte) {
     const isEnglish = '{{ LANGUAGE_CODE }}' === 'en' || '{{ request.LANGUAGE_CODE }}' === 'en';
-    
+
     let mensaje;
     if (isEnglish) {
         mensaje = `Hello ${nombreCliente},\n\nHere is the maintenance history report for your vehicle ${patente}:\n${urlReporte}\n\nThank you for trusting us! 🚗✨`;
     } else {
         mensaje = `Hola ${nombreCliente},\n\nAquí está el reporte de historial de mantenimiento de tu vehículo ${patente}:\n${urlReporte}\n\n¡Gracias por confiar en nosotros! 🚗✨`;
     }
-    
+
     const mensajeEncoded = encodeURIComponent(mensaje);
     const whatsappUrl = `https://wa.me/${telefono}?text=${mensajeEncoded}`;
-    
+
     window.open(whatsappUrl, '_blank');
 }
 </script>
 {% endblock %}
-

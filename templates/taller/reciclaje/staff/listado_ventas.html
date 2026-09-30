@@ -1,5 +1,5 @@
 {% extends "layouts/base_egarage_panel.html" %}
-{% load country_url %}
+{% load country_url money %}
 
 {% block page_title %}Ventas de reciclaje{% endblock %}
 {% block page_icon %}💰{% endblock %}
@@ -22,7 +22,7 @@
     <tr>
       <td><a href="{% country_url 'reciclaje_staff:detalle_venta' venta.pk %}" style="color:#00fff7;">#{{ venta.pk }}</a></td>
       <td>{{ venta.comprador|default:"—" }}</td>
-      <td>${{ venta.total|floatformat:0 }}</td>
+      <td>{{ venta.total|money_clp }}</td>
       <td>{{ venta.created_at|date:"d/m/Y H:i" }}</td>
     </tr>
     {% empty %}

@@ -620,6 +620,7 @@ class DocumentoForm(forms.ModelForm):
             LineaServicio,
             ORIGEN_DESARME,
             ORIGEN_EXTERNO,
+            ORIGEN_COMPRA_TRABAJO,
             ORIGEN_STOCK_BODEGA,
         )
         from taller.servicios.models import Servicio
@@ -634,7 +635,12 @@ class DocumentoForm(forms.ModelForm):
         documento.lineas_servicio.all().delete()
         documento.lineas_otro_servicio.all().delete()
 
-        allowed_origins = {ORIGEN_EXTERNO, ORIGEN_STOCK_BODEGA, ORIGEN_DESARME}
+        allowed_origins = {
+            ORIGEN_EXTERNO,
+            ORIGEN_STOCK_BODEGA,
+            ORIGEN_COMPRA_TRABAJO,
+            ORIGEN_DESARME,
+        }
 
         for rep_data in repuestos:
             codigo = (rep_data.get("codigo") or "").strip()
@@ -652,7 +658,11 @@ class DocumentoForm(forms.ModelForm):
             elif repuesto_id is not None or part_id is not None:
                 origen = origen or ORIGEN_STOCK_BODEGA
             else:
-                origen = ORIGEN_EXTERNO
+                origen = (
+                    ORIGEN_COMPRA_TRABAJO
+                    if origen == ORIGEN_COMPRA_TRABAJO
+                    else ORIGEN_EXTERNO
+                )
             if origen not in allowed_origins:
                 origen = (
                     ORIGEN_EXTERNO
@@ -672,6 +682,9 @@ class DocumentoForm(forms.ModelForm):
                 "origen_repuesto": origen,
                 "tecnico_responsable_id": _to_optional_int(rep_data.get("tecnico_responsable_id")),
             }
+            proveedor_compra = (rep_data.get("proveedor_compra") or "").strip()
+            if proveedor_compra:
+                kwargs["proveedor_compra"] = proveedor_compra
 
             if origen == ORIGEN_DESARME and pieza_desarme_id:
                 kwargs["pieza_desarme_id"] = pieza_desarme_id

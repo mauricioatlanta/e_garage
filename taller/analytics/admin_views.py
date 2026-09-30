@@ -398,14 +398,23 @@ def test_info_view(request):
         return redirect("/")
 
     # Obtener usuarios de prueba
-    usuarios_prueba = User.objects.filter(
-        email__in=[
-            "test_chile@egarage.cl",
-            "test_chile_pago@egarage.cl",
-            "test_usa@egarage.com",
-            "test_usa_pago@egarage.com",
-        ]
-    ).select_related("empresa")
+    usuarios_prueba = (
+        User.objects.filter(
+            Q(
+                email__in=[
+                    "test_chile@egarage.cl",
+                    "test_chile_pago@egarage.cl",
+                    "test_usa@egarage.com",
+                    "test_usa_pago@egarage.com",
+                ]
+            )
+            | Q(email__iendswith="@egarage.test")
+            | Q(username__startswith="test_")
+            | Q(username__startswith="mauricio_")
+        )
+        .select_related("empresa")
+        .order_by("username")
+    )
 
     context = {"usuarios_prueba": usuarios_prueba, "timestamp": timezone.now()}
 

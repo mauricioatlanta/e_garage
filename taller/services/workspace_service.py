@@ -188,7 +188,13 @@ class WorkspaceService:
                 items.append(_make_item(nav_def, "secondary", brand_label))
 
         # Safety net: active modules not covered by any workspace nav definition.
-        for key in sorted(active - seen_module_keys, key=lambda k: NAV_ITEMS[k]["order"]):
+        fallback_modules = active - seen_module_keys
+        if ws.product_key == "RECYCLING":
+            from taller.constants.business_modules import MOD_DOCUMENTOS
+
+            fallback_modules = fallback_modules - {MOD_DOCUMENTOS}
+
+        for key in sorted(fallback_modules, key=lambda k: NAV_ITEMS[k]["order"]):
             defn = NAV_ITEMS[key]
             hint = PATH_HINTS.get(key, "")
             items.append({

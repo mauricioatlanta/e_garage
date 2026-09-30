@@ -28,6 +28,7 @@ from taller.constants.business_modules import (
 PRODUCT_TALLER         = "TALLER"
 PRODUCT_DESARMADURIA   = "DESARMADURIA"
 PRODUCT_CASA_REPUESTOS = "CASA_REPUESTOS"
+PRODUCT_TIRE           = "TIRE"
 PRODUCT_CARWASH        = "CARWASH"
 PRODUCT_RECYCLING      = "RECYCLING"
 
@@ -53,7 +54,7 @@ RUBRO_TO_PRODUCT = {
     "DESARMADURIA":        PRODUCT_DESARMADURIA,
     "MIXED":               PRODUCT_DESARMADURIA,
     "PARTS":               PRODUCT_CASA_REPUESTOS,
-    "TIRE":                PRODUCT_CASA_REPUESTOS,
+    "TIRE":                PRODUCT_TIRE,
     "DETAILING":           PRODUCT_CARWASH,
     "RECYCLING":           PRODUCT_RECYCLING,
 }
@@ -67,7 +68,7 @@ PRODUCT_PROFILES = {
         "default_rubro": "WORKSHOP",
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",          "icon": "fas fa-home"},
-            {"key": MOD_DOCUMENTOS,    "label": "Presupuestos/OT", "icon": "fas fa-file-invoice"},
+            {"key": MOD_DOCUMENTOS,    "label": "Trabajos",        "icon": "fas fa-file-invoice"},
             {"key": MOD_VEHICULOS,     "label": "Vehículos",       "icon": "fas fa-car"},
             {"key": MOD_CLIENTES,      "label": "Clientes",        "icon": "fas fa-users"},
             {"key": MOD_SERVICIOS,     "label": "Servicios",       "icon": "fas fa-tools"},
@@ -129,6 +130,30 @@ PRODUCT_PROFILES = {
         ],
     },
 
+    PRODUCT_TIRE: {
+        "name":          "eGarage Neumáticos & Vulcanización",
+        "tagline":       "Inventario, servicios y ventas rápidas para llanteras",
+        "icon":          "fas fa-circle-notch",
+        "color_class":   "amber",
+        "default_rubro": "TIRE",
+        "nav": [
+            {"key": MOD_INICIO,        "label": "Inicio",                    "icon": "fas fa-home"},
+            {"key": MOD_REPUESTOS,     "label": "Inventario de Neumáticos",  "icon": "fas fa-circle-notch"},
+            {"key": MOD_SERVICIOS,     "label": "Servicios Vulcanización",   "icon": "fas fa-tools"},
+            {"key": MOD_DOCUMENTOS,    "label": "Ventas de Mostrador",       "icon": "fas fa-cash-register"},
+            {"key": MOD_CLIENTES,      "label": "Clientes",                  "icon": "fas fa-users"},
+            {"key": MOD_VEHICULOS,     "label": "Vehículos",                 "icon": "fas fa-car"},
+            {"key": MOD_REPORTES,      "label": "Reportes",                  "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": "Configuración",             "icon": "fas fa-cog"},
+        ],
+        "kpi_labels": ["Ventas hoy", "Neumáticos críticos", "Servicios hoy", "Ticket promedio"],
+        "quick_access": [
+            {"label": "POS Mostrador",          "icon": "fas fa-cash-register", "path": "repuestos/pos/"},
+            {"label": "Agregar Neumático",      "icon": "fas fa-plus",          "path": "repuestos/crear/"},
+            {"label": "Servicios Vulcanización", "icon": "fas fa-tools",        "path": "servicios/"},
+        ],
+    },
+
     PRODUCT_RECYCLING: {
         "name":          "eGarage Reciclaje",
         "tagline":       "Compra y control de catalíticos, chatarra y metales",
@@ -158,7 +183,7 @@ PRODUCT_PROFILES = {
         "default_rubro": "DETAILING",
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",        "icon": "fas fa-home"},
-            {"key": MOD_DOCUMENTOS,    "label": "Caja",          "icon": "fas fa-cash-register"},
+            {"key": MOD_DOCUMENTOS,    "label": "Trabajos",       "icon": "fas fa-cash-register"},
             {"key": MOD_CLIENTES,      "label": "Clientes",      "icon": "fas fa-users"},
             {"key": MOD_SERVICIOS,     "label": "Servicios",     "icon": "fas fa-tint"},
             {"key": MOD_REPORTES,      "label": "Reportes",      "icon": "fas fa-chart-bar"},

@@ -247,9 +247,9 @@
           {{ form.ciudad }}
           <div class="cliente-form-field-actions">
             <button type="button" id="btn-agregar-ciudad" class="cliente-inline-btn">
-              + Agregar ciudad
+              {% if request.LANGUAGE_CODE == 'en' %}+ Add city{% else %}+ Agregar ciudad{% endif %}
             </button>
-            <span class="cliente-inline-help">Si no aparece en el listado, créala aquí.</span>
+            <span class="cliente-inline-help">{% if request.LANGUAGE_CODE == 'en' %}If it is not listed, add it here.{% else %}Si no aparece en el listado, créala aquí.{% endif %}</span>
           </div>
           {{ form.ciudad.errors }}
         </div>
@@ -259,9 +259,9 @@
           {{ form.estado_usa }}
           <div class="cliente-form-field-actions">
             <button type="button" id="btn-agregar-estado" class="cliente-inline-btn">
-              + Agregar {{ form.estado_usa.label|lower }}
+              {% if request.LANGUAGE_CODE == 'en' %}+ Add state{% else %}+ Agregar {{ form.estado_usa.label|lower }}{% endif %}
             </button>
-            <span class="cliente-inline-help">Si no aparece en el listado, créalo aquí.</span>
+            <span class="cliente-inline-help">{% if request.LANGUAGE_CODE == 'en' %}If it is not listed, add it here.{% else %}Si no aparece en el listado, créalo aquí.{% endif %}</span>
           </div>
           {{ form.estado_usa.errors }}
         </div>
@@ -271,9 +271,9 @@
           {{ form.ciudad_usa }}
           <div class="cliente-form-field-actions">
             <button type="button" id="btn-agregar-ciudad-usa" class="cliente-inline-btn" disabled>
-              + Agregar {{ form.ciudad_usa.label|lower }}
+              {% if request.LANGUAGE_CODE == 'en' %}+ Add city{% else %}+ Agregar {{ form.ciudad_usa.label|lower }}{% endif %}
             </button>
-            <span class="cliente-inline-help">Si no aparece en el listado, créala aquí.</span>
+            <span class="cliente-inline-help">{% if request.LANGUAGE_CODE == 'en' %}If it is not listed, add it here.{% else %}Si no aparece en el listado, créala aquí.{% endif %}</span>
           </div>
           {{ form.ciudad_usa.errors }}
         </div>
@@ -289,19 +289,19 @@
     <div class="cliente-form-actions">
       {% if cliente_cancel_url %}
         <a href="{{ cliente_cancel_url }}" class="eg-btn eg-btn-secondary">
-          Cancelar
+          {% if request.LANGUAGE_CODE == 'en' %}Cancel{% else %}Cancelar{% endif %}
         </a>
       {% else %}
         <a href="{% country_url 'clientes:lista_clientes' %}" class="eg-btn eg-btn-secondary">
-          Cancelar
+          {% if request.LANGUAGE_CODE == 'en' %}Cancel{% else %}Cancelar{% endif %}
         </a>
       {% endif %}
 
       <button type="submit" class="eg-btn">
         {% if form.instance.pk %}
-          Guardar cambios
+          {% if request.LANGUAGE_CODE == 'en' %}Save changes{% else %}Guardar cambios{% endif %}
         {% else %}
-          Guardar cliente
+          {% if request.LANGUAGE_CODE == 'en' %}Save client{% else %}Guardar cliente{% endif %}
         {% endif %}
       </button>
     </div>

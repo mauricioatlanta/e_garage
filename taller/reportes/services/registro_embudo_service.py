@@ -61,23 +61,18 @@ def registrar_email_confirmado(user):
         )
 
 
-def registrar_primer_login(user):
+def registrar_primer_login(user, request=None):
     """
-    Registra el primer login en el embudo.
+    Wrapper compatible hacia el servicio canónico del embudo.
 
     Args:
         user: Usuario que hizo login
     """
-    try:
-        embudo = RegistroEmbudoSuscriptor.objects.filter(user=user).first()
-        if embudo and not embudo.primer_login_at:
-            embudo.primer_login_at = timezone.now()
-            embudo.save(update_fields=["primer_login_at"])
-            log.info(f"[Embudo] Primer login registrado para {user.email}")
-        elif not embudo:
-            log.warning(f"[Embudo] No se encontró embudo para {user.email} al hacer login")
-    except Exception as e:
-        log.error(f"[Embudo] Error registrando primer login para {user.email}: {e}", exc_info=True)
+    from taller.services.registro_embudo_service import (
+        registrar_primer_login as registrar_primer_login_canonico,
+    )
+
+    return registrar_primer_login_canonico(user, request=request)
 
 
 def registrar_empresa_creada(user):

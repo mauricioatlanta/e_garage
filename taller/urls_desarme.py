@@ -34,6 +34,7 @@ try:
     from taller.desarme import views_venta
     from taller.desarme.views_inventario import (
         confirmar_venta_desde_inventario,
+        crear_venta_operaciones,
         crear_venta_desde_inventario,
         finalizar_venta_desde_inventario,
         inventario_inteligente,
@@ -59,6 +60,11 @@ try:
             "piezas/vender/",
             views.iniciar_venta_desde_lista,
             name="iniciar_venta_desde_lista",
+        ),
+        path(
+            "piezas/crear-venta/",
+            crear_venta_operaciones,
+            name="crear_venta_operaciones",
         ),
         path(
             "vehiculos/<int:pk>/vender/",

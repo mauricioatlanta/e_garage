@@ -18,7 +18,7 @@
 <div class="cliente-list-toolbar">
   <form method="get" class="cliente-list-search flex-1 relative" id="search-form">
     <input type="text" name="q" id="search-input"
-           value="{{ request.GET.q }}"
+           value="{{ search_query|default:request.GET.q }}"
            placeholder="Buscar por nombre, apellido, email o teléfono..."
            autocomplete="off"
            class="w-full rounded-xl px-5 py-3 text-white placeholder-gray-400 shadow-lg transition outline-none font-mono" />
@@ -170,8 +170,8 @@
     </div>
     <div class="flex items-center gap-2">
       {% if page_obj.has_previous %}
-      <a href="?q={{ request.GET.q }}&page=1" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">««</a>
-      <a href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">«</a>
+      <a href="?q={{ search_query|default:request.GET.q }}&page=1" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">««</a>
+      <a href="?q={{ search_query|default:request.GET.q }}&page={{ page_obj.previous_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">«</a>
       {% else %}
       <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">««</span>
       <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">«</span>
@@ -182,8 +182,8 @@
       </span>
 
       {% if page_obj.has_next %}
-      <a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»</a>
-      <a href="?q={{ request.GET.q }}&page={{ page_obj.paginator.num_pages }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»»</a>
+      <a href="?q={{ search_query|default:request.GET.q }}&page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»</a>
+      <a href="?q={{ search_query|default:request.GET.q }}&page={{ page_obj.paginator.num_pages }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»»</a>
       {% else %}
       <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">»</span>
       <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">»»</span>

@@ -308,9 +308,12 @@
             {% endif %}
 
             {# Campos de cuenta — excluir plan y rubros_seleccionados (se renderizan por separado) #}
+            {% if current_country %}
+                <input type="hidden" name="country" value="{{ current_country }}">
+            {% endif %}
             <section class="grid gap-4 md:grid-cols-2">
                 {% for field in form.visible_fields %}
-                    {% if field.name != "plan" and field.name != "rubros_seleccionados" and field.name != "rubros_adicionales" %}
+                    {% if field.name == "first_name" or field.name == "nombre_taller" or field.name == "telefono" or field.name == "email" or field.name == "password1" or field.name == "country" and not current_country %}
                     <div class="field">
                         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                         {{ field }}
@@ -323,6 +326,7 @@
                     </div>
                     {% endif %}
                 {% endfor %}
+                <input type="hidden" name="password2" id="id_password2_shadow">
             </section>
 
             {# --- Selector de rubro (dos pasos) --- #}
@@ -393,7 +397,7 @@
                 </div>
 
                 {# Paso 2: actividades adicionales (aparece tras elegir principal) #}
-                <div id="adicionales-section" style="display:none; margin-top:18px;">
+                <div id="adicionales-section" style="display:none; margin-top:18px;" aria-hidden="true">
                     <h3 class="text-base font-extrabold mb-1">¿También realizas otras actividades?</h3>
                     <p class="section-hint text-sm mb-2">Opcional — máximo 2. Tu actividad principal ya está incluida.</p>
                     {% if form.rubros_adicionales.errors %}
@@ -453,25 +457,7 @@
                 </div>
             </section>
 
-            <section>
-                <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                        <h2 class="text-xl font-extrabold">Selecciona tu plan</h2>
-                        <p class="section-hint text-sm">Cancela cuando quieras. Ahorra pagando anual.</p>
-                    </div>
-                    <div class="trial-chip rounded-full px-3 py-2 text-sm font-bold">
-                        30 días gratis
-                    </div>
-                </div>
-
-                <input type="hidden" name="plan" id="id_plan" value="trial">
-                <div class="pricing-grid">
-                    {% include "includes/pricing_plan_card.html" with plan="trial" pricing="$0" billing_cycle="monthly" country="" payment_methods="" highlight=False cta_url="" %}
-                    {% include "includes/pricing_plan_card.html" with plan="entry" pricing="$20.000 CLP mensual / $200.000 CLP anual" billing_cycle="monthly" country="CL" payment_methods="" highlight=False cta_url="" %}
-                    {% include "includes/pricing_plan_card.html" with plan="growth" pricing="$39.000 CLP mensual / $390.000 CLP anual" billing_cycle="monthly" country="CL" payment_methods="" highlight=True cta_url="" %}
-                    {% include "includes/pricing_plan_card.html" with plan="business" pricing="$69.000 CLP mensual / $690.000 CLP anual" billing_cycle="monthly" country="CL" payment_methods="" highlight=False cta_url="" %}
-                </div>
-            </section>
+            <input type="hidden" name="plan" id="id_plan" value="trial">
 
             <button type="submit" class="submit-button w-full rounded-xl px-5 py-4 text-base font-extrabold transition">
                 Crear cuenta
@@ -524,7 +510,7 @@
                 });
 
                 var sec = document.getElementById('adicionales-section');
-                if (sec) sec.style.display = '';
+                if (sec) sec.style.display = 'none';
 
                 syncAdicionalesGridDisabled(key);
 
@@ -594,6 +580,11 @@
                 var form = document.querySelector('form[method="post"]');
                 if (form) {
                     form.addEventListener('submit', function (e) {
+                        var password1 = document.querySelector('input[name="password1"]');
+                        var password2 = document.getElementById('id_password2_shadow');
+                        if (password1 && password2) {
+                            password2.value = password1.value;
+                        }
                         if (!principalInput || !principalInput.value) {
                             e.preventDefault();
                             var err = document.getElementById('rubro-principal-error');
@@ -608,11 +599,28 @@
                 restoreState();
 
                 // Prefill desde la landing: reutiliza el mismo flujo de selección manual.
-                var rubroFromUrl = new URLSearchParams(window.location.search).get('rubro') || '';
+                var rubroFromUrl = (new URLSearchParams(window.location.search).get('rubro') || '').trim();
+                var rubroAliases = {
+                    'taller': 'TALLER_MECANICO',
+                    'talleres': 'TALLER_MECANICO',
+                    'workshop': 'TALLER_MECANICO',
+                    'desarmaduria': 'DESARMADURIA',
+                    'desarmadurias': 'DESARMADURIA',
+                    'salvage': 'DESARMADURIA',
+                    'repuestos': 'CASA_REPUESTOS',
+                    'repuesto': 'CASA_REPUESTOS',
+                    'parts': 'CASA_REPUESTOS',
+                    'casa_repuestos': 'CASA_REPUESTOS',
+                    'reciclaje': 'RECICLAJE',
+                    'recycling': 'RECICLAJE'
+                };
+                var rubroKey = rubroAliases[rubroFromUrl.toLowerCase()] || rubroFromUrl.toUpperCase();
                 var allowedRubros = ['TALLER_MECANICO', 'DESARMADURIA', 'CASA_REPUESTOS', 'RECICLAJE'];
 
-                if (allowedRubros.indexOf(rubroFromUrl) !== -1) {
-                    selectPrincipalCard(rubroFromUrl);
+                if (allowedRubros.indexOf(rubroKey) !== -1) {
+                    selectPrincipalCard(rubroKey);
+                    var rubroSection = document.getElementById('rubro-section');
+                    if (rubroSection) rubroSection.style.display = 'none';
                 }
             });
         })();

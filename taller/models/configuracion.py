@@ -317,10 +317,11 @@ class ConfiguracionEmpresa(models.Model):
 
         # Ajustes según rubro
         if self.rubro_principal == "PARTS":
-            # Casa de repuestos: solo repuestos, sin servicios ni kilometraje
+            # Casa de repuestos: solo repuestos, sin servicios, kilometraje ni vehículo.
             secciones["servicios"] = False
             secciones["otros_servicios"] = False
             secciones["kilometraje"] = False
+            secciones["vehiculo"] = False
         elif self.rubro_principal == "RECYCLING":
             # Reciclaje (catalíticos, chatarra u otros materiales): la compra
             # nunca está asociada a un vehículo del cliente ni a servicios

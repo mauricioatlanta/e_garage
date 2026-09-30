@@ -24,6 +24,7 @@ from django import forms
 
 from taller.forms.custom_signup import (
     CustomSignupForm,
+    normalize_public_rubro,
     _GROUP_KEY_TO_RUBROS,
     SIGNUP_RUBRO_GROUPS,
 )
@@ -67,6 +68,24 @@ def test_grupo_desconocido_es_invalido():
     stub = _stub(principal="REPUESTOS_DESARMADURIA")  # viejo grupo fusionado
     with pytest.raises(forms.ValidationError):
         CustomSignupForm.clean_rubro_principal_signup(stub)
+
+
+@pytest.mark.parametrize(
+    ("public_value", "expected"),
+    [
+        ("taller", "TALLER_MECANICO"),
+        ("desarmaduria", "DESARMADURIA"),
+        ("repuestos", "CASA_REPUESTOS"),
+        ("TALLER_MECANICO", "TALLER_MECANICO"),
+    ],
+)
+def test_public_rubro_aliases_map_to_signup_groups(public_value, expected):
+    assert normalize_public_rubro(public_value) == expected
+
+
+def test_clean_principal_accepts_public_aliases():
+    stub = _stub(principal="repuestos")
+    assert CustomSignupForm.clean_rubro_principal_signup(stub) == "CASA_REPUESTOS"
 
 
 # ─── 2. Signup con un grupo → configuración correcta ─────────────────────────

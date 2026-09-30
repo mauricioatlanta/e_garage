@@ -19,6 +19,8 @@ from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto, ORIGEN_DESARME
 from taller.models.pieza_desarme import ESTADO_DISPONIBLE, ESTADO_RESERVADA, ESTADO_VENDIDA, PiezaDesarme
 from taller.models.vehiculo_desarme import VehiculoDesarme
+from taller.services.empresa_service import get_empresa_safe
+from taller.templatetags.country_url import reverse_country_url
 
 from .forms_venta_inventario import ConfirmarVentaDesdeInventarioForm
 from .views import _desarme_url, _empresa_or_redirect
@@ -39,6 +41,7 @@ def inventario_inteligente(request, pk):
         pk=pk,
         empresa=empresa,
     )
+    return redirect(f"{_desarme_url(request, 'piezas/')}?vehiculo={vehiculo.pk}&modo=venta")
 
     piezas_qs = (
         vehiculo.piezas_desarme.filter(activo=True)
@@ -197,7 +200,7 @@ def _get_venta_session_data(request, vehiculo):
         return None
 
     ids = [row["id"] for row in items if "id" in row]
-    empresa = getattr(request.user, "empresa", None) if getattr(request, "user", None) else None
+    empresa = get_empresa_safe(request) if getattr(request, "user", None) else None
     piezas_qs = PiezaDesarme.objects.filter(
         empresa=empresa,
         vehiculo_desarme=vehiculo,
@@ -379,6 +382,175 @@ def _redirect_to_documento_or_fallback(request, documento, vehiculo):
         except NoReverseMatch:
             continue
     return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/inventario-inteligente/"))
+
+
+def _redirect_to_documento_from_operations(request, documento):
+    try:
+        return redirect(reverse_country_url(request, "documentos:ver_documento", documento.pk))
+    except NoReverseMatch:
+        pass
+    candidates = [
+        ("documentos:imprimir_documento", [documento.pk]),
+        ("documentos:ver_documento", [documento.pk]),
+        ("documentos:ver_documento_cbv", [documento.pk]),
+        ("documentos:detalle_documento", [documento.pk]),
+        ("documentos:detalle", [documento.pk]),
+        ("taller:ver_documento", [documento.pk]),
+        ("taller:detalle_documento", [documento.pk]),
+    ]
+    for viewname, args in candidates:
+        try:
+            return redirect(reverse(viewname, args=args))
+        except NoReverseMatch:
+            continue
+    return redirect(_desarme_url(request, "piezas/"))
+
+
+@login_required
+@require_POST
+def crear_venta_operaciones(request):
+    """Crea un Documento PTS desde el centro global de venta de repuestos."""
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+
+    selected_data_raw = request.POST.get("selected_data", "[]")
+    try:
+        selected_data = json.loads(selected_data_raw)
+    except json.JSONDecodeError:
+        selected_data = []
+
+    seleccion = []
+    for row in selected_data:
+        try:
+            pieza_id = int(row.get("id"))
+        except (TypeError, ValueError):
+            continue
+        try:
+            cantidad = int(row.get("cantidad", 1))
+        except (TypeError, ValueError):
+            cantidad = 1
+        try:
+            precio_venta = Decimal(str(row.get("precio_venta", "0")))
+        except (InvalidOperation, TypeError, ValueError):
+            precio_venta = Decimal("0")
+        if cantidad > 0 and precio_venta >= 0:
+            seleccion.append(
+                {
+                    "id": pieza_id,
+                    "cantidad": cantidad,
+                    "precio_venta": precio_venta,
+                }
+            )
+
+    if not seleccion:
+        messages.warning(request, "Selecciona al menos un repuesto para vender.")
+        return redirect(_desarme_url(request, "piezas/"))
+
+    form = ConfirmarVentaDesdeInventarioForm(request.POST, empresa=empresa)
+    if not form.is_valid():
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(request, f"{field}: {error}" if field != "__all__" else error)
+        return redirect(_desarme_url(request, "piezas/"))
+
+    try:
+        if form.cleaned_data.get("usar_cliente_rapido", False):
+            cliente = _crear_o_reusar_cliente_rapido(empresa, form)
+        else:
+            cliente = form.cleaned_data["cliente"]
+    except Exception as exc:
+        messages.error(request, f"No se pudo crear el cliente rápido: {exc}")
+        return redirect(_desarme_url(request, "piezas/"))
+
+    tipo_doc = _get_tipo_documento_por_pais(empresa)
+    observaciones = (form.cleaned_data.get("observaciones") or "").strip()
+
+    class _StockInsuficiente(Exception):
+        pass
+
+    try:
+        with transaction.atomic():
+            ids = [row["id"] for row in seleccion]
+            piezas_locked = {
+                p.pk: p
+                for p in (
+                    PiezaDesarme.objects.select_for_update()
+                    .filter(pk__in=ids, empresa=empresa)
+                    .select_related("vehiculo_desarme")
+                )
+            }
+            valid_estados = {ESTADO_DISPONIBLE, ESTADO_RESERVADA}
+            for row in seleccion:
+                pieza = piezas_locked.get(row["id"])
+                if (
+                    pieza is None
+                    or pieza.estado_pieza not in valid_estados
+                    or not pieza.activo
+                    or (pieza.cantidad or 0) < row["cantidad"]
+                ):
+                    nombre = getattr(pieza, "nombre", "") or f"Pieza #{row['id']}"
+                    stock = pieza.cantidad if pieza else 0
+                    raise _StockInsuficiente(
+                        f"Stock insuficiente para '{nombre}'. Disponible: {stock}, solicitado: {row['cantidad']}."
+                    )
+
+            vehicle_ids = {
+                pieza.vehiculo_desarme_id for pieza in piezas_locked.values() if pieza.vehiculo_desarme_id
+            }
+            vehiculo_desarme = None
+            if len(vehicle_ids) == 1:
+                only_vehicle_id = next(iter(vehicle_ids))
+                vehiculo_desarme = piezas_locked[ids[0]].vehiculo_desarme
+                if vehiculo_desarme.pk != only_vehicle_id:
+                    vehiculo_desarme = VehiculoDesarme.objects.get(pk=only_vehicle_id, empresa=empresa)
+
+            documento = Documento.objects.create(
+                empresa=empresa,
+                cliente=cliente,
+                vehiculo=None,
+                vehiculo_desarme=vehiculo_desarme,
+                observaciones=observaciones or None,
+                estado="EMITIDO",
+                tipo="PTS",
+                numero=_generar_numero_documento(empresa, tipo_doc),
+                fecha_emision=timezone.now().date(),
+                country=getattr(empresa, "pais", "CL") or "CL",
+                moneda=getattr(empresa, "moneda", "CLP") or "CLP",
+            )
+
+            for row in seleccion:
+                pieza = piezas_locked[row["id"]]
+                LineaRepuesto.objects.create(
+                    documento=documento,
+                    repuesto=None,
+                    part=None,
+                    pieza_desarme=pieza,
+                    codigo=pieza.codigo or "",
+                    nombre=pieza.nombre or "",
+                    cantidad=row["cantidad"],
+                    precio_unitario=row["precio_venta"],
+                    descuento=Decimal("0"),
+                    origen_repuesto=ORIGEN_DESARME,
+                    vendedor=form.cleaned_data.get("vendedor"),
+                )
+                nueva_cantidad = max(0, (pieza.cantidad or 0) - row["cantidad"])
+                nuevo_estado = ESTADO_VENDIDA if nueva_cantidad == 0 else pieza.estado_pieza
+                PiezaDesarme.objects.filter(pk=pieza.pk).update(
+                    cantidad=nueva_cantidad,
+                    estado_pieza=nuevo_estado,
+                    activo=nueva_cantidad > 0,
+                )
+
+            documento.refresh_from_db()
+            documento.recompute_totals(persist=True)
+
+    except _StockInsuficiente as exc:
+        messages.error(request, str(exc))
+        return redirect(_desarme_url(request, "piezas/"))
+
+    messages.success(request, f"Venta creada correctamente para {cliente.nombre}. #{documento.pk}")
+    return _redirect_to_documento_from_operations(request, documento)
 
 
 @login_required

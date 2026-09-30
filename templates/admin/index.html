@@ -1,145 +1,76 @@
 {% extends "admin/index.html" %}
 {% load static %}
 
-{% block content %}
-
-<div style="
-    margin:20px 0 30px 0;
-    padding:24px;
-    border-radius:18px;
-    background:linear-gradient(135deg,#0f172a,#111827,#1e293b);
-    border:1px solid #334155;
-    box-shadow:0 10px 30px rgba(0,0,0,.35);
-">
-
-    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
-
-        <img
-            src="{% static 'img/logo_egarage.png' %}?v=2"
-            style="height:72px;width:auto;filter:drop-shadow(0 0 12px rgba(255,255,255,.15));"
-        >
-
-        <div>
-            <h1 style="
-                margin:0;
-                color:white;
-                font-size:30px;
-                font-weight:800;
-                letter-spacing:-0.5px;
-            ">
-                eGarage Operations Center
-            </h1>
-
-            <p style="
-                margin-top:6px;
-                color:#cbd5e1;
-                font-size:15px;
-            ">
-                Centro operacional SaaS • Monitoreo • Suscriptores • Analytics
-            </p>
-        </div>
-
-    </div>
-
-    <div style="
-        margin-top:28px;
-        display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-        gap:16px;
-    ">
-
-        <a href="/admin/suscriptores/" style="
-            text-decoration:none;
-            background:#111827;
-            border:1px solid #374151;
-            border-radius:16px;
-            padding:22px;
-            color:white;
-            transition:.2s;
-            display:block;
-        ">
-            <div style="font-size:15px;color:#93c5fd;font-weight:700;">
-                SUSCRIPTORES
-            </div>
-
-            <div style="margin-top:10px;font-size:24px;font-weight:800;">
-                Panel SaaS
-            </div>
-
-            <div style="margin-top:8px;color:#cbd5e1;font-size:14px;">
-                Empresas • Renovaciones • Trials • Pagos
-            </div>
-        </a>
-
-        <a href="/admin/" style="
-            text-decoration:none;
-            background:#111827;
-            border:1px solid #374151;
-            border-radius:16px;
-            padding:22px;
-            color:white;
-            display:block;
-        ">
-            <div style="font-size:15px;color:#86efac;font-weight:700;">
-                DJANGO ADMIN
-            </div>
-
-            <div style="margin-top:10px;font-size:24px;font-weight:800;">
-                Modelos
-            </div>
-
-            <div style="margin-top:8px;color:#cbd5e1;font-size:14px;">
-                Usuarios • Vehículos • Clientes • Documentos
-            </div>
-        </a>
-
-        <a href="/analytics/public/" style="
-            text-decoration:none;
-            background:#111827;
-            border:1px solid #374151;
-            border-radius:16px;
-            padding:22px;
-            color:white;
-            display:block;
-        ">
-            <div style="font-size:15px;color:#c4b5fd;font-weight:700;">
-                ANALYTICS
-            </div>
-
-            <div style="margin-top:10px;font-size:24px;font-weight:800;">
-                Visitas Públicas
-            </div>
-
-            <div style="margin-top:8px;color:#cbd5e1;font-size:14px;">
-                Países • Landings • Humanos • Bots
-            </div>
-        </a>
-
-        <a href="/healthz/" style="
-            text-decoration:none;
-            background:#111827;
-            border:1px solid #374151;
-            border-radius:16px;
-            padding:22px;
-            color:white;
-            display:block;
-        ">
-            <div style="font-size:15px;color:#fca5a5;font-weight:700;">
-                HEALTH
-            </div>
-
-            <div style="margin-top:10px;font-size:24px;font-weight:800;">
-                Infraestructura
-            </div>
-
-            <div style="margin-top:8px;color:#cbd5e1;font-size:14px;">
-                Gunicorn • Nginx • Healthchecks
-            </div>
-        </a>
-
-    </div>
-</div>
-
+{% block extrastyle %}
 {{ block.super }}
+<style>
+    .eg-admin-hub { --ink:#07111f; --panel:#0d1b2a; --panel-soft:#12263a; --line:rgba(148,163,184,.2); --cyan:#55e6f5; --lime:#b7f36b; --amber:#ffc857; --pink:#ff7aa8; color:#e7f4fb; margin:0 0 32px; font-family:"Segoe UI",system-ui,sans-serif; }
+    .eg-admin-hero { position:relative; min-height:360px; overflow:hidden; padding:30px; border:1px solid var(--line); border-radius:14px; background:linear-gradient(rgba(85,230,245,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(85,230,245,.055) 1px,transparent 1px),linear-gradient(135deg,#07111f 0%,#0d1b2a 52%,#16233b 100%); background-size:36px 36px,36px 36px,auto; box-shadow:0 20px 60px rgba(2,8,23,.34); }
+    .eg-admin-hero::after { position:absolute; inset:0; pointer-events:none; content:""; background:linear-gradient(110deg,transparent 0 48%,rgba(85,230,245,.12) 49%,transparent 50% 100%); opacity:.6; }
+    .eg-admin-hero-copy { position:relative; z-index:2; max-width:430px; }
+    .eg-admin-kicker { margin:0 0 10px; color:var(--cyan); font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+    .eg-admin-title { margin:0; color:#fff; font-size:clamp(28px,4vw,48px); line-height:1.02; letter-spacing:0; }
+    .eg-admin-summary { margin:16px 0 0; color:#b7c8d7; font-size:15px; line-height:1.6; }
+    .eg-admin-map { position:absolute; top:24px; right:24px; bottom:24px; width:min(53%,610px); min-width:420px; }
+    .eg-admin-map-line { position:absolute; height:1px; transform-origin:left center; background:linear-gradient(90deg,rgba(85,230,245,.7),rgba(85,230,245,0)); }
+    .eg-admin-map-line.one { top:49%; left:26%; width:42%; transform:rotate(-27deg); }
+    .eg-admin-map-line.two { top:49%; left:26%; width:45%; transform:rotate(25deg); }
+    .eg-admin-map-line.three { top:49%; left:26%; width:43%; transform:rotate(0deg); }
+    .eg-admin-map-line.four { top:49%; left:26%; width:30%; transform:rotate(58deg); }
+    .eg-admin-map-core,.eg-admin-map-node { position:absolute; display:flex; align-items:center; justify-content:center; border:1px solid currentColor; border-radius:50%; text-align:center; }
+    .eg-admin-map-core { top:35%; left:15%; width:130px; height:130px; color:var(--cyan); background:rgba(7,17,31,.88); box-shadow:0 0 0 12px rgba(85,230,245,.04),0 0 42px rgba(85,230,245,.28); font-size:14px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+    .eg-admin-map-node { width:86px; height:86px; padding:12px; color:#fff; background:rgba(13,27,42,.94); font-size:11px; font-weight:700; line-height:1.2; }
+    .eg-admin-map-node.analytics { top:4%; right:6%; color:var(--lime); }
+    .eg-admin-map-node.public { top:39%; right:0; color:var(--cyan); }
+    .eg-admin-map-node.saas { bottom:4%; right:14%; color:var(--amber); }
+    .eg-admin-map-node.qa { bottom:3%; left:2%; color:var(--pink); }
+    .eg-admin-section { margin-top:20px; }
+    .eg-admin-section-title { margin:0 0 10px; color:#9fb3c8; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+    .eg-admin-links { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .eg-admin-link { display:block; min-height:118px; padding:17px; border:1px solid var(--line); border-radius:10px; color:#e7f4fb; background:var(--panel); text-decoration:none; transition:border-color .18s ease,background .18s ease,transform .18s ease; }
+    .eg-admin-link:hover,.eg-admin-link:focus-visible { border-color:var(--cyan); background:var(--panel-soft); color:#fff; outline:none; transform:translateY(-2px); }
+    .eg-admin-link-label { display:block; margin-bottom:9px; color:var(--cyan); font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    .eg-admin-link-title { display:block; color:#fff; font-size:16px; font-weight:750; }
+    .eg-admin-link-path { display:block; margin-top:9px; overflow-wrap:anywhere; color:#93a9bd; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:11px; }
+    @media (max-width:1100px) { .eg-admin-links { grid-template-columns:repeat(2,minmax(0,1fr)); } .eg-admin-map { width:48%; min-width:360px; } }
+    @media (max-width:760px) { .eg-admin-hero { min-height:600px; padding:22px; } .eg-admin-map { top:250px; right:10px; bottom:10px; width:calc(100% - 20px); min-width:0; } .eg-admin-links { grid-template-columns:1fr; } }
+</style>
+{% endblock %}
 
+{% block content %}
+<div class="eg-admin-hub">
+    <section class="eg-admin-hero" aria-labelledby="eg-admin-title">
+        <div class="eg-admin-hero-copy">
+            <p class="eg-admin-kicker">eGarage / operations grid</p>
+            <h1 id="eg-admin-title" class="eg-admin-title">Centro de control</h1>
+            <p class="eg-admin-summary">Un mapa operativo para moverte entre administración, suscriptores, analytics públicos y control QA desde un solo lugar.</p>
+        </div>
+        <div class="eg-admin-map" aria-hidden="true">
+            <span class="eg-admin-map-line one"></span><span class="eg-admin-map-line two"></span><span class="eg-admin-map-line three"></span><span class="eg-admin-map-line four"></span>
+            <span class="eg-admin-map-core">ADMIN<br>CORE</span>
+            <span class="eg-admin-map-node analytics">Analytics<br>AI</span><span class="eg-admin-map-node public">Analytics<br>público</span><span class="eg-admin-map-node saas">SaaS<br>suscriptores</span><span class="eg-admin-map-node qa">QA<br>Control</span>
+        </div>
+    </section>
+
+    <section class="eg-admin-section" aria-labelledby="eg-admin-dashboards">
+        <h2 id="eg-admin-dashboards" class="eg-admin-section-title">Paneles operativos</h2>
+        <div class="eg-admin-links">
+            <a class="eg-admin-link" href="/analytics/public/"><span class="eg-admin-link-label">Public analytics</span><span class="eg-admin-link-title">Adquisición pública</span><span class="eg-admin-link-path">/analytics/public/</span></a>
+            <a class="eg-admin-link" href="/analytics/dashboard/"><span class="eg-admin-link-label">Analytics AI</span><span class="eg-admin-link-title">Dashboard principal</span><span class="eg-admin-link-path">/analytics/dashboard/</span></a>
+            <a class="eg-admin-link" href="/admin/suscriptores/"><span class="eg-admin-link-label">SaaS operations</span><span class="eg-admin-link-title">Suscriptores</span><span class="eg-admin-link-path">/admin/suscriptores/</span></a>
+            <a class="eg-admin-link" href="/admin/control/"><span class="eg-admin-link-label">Control room</span><span class="eg-admin-link-title">Administración</span><span class="eg-admin-link-path">/admin/control/</span></a>
+        </div>
+    </section>
+
+    <section class="eg-admin-section" aria-labelledby="eg-admin-tools">
+        <h2 id="eg-admin-tools" class="eg-admin-section-title">Herramientas y diagnóstico</h2>
+        <div class="eg-admin-links">
+            <a class="eg-admin-link" href="/admin/"><span class="eg-admin-link-label">Django core</span><span class="eg-admin-link-title">Modelos y registros</span><span class="eg-admin-link-path">/admin/</span></a>
+            <a class="eg-admin-link" href="/qa/control/"><span class="eg-admin-link-label">Quality control</span><span class="eg-admin-link-title">QA Control Tower</span><span class="eg-admin-link-path">/qa/control/</span></a>
+            <a class="eg-admin-link" href="/admin/test/info/"><span class="eg-admin-link-label">Diagnostics</span><span class="eg-admin-link-title">Información de prueba</span><span class="eg-admin-link-path">/admin/test/info/</span></a>
+            <a class="eg-admin-link" href="/healthz/"><span class="eg-admin-link-label">System health</span><span class="eg-admin-link-title">Estado del sistema</span><span class="eg-admin-link-path">/healthz/</span></a>
+        </div>
+    </section>
+</div>
+{{ block.super }}
 {% endblock %}

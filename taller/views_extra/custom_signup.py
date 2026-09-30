@@ -8,6 +8,10 @@ from django.utils.translation import activate
 
 from taller.config.country_settings import CountrySettings
 from taller.forms.custom_signup import CustomSignupForm
+from taller.services.public_event_tracking import (
+    record_signup_completed_from_request,
+    record_signup_started_from_request,
+)
 from taller.utils.country_config import get_country_config
 
 
@@ -47,6 +51,12 @@ class CustomSignupView(SignupView):
 
     form_class = CustomSignupForm
     template_name = "account/signup.html"
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        if getattr(response, "status_code", None) == 200:
+            record_signup_started_from_request(request)
+        return response
 
     def get_form_kwargs(self):
         """Pasa request, country_code y default_phone_prefix al formulario"""
@@ -125,6 +135,7 @@ class CustomSignupView(SignupView):
         if resp:
             # Email ya existía: allauth envió aviso al dueño. Mostrar respuesta de allauth.
             return resp
+        record_signup_completed_from_request(self.request, user, country_code)
         _send_confirmation_compat(self.request, user, signup=True)
 
         # Guardar contexto del signup para pantalla intermedia y reenvío de confirmación.

@@ -143,6 +143,7 @@ class ClienteForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.empresa = kwargs.pop("empresa", None)  # Almacenar empresa
         pais_override = kwargs.pop("pais", None)
+        self.language = str(kwargs.pop("language", "") or "").lower()
         super().__init__(*args, **kwargs)
 
         # Solo nombre, apellido y teléfono son obligatorios (el modelo permite blank en apellido/teléfono).
@@ -160,6 +161,26 @@ class ClienteForm(forms.ModelForm):
         else:
             self.pais = "CL"  # Default a Chile
         self.pais = str(self.pais or "CL").upper()
+
+        if self.pais == "US" and self.language == "en":
+            english_labels = {
+                "nombre": "First name",
+                "apellido": "Last name",
+                "telefono": "Phone",
+                "email": "Email",
+                "direccion": "Address",
+                "estado_usa": "State",
+                "ciudad_usa": "City",
+                "zipcode": "ZIP Code",
+            }
+            for field_name, label in english_labels.items():
+                self.fields[field_name].label = label
+            self.fields["nombre"].widget.attrs["placeholder"] = "First name"
+            self.fields["apellido"].widget.attrs["placeholder"] = "Last name"
+            self.fields["telefono"].widget.attrs["placeholder"] = "+1 555 123 4567"
+            self.fields["email"].widget.attrs["placeholder"] = "name@example.com"
+            self.fields["direccion"].widget.attrs["placeholder"] = "Address"
+            self.fields["zipcode"].widget.attrs["placeholder"] = "ZIP code"
 
         if self.pais == "CL" and (
             not TallerRegion.objects.exists() or not TallerCiudad.objects.exists()
@@ -203,6 +224,9 @@ class ClienteForm(forms.ModelForm):
             self.fields["estado_usa"].queryset = EstadoUSA.objects.filter(pais=self.pais).order_by(
                 "nombre"
             )
+            if self.pais == "US" and self.language == "en":
+                self.fields["estado_usa"].empty_label = "Select state"
+                self.fields["ciudad_usa"].empty_label = "Select city"
 
         # Cargar ciudades si hay estado seleccionado
         if "estado_usa" in self.data and self.data.get("estado_usa") not in [None, ""]:
@@ -269,6 +293,14 @@ class ClienteForm(forms.ModelForm):
 
             self.fields["zipcode"].label = etiqueta_codigo
             self.fields["zipcode"].widget.attrs["placeholder"] = etiqueta_codigo
+
+            if self.pais == "US" and self.language == "en":
+                self.fields["estado_usa"].label = "State"
+                self.fields["estado_usa"].empty_label = "Select state"
+                self.fields["ciudad_usa"].label = "City"
+                self.fields["ciudad_usa"].empty_label = "Select city"
+                self.fields["zipcode"].label = "ZIP Code"
+                self.fields["zipcode"].widget.attrs["placeholder"] = "ZIP code"
         else:
             # Chile usa modelo legacy Region/Ciudad
             print("[DEBUG] [ClienteForm] Configurando campos para Chile (Region/Ciudad)")

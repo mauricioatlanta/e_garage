@@ -1,5 +1,5 @@
 {% extends "layouts/base_egarage_panel.html" %}
-{% load country_url %}
+{% load country_url money %}
 
 {% block page_title %}Reciclaje — Panel{% endblock %}
 {% block page_subtitle %}Catalíticos y chatarra electrónica · compras, ventas y stock{% endblock %}
@@ -17,13 +17,24 @@
   .rec-table th, .rec-table td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
   .rec-alert { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; }
   .rec-charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+  .rec-chart-box { height: 220px; min-height: 0; position: relative; }
+  .rec-chart-box canvas { display: block; max-height: 220px; }
   .rec-chart-caption { color: #9ca3af; font-size: 0.85rem; text-align: center; margin-top: 0.5rem; }
+  @media (max-width: 680px) {
+    .rec-charts-grid { grid-template-columns: 1fr; }
+    .rec-chart-box { height: 180px; }
+    .rec-chart-box canvas { max-height: 180px; }
+  }
 </style>
 {% endblock %}
 
 {% block panel_content %}
 {% if messages %}
-  {% for message in messages %}<div class="rec-alert">{{ message }}</div>{% endfor %}
+  {% for message in messages %}
+    {% if "Configuración guardada correctamente." not in message %}
+      <div class="rec-alert">{{ message }}</div>
+    {% endif %}
+  {% endfor %}
 {% endif %}
 
 <div class="rec-nav">
@@ -41,7 +52,7 @@
     <div class="rec-label">Catalíticos disponibles</div>
   </div>
   <div class="rec-card">
-    <div class="rec-kpi">${{ valor_stock_catalitico|floatformat:0 }}</div>
+    <div class="rec-kpi">{{ valor_stock_catalitico|money_clp }}</div>
     <div class="rec-label">Valor en stock (precio de venta)</div>
   </div>
   <div class="rec-card">
@@ -53,19 +64,19 @@
 <div class="rec-card" style="margin-bottom:1.5rem;">
   <h3>📈 Gráficas</h3>
   <div class="rec-charts-grid">
-    <div>
+    <div class="rec-chart-box">
       <canvas id="chart-compras-7d" height="220"></canvas>
       <p class="rec-chart-caption">Compras últimos 7 días</p>
     </div>
-    <div>
+    <div class="rec-chart-box">
       <canvas id="chart-compras-mensuales" height="220"></canvas>
       <p class="rec-chart-caption">Compras por mes (últimos 6 meses)</p>
     </div>
-    <div>
+    <div class="rec-chart-box">
       <canvas id="chart-rangos-precio" height="220"></canvas>
       <p class="rec-chart-caption">Distribución del catálogo por precio de venta (CLP)</p>
     </div>
-    <div>
+    <div class="rec-chart-box">
       <canvas id="chart-top-cataliticos" height="220"></canvas>
       <p class="rec-chart-caption">Top catalíticos más comprados</p>
     </div>
@@ -75,13 +86,13 @@
 <div class="rec-grid">
   {% if catalitico_mas_caro %}
   <div class="rec-card">
-    <div class="rec-kpi">${{ catalitico_mas_caro.precio_venta|floatformat:0 }}</div>
+    <div class="rec-kpi">{{ catalitico_mas_caro.precio_venta|money_clp }}</div>
     <div class="rec-label">Catalítico más caro ({{ catalitico_mas_caro.codigo }})</div>
   </div>
   {% endif %}
   {% if catalitico_mas_barato %}
   <div class="rec-card">
-    <div class="rec-kpi">${{ catalitico_mas_barato.precio_venta|floatformat:0 }}</div>
+    <div class="rec-kpi">{{ catalitico_mas_barato.precio_venta|money_clp }}</div>
     <div class="rec-label">Catalítico más barato ({{ catalitico_mas_barato.codigo }})</div>
   </div>
   {% endif %}
@@ -96,7 +107,7 @@
       <tr>
         <td>{{ item.cliente|default:"Mostrador" }}</td>
         <td>{{ item.compras }}</td>
-        <td>${{ item.total|floatformat:0 }}</td>
+        <td>{{ item.total|money_clp }}</td>
       </tr>
       {% empty %}
       <tr><td colspan="3">Sin compras registradas.</td></tr>

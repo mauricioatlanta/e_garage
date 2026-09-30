@@ -890,7 +890,7 @@
 {% block main_actions %}
 <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
   {% if request.user|is_admin_or_owner %}
-  <a href="{% country_url 'documentos:crear_documento' %}" class="crear-documento-btn">
+  <a href="{% if request.empresa.config.rubro_principal == 'DESARMADURIA' %}{% country_url 'desarme:lista_piezas' %}{% else %}{% country_url 'documentos:crear_documento' %}{% endif %}" class="crear-documento-btn">
     <i class="fas fa-plus-circle"></i>
     <span>{{ ui_labels.new_document }}</span>
   </a>
@@ -901,7 +901,7 @@
 {% block page_stats %}
 <div class="kpis-grid">
   <div class="kpi-card">
-    <div class="kpi-label">📄 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Total Documents{% else %}Total Documentos{% endif %}</div>
+    <div class="kpi-label">📄 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Total {{ ui_labels.documents_menu }}{% else %}Total {{ ui_labels.documents_menu }}{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.total|default:"0" }}</div>
     <div class="kpi-subvalue">{% if estadisticas.total_monto %}{{ estadisticas.total_monto|money_by_country:country }}{% endif %}</div>
   </div>
@@ -951,7 +951,7 @@
       <input type="text" name="vehiculo" value="{{ filtros_activos.vehiculo|default:'' }}" class="filtro-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}License plate or model...{% else %}Patente o modelo...{% endif %}">
     </div>
     <div class="filtro-group">
-      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Document Type{% else %}Tipo de Documento{% endif %}</label>
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}{{ ui_labels.documents_menu }} Type{% else %}Tipo de {{ ui_labels.workflow_singular }}{% endif %}</label>
       <select name="tipo" class="filtro-input">
         <option value="">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}All types{% else %}Todos los tipos{% endif %}</option>
         <option value="FAC" {% if filtros_activos.tipo == 'FAC' %}selected{% endif %}>{{ ui_labels.document_type_invoice }}</option>
@@ -969,8 +969,8 @@
       </select>
     </div>
     <div class="filtro-group">
-      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Document Number{% else %}Número de Documento{% endif %}</label>
-      <input type="text" name="numero" value="{{ filtros_activos.numero|default:'' }}" class="filtro-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Document number...{% else %}Número...{% endif %}">
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}{{ ui_labels.workflow_singular }} Number{% else %}Número de {{ ui_labels.workflow_singular }}{% endif %}</label>
+      <input type="text" name="numero" value="{{ filtros_activos.numero|default:'' }}" class="filtro-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}{{ ui_labels.workflow_singular }} number...{% else %}Número...{% endif %}">
     </div>
     <div class="filtro-group">
       <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Date From{% else %}Fecha Desde{% endif %}</label>
@@ -1046,17 +1046,19 @@
                 {% if grupo.grouper == 'FAC' %}🧾
                 {% elif grupo.grouper == 'OT' %}🔧
                 {% elif grupo.grouper == 'PRES' %}📋
+                {% elif grupo.grouper == 'PTS' %}🛒
                 {% else %}📄{% endif %}
               </span>
               <span>
                 {% if grupo.grouper == 'FAC' %}{{ ui_labels.document_type_invoice }}
                 {% elif grupo.grouper == 'OT' %}{{ ui_labels.document_type_work_order }}
                 {% elif grupo.grouper == 'PRES' %}{{ ui_labels.document_type_estimate }}
+                {% elif grupo.grouper == 'PTS' %}{{ ui_labels.workflow_singular }}
                 {% else %}{{ grupo.grouper }}{% endif %}
               </span>
             </div>
             <div class="tipo-seccion-count">
-              <strong>{{ grupo.list|length }}</strong> documento{{ grupo.list|length|pluralize }}
+              <strong>{{ grupo.list|length }}</strong> {{ ui_labels.workflow_singular|lower }}{{ grupo.list|length|pluralize }}
             </div>
           </div>
           
@@ -1070,12 +1072,14 @@
                       {% if documento.tipo == 'FAC' %}🧾
                       {% elif documento.tipo == 'OT' %}🔧
                       {% elif documento.tipo == 'PRES' %}📋
+                      {% elif documento.tipo == 'PTS' %}🛒
                       {% else %}📄{% endif %}
                     </span>
                     <span>
                       {% if documento.tipo == 'FAC' %}{{ ui_labels.document_type_invoice }}
                       {% elif documento.tipo == 'OT' %}{{ ui_labels.document_type_work_order }}
                       {% elif documento.tipo == 'PRES' %}{{ ui_labels.document_type_estimate }}
+                      {% elif documento.tipo == 'PTS' %}{{ ui_labels.workflow_singular }}
                       {% else %}{{ documento.tipo }}{% endif %}
                     </span>
                   </div>
@@ -1262,6 +1266,7 @@
               {% if documento.tipo == 'FAC' %}🧾 {{ ui_labels.document_type_invoice }}
               {% elif documento.tipo == 'OT' %}🔧 {{ ui_labels.document_type_work_order }}
               {% elif documento.tipo == 'PRES' %}📋 {{ ui_labels.document_type_estimate }}
+              {% elif documento.tipo == 'PTS' %}🛒 {{ ui_labels.workflow_singular }}
               {% else %}{{ documento.tipo }}{% endif %}
             </td>
             <td><strong>#{{ documento.numero|default:documento.id }}</strong></td>
@@ -1306,15 +1311,15 @@
     <div class="empty-state">
       <div class="empty-icon">📄</div>
       <h3 class="empty-title">
-        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}No documents{% else %}No hay documentos{% endif %}
+        {% if LANGUAGE_CODE == 'en' %}No {{ ui_labels.documents_menu|lower }}{% else %}No hay {{ ui_labels.documents_menu|lower }}{% endif %}
       </h3>
       <p class="empty-description">
-        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}No documents have been created in the system yet. Create your first document to start managing the workshop.{% else %}Aún no se han creado documentos en el sistema. Crea tu primer documento para comenzar a gestionar el taller.{% endif %}
+        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}No {{ ui_labels.documents_menu|lower }} records have been created yet. Create your first {{ ui_labels.workflow_singular|lower }} to start managing your business.{% elif ui_labels.workflow_singular == 'Venta' %}Aún no se han creado {{ ui_labels.documents_menu|lower }}. Crea tu primera {{ ui_labels.workflow_singular|lower }} para comenzar a gestionar tu negocio.{% else %}Aún no se han creado {{ ui_labels.documents_menu|lower }}. Crea tu primer {{ ui_labels.workflow_singular|lower }} para comenzar a gestionar tu negocio.{% endif %}
       </p>
       {% if request.user|is_admin_or_owner %}
-      <a href="{% country_url 'documentos:crear_documento' %}" class="crear-documento-btn">
+      <a href="{% if request.empresa.config.rubro_principal == 'DESARMADURIA' %}{% country_url 'desarme:lista_piezas' %}{% else %}{% country_url 'documentos:crear_documento' %}{% endif %}" class="crear-documento-btn">
         <i class="fas fa-plus-circle"></i>
-        <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Create First Document{% else %}Crear Primer Documento{% endif %}</span>
+        <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Create First {{ ui_labels.workflow_singular }}{% elif ui_labels.workflow_singular == 'Venta' %}Crear Primera {{ ui_labels.workflow_singular }}{% else %}Crear Primer {{ ui_labels.workflow_singular }}{% endif %}</span>
       </a>
       {% endif %}
     </div>

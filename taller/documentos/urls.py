@@ -12,6 +12,7 @@ from .views_migrated import DocumentoCreateView, DocumentoDeleteView, DocumentoD
 from .views_migrated import DocumentoDetailView as MigratedDetailView
 from .views_migrated import DocumentoListView
 from .views_migrated import DocumentoUpdateView as MigratedUpdateView
+from .views_migrated import actualizar_estado_operativo_ot
 from .api_repuestos import buscar_repuestos_api  # ✅ API de autocomplete para Alpine.js
 from . import views_seguimiento  # ✅ Vistas de seguimiento y memoria
 from . import views_inspeccion  # ✅ Inspección de ingreso de vehículos
@@ -49,6 +50,11 @@ urlpatterns = [
     # Alias adicional para editar (compatibilidad con URL esperada)
     path("editar/<int:pk>/", MigratedUpdateView.as_view(), name="documento_editar_alias"),
     # Detalle y eliminación con template resolution
+    path(
+        "ver/<int:pk>/estado-operativo/",
+        actualizar_estado_operativo_ot,
+        name="actualizar_estado_operativo_ot",
+    ),
     path("ver/<int:pk>/", MigratedDetailView.as_view(), name="ver_documento"),
     path("eliminar/<int:pk>/", DocumentoDeleteView.as_view(), name="eliminar_documento"),
     # Compatibilidad con rutas antiguas - CON PRESERVACIÓN DE PAÍS

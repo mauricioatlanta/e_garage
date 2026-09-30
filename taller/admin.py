@@ -472,6 +472,7 @@ class ProductoChatarraAdmin(admin.ModelAdmin):
         "categoria",
         "unidad_medida",
         "cantidad_stock",
+        "precio_compra",
         "precio_venta",
         "activo",
         "empresa",

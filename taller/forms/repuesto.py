@@ -89,13 +89,39 @@ PART_NUMBER_EXIST_ERROR = {
 }
 
 
+def _format_clp(value):
+    try:
+        amount = Decimal(str(value or 0))
+    except (InvalidOperation, TypeError, ValueError):
+        amount = Decimal("0")
+    formatted = f"{amount:,.0f}".replace(",", ".")
+    return f"${formatted}"
+
+
+def _normalize_money_input(value):
+    value_str = str(value or "").strip()
+    value_str = value_str.replace("$", "").replace("CLP", "").replace(" ", "")
+    if "," in value_str and "." in value_str:
+        value_str = value_str.replace(".", "").replace(",", ".")
+    elif "," in value_str:
+        value_str = value_str.replace(",", ".")
+    elif value_str.count(".") > 1:
+        value_str = value_str.replace(".", "")
+    elif "." in value_str:
+        parts = value_str.split(".")
+        if len(parts[-1]) == 3 and all(part.isdigit() for part in parts):
+            value_str = "".join(parts)
+    return value_str
+
+
 class RepuestoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         # Extraer usuario para obtener configuración de país
         self.user = kwargs.pop("user", None)
+        self.empresa = kwargs.pop("empresa", None)
         super().__init__(*args, **kwargs)
 
-        empresa = getattr(self.user, "empresa", None) if self.user else None
+        empresa = self.empresa or (getattr(self.user, "empresa", None) if self.user else None)
         country = (getattr(empresa, "pais", "CL") or "CL").strip().upper() if empresa else "CL"
         lang, category_names = CATEGORY_MAP.get(country, ("es", SPANISH_CATEGORIES))
         self.language = lang
@@ -104,14 +130,26 @@ class RepuestoForm(forms.ModelForm):
         self._ensure_default_categories(empresa, category_names)
         self._configure_categoria_field(empresa, lang)
 
-        # Configurar placeholders simples
-        self.fields["precio_compra"].widget.attrs.update({"placeholder": "0.00"})
-        self.fields["precio_venta"].widget.attrs.update({"placeholder": "0.00"})
+        if country == "CL":
+            self.fields["precio_compra"].widget.attrs.update(
+                {"placeholder": "$0", "inputmode": "numeric"}
+            )
+            self.fields["precio_venta"].widget.attrs.update(
+                {"placeholder": "$0", "inputmode": "numeric"}
+            )
+            if not self.is_bound and getattr(self.instance, "pk", None):
+                self.initial["precio_compra"] = _format_clp(self.instance.precio_compra)
+                self.initial["precio_venta"] = _format_clp(self.instance.precio_venta)
+        else:
+            self.fields["precio_compra"].widget.attrs.update({"placeholder": "0.00"})
+            self.fields["precio_venta"].widget.attrs.update({"placeholder": "0.00"})
 
     class Meta:
         model = Repuesto
         fields = [
             "part_number",
+            "codigo_oem",
+            "codigos_equivalentes",
             "nombre",
             "categoria",
             "precio_compra",
@@ -119,6 +157,16 @@ class RepuestoForm(forms.ModelForm):
             "cantidad_stock",
             "stock_minimo",
             "proveedor",
+            "ubicacion",
+            "ancho",
+            "perfil",
+            "aro",
+            "indice_carga",
+            "codigo_velocidad",
+            "condicion",
+            "profundidad_mm",
+            "marca_neumatico",
+            "modelo_neumatico",
         ]
         widgets = {
             "part_number": forms.TextInput(
@@ -163,6 +211,31 @@ class RepuestoForm(forms.ModelForm):
                     "class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"
                 }
             ),
+            "codigo_oem": forms.TextInput(
+                attrs={
+                    "class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"
+                }
+            ),
+            "codigos_equivalentes": forms.Textarea(
+                attrs={
+                    "class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2",
+                    "rows": 2,
+                }
+            ),
+            "ubicacion": forms.TextInput(
+                attrs={
+                    "class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"
+                }
+            ),
+            "ancho": forms.NumberInput(attrs={"class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"}),
+            "perfil": forms.NumberInput(attrs={"class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"}),
+            "aro": forms.NumberInput(attrs={"class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"}),
+            "indice_carga": forms.TextInput(attrs={"class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"}),
+            "codigo_velocidad": forms.TextInput(attrs={"class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"}),
+            "condicion": forms.Select(attrs={"class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"}),
+            "profundidad_mm": forms.NumberInput(attrs={"class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2", "step": "0.1"}),
+            "marca_neumatico": forms.TextInput(attrs={"class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"}),
+            "modelo_neumatico": forms.TextInput(attrs={"class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"}),
         }
 
     def _configure_labels(self, lang: str) -> None:
@@ -266,7 +339,7 @@ class RepuestoForm(forms.ModelForm):
             else:
                 valor_str = str(valor)
 
-            decimal_valor = Decimal(valor_str)
+            decimal_valor = Decimal(_normalize_money_input(valor_str))
 
             if decimal_valor.as_tuple().exponent < -2:
                 raise forms.ValidationError(DECIMAL_ERROR.get(self.language, DECIMAL_ERROR["es"]))
@@ -288,7 +361,7 @@ class RepuestoForm(forms.ModelForm):
             else:
                 valor_str = str(valor)
 
-            decimal_valor = Decimal(valor_str)
+            decimal_valor = Decimal(_normalize_money_input(valor_str))
 
             if decimal_valor.as_tuple().exponent < -2:
                 raise forms.ValidationError(DECIMAL_ERROR.get(self.language, DECIMAL_ERROR["es"]))

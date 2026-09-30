@@ -15,6 +15,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 
 from taller.models.configuracion import ConfiguracionEmpresa
+from taller.services.empresa_service import get_empresa_safe
 from taller.servicios.models import (
     CategoriaServicio,
     Servicio,
@@ -56,7 +57,7 @@ def api_buscar_servicios(request):
     - subcategoria_id: Filtrar por subcategoría
     - limit: Límite de resultados (default: 20)
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse({"servicios": [], "total": 0})
 
@@ -180,7 +181,7 @@ def api_crear_servicio_rapido(request):
 
     Retorna el servicio creado con sus datos.
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse({"success": False, "error": "Usuario sin empresa asignada"}, status=403)
 

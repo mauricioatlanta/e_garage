@@ -9,7 +9,7 @@
 
 {% block main_actions %}
 <div class="flex flex-wrap gap-3">
-  <a href="{% country_url 'desarme:inventario_inteligente' vehiculo.pk %}" class="btn-action btn-action-outline">← {% trans "Volver al inventario" %}</a>
+  <a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ vehiculo.pk }}&modo=venta" class="btn-action btn-action-outline">← {% trans "Volver al centro de ventas" %}</a>
   <a href="{% country_url 'desarme:ver_vehiculo' vehiculo.pk %}" class="btn-action btn-action-cyan">🔧 {% trans "Vehículo" %}</a>
   <button type="button" onclick="window.print()" class="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm font-bold text-cyan-200 transition hover:bg-cyan-400/15">
     🖨 {% trans "Imprimir resumen" %}

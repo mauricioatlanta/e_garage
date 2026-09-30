@@ -700,6 +700,10 @@
 
 <body class="min-h-screen flex flex-col{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %} eg-desarme-dashboard-compact{% endif %}">
 
+  {% if qa_control_authorized %}
+    {% include "qa_control/bar.html" %}
+  {% endif %}
+
 
   {# --- Fondo estelar SOLO su HTML cuando flag activo --- #}
   {% if enable_space_bg|default:1 %}
@@ -806,52 +810,80 @@
   {% if not eg_us_signup_slim_header|default:False and '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
   <div id="main-navigation" class="{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}flex flex-row flex-wrap items-center justify-center mt-1 gap-1{% else %}flex flex-col items-center justify-center mt-3 gap-2{% endif %}">
     {% if request.user.is_authenticated %}
+      {% if workspace.product_key == "DESARMADURIA" or workspace.product_key == "RECYCLING" %}
+      <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
+        {% for item in workspace.nav %}
+        <a href="{{ item.url }}" class="nav-button-standard{% if item.is_active %} bg-gray-100 text-gray-900{% endif %}">
+          <span class="nav-icon"><i class="{{ item.icon }}"></i></span>
+          <span class="nav-text">{{ item.label }}</span>
+        </a>
+        {% endfor %}
+        <form action="{% url 'account_logout' %}" method="post" class="inline-block">
+          {% csrf_token %}
+          <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
+            <span class="nav-icon">🚪</span>
+            <span class="nav-text">{% if request.country == 'US' %}Logout{% else %}Salir{% endif %}</span>
+          </button>
+        </form>
+      </div>
+      {% else %}
       {# Fila 1: Settings, Equipo, Center, Clients, Documents, Extra #}
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
         <a href="{% country_url 'company_settings' %}" class="nav-button-standard">
           <span class="nav-icon">⚙️</span>
-          <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Settings{% else %}Ajustes{% endif %}</span>
+          <span class="nav-text">{% if request.country == 'US' %}Settings{% else %}Ajustes{% endif %}</span>
         </a>
         {% if request.user|is_owner %}
         <a href="{% nav_url 'team' %}" class="nav-button-standard {% if 'equipo' in request.path %}bg-gray-100 text-gray-900{% endif %}">
           <span class="nav-icon">👤</span>
-          <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Team{% else %}Equipo{% endif %}</span>
+          <span class="nav-text">{% if request.country == 'US' %}Team{% else %}Equipo{% endif %}</span>
         </a>
         {% endif %}
+        {% if not qa_control_is_cl_desarme %}
         <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
           <span class="nav-icon">🚀</span>
-          <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Center{% else %}Centro{% endif %}</span>
+          <span class="nav-text">{% if request.country == 'US' %}Center{% else %}Centro{% endif %}</span>
         </a>
         <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
           <span class="nav-icon">👥</span>
-          <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Clients{% else %}Clientes{% endif %}</span>
+          <span class="nav-text">{% if request.country == 'US' %}Clients{% else %}Clientes{% endif %}</span>
         </a>
         {% if 'reciclaje' in business_modules %}
         <a href="{% country_url 'reciclaje_staff:dashboard' %}" class="nav-button-standard">
-          <span class="nav-icon">📄</span>
+          <span class="nav-icon">♻️</span>
           <span class="nav-text">Compras</span>
+        </a>
+        <a href="{% country_url 'reciclaje_staff:listado_ventas' %}" class="nav-button-standard">
+          <span class="nav-icon">💵</span>
+          <span class="nav-text">Ventas</span>
         </a>
         {% else %}
         <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
           <span class="nav-icon">📄</span>
-          <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Documents{% else %}Documentos{% endif %}</span>
+          <span class="nav-text">{{ ui_labels.documents_menu|default_if_none:"Documentos" }}</span>
         </a>
         {% endif %}
-        <a href="{% if request.path|slice:':4' == '/us/' %}/us/{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}es{% else %}en{% endif %}/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
+        <a href="{% if request.country == 'US' %}/us/{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}es{% else %}en{% endif %}/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
           <span class="nav-icon">⭐</span>
           <span class="nav-text">Extra</span>
         </a>
+        {% endif %}
       </div>
 
       <!-- Row 2: Parts, Reports, Services, Disassembly, Vehicles, Logout -->
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
+        {% if not qa_control_is_cl_desarme %}
         {% if 'repuestos' in business_modules %}
         <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
           <span class="nav-icon">🔧</span>
-          <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Parts{% else %}Repuestos{% endif %}</span>
+          <span class="nav-text">{% if request.country == 'US' %}Parts{% else %}Repuestos{% endif %}</span>
         </a>
         {% endif %}
         {% if 'reciclaje' in business_modules %}
+        <a href="{% country_url 'reciclaje_staff:resumen_stock' %}" class="nav-button-standard">
+          <span class="nav-icon">🏷️</span>
+          <span class="nav-text">Catálogo</span>
+        </a>
         <a href="{% country_url 'reciclaje_staff:reporte_fechas' %}" class="nav-button-standard">
           <span class="nav-icon">📊</span>
           <span class="nav-text">Reportes</span>
@@ -859,53 +891,57 @@
         {% else %}
         <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
           <span class="nav-icon">📊</span>
-          <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Reports{% else %}Reportes{% endif %}</span>
+          <span class="nav-text">{% if request.country == 'US' %}Reports{% else %}Reportes{% endif %}</span>
         </a>
         {% endif %}
         {% if 'servicios' in business_modules %}
         <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
           <span class="nav-icon">🛠️</span>
-          <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Services{% else %}Servicios{% endif %}</span>
+          <span class="nav-text">{% if request.country == 'US' %}Services{% else %}Servicios{% endif %}</span>
         </a>
+        {% endif %}
         {% endif %}
         {% if 'desarme' in business_modules %}
         {% country_url 'desarme:index' as desarme_url %}
         <a href="{% if desarme_url %}{{ desarme_url }}{% else %}#{% endif %}" class="nav-button-standard">
           <span class="nav-icon">🧩</span>
-          <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Disassembly{% else %}Desarme{% endif %}</span>
+          <span class="nav-text">{% if request.country == 'US' %}Disassembly{% else %}Desarme{% endif %}</span>
         </a>
         {% endif %}
+        {% if not qa_control_is_cl_desarme %}
         {% if 'vehiculos' in business_modules %}
         {% country_url 'vehiculos:lista_vehiculos' as vehiculos_url %}
         {% if vehiculos_url %}
         <a href="{{ vehiculos_url }}" class="nav-button-standard">
           <span class="nav-icon">🚗</span>
-          <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Vehicles{% else %}Vehículos{% endif %}</span>
+          <span class="nav-text">{% if request.country == 'US' %}Vehicles{% else %}Vehículos{% endif %}</span>
         </a>
         {% else %}
         <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
           <span class="nav-icon">🚗</span>
-          <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Vehicles{% else %}Vehículos{% endif %}</span>
+          <span class="nav-text">{% if request.country == 'US' %}Vehicles{% else %}Vehículos{% endif %}</span>
         </a>
+        {% endif %}
         {% endif %}
         {% endif %}
         <form action="{% url 'account_logout' %}" method="post" class="inline-block">
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
             <span class="nav-icon">🚪</span>
-            <span class="nav-text">{% if request.path|slice:':4' == '/us/' %}Logout{% else %}Salir{% endif %}</span>
+            <span class="nav-text">{% if request.country == 'US' %}Logout{% else %}Salir{% endif %}</span>
           </button>
         </form>
       </div>
+      {% endif %}
 
     {% else %}
       <!-- Login button for non-authenticated users -->
       <div class="flex items-center justify-center">
-        <a href="{% if request.path|slice:':4' == '/us/' %}{% if request.LANGUAGE_CODE == 'es' %}/us/es/accounts/login/{% else %}/us/en/accounts/login/{% endif %}{% else %}{% url 'account_login' %}{% endif %}" class="nav-button flex items-center gap-2 px-4 py-2 bg-[#0a0f1a] border border-cyan-400 rounded-lg hover:bg-[#0f172a] transition-all duration-300 text-cyan-300 hover:text-white">
+        <a href="{% if request.country == 'US' %}{% if request.LANGUAGE_CODE == 'es' %}/us/es/accounts/login/{% else %}/us/en/accounts/login/{% endif %}{% else %}{% url 'account_login' %}{% endif %}" class="nav-button flex items-center gap-2 px-4 py-2 bg-[#0a0f1a] border border-cyan-400 rounded-lg hover:bg-[#0f172a] transition-all duration-300 text-cyan-300 hover:text-white">
         <div class="w-4 h-4 bg-cyan-400 rounded-sm flex items-center justify-center">
           <div class="w-2 h-2 bg-white rounded-full"></div>
         </div>
-        <span class="font-medium text-sm">{% if request.path|slice:':4' == '/us/' %}{% if request.LANGUAGE_CODE == 'es' %}INICIAR SESIÓN{% else %}SIGN IN{% endif %}{% else %}INICIAR SESIÓN{% endif %}</span>
+        <span class="font-medium text-sm">{% if request.country == 'US' %}{% if request.LANGUAGE_CODE == 'es' %}INICIAR SESIÓN{% else %}SIGN IN{% endif %}{% else %}INICIAR SESIÓN{% endif %}</span>
       </a>
     {% endif %}
     </div>
@@ -1284,6 +1320,3 @@ document.addEventListener("DOMContentLoaded", function() {
 <script src="{% static 'js/password-toggle.js' %}"></script>
 </body>
 </html>
-
-
-

@@ -1,62 +1,400 @@
 {% extends "layouts/base_egarage_panel.html" %}
-{% load country_url %}
+{% load country_url money %}
 
 {% block page_title %}Compra #{{ compra.pk }}{% endblock %}
 {% block page_icon %}🧾{% endblock %}
 
 {% block page_extra_css %}
 <style>
-  .rec-card { background: rgba(0,0,0,0.7); border: 1px solid rgba(0,255,255,0.3); border-radius: 10px; padding: 20px; margin-bottom: 1.5rem; }
-  .rec-table { width: 100%; border-collapse: collapse; color: #e5e7eb; }
-  .rec-table th, .rec-table td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .invoice-shell {
+    color: #e8fbff;
+    display: grid;
+    gap: 1rem;
+  }
+  .invoice-hero {
+    background:
+      linear-gradient(135deg, rgba(8, 18, 32, 0.96), rgba(5, 48, 54, 0.9)),
+      radial-gradient(circle at top right, rgba(0, 255, 247, 0.22), transparent 36%);
+    border: 1px solid rgba(0, 255, 247, 0.38);
+    border-radius: 12px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+    padding: clamp(1rem, 2.2vw, 1.6rem);
+  }
+  .invoice-hero-top {
+    align-items: flex-start;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+  }
+  .invoice-kicker {
+    color: #67e8f9;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .invoice-title {
+    color: #ffffff;
+    font-size: clamp(1.8rem, 3vw, 2.7rem);
+    font-weight: 900;
+    line-height: 1;
+    margin: 0.25rem 0;
+  }
+  .invoice-status {
+    background: rgba(34, 197, 94, 0.14);
+    border: 1px solid rgba(34, 197, 94, 0.42);
+    border-radius: 999px;
+    color: #bbf7d0;
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 0.45rem 0.7rem;
+    white-space: nowrap;
+  }
+  .invoice-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.85rem;
+  }
+  .invoice-action {
+    background: rgba(0, 255, 247, 0.1);
+    border: 1px solid rgba(0, 255, 247, 0.36);
+    border-radius: 8px;
+    color: #dffcff;
+    cursor: pointer;
+    font-weight: 850;
+    padding: 0.5rem 0.75rem;
+    text-decoration: none;
+  }
+  .invoice-action:hover {
+    background: rgba(0, 255, 247, 0.18);
+  }
+  .invoice-action-danger {
+    border-color: rgba(248, 113, 113, 0.46);
+    color: #fecaca;
+  }
+  .invoice-total {
+    color: #ffffff;
+    font-size: clamp(1.8rem, 4vw, 3.4rem);
+    font-weight: 950;
+    line-height: 1;
+    text-align: right;
+  }
+  .invoice-total-label {
+    color: #a7f3d0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-top: 0.35rem;
+    text-align: right;
+  }
+  .invoice-meta-grid {
+    display: grid;
+    gap: 0.8rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+  .invoice-meta-card {
+    background: rgba(2, 8, 23, 0.66);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 10px;
+    padding: 0.85rem;
+  }
+  .invoice-label {
+    color: #94a3b8;
+    font-size: 0.76rem;
+    font-weight: 800;
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+  }
+  .invoice-value {
+    color: #f8fafc;
+    font-size: 1rem;
+    font-weight: 750;
+    word-break: break-word;
+  }
+  .invoice-card {
+    background: rgba(3, 10, 24, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .invoice-card-head {
+    align-items: center;
+    background: rgba(15, 23, 42, 0.92);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+    display: flex;
+    justify-content: space-between;
+    padding: 0.9rem 1rem;
+  }
+  .invoice-card-title {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 850;
+    margin: 0;
+  }
+  .invoice-chip {
+    background: rgba(0, 255, 247, 0.1);
+    border: 1px solid rgba(0, 255, 247, 0.28);
+    border-radius: 999px;
+    color: #a5f3fc;
+    font-size: 0.76rem;
+    font-weight: 800;
+    padding: 0.28rem 0.55rem;
+  }
+  .invoice-table-wrap {
+    overflow-x: auto;
+  }
+  .invoice-table {
+    border-collapse: collapse;
+    color: #e5e7eb;
+    min-width: 720px;
+    width: 100%;
+  }
+  .invoice-table th {
+    background: rgba(8, 47, 73, 0.45);
+    color: #bae6fd;
+    font-size: 0.74rem;
+    font-weight: 850;
+    padding: 0.8rem 1rem;
+    text-align: left;
+    text-transform: uppercase;
+  }
+  .invoice-table td {
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+    color: #f1f5f9;
+    padding: 0.9rem 1rem;
+    vertical-align: top;
+  }
+  .invoice-table tbody tr:nth-child(even) {
+    background: rgba(15, 23, 42, 0.42);
+  }
+  .invoice-code {
+    color: #67e8f9;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 850;
+  }
+  .invoice-muted {
+    color: #94a3b8;
+    font-size: 0.82rem;
+    margin-top: 0.2rem;
+  }
+  .invoice-product-name {
+    color: #ffffff;
+    font-weight: 900;
+  }
+  .invoice-line-label {
+    color: #67e8f9;
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.18rem;
+    text-transform: uppercase;
+  }
+  .invoice-line-meta {
+    color: #94a3b8;
+    font-size: 0.82rem;
+    margin-top: 0.28rem;
+  }
+  .invoice-line-meta strong {
+    color: #cbd5e1;
+  }
+  .invoice-category {
+    color: #a5f3fc;
+    font-weight: 850;
+  }
+  .invoice-number {
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+    font-weight: 850;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .invoice-summary {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem;
+  }
+  .invoice-summary-box {
+    background: rgba(2, 8, 23, 0.72);
+    border: 1px solid rgba(0, 255, 247, 0.24);
+    border-radius: 10px;
+    min-width: min(100%, 320px);
+    padding: 0.95rem 1rem;
+  }
+  .invoice-summary-row {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+  }
+  .invoice-summary-row span:first-child {
+    color: #94a3b8;
+    font-weight: 700;
+  }
+  .invoice-summary-row span:last-child {
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 950;
+  }
+  .invoice-notes {
+    background: rgba(14, 165, 233, 0.08);
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    border-radius: 10px;
+    color: #dbeafe;
+    padding: 1rem;
+  }
+  .invoice-empty {
+    color: #94a3b8;
+    padding: 1rem;
+  }
+  @media (max-width: 680px) {
+    .invoice-hero-top {
+      flex-direction: column;
+    }
+    .invoice-total,
+    .invoice-total-label {
+      text-align: left;
+    }
+  }
+  @media print {
+    .invoice-actions,
+    .eg-panel-sidebar,
+    .eg-help-button,
+    header,
+    nav {
+      display: none !important;
+    }
+    .invoice-card,
+    .invoice-hero {
+      box-shadow: none;
+    }
+  }
 </style>
 {% endblock %}
 
 {% block panel_content %}
-<div class="rec-card">
-  <p><strong>Cliente:</strong> {{ compra.cliente|default:"Mostrador" }}</p>
-  <p><strong>Fecha:</strong> {{ compra.created_at|date:"d/m/Y H:i" }}</p>
-  <p><strong>Registrado por:</strong> {{ compra.creado_por|default:"—" }}</p>
-  {% if compra.notas %}<p><strong>Notas:</strong> {{ compra.notas }}</p>{% endif %}
-  <p><strong>Total:</strong> ${{ compra.total|floatformat:0 }}</p>
-</div>
+<div class="invoice-shell">
+  {% if messages %}
+    {% for message in messages %}<div class="invoice-notes">{{ message }}</div>{% endfor %}
+  {% endif %}
+  <section class="invoice-hero" aria-label="Resumen de compra">
+    <div class="invoice-hero-top">
+      <div>
+        <div class="invoice-kicker">Comprobante de compra</div>
+        <h2 class="invoice-title">#{{ compra.pk }}</h2>
+        <span class="invoice-status">Registrada</span>
+        <div class="invoice-actions">
+          <a href="../" class="invoice-action">Volver a compras</a>
+          <button type="button" class="invoice-action" onclick="window.print()">Imprimir</button>
+          <a href="editar/" class="invoice-action">Editar</a>
+          <a href="eliminar/" class="invoice-action invoice-action-danger">Borrar</a>
+        </div>
+      </div>
+      <div>
+        <div class="invoice-total">{{ compra.total|money_clp }}</div>
+        <div class="invoice-total-label">Total pagado</div>
+      </div>
+    </div>
 
-{% if detalles_catalitico %}
-<div class="rec-card">
-  <h3>Catalíticos</h3>
-  <table class="rec-table">
-    <thead><tr><th>Código</th><th>Nombre</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th></tr></thead>
-    <tbody>
-      {% for d in detalles_catalitico %}
-      <tr>
-        <td>{{ d.catalitico.codigo }}</td>
-        <td>{{ d.catalitico.nombre }}</td>
-        <td>{{ d.cantidad }}</td>
-        <td>${{ d.precio_unitario|floatformat:0 }}</td>
-        <td>${{ d.subtotal|floatformat:0 }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-{% endif %}
+    <div class="invoice-meta-grid">
+      <div class="invoice-meta-card">
+        <div class="invoice-label">Cliente / proveedor</div>
+        <div class="invoice-value">{{ compra.cliente|default:"Mostrador" }}</div>
+      </div>
+      <div class="invoice-meta-card">
+        <div class="invoice-label">Fecha</div>
+        <div class="invoice-value">{{ compra.created_at|date:"d/m/Y H:i" }}</div>
+      </div>
+      <div class="invoice-meta-card">
+        <div class="invoice-label">Registrado por</div>
+        <div class="invoice-value">{{ compra.creado_por|default:"—" }}</div>
+      </div>
+    </div>
+  </section>
 
-{% if detalles_chatarra %}
-<div class="rec-card">
-  <h3>Chatarra</h3>
-  <table class="rec-table">
-    <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th></tr></thead>
-    <tbody>
-      {% for d in detalles_chatarra %}
-      <tr>
-        <td>{{ d.producto.nombre }}</td>
-        <td>{{ d.cantidad }}</td>
-        <td>${{ d.precio_unitario|floatformat:0 }}</td>
-        <td>${{ d.subtotal|floatformat:0 }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  {% if compra.notas and "[pythonanywhere:" not in compra.notas and "Migrado desde PythonAnywhere" not in compra.notas %}
+  <section class="invoice-notes">
+    <div class="invoice-label">Notas operativas</div>
+    <div>{{ compra.notas }}</div>
+  </section>
+  {% endif %}
+
+  {% if detalles_catalitico %}
+  <section class="invoice-card">
+    <div class="invoice-card-head">
+      <h3 class="invoice-card-title">Catalíticos comprados</h3>
+      <span class="invoice-chip">{{ detalles_catalitico|length }} línea(s)</span>
+    </div>
+    <div class="invoice-table-wrap">
+      <table class="invoice-table">
+        <thead>
+          <tr><th>Código</th><th>Material</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th></tr>
+        </thead>
+        <tbody>
+          {% for d in detalles_catalitico %}
+          <tr>
+            <td><span class="invoice-code">{{ d.catalitico.codigo }}</span></td>
+            <td>
+              <strong>{{ d.catalitico.nombre }}</strong>
+              <div class="invoice-muted">{{ d.catalitico.marca_vehiculo }} {{ d.catalitico.modelo_vehiculo }}</div>
+            </td>
+            <td>{{ d.cantidad }} unidad{% if d.cantidad != 1 %}es{% endif %}</td>
+            <td class="invoice-number">{{ d.precio_unitario|money_clp }}</td>
+            <td class="invoice-number">{{ d.subtotal|money_clp }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if detalles_chatarra %}
+  <section class="invoice-card">
+    <div class="invoice-card-head">
+      <h3 class="invoice-card-title">Materiales reciclables</h3>
+      <span class="invoice-chip">{{ detalles_chatarra|length }} línea(s)</span>
+    </div>
+    <div class="invoice-table-wrap">
+      <table class="invoice-table">
+        <thead>
+          <tr><th>Material comprado</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th></tr>
+        </thead>
+        <tbody>
+          {% for d in detalles_chatarra %}
+          <tr>
+            <td>
+              <span class="invoice-line-label">Material comprado</span>
+              <div class="invoice-product-name">{{ d.producto.nombre|default:d.producto.codigo }}</div>
+              <div class="invoice-line-meta"><strong>Código/SKU:</strong> {{ d.producto.codigo }}</div>
+            </td>
+            <td>{{ d.cantidad|floatformat:"-3" }} {{ unidad_peso_larga }}</td>
+            <td class="invoice-number">{{ d.precio_unitario|money_clp }}</td>
+            <td class="invoice-number">{{ d.subtotal|money_clp }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if not detalles_catalitico and not detalles_chatarra %}
+  <section class="invoice-card">
+    <div class="invoice-empty">Esta compra no tiene líneas registradas.</div>
+  </section>
+  {% endif %}
+
+  <section class="invoice-card">
+    <div class="invoice-summary">
+      <div class="invoice-summary-box">
+        <div class="invoice-summary-row">
+          <span>Total comprobante</span>
+          <span>{{ compra.total|money_clp }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
-{% endif %}
 {% endblock %}

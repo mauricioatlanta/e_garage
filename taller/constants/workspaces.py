@@ -48,6 +48,7 @@ from taller.constants.product_profiles import (
     PRODUCT_DESARMADURIA,
     PRODUCT_RECYCLING,
     PRODUCT_TALLER,
+    PRODUCT_TIRE,
     RUBRO_TO_PRODUCT,
 )
 
@@ -181,8 +182,35 @@ TERMINOLOGY: dict[str, object] = {
     "workspace.parts.action.new_sale":        _("workspace.parts.action.new_sale"),
     "workspace.parts.action.new_quote":       _("workspace.parts.action.new_quote"),
     "workspace.parts.action.new_parts_sale":  _("workspace.parts.action.new_parts_sale"),
+    "workspace.parts.action.pos":             "POS Mostrador",
     "workspace.parts.action.add_part":        _("workspace.parts.action.add_part"),
     "workspace.parts.action.view_inventory":  _("workspace.parts.action.view_inventory"),
+
+    # -- Neumáticos / Vulcanización: brand --
+    "workspace.tire.brand.name":    "eGarage Neumáticos & Vulcanización",
+    "workspace.tire.brand.tagline": "Inventario, servicios y ventas rápidas para llanteras",
+    # -- Neumáticos / Vulcanización: nav --
+    "workspace.tire.nav.home":      "Inicio",
+    "workspace.tire.nav.tires":     "Inventario de Neumáticos",
+    "workspace.tire.nav.services":  "Servicios de Vulcanización",
+    "workspace.tire.nav.sales":     "Ventas de Mostrador",
+    "workspace.tire.nav.clients":   "Clientes",
+    "workspace.tire.nav.vehicles":  "Vehículos",
+    "workspace.tire.nav.reports":   "Reportes",
+    "workspace.tire.nav.settings":  "Configuración",
+    # -- Neumáticos / Vulcanización: actions --
+    "workspace.tire.action.pos":          "POS Mostrador",
+    "workspace.tire.action.add_tire":     "Agregar Neumático",
+    "workspace.tire.action.services":     "Servicios Vulcanización",
+    # -- Neumáticos / Vulcanización: texts --
+    "workspace.tire.texts.search_title":       "Buscar neumático o cliente",
+    "workspace.tire.texts.search_label":       "Medida, código o cliente",
+    "workspace.tire.texts.search_placeholder": "Ej: 205/55R16, 04465-0D020 o Juan Pérez",
+    "workspace.tire.texts.search_hint":        "Busca por medida, código OEM, equivalente o nombre.",
+    "workspace.tire.texts.live_title":         "Mostrador en vivo",
+    "workspace.tire.texts.live_metric":        "operaciones hoy",
+    "workspace.tire.texts.quick_actions":      "Accesos rápidos",
+    "workspace.tire.texts.activity_feed":      "Actividad reciente",
 
     # -- Reciclaje: brand --
     "workspace.recycling.brand.name":    _("workspace.recycling.brand.name"),
@@ -190,6 +218,8 @@ TERMINOLOGY: dict[str, object] = {
     # -- Reciclaje: nav --
     "workspace.recycling.nav.home":      _("workspace.recycling.nav.home"),
     "workspace.recycling.nav.purchases": _("workspace.recycling.nav.purchases"),
+    "workspace.recycling.nav.sales":     "Ventas",
+    "workspace.recycling.nav.catalog":   "Catálogo / stock",
     "workspace.recycling.nav.clients":   _("workspace.recycling.nav.clients"),
     "workspace.recycling.nav.reports":   _("workspace.recycling.nav.reports"),
     "workspace.recycling.nav.settings":  _("workspace.recycling.nav.settings"),
@@ -376,6 +406,7 @@ WORKSPACE_CASA_REPUESTOS = WorkspaceDef(
     ),
     quick_actions=(
         WorkspaceActionDef("workspace.parts.action.new_quote",      "fas fa-file-invoice",  "documentos/form/?tipo=PRES"),
+        WorkspaceActionDef("workspace.parts.action.pos",            "fas fa-cash-register", "repuestos/pos/"),
         WorkspaceActionDef("workspace.parts.action.new_parts_sale", "fas fa-shopping-cart", "documentos/form/?tipo=PTS"),
         WorkspaceActionDef("workspace.parts.action.add_part",       "fas fa-plus",          "repuestos/crear/"),
         WorkspaceActionDef("workspace.parts.action.view_inventory", "fas fa-boxes",         "repuestos/"),
@@ -390,6 +421,48 @@ WORKSPACE_CASA_REPUESTOS = WorkspaceDef(
         live_feed_metric_key="workspace.parts.texts.live_metric",
         quick_actions_label_key="workspace.parts.texts.quick_actions",
         activity_feed_title_key="workspace.parts.texts.activity_feed",
+    ),
+)
+
+WORKSPACE_TIRE = WorkspaceDef(
+    product_key=PRODUCT_TIRE,
+    brand=WorkspaceBrand(
+        name_key="workspace.tire.brand.name",
+        tagline_key="workspace.tire.brand.tagline",
+        icon="fas fa-circle-notch",
+        color_class="amber",
+    ),
+    nav=(
+        WorkspaceNavDef(MOD_INICIO,        "workspace.tire.nav.home",     "fas fa-home",          nav_key="tire_home",      path="dashboard/"),
+        WorkspaceNavDef(MOD_REPUESTOS,     "workspace.tire.nav.tires",    "fas fa-circle-notch",  nav_key="tire_inventory", path="repuestos/"),
+        WorkspaceNavDef(MOD_SERVICIOS,     "workspace.tire.nav.services", "fas fa-tools",         nav_key="tire_services",  path="servicios/"),
+        WorkspaceNavDef(MOD_DOCUMENTOS,    "workspace.tire.nav.sales",    "fas fa-cash-register", nav_key="tire_pos",       path="repuestos/pos/"),
+        WorkspaceNavDef(MOD_CLIENTES,      "workspace.tire.nav.clients",  "fas fa-users",         nav_key="tire_clients",   path="clientes/"),
+        WorkspaceNavDef(MOD_VEHICULOS,     "workspace.tire.nav.vehicles", "fas fa-car",           nav_key="tire_vehicles",  path="vehiculos/"),
+        WorkspaceNavDef(MOD_REPORTES,      "workspace.tire.nav.reports",  "fas fa-chart-bar",     nav_key="tire_reports",   path="reportes/"),
+        WorkspaceNavDef(MOD_CONFIGURACION, "workspace.tire.nav.settings", "fas fa-cog",           nav_key="tire_config",    path="settings/"),
+    ),
+    widget_keys=(
+        WGT_KPI_SALES_TODAY,
+        WGT_KPI_STOCK_CRITICAL,
+        WGT_KPI_SERVICES_TODAY,
+        WGT_KPI_PARTS_SOLD_TODAY,
+    ),
+    quick_actions=(
+        WorkspaceActionDef("workspace.tire.action.pos",      "fas fa-cash-register", "repuestos/pos/"),
+        WorkspaceActionDef("workspace.tire.action.add_tire", "fas fa-plus",          "repuestos/crear/"),
+        WorkspaceActionDef("workspace.tire.action.services", "fas fa-tools",         "servicios/"),
+    ),
+    theme={"--eg-primary": "#f59e0b", "--eg-accent": "#0f766e"},
+    texts=WorkspaceTextsDef(
+        search_title_key="workspace.tire.texts.search_title",
+        search_label_key="workspace.tire.texts.search_label",
+        search_placeholder_key="workspace.tire.texts.search_placeholder",
+        search_hint_key="workspace.tire.texts.search_hint",
+        live_feed_title_key="workspace.tire.texts.live_title",
+        live_feed_metric_key="workspace.tire.texts.live_metric",
+        quick_actions_label_key="workspace.tire.texts.quick_actions",
+        activity_feed_title_key="workspace.tire.texts.activity_feed",
     ),
 )
 
@@ -443,6 +516,8 @@ WORKSPACE_RECYCLING = WorkspaceDef(
     nav=(
         WorkspaceNavDef(MOD_INICIO,        "workspace.recycling.nav.home",      "fas fa-home",        nav_key="recycling_home",      path="reciclaje/"),
         WorkspaceNavDef(MOD_RECICLAJE,     "workspace.recycling.nav.purchases", "fas fa-recycle",     nav_key="recycling_purchases", path="reciclaje/compras/"),
+        WorkspaceNavDef(MOD_RECICLAJE,     "workspace.recycling.nav.sales",     "fas fa-cash-register", nav_key="recycling_sales",   path="reciclaje/ventas/"),
+        WorkspaceNavDef(MOD_RECICLAJE,     "workspace.recycling.nav.catalog",   "fas fa-boxes-stacked", nav_key="recycling_catalog", path="reciclaje/stock/"),
         WorkspaceNavDef(MOD_CLIENTES,      "workspace.recycling.nav.clients",   "fas fa-users",       nav_key="recycling_clients"),
         WorkspaceNavDef(MOD_REPORTES,      "workspace.recycling.nav.reports",   "fas fa-chart-bar",   nav_key="recycling_reports",   path="reciclaje/reportes/"),
         WorkspaceNavDef(MOD_CONFIGURACION, "workspace.recycling.nav.settings",  "fas fa-cog",         nav_key="recycling_config"),
@@ -476,6 +551,7 @@ WORKSPACE_DEFINITIONS: dict[str, WorkspaceDef] = {
     PRODUCT_TALLER:         WORKSPACE_TALLER,
     PRODUCT_DESARMADURIA:   WORKSPACE_DESARMADURIA,
     PRODUCT_CASA_REPUESTOS: WORKSPACE_CASA_REPUESTOS,
+    PRODUCT_TIRE:           WORKSPACE_TIRE,
     PRODUCT_CARWASH:        WORKSPACE_CARWASH,
     PRODUCT_RECYCLING:      WORKSPACE_RECYCLING,
 }

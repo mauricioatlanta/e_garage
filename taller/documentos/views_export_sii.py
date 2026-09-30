@@ -14,6 +14,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
 
 from taller.models.documento import Documento
+from taller.services.empresa_service import get_empresa_safe
 from taller.utils.billing_validation import validar_cliente_para_facturacion
 
 
@@ -30,7 +31,7 @@ def exportar_csv_sii(request, documento_id):
     GET /documentos/<id>/exportar-sii/
     POST /documentos/<id>/exportar-sii/ (con datos de facturación)
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse({"success": False, "error": "No empresa found"}, status=400)
 
@@ -162,7 +163,7 @@ def verificar_facturacion_documento(request, documento_id):
 
     GET /documentos/<id>/verificar-facturacion/
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse({"success": False, "error": "No empresa found"}, status=400)
 

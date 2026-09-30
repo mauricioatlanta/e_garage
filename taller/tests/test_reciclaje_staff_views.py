@@ -19,15 +19,19 @@ from decimal import Decimal
 
 import pytest
 from django.contrib.auth.models import User
-from django.test import Client
+from django.test import Client, RequestFactory
 
 from taller.models.reciclaje import (
     Catalitico,
+    CategoriaChatarra,
     CompraReciclaje,
     DetalleCompraCatalitico,
+    DetalleCompraChatarra,
+    ProductoChatarra,
     VentaReciclaje,
 )
 from taller.models.team_member import TeamMember
+from taller.reciclaje.views_staff import resumen_stock
 from taller.tests.factories import CataliticoFactory, EmpresaFactory, ProductoChatarraFactory
 
 
@@ -135,6 +139,17 @@ def test_dashboard_rangos_precio_y_extremos(cliente_owner, empresa_a):
 
 
 @pytest.mark.django_db
+def test_dashboard_formatea_montos_como_clp(cliente_owner, empresa_a):
+    CataliticoFactory(empresa=empresa_a, codigo="CLP-1", precio_venta=Decimal("1234567"))
+
+    response = cliente_owner.get("/cl/es/reciclaje/")
+    content = response.content.decode()
+
+    assert "$1.234.567" in content
+    assert "$1.234.567 CLP" not in content
+
+
+@pytest.mark.django_db
 def test_dashboard_no_mezcla_datos_de_otra_empresa(cliente_owner, empresa_a, empresa_b):
     CataliticoFactory(empresa=empresa_b, codigo="OTRA-EMPRESA", precio_venta=Decimal("999999"))
 
@@ -143,6 +158,121 @@ def test_dashboard_no_mezcla_datos_de_otra_empresa(cliente_owner, empresa_a, emp
     assert "OTRA-EMPRESA" not in response.content.decode()
     if response.context["catalitico_mas_caro"] is not None:
         assert response.context["catalitico_mas_caro"].empresa_id == empresa_a.pk
+
+
+# ── Stock: catálogo de materiales ─────────────────────────────────────────────
+
+
+@pytest.mark.django_db
+def test_stock_muestra_accion_nuevo_producto(cliente_owner):
+    response = cliente_owner.get("/cl/es/reciclaje/stock/")
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert ">+ Nuevo producto<" in content
+    assert ">+ Nueva categoría<" in content
+    assert 'href="productos/nuevo/"' in content
+    assert 'href="categorias/nueva/"' in content
+
+
+@pytest.mark.django_db
+def test_stock_respeta_empresa_resuelta_por_qa_context(empresa_a, empresa_b):
+    """QA Control reemplaza request.empresa. Las vistas de reciclaje deben
+    consultar ese tenant, no la empresa propietaria del usuario superadmin."""
+    categoria_a = CategoriaChatarra.objects.create(empresa=empresa_a, nombre="Metales QA")
+    categoria_b = CategoriaChatarra.objects.create(empresa=empresa_b, nombre="Metales ocultos")
+    ProductoChatarraFactory(
+        empresa=empresa_a,
+        categoria=categoria_a,
+        nombre="Cobre QA",
+        codigo="COBRE-QA",
+    )
+    ProductoChatarraFactory(
+        empresa=empresa_b,
+        categoria=categoria_b,
+        nombre="Producto oculto",
+        codigo="OTRO-QA",
+    )
+
+    request = RequestFactory().get(f"/cl/es/reciclaje/stock/?categoria={categoria_a.pk}")
+    request.user = empresa_b.user
+    request.empresa = empresa_a
+    request.company = empresa_a
+
+    response = resumen_stock(request)
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert "Cobre QA" in content
+    assert "Producto oculto" not in content
+
+
+@pytest.mark.django_db
+def test_crear_producto_chatarra_crea_material_para_empresa(cliente_owner, empresa_a):
+    response = cliente_owner.post(
+        "/cl/es/reciclaje/stock/productos/nuevo/",
+        {
+            "codigo": "cobre-01",
+            "nombre": "Cobre limpio",
+            "categoria": "Metales",
+            "unidad_medida": ProductoChatarra.UNIDAD_KG,
+            "precio_compra": "4500",
+            "precio_venta": "5200",
+            "cantidad_stock": "12.5",
+            "stock_minimo": "3",
+            "proveedor": "Mostrador",
+        },
+    )
+
+    assert response.status_code == 302
+    producto = ProductoChatarra.objects.get(empresa=empresa_a, codigo="COBRE-01")
+    assert producto.nombre == "Cobre limpio"
+    assert producto.categoria.nombre == "Metales"
+    assert producto.precio_compra == Decimal("4500")
+    assert producto.precio_venta == Decimal("5200")
+    assert producto.cantidad_stock == Decimal("12.5")
+    assert producto.stock_minimo == Decimal("3")
+    assert CategoriaChatarra.objects.filter(empresa=empresa_a, nombre="Metales").count() == 1
+
+
+@pytest.mark.django_db
+def test_crear_categoria_chatarra_crea_categoria_para_empresa(cliente_owner, empresa_a):
+    response = cliente_owner.post(
+        "/cl/es/reciclaje/stock/categorias/nueva/",
+        {
+            "nombre": "Plásticos",
+            "descripcion": "Material plástico comprado por kilo.",
+        },
+    )
+
+    assert response.status_code == 302
+    categoria = CategoriaChatarra.objects.get(empresa=empresa_a, nombre="Plásticos")
+    assert categoria.descripcion == "Material plástico comprado por kilo."
+
+
+@pytest.mark.django_db
+def test_stock_segrega_materiales_por_categoria(cliente_owner, empresa_a):
+    metales = CategoriaChatarra.objects.create(empresa=empresa_a, nombre="Metales")
+    papel = CategoriaChatarra.objects.create(empresa=empresa_a, nombre="Papel y cartón")
+    CataliticoFactory(empresa=empresa_a, codigo="CAT-OCULTO")
+    ProductoChatarraFactory(empresa=empresa_a, categoria=metales, nombre="Cobre limpio")
+    ProductoChatarraFactory(empresa=empresa_a, categoria=papel, nombre="Papel reciclado")
+
+    response = cliente_owner.get("/cl/es/reciclaje/stock/")
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert "Cobre limpio" not in content
+    assert "Papel reciclado" not in content
+    assert "Selecciona una categoría" in content
+
+    response = cliente_owner.get(f"/cl/es/reciclaje/stock/?categoria={metales.pk}")
+    content = response.content.decode()
+
+    assert "Cobre limpio" in content
+    assert "Papel reciclado" not in content
+    assert "Catalíticos disponibles" not in content
+    assert "CAT-OCULTO" not in content
 
 
 # ── Compra: catalítico ────────────────────────────────────────────────────────
@@ -225,6 +355,8 @@ def test_api_catalitico_por_codigo_devuelve_datos_para_autocompletar(cliente_own
     assert data["modelo_vehiculo"] == "Corolla"
     assert data["precio_compra"] == "15000.00"
     assert data["cantidad_stock"] == 3
+    assert data["codigo"] == "AUTO-1"
+    assert data["suggestions"][0]["codigo"] == "AUTO-1"
 
 
 @pytest.mark.django_db
@@ -234,7 +366,39 @@ def test_api_catalitico_por_codigo_no_encontrado(cliente_owner, empresa_a):
     )
 
     assert response.status_code == 200
-    assert response.json() == {"found": False}
+    assert response.json() == {"found": False, "suggestions": []}
+
+
+@pytest.mark.django_db
+def test_api_catalitico_por_codigo_sugiere_por_busqueda_parcial(
+    cliente_owner, empresa_a, empresa_b
+):
+    CataliticoFactory(
+        empresa=empresa_a,
+        codigo="HONDA-CRV-01",
+        nombre="Catalítico Honda",
+        marca_vehiculo="Honda",
+        modelo_vehiculo="CR-V",
+        precio_compra=Decimal("12345"),
+    )
+    CataliticoFactory(empresa=empresa_b, codigo="HONDA-AJENO")
+
+    response = cliente_owner.get(
+        "/cl/es/reciclaje/api/catalitico-por-codigo/", {"codigo": "hond"}
+    )
+    data = response.json()
+
+    assert data["found"] is False
+    assert data["suggestions"] == [
+        {
+            "codigo": "HONDA-CRV-01",
+            "nombre": "Catalítico Honda",
+            "marca_vehiculo": "Honda",
+            "modelo_vehiculo": "CR-V",
+            "precio_compra": "12345.00",
+            "cantidad_stock": 1,
+        }
+    ]
 
 
 @pytest.mark.django_db
@@ -245,7 +409,7 @@ def test_api_catalitico_por_codigo_aislado_por_empresa(cliente_owner, empresa_a,
         "/cl/es/reciclaje/api/catalitico-por-codigo/", {"codigo": "OTRA-EMPRESA"}
     )
 
-    assert response.json() == {"found": False}
+    assert response.json() == {"found": False, "suggestions": []}
 
 
 @pytest.mark.django_db
@@ -291,6 +455,52 @@ def test_crear_compra_chatarra_incrementa_stock(cliente_owner, empresa_a):
 
     producto.refresh_from_db()
     assert producto.cantidad_stock == Decimal("15.500")
+
+
+@pytest.mark.django_db
+def test_crear_compra_chatarra_expone_precio_compra_para_autocompletar(
+    cliente_owner, empresa_a
+):
+    producto = ProductoChatarraFactory(
+        empresa=empresa_a,
+        nombre="Cobre primera",
+        precio_compra=Decimal("7200.00"),
+    )
+
+    response = cliente_owner.get("/cl/es/reciclaje/compras/nueva/")
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert 'name="chatarra_producto_id[]"' in content
+    assert "rec-producto-busqueda" in content
+    assert "Buscar por código o nombre" in content
+    assert "/api/producto-chatarra/" in content
+    assert 'class="rec-input rec-linea-precio rec-money-input"' in content
+    assert 'class="rec-linea-precio-raw"' in content
+    assert "setPrecioFila" in content
+    assert "Cantidad (unid.)" in content
+    assert "Cantidad (kg)" in content
+    assert "Cantidad (lb)" not in content
+
+
+@pytest.mark.django_db
+def test_api_producto_chatarra_busca_por_codigo_y_nombre(cliente_owner, empresa_a):
+    producto = ProductoChatarraFactory(
+        empresa=empresa_a,
+        codigo="COBRE-API",
+        nombre="Cobre limpio",
+        precio_compra=Decimal("7200.00"),
+    )
+
+    response = cliente_owner.get(
+        "/cl/es/reciclaje/api/producto-chatarra/", {"q": "cobre"}
+    )
+
+    assert response.status_code == 200
+    suggestion = response.json()["suggestions"][0]
+    assert suggestion["id"] == producto.pk
+    assert suggestion["codigo"] == "COBRE-API"
+    assert suggestion["nombre"] == "Cobre limpio"
 
 
 @pytest.mark.django_db
@@ -431,6 +641,106 @@ def test_detalle_compra_404_para_compra_de_otra_empresa(cliente_owner, empresa_b
     compra_ajena = CompraReciclaje.objects.create(empresa=empresa_b)
     response = cliente_owner.get(f"/cl/es/reciclaje/compras/{compra_ajena.pk}/")
     assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_detalle_compra_renderiza_invoice_moderno(cliente_owner, empresa_a):
+    categoria = CategoriaChatarra.objects.create(empresa=empresa_a, nombre="Metales")
+    producto = ProductoChatarraFactory(
+        empresa=empresa_a,
+        categoria=categoria,
+        nombre="Cobre limpio",
+    )
+    compra = CompraReciclaje.objects.create(empresa=empresa_a, notas="Pago contra recepción.")
+    DetalleCompraChatarra.objects.create(
+        compra=compra,
+        producto=producto,
+        cantidad=Decimal("2"),
+        precio_unitario=Decimal("4500"),
+    )
+
+    response = cliente_owner.get(f"/cl/es/reciclaje/compras/{compra.pk}/")
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert "Comprobante de compra" in content
+    assert "invoice-hero" in content
+    assert "Material comprado" in content
+    assert 'href="../"' in content
+    assert "Volver a compras" in content
+    assert "Código/SKU" in content
+    assert "Cobre limpio" in content
+    assert "2 kilos" in content
+    assert "$9.000" in content
+    assert "$9.000 CLP" not in content
+    assert 'href="editar/"' in content
+    assert 'href="eliminar/"' in content
+    assert "window.print()" in content
+
+
+@pytest.mark.django_db
+def test_detalle_compra_oculta_notas_tecnicas_migradas(cliente_owner, empresa_a):
+    compra = CompraReciclaje.objects.create(
+        empresa=empresa_a,
+        notas="[pythonanywhere:compra:40] Migrado desde PythonAnywhere. Cliente original: marco Olivares.",
+    )
+
+    response = cliente_owner.get(f"/cl/es/reciclaje/compras/{compra.pk}/")
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert "Notas operativas" not in content
+    assert "PythonAnywhere" not in content
+    assert "marco Olivares" not in content
+
+
+@pytest.mark.django_db
+def test_eliminar_compra_revierte_stock_chatarra(cliente_owner, empresa_a):
+    producto = ProductoChatarraFactory(
+        empresa=empresa_a,
+        cantidad_stock=Decimal("25.000"),
+    )
+    compra = CompraReciclaje.objects.create(empresa=empresa_a)
+    DetalleCompraChatarra.objects.create(
+        compra=compra,
+        producto=producto,
+        cantidad=Decimal("5.000"),
+        precio_unitario=Decimal("1000"),
+    )
+
+    response = cliente_owner.post(f"/cl/es/reciclaje/compras/{compra.pk}/eliminar/")
+
+    assert response.status_code == 302
+    producto.refresh_from_db()
+    assert producto.cantidad_stock == Decimal("20.000")
+    assert not CompraReciclaje.objects.filter(pk=compra.pk).exists()
+
+
+@pytest.mark.django_db
+def test_detalle_compra_no_usa_categoria_otros_como_descripcion(cliente_owner, empresa_a):
+    categoria = CategoriaChatarra.objects.create(empresa=empresa_a, nombre="otros")
+    producto = ProductoChatarraFactory(
+        empresa=empresa_a,
+        categoria=categoria,
+        codigo="9000",
+        nombre="9000",
+    )
+    compra = CompraReciclaje.objects.create(empresa=empresa_a)
+    DetalleCompraChatarra.objects.create(
+        compra=compra,
+        producto=producto,
+        cantidad=Decimal("25"),
+        precio_unitario=Decimal("100000"),
+    )
+
+    response = cliente_owner.get(f"/cl/es/reciclaje/compras/{compra.pk}/")
+    content = response.content.decode()
+
+    assert "Material comprado" in content
+    assert "9000" in content
+    assert "Código/SKU" in content
+    assert "9000" in content
+    assert "Sin categoría definida" not in content
 
 
 @pytest.mark.django_db

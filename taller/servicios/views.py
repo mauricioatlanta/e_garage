@@ -5,6 +5,7 @@ from django.middleware.csrf import get_token
 from django.shortcuts import redirect, render
 
 from taller.templatetags.country_url import reverse_country_url
+from taller.services.empresa_service import get_empresa_safe
 from django.utils.translation import get_language, gettext as _
 from django.views.decorators.http import require_POST
 
@@ -109,7 +110,7 @@ def _safe_reverse_country_url(request, view_path, fallback="#", *args, **kwargs)
 
 
 def _resolve_servicios_menu_scope(request):
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     country_code = _detectar_pais(request)
     request_lang = get_language() or getattr(request, "LANGUAGE_CODE", None) or "es"
     language = COUNTRY_LANGUAGE_MAP.get(country_code, (request_lang or "es")[:2])
@@ -364,7 +365,7 @@ def buscar_servicios_api(request):
     language = COUNTRY_LANGUAGE_MAP.get(country, "es")
 
     # Obtener empresa del usuario
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
 
     if not empresa:
         return JsonResponse({"servicios": [], "total": 0})
@@ -568,7 +569,7 @@ CURRENCY_SETTINGS = {
 
 
 def _detectar_pais(request):
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if empresa and getattr(empresa, "pais", None):
         return empresa.pais.strip().upper()
     path = request.path.lower()
@@ -707,7 +708,7 @@ def crear_subcategoria_api(request):
 
 @login_required
 def buscar_otros_servicios_api(request):
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse({"otros_servicios": [], "total": 0})
 
@@ -784,7 +785,7 @@ def buscar_otros_servicios_api(request):
 def otros_servicios_menu(request):
     """Vista para el menú de otros servicios (servicios externos) con búsqueda inteligente"""
 
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     country_code = _detectar_pais(request)
     # Detectar idioma real del request, no solo el mapeo por país
     language = (
@@ -882,7 +883,7 @@ def crear_otro_servicio(request):
 
     if request.method == "POST":
         try:
-            empresa = getattr(request.user, "empresa", None)
+            empresa = get_empresa_safe(request)
             if not empresa:
                 messages.error(request, "Usuario no tiene empresa asociada")
                 return redirect(reverse_country_url(request, "servicios:otros_servicios_menu"))
@@ -953,7 +954,7 @@ def editar_otro_servicio(request, pk):
     from taller.utils.templates import select_country_lang_template
 
     servicio = get_object_or_404(
-        ServicioExterno, pk=pk, empresa=getattr(request.user, "empresa", None)
+        ServicioExterno, pk=pk, empresa=get_empresa_safe(request)
     )
 
     # Determinar el país basándose en la URL
@@ -1024,7 +1025,7 @@ def eliminar_otro_servicio(request, pk):
     from taller.servicios.models import ServicioExterno
 
     # 🔒 BLINDAJE MULTI-TENANT: Verificar empresa antes de buscar
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         messages.error(request, "Usuario sin empresa asignada")
         return redirect(reverse_country_url(request, "servicios:otros_servicios_menu"))

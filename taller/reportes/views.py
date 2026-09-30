@@ -29,13 +29,14 @@ from django.db.models import (
 )
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models.functions import Coalesce
-from django.http import HttpResponse, JsonResponse, Http404
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import render
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 
 from taller.auth.decorators import login_required_default
 from taller.middleware.rate_limiting import rate_limit
+from taller.templatetags.country_url import country_url
 from taller.templatetags.role_tags import is_owner
 from taller.models import ConfiguracionEmpresa, Documento
 from taller.models.clientes import Cliente
@@ -51,6 +52,31 @@ from taller.utils.empresa import get_or_create_empresa, get_user_empresa_safe
 from taller.reportes.kilometraje_reportes import ReporteKilometraje
 
 # from taller.utils import get_or_create_empresa  # Eliminado: usamos la función local
+
+
+def _active_empresa_reportes(request):
+    return getattr(request, "empresa", None) or get_user_empresa_safe(request.user)
+
+
+def _path_country_code(path):
+    normalized = (path or "").lower()
+    if normalized.startswith("/cl/"):
+        return "CL"
+    if normalized.startswith("/uy/"):
+        return "UY"
+    if normalized.startswith("/us/"):
+        return "US"
+    if normalized.startswith("/mx/"):
+        return "MX"
+    if normalized.startswith("/pe/"):
+        return "PE"
+    if normalized.startswith("/ve/"):
+        return "VE"
+    if normalized.startswith("/br/"):
+        return "BR"
+    if normalized.startswith("/ar/"):
+        return "AR"
+    return None
 
 
 # @login_required_default
@@ -1911,13 +1937,24 @@ def historial_mantenimiento_vehiculo(request, vehiculo_id):
     Muestra el historial completo tipo "Libro de Mantenciones Digital"
     """
     # 🔒 FILTRO CRÍTICO POR EMPRESA
-    empresa = get_user_empresa_safe(request.user)
+    empresa = _active_empresa_reportes(request)
 
     # Obtener vehículo (con filtro de empresa)
     try:
         vehiculo = Vehiculo.objects.get(pk=vehiculo_id, empresa=empresa)
     except Vehiculo.DoesNotExist:
         raise Http404("Vehículo no encontrado")
+
+    path_country = _path_country_code(getattr(request, "path", ""))
+    vehicle_country = str(getattr(vehiculo.empresa, "pais", "") or "").upper()
+    if path_country and vehicle_country and path_country != vehicle_country:
+        canonical_url = country_url(
+            {"request": request, "empresa": vehiculo.empresa},
+            "reportes:historial_mantenimiento_vehiculo",
+            vehiculo.pk,
+        )
+        if canonical_url and canonical_url != getattr(request, "path", ""):
+            return HttpResponseRedirect(canonical_url)
 
     # Crear instancia del reporte
     reporte = ReporteKilometraje(empresa)
@@ -1944,7 +1981,7 @@ def api_historial_vehiculo(request, vehiculo_id):
     Útil para Portal del Cliente y exportaciones.
     """
     # 🔒 FILTRO CRÍTICO POR EMPRESA
-    empresa = get_user_empresa_safe(request.user)
+    empresa = _active_empresa_reportes(request)
 
     try:
         vehiculo = Vehiculo.objects.get(pk=vehiculo_id, empresa=empresa)
@@ -1990,7 +2027,7 @@ def exportar_historial_pdf(request, vehiculo_id):
     Genera un PDF del historial completo del vehículo usando WeasyPrint.
     """
     # 🔒 FILTRO CRÍTICO POR EMPRESA
-    empresa = get_user_empresa_safe(request.user)
+    empresa = _active_empresa_reportes(request)
 
     try:
         vehiculo = Vehiculo.objects.get(pk=vehiculo_id, empresa=empresa)
@@ -2070,7 +2107,7 @@ def exportar_historial_excel(request, vehiculo_id):
     Genera un archivo Excel del historial completo del vehículo usando openpyxl.
     """
     # 🔒 FILTRO CRÍTICO POR EMPRESA
-    empresa = get_user_empresa_safe(request.user)
+    empresa = _active_empresa_reportes(request)
 
     try:
         vehiculo = Vehiculo.objects.get(pk=vehiculo_id, empresa=empresa)

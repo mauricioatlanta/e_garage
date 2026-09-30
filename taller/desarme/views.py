@@ -22,6 +22,7 @@ from django.utils.translation import get_language
 from django.views.decorators.http import require_GET, require_POST
 
 from taller.models.empresa import Empresa
+from taller.models.clientes import Cliente
 from taller.models.pieza_desarme import (
     ESTADO_DANADA,
     ESTADO_DISPONIBLE,
@@ -40,6 +41,7 @@ from taller.models.inspeccion_ingreso import DanoInspeccion, InspeccionIngreso
 from taller.models.vendedor_desarme import VendedorDesarme
 from taller.documentos.views_migrated import _reverse_with_request
 from taller.utils.empresa import get_user_empresa_safe
+from taller.services.empresa_service import get_empresa_safe
 from .forms import PiezaDesarmeForm, PiezaSueltaForm, VehiculoDesarmeForm
 from .services import _ensure_vehiculo_desarme
 from taller.services.desarme_financial_service import calcular_ganancia_vehiculo
@@ -188,7 +190,7 @@ def api_vendedor_crear(request):
 def _empresa_or_redirect(request):
     """Obtiene la empresa del usuario o redirige con error (acceso seguro a OneToOne)."""
     try:
-        empresa = request.user.empresa if getattr(request.user, "is_authenticated", False) else None
+        empresa = get_empresa_safe(request) if getattr(request.user, "is_authenticated", False) else None
     except Exception:
         empresa = None
     if not empresa:
@@ -946,6 +948,7 @@ def lista_piezas(request):
         .order_by("nombre")
         .values_list("id", "nombre")
     )
+    clientes_venta_choices = Cliente.objects.filter(empresa=empresa).order_by("nombre", "apellido")
 
     return_to = request.GET.get("return_to", "").strip()
     select_field = request.GET.get("select_field", "").strip()
@@ -970,6 +973,7 @@ def lista_piezas(request):
             "costo_max_filtro": request.GET.get("costo_max", "").strip(),
             "proveedor_filtro": request.GET.get("proveedor", "").strip(),
             "proveedores_choices": proveedores_choices,
+            "clientes_venta_choices": clientes_venta_choices,
             "return_to": return_to,
             "select_field": select_field,
             "querystring": request.GET.urlencode(),
@@ -1008,7 +1012,7 @@ def crear_pieza(request):
                 messages.success(request, f"Pieza {pieza.codigo} creada.")
                 if pieza.vehiculo_desarme_id:
                     return redirect(
-                        _desarme_url(request, f"vehiculos/{pieza.vehiculo_desarme_id}/inventario-inteligente/")
+                        _desarme_url(request, f"piezas/?vehiculo={pieza.vehiculo_desarme_id}&modo=venta")
                     )
                 return redirect(_desarme_url(request, "piezas/"))
             except IntegrityError:
@@ -1123,7 +1127,7 @@ def editar_pieza(request, pk):
                 messages.success(request, "Pieza actualizada.")
                 if pieza.vehiculo_desarme_id:
                     return redirect(
-                        _desarme_url(request, f"vehiculos/{pieza.vehiculo_desarme_id}/inventario-inteligente/")
+                        _desarme_url(request, f"piezas/?vehiculo={pieza.vehiculo_desarme_id}&modo=venta")
                     )
                 return redirect(_desarme_url(request, "piezas/"))
             except Exception as e:
@@ -1168,7 +1172,7 @@ def iniciar_venta_desde_inventario(request, pk):
 
     if not pieza_ids_int:
         messages.warning(request, "No se seleccionaron piezas válidas para la venta.")
-        return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/inventario-inteligente/"))
+        return redirect(_desarme_url(request, f"piezas/?vehiculo={vehiculo.pk}&modo=venta"))
 
     valid_estados = {ESTADO_DISPONIBLE, ESTADO_RESERVADA}
     piezas_qs = PiezaDesarme.objects.filter(
@@ -1231,7 +1235,7 @@ def iniciar_venta_desde_inventario(request, pk):
             request,
             "Las piezas seleccionadas no son vendibles o no tienen stock disponible.",
         )
-        return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/inventario-inteligente/"))
+        return redirect(_desarme_url(request, f"piezas/?vehiculo={vehiculo.pk}&modo=venta"))
 
     request.session["desarme_repuestos_prefill"] = repuestos_prefill
     request.session["desarme_origen_label"] = str(vehiculo)
@@ -1915,7 +1919,7 @@ def _revisar_finalizar_sesion(data, vehiculo, empresa, user, request):
 def avisar_owner_pieza(request, pk):
     """Genera redirect a wa.me para que Vendedor notifique al owner sobre una pieza."""
     pieza = get_object_or_404(PiezaDesarme, pk=pk)
-    empresa = get_user_empresa_safe(request.user)
+    empresa = get_empresa_safe(request)
 
     if not empresa or pieza.empresa_id != empresa.pk:
         messages.error(request, "No tienes acceso a esta pieza.")
@@ -1943,7 +1947,7 @@ def avisar_owner_pieza(request, pk):
             precio_str = f"{simbolo}{miles}"
 
     inventario_url = request.build_absolute_uri(
-        _desarme_url(request, f"vehiculos/{pieza.vehiculo_desarme_id}/inventario-inteligente/")
+        _desarme_url(request, f"piezas/?vehiculo={pieza.vehiculo_desarme_id}&modo=venta")
     )
     vendedor_nombre = request.user.get_full_name() or request.user.username
 

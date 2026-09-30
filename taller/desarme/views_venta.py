@@ -20,6 +20,7 @@ from taller.models.pieza_desarme import (
 _ESTADOS_NO_VENDIBLES = {ESTADO_VENDIDA, ESTADO_SCRAP, ESTADO_FALTANTE}
 from taller.models.venta_desarme import VentaDesarme, LineaVentaDesarme
 from taller.models.vendedor_desarme import VendedorDesarme
+from taller.services.empresa_service import get_empresa_safe
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ SESSION_KEY = "desarme_venta_rapida"
 
 
 def _empresa(request):
-    return getattr(request.user, "empresa", None)
+    return get_empresa_safe(request)
 
 
 def _url(request, suffix):

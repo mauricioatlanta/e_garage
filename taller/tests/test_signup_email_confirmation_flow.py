@@ -29,8 +29,11 @@ class TestSignupEmailConfirmationFlow:
             "email": email,
             "password1": "StrongPass123!",
             "password2": "StrongPass123!",
+            "first_name": "Mauricio",
+            "nombre_taller": "Taller Test",
             "telefono": telefono,
             "country": country,
+            "rubro_principal_signup": "TALLER_MECANICO",
         }
 
     def _extract_confirmation_link(self, body):

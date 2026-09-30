@@ -4,6 +4,7 @@ from django.utils import translation
 from taller.welcome_config import get_config
 from taller.models.public_page_view import PublicPageView
 from taller.services.public_analytics import track_public_page
+from taller.services.public_attribution import attach_public_analytics_cookies
 
 
 def bienvenida_view(request, country: str, lang: str = "es"):
@@ -20,7 +21,7 @@ def bienvenida_view(request, country: str, lang: str = "es"):
     template = f"{country}/{lang}/onboarding/bienvenida.html"
     response = render(request, template, context)
     response.set_cookie("django_language", lang)
-    return response
+    return attach_public_analytics_cookies(request, response)
 
 
 # ── Country wrappers ──────────────────────────────────────────────────────────

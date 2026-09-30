@@ -211,9 +211,20 @@ class WorkspaceNavTests(TestCase):
     def test_recycling_nav_urls_point_into_reciclaje_panel(self):
         config = _make_config("RECYCLING")
         ws = WorkspaceService.resolve(config, "/cl/es", "")
-        urls = {item["key"]: item["url"] for item in ws["nav"]}
-        self.assertEqual(urls[MOD_INICIO], "/cl/es/reciclaje/")
-        self.assertEqual(urls[MOD_REPORTES], "/cl/es/reciclaje/reportes/")
+        urls = {item["nav_key"]: item["url"] for item in ws["nav"]}
+        self.assertEqual(urls["recycling_home"], "/cl/es/reciclaje/")
+        self.assertEqual(urls["recycling_purchases"], "/cl/es/reciclaje/compras/")
+        self.assertEqual(urls["recycling_sales"], "/cl/es/reciclaje/ventas/")
+        self.assertEqual(urls["recycling_catalog"], "/cl/es/reciclaje/stock/")
+        self.assertEqual(urls["recycling_reports"], "/cl/es/reciclaje/reportes/")
+
+    def test_recycling_nav_exposes_catalog_and_sales_as_first_class_buttons(self):
+        config = _make_config("RECYCLING")
+        ws = WorkspaceService.resolve(config, "/cl/es", "")
+        nav_keys = [item["nav_key"] for item in ws["nav"]]
+        self.assertIn("recycling_purchases", nav_keys)
+        self.assertIn("recycling_sales", nav_keys)
+        self.assertIn("recycling_catalog", nav_keys)
 
     def test_desarm_nav_includes_desarme(self):
         config = _make_config("MIXED")

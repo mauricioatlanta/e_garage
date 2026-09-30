@@ -17,6 +17,7 @@ def _serialize_repuesto(linea):
         "origen_repuesto": getattr(linea, "origen_repuesto", None) or "STOCK_BODEGA",
         "pieza_desarme_id": getattr(linea, "pieza_desarme_id", None),
         "costo_linea": float(getattr(linea, "costo_linea", 0) or 0),
+        "proveedor_compra": getattr(linea, "proveedor_compra", "") or "",
     }
 
 

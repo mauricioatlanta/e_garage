@@ -9,6 +9,9 @@ from taller.repuestos.views import (
     eliminar_repuesto,
     lista_repuestos,
     ver_repuesto,
+    pos_buscar_repuestos,
+    pos_confirmar_venta,
+    pos_mostrador,
 )
 
 from .api import api_repuesto_por_codigo
@@ -23,6 +26,9 @@ urlpatterns = [
         name="reabastecimiento",
     ),
     path("crear/", crear_repuesto, name="crear_repuesto"),
+    path("pos/", pos_mostrador, name="pos_mostrador"),
+    path("pos/buscar/", pos_buscar_repuestos, name="pos_buscar"),
+    path("pos/confirmar/", pos_confirmar_venta, name="pos_confirmar"),
     path("<int:pk>/", ver_repuesto, name="ver_repuesto"),
     path("editar/<int:pk>/", editar_repuesto, name="editar_repuesto"),
     path("<int:pk>/eliminar/", eliminar_repuesto, name="eliminar_repuesto"),

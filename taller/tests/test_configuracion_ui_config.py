@@ -51,12 +51,18 @@ def test_workshop_sigue_mostrando_vehiculo_por_defecto():
 
 
 @pytest.mark.django_db
-def test_parts_no_afectado_por_el_cambio():
-    """Regresión: PARTS ya ocultaba servicios/kilometraje; ese
-    comportamiento no debe cambiar (su 'vehiculo' sigue sin override
-    explícito — comportamiento preexistente, fuera de alcance de este fix)."""
+def test_parts_oculta_vehiculo_servicios_y_kilometraje():
+    """Casa de repuestos usa el documento como venta/cotización de repuestos,
+    sin datos de vehículo ni servicios de taller."""
     config = ConfiguracionEmpresaFactory(rubro_principal="PARTS")
     secciones = config.get_secciones_visibles()
     assert secciones["servicios"] is False
     assert secciones["otros_servicios"] is False
     assert secciones["kilometraje"] is False
+    assert secciones["vehiculo"] is False
+
+    ui_config = config.get_ui_config()
+    assert ui_config["show_vehicle"] is False
+    assert ui_config["show_services"] is False
+    assert ui_config["show_otros_servicios"] is False
+    assert ui_config["show_kilometraje"] is False

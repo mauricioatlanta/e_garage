@@ -200,10 +200,11 @@ def test_alta_desarme_completa_hasta_venta_sin_pasar_por_vehiculo(
         p.precio_venta_sugerido = p.precio_venta_sugerido or 100
         p.save(update_fields=["cantidad", "precio_venta_sugerido"])
 
-    # 4) inventario_inteligente: arma el grid de piezas del vehículo.
+    # 4) inventario_inteligente: compatibilidad hacia el centro unificado de piezas.
     req_inv = _get(rf, f"/desarme/vehiculos/{vehiculo.pk}/inventario-inteligente/", user_usa)
     resp_inv = inventario_inteligente(req_inv, pk=vehiculo.pk)
-    assert resp_inv.status_code == 200
+    assert resp_inv.status_code == 302
+    assert resp_inv.url == f"/cl/es/desarme/piezas/?vehiculo={vehiculo.pk}&modo=venta"
 
     # 5) crear_venta_desde_inventario: selecciona una pieza y arma la sesión de venta.
     pieza = piezas[0]

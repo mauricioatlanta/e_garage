@@ -1,5 +1,7 @@
 import hashlib
+import hmac
 
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -33,12 +35,32 @@ class PublicPageView(models.Model):
     language = models.CharField(max_length=8, blank=True, db_index=True)
 
     visitor_hash = models.CharField(max_length=64, db_index=True)
+    # Legacy acquisition fields remain represented until the transition is complete.
+    session_key = models.CharField(max_length=64, blank=True, db_index=True)
+    public_session = models.ForeignKey(
+        "taller.PublicAnalyticsSession",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="page_views",
+    )
 
     referrer = models.CharField(max_length=500, blank=True)
     user_agent = models.CharField(max_length=500, blank=True)
 
     is_mobile = models.BooleanField(default=False, db_index=True)
     is_bot = models.BooleanField(default=False, db_index=True)
+    is_internal = models.BooleanField(default=False, db_index=True)
+    is_staff = models.BooleanField(default=False, db_index=True)
+    is_server = models.BooleanField(default=False, db_index=True)
+
+    utm_source = models.CharField(max_length=120, blank=True, db_index=True)
+    utm_medium = models.CharField(max_length=120, blank=True)
+    utm_campaign = models.CharField(max_length=160, blank=True, db_index=True)
+    utm_content = models.CharField(max_length=160, blank=True)
+    utm_term = models.CharField(max_length=160, blank=True)
+    landing_initial = models.CharField(max_length=255, blank=True)
+    source_label = models.CharField(max_length=120, blank=True, db_index=True)
 
     created_at = models.DateTimeField(default=timezone.now, db_index=True)
 
@@ -50,6 +72,9 @@ class PublicPageView(models.Model):
             models.Index(fields=["path", "created_at"]),
             models.Index(fields=["visitor_hash", "created_at"]),
             models.Index(fields=["is_bot", "created_at"]),
+            models.Index(fields=["is_internal", "created_at"], name="taller_publ_is_inte_19267f_idx"),
+            models.Index(fields=["utm_campaign", "created_at"], name="taller_publ_utm_cam_fa31ef_idx"),
+            models.Index(fields=["source_label", "created_at"], name="taller_publ_source__3db700_idx"),
         ]
         verbose_name = "Visita pública"
         verbose_name_plural = "Visitas públicas"
@@ -63,8 +88,12 @@ class PublicPageView(models.Model):
         Identificador aproximado diario sin conservar la IP original.
         """
         raw = f"{date_key}|{ip}|{user_agent}"
-        return hashlib.sha256(
-            raw.encode("utf-8", errors="replace")
+        key = getattr(settings, "PUBLIC_ANALYTICS_HASH_KEY", "") or settings.SECRET_KEY
+
+        return hmac.new(
+            key.encode("utf-8"),
+            raw.encode("utf-8", errors="replace"),
+            hashlib.sha256,
         ).hexdigest()
 
 

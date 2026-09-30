@@ -1,5 +1,5 @@
 {% extends "layouts/base_egarage_panel.html" %}
-{% load country_url %}
+{% load money %}
 
 {% block page_title %}Stock de reciclaje{% endblock %}
 {% block page_icon %}📦{% endblock %}
@@ -11,10 +11,58 @@
   .rec-table th, .rec-table td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
   .rec-link { color: #00fff7; text-decoration: none; margin-right: 0.75rem; }
   .rec-warn { color: #f59e0b; }
+  .rec-toolbar { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1rem; flex-wrap:wrap; }
+  .rec-btn { background:#00fff7; color:#0f2027; font-weight:bold; border:0; border-radius:8px; padding:0.6rem 1rem; text-decoration:none; }
+  .rec-btn-secondary { background:transparent; color:#00fff7; border:1px solid rgba(0,255,255,0.5); }
+  .rec-alert { background:rgba(14,165,233,0.14); border:1px solid rgba(0,255,255,0.35); color:#e0f2fe; padding:0.75rem 1rem; border-radius:8px; margin-bottom:1rem; }
+  .rec-category-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:0.85rem; margin-bottom:1.5rem; }
+  .rec-category-card { display:block; background:linear-gradient(135deg,rgba(8,18,32,0.95),rgba(10,40,48,0.85)); border:1px solid rgba(0,255,255,0.28); border-radius:10px; padding:1rem; color:#e5e7eb; text-decoration:none; }
+  .rec-category-card.is-active { border-color:#00fff7; box-shadow:0 0 18px rgba(0,255,247,0.22); }
+  .rec-category-name { color:#fff; font-weight:800; }
+  .rec-category-meta { color:#9ca3af; font-size:0.82rem; margin-top:0.25rem; }
+  .rec-empty-panel { border:1px dashed rgba(0,255,255,0.35); border-radius:10px; padding:1.25rem; color:#9ca3af; background:rgba(0,255,255,0.05); }
 </style>
 {% endblock %}
 
 {% block panel_content %}
+{% if messages %}
+  {% for message in messages %}<div class="rec-alert">{{ message }}</div>{% endfor %}
+{% endif %}
+
+<div class="rec-toolbar">
+  <div>
+    <div style="color:#e5e7eb;font-weight:700;">Catálogo de materiales</div>
+    <div style="color:#9ca3af;font-size:0.85rem;">Organiza cada tipo de reciclaje por categorías propias de compra y venta.</div>
+  </div>
+  <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+    <a href="categorias/nueva/" class="rec-btn rec-btn-secondary">+ Nueva categoría</a>
+    <a href="productos/nuevo/" class="rec-btn">+ Nuevo producto</a>
+  </div>
+</div>
+
+<div class="rec-card">
+  <h3>Categorías de reciclaje</h3>
+  {% if categorias %}
+  <div class="rec-category-grid">
+    {% for categoria in categorias %}
+    <a href="?categoria={{ categoria.pk }}" class="rec-category-card {% if categoria_actual.pk == categoria.pk %}is-active{% endif %}">
+      <div class="rec-category-name">{{ categoria.nombre }}</div>
+      <div class="rec-category-meta">{{ categoria.producto_count|default:0 }} material(es)</div>
+      {% if categoria.descripcion %}<div class="rec-category-meta">{{ categoria.descripcion }}</div>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% if categoria_actual %}
+    <a href="./" class="rec-link">Ver solo categorías</a>
+  {% else %}
+    <div class="rec-empty-panel">Selecciona una categoría para ver sus materiales sin mezclar todo el catálogo.</div>
+  {% endif %}
+  {% else %}
+  <div class="rec-empty-panel">Aún no hay categorías. Crea la primera, por ejemplo: Metales, Papel y cartón, Plásticos, Baterías o Chatarra electrónica.</div>
+  {% endif %}
+</div>
+
+{% if not categoria_actual %}
 <div class="rec-card">
   <h3>Catalíticos disponibles</h3>
   <table class="rec-table">
@@ -26,10 +74,10 @@
         <td>{{ c.nombre }}</td>
         <td>{{ c.marca_vehiculo }} {{ c.modelo_vehiculo }}</td>
         <td>{{ c.cantidad_stock }}</td>
-        <td>${{ c.precio_venta|floatformat:0 }}</td>
+        <td>{{ c.precio_venta|money_clp }}</td>
         <td>
-          <a href="{% country_url 'reciclaje_staff:editar_catalitico' c.pk %}" class="rec-link">Editar</a>
-          <a href="{% country_url 'reciclaje_staff:eliminar_catalitico' c.pk %}" class="rec-link">Eliminar</a>
+          <a href="../catalitico/{{ c.pk }}/editar/" class="rec-link">Editar</a>
+          <a href="../catalitico/{{ c.pk }}/eliminar/" class="rec-link">Eliminar</a>
         </td>
       </tr>
       {% empty %}
@@ -38,9 +86,13 @@
     </tbody>
   </table>
 </div>
+{% endif %}
 
 <div class="rec-card">
-  <h3>Chatarra electrónica</h3>
+  <h3>{% if categoria_actual %}Materiales · {{ categoria_actual.nombre }}{% else %}Materiales{% endif %}</h3>
+  {% if not categoria_actual %}
+  <div class="rec-empty-panel">La lista completa está oculta para mantener el catálogo ordenado. Elige una categoría arriba o crea una nueva.</div>
+  {% else %}
   <table class="rec-table">
     <thead><tr><th>Producto</th><th>Categoría</th><th>Stock</th><th>Precio compra</th><th>Precio venta</th></tr></thead>
     <tbody>
@@ -49,13 +101,14 @@
         <td>{{ p.nombre }}</td>
         <td>{{ p.categoria|default:"—" }}</td>
         <td>{{ p.cantidad_stock }} {{ p.get_unidad_medida_display }}{% if p.stock_minimo and p.cantidad_stock < p.stock_minimo %} ⚠️ bajo mínimo{% endif %}</td>
-        <td>${{ p.precio_compra|floatformat:0 }}</td>
-        <td>${{ p.precio_venta|floatformat:0 }}</td>
+        <td>{{ p.precio_compra|money_clp }}</td>
+        <td>{{ p.precio_venta|money_clp }}</td>
       </tr>
       {% empty %}
       <tr><td colspan="5">Sin productos de chatarra.</td></tr>
       {% endfor %}
     </tbody>
   </table>
+  {% endif %}
 </div>
 {% endblock %}

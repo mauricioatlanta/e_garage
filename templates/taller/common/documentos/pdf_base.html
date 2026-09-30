@@ -81,12 +81,6 @@
                         <div class="text-sm">{{ obj.fecha_emision|date:"d/m/Y" }}</div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium mb-1">
-                            {% if country == "US" %}Technician{% else %}Técnico{% endif %}
-                        </label>
-                        <div class="text-sm">{{ obj.tecnico_responsable|default:"-" }}</div>
-                    </div>
                 </div>
 
                 <!-- Información de cliente y vehículo -->
@@ -97,7 +91,7 @@
                         </label>
                         <div class="text-sm">
                             {% if obj.cliente %}
-                                {{ obj.cliente.nombre }}
+                                {{ obj.cliente.nombre }} {{ obj.cliente.apellido|default:"" }}
                                 {% if obj.cliente.tax_id %}<br><small class="text-gray-500">{{ obj.cliente.tax_id }}</small>{% endif %}
                             {% else %}
                                 -

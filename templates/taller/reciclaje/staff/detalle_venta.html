@@ -1,5 +1,5 @@
 {% extends "layouts/base_egarage_panel.html" %}
-{% load country_url %}
+{% load country_url money %}
 
 {% block page_title %}Venta #{{ venta.pk }}{% endblock %}
 {% block page_icon %}💰{% endblock %}
@@ -18,7 +18,7 @@
   <p><strong>Fecha:</strong> {{ venta.created_at|date:"d/m/Y H:i" }}</p>
   <p><strong>Registrado por:</strong> {{ venta.creado_por|default:"—" }}</p>
   {% if venta.notas %}<p><strong>Notas:</strong> {{ venta.notas }}</p>{% endif %}
-  <p><strong>Total:</strong> ${{ venta.total|floatformat:0 }}</p>
+  <p><strong>Total:</strong> {{ venta.total|money_clp }}</p>
 </div>
 
 {% if detalles_catalitico %}
@@ -32,8 +32,8 @@
         <td>{{ d.catalitico.codigo }}</td>
         <td>{{ d.catalitico.nombre }}</td>
         <td>{{ d.cantidad }}</td>
-        <td>${{ d.precio_unitario|floatformat:0 }}</td>
-        <td>${{ d.subtotal|floatformat:0 }}</td>
+        <td>{{ d.precio_unitario|money_clp }}</td>
+        <td>{{ d.subtotal|money_clp }}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -51,8 +51,8 @@
       <tr>
         <td>{{ d.producto.nombre }}</td>
         <td>{{ d.cantidad }}</td>
-        <td>${{ d.precio_unitario|floatformat:0 }}</td>
-        <td>${{ d.subtotal|floatformat:0 }}</td>
+        <td>{{ d.precio_unitario|money_clp }}</td>
+        <td>{{ d.subtotal|money_clp }}</td>
       </tr>
       {% endfor %}
     </tbody>

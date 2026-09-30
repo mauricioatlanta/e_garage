@@ -33,6 +33,7 @@ class SubscriptionAccessService:
         "/clientes/",
         "/reportes/",
         "/servicios/",
+        "/repuestos/",
     )
 
     HARD_URLS = (

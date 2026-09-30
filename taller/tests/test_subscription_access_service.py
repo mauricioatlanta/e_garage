@@ -49,10 +49,30 @@ class SubscriptionAccessServiceTests(TestCase):
         self.assertTrue(decision.warn)
         self.assertEqual(decision.reason, "restricted_soft")
 
+    def test_restricted_allows_repuestos_get_with_warning(self):
+        empresa = self._create_empresa(days_offset=-10, suscripcion_activa=False)
+
+        decision = SubscriptionAccessService.decide(empresa, "/cl/es/repuestos/", "GET")
+
+        self.assertEqual(decision.state, "restricted")
+        self.assertTrue(decision.allow)
+        self.assertTrue(decision.warn)
+        self.assertEqual(decision.reason, "restricted_soft")
+
     def test_restricted_blocks_servicios_post(self):
         empresa = self._create_empresa(days_offset=-10, suscripcion_activa=False)
 
         decision = SubscriptionAccessService.decide(empresa, "/cl/es/servicios/", "POST")
+
+        self.assertEqual(decision.state, "restricted")
+        self.assertFalse(decision.allow)
+        self.assertEqual(decision.redirect_to, "/cl/es/suscripcion/pago/")
+        self.assertEqual(decision.reason, "restricted_write_block")
+
+    def test_restricted_blocks_repuestos_post(self):
+        empresa = self._create_empresa(days_offset=-10, suscripcion_activa=False)
+
+        decision = SubscriptionAccessService.decide(empresa, "/cl/es/repuestos/", "POST")
 
         self.assertEqual(decision.state, "restricted")
         self.assertFalse(decision.allow)

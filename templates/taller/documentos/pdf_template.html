@@ -530,7 +530,6 @@
         <thead>
             <tr>
                 <th>Servicio</th>
-                <th>Empresa Externa</th>
                 <th class="texto-derecha">Precio</th>
             </tr>
         </thead>
@@ -538,7 +537,6 @@
             {% for servicio in otros_servicios %}
             <tr class="servicio-externo">
                 <td>{{ servicio.nombre|default:"" }}</td>
-                <td>{{ servicio.empresa_externa|default:"" }}</td>
                 <td class="texto-derecha">{{ servicio.precio_cliente|money_clp|default:"$0" }}</td>
             </tr>
             {% endfor %}

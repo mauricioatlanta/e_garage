@@ -29,9 +29,11 @@ from django.test import RequestFactory
 
 from taller.models.lineas_documento import (
     LineaRepuesto,
+    ORIGEN_COMPRA_TRABAJO,
     ORIGEN_STOCK_BODEGA,
     ORIGEN_EXTERNO,
 )
+from taller.models.movimiento_inventario import MovimientoInventario
 from taller.models.repuesto import Repuesto
 from taller.services.inventory_service import InventoryService
 from taller.tests.factories import (
@@ -64,6 +66,28 @@ def _make_linea(doc, repuesto, *, cantidad=1, origen=ORIGEN_STOCK_BODEGA):
         descuento=Decimal("0.00"),
         origen_repuesto=origen,
         repuesto=repuesto if origen == ORIGEN_STOCK_BODEGA else None,
+    )
+
+
+def _make_linea_compra_trabajo(
+    doc,
+    repuesto,
+    *,
+    cantidad=1,
+    costo_linea=Decimal("0.00"),
+    proveedor_compra="",
+):
+    return LineaRepuesto.objects.create(
+        documento=doc,
+        nombre=repuesto.nombre,
+        codigo=repuesto.part_number or "TEST",
+        cantidad=cantidad,
+        precio_unitario=repuesto.precio_venta,
+        descuento=Decimal("0.00"),
+        origen_repuesto=ORIGEN_COMPRA_TRABAJO,
+        repuesto=repuesto,
+        costo_linea=costo_linea,
+        proveedor_compra=proveedor_compra,
     )
 
 
@@ -272,3 +296,87 @@ def test_externo_no_mueve_stock():
 
     resultado = InventoryService.procesar_movimiento_stock(doc, "descontar")
     assert resultado["procesado"] is False
+
+
+@pytest.mark.django_db
+def test_compra_trabajo_no_exige_stock_previo_y_deja_saldo_neto_igual_al_emitir():
+    empresa = EmpresaFactory(pais="CL")
+    repuesto = RepuestoFactory(
+        empresa=empresa,
+        cantidad_stock=0,
+        precio_compra=Decimal("4000.00"),
+        precio_venta=Decimal("9000.00"),
+    )
+    doc = DocumentoFactory(empresa=empresa, tipo="FAC", estado="BORRADOR")
+    linea = _make_linea_compra_trabajo(
+        doc,
+        repuesto,
+        cantidad=1,
+        costo_linea=Decimal("4500.00"),
+        proveedor_compra="Proveedor puntual",
+    )
+
+    assert InventoryService.validar_stock_disponible(doc) == []
+
+    resultado = InventoryService.procesar_movimiento_stock(doc, "descontar")
+
+    repuesto.refresh_from_db()
+    linea.refresh_from_db()
+    assert resultado["procesado"] is True
+    assert repuesto.cantidad_stock == 0
+    assert linea.costo_linea == Decimal("4500.00")
+    assert linea.proveedor_compra == "Proveedor puntual"
+
+    movimientos = MovimientoInventario.objects.filter(documento=doc).order_by("created_at", "pk")
+    assert list(movimientos.values_list("tipo", "cantidad_delta", "saldo_resultante")) == [
+        (MovimientoInventario.TipoMovimiento.RECEPCION, 1, 1),
+        (MovimientoInventario.TipoMovimiento.EMISION, -1, 0),
+    ]
+    assert movimientos[0].metadata["proveedor_compra"] == "Proveedor puntual"
+
+
+@pytest.mark.django_db
+def test_anular_compra_trabajo_repone_la_unidad_comprada_al_stock():
+    empresa = EmpresaFactory(pais="CL")
+    repuesto = RepuestoFactory(empresa=empresa, cantidad_stock=0)
+    doc = DocumentoFactory(empresa=empresa, tipo="FAC", estado="BORRADOR")
+    _make_linea_compra_trabajo(doc, repuesto, cantidad=1, costo_linea=Decimal("3000.00"))
+
+    InventoryService.procesar_movimiento_stock(doc, "descontar")
+    InventoryService.procesar_movimiento_stock(doc, "reponer")
+
+    repuesto.refresh_from_db()
+    assert repuesto.cantidad_stock == 1
+    assert MovimientoInventario.objects.filter(
+        documento=doc,
+        tipo=MovimientoInventario.TipoMovimiento.ANULACION,
+        cantidad_delta=1,
+        saldo_resultante=1,
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_cambiar_precio_catalogo_no_altera_linea_historica():
+    empresa = EmpresaFactory(pais="CL")
+    repuesto = RepuestoFactory(
+        empresa=empresa,
+        cantidad_stock=5,
+        precio_compra=Decimal("2000.00"),
+        precio_venta=Decimal("6000.00"),
+    )
+    doc = DocumentoFactory(empresa=empresa, tipo="FAC", estado="BORRADOR")
+    linea = _make_linea_compra_trabajo(
+        doc,
+        repuesto,
+        cantidad=1,
+        costo_linea=Decimal("2500.00"),
+    )
+
+    Repuesto.objects.filter(pk=repuesto.pk).update(
+        precio_compra=Decimal("5000.00"),
+        precio_venta=Decimal("12000.00"),
+    )
+
+    linea.refresh_from_db()
+    assert linea.precio_unitario == Decimal("6000.00")
+    assert linea.costo_linea == Decimal("2500.00")

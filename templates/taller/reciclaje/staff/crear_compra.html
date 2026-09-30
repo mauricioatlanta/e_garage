@@ -1,5 +1,6 @@
 {% extends "layouts/base_egarage_panel.html" %}
 {% load country_url %}
+{% load l10n %}
 
 {% block page_title %}Nueva compra de reciclaje{% endblock %}
 {% block page_subtitle %}Registra catalíticos y/o chatarra comprados a un cliente{% endblock %}
@@ -16,6 +17,52 @@
   .rec-table th { text-align: left; color: #9ca3af; font-size: 0.8rem; padding: 0.4rem; }
   .rec-table td { padding: 0.3rem 0.4rem; }
   .rec-field-label { color: #9ca3af; font-size: 0.85rem; display: block; margin-bottom: 0.25rem; }
+  .rec-smart-cell { min-width: 180px; position: relative; }
+  .rec-smart-input { width: 100%; }
+  .rec-suggest-panel {
+    background: rgba(2, 8, 23, 0.98);
+    border: 1px solid rgba(0,255,255,0.35);
+    border-radius: 8px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+    display: none;
+    left: 0;
+    max-height: 280px;
+    overflow-y: auto;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.35rem);
+    z-index: 30;
+  }
+  .rec-suggest-panel.is-open { display: block; }
+  .rec-suggest-item {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgba(148,163,184,0.12);
+    color: #e5e7eb;
+    cursor: pointer;
+    display: block;
+    padding: 0.65rem 0.75rem;
+    text-align: left;
+    width: 100%;
+  }
+  .rec-suggest-item:hover, .rec-suggest-item.is-active {
+    background: rgba(0,255,247,0.12);
+  }
+  .rec-suggest-code { color:#67e8f9; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight:800; }
+  .rec-suggest-name { color:#fff; font-weight:750; margin-left:0.35rem; }
+  .rec-suggest-meta { color:#94a3b8; font-size:0.78rem; margin-top:0.18rem; }
+  .rec-suggest-empty { color:#94a3b8; padding:0.75rem; font-size:0.82rem; }
+  .rec-money-wrap { position: relative; }
+  .rec-money-input { min-width: 118px; padding-right: 0.7rem; text-align: right; }
+  .rec-qty-wrap { align-items:center; display:flex; gap:0.4rem; }
+  .rec-unit-pill {
+    border: 1px solid rgba(0,255,255,0.32);
+    border-radius: 999px;
+    color: #a5f3fc;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.28rem 0.45rem;
+  }
 </style>
 {% endblock %}
 
@@ -60,16 +107,29 @@
     <h3>Catalíticos</h3>
     <table class="rec-table" id="tabla-catalitico">
       <thead>
-        <tr><th>Código</th><th>Nombre</th><th>Marca</th><th>Modelo</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th><th></th></tr>
+        <tr><th>Código</th><th>Nombre</th><th>Marca</th><th>Modelo</th><th>Cantidad (unid.)</th><th>Precio unitario</th><th>Subtotal</th><th></th></tr>
       </thead>
       <tbody>
         <tr>
-          <td><input type="text" name="catalitico_codigo[]" class="rec-input rec-linea-codigo"></td>
+          <td class="rec-smart-cell">
+            <input type="text" name="catalitico_codigo[]" class="rec-input rec-linea-codigo rec-smart-input" autocomplete="off" placeholder="Buscar código, marca o modelo">
+            <div class="rec-suggest-panel" data-suggest-panel></div>
+          </td>
           <td><input type="text" name="catalitico_nombre[]" class="rec-input"></td>
           <td><input type="text" name="catalitico_marca[]" class="rec-input" style="width:100px;"></td>
           <td><input type="text" name="catalitico_modelo[]" class="rec-input" style="width:100px;"></td>
-          <td><input type="number" name="catalitico_cantidad[]" class="rec-input rec-linea-cantidad" value="1" min="1" style="width:70px;"></td>
-          <td><input type="number" name="catalitico_precio[]" class="rec-input rec-linea-precio" step="any" style="width:110px;"></td>
+          <td>
+            <div class="rec-qty-wrap">
+              <input type="number" name="catalitico_cantidad[]" class="rec-input rec-linea-cantidad" value="1" min="1" style="width:70px;">
+              <span class="rec-unit-pill">unid.</span>
+            </div>
+          </td>
+          <td>
+            <div class="rec-money-wrap">
+              <input type="text" class="rec-input rec-linea-precio rec-money-input" inputmode="numeric" autocomplete="off" placeholder="$0">
+              <input type="hidden" name="catalitico_precio[]" class="rec-linea-precio-raw">
+            </div>
+          </td>
           <td class="rec-linea-subtotal">$0</td>
           <td><button type="button" class="rec-btn-sm" onclick="agregarFila('tabla-catalitico', this)">+ fila</button></td>
         </tr>
@@ -84,20 +144,27 @@
     <h3>Chatarra electrónica</h3>
     <table class="rec-table" id="tabla-chatarra">
       <thead>
-        <tr><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th><th></th></tr>
+        <tr><th>Producto</th><th>Cantidad ({% if country_code == "US" %}lb{% else %}kg{% endif %})</th><th>Precio unitario</th><th>Subtotal</th><th></th></tr>
       </thead>
       <tbody>
         <tr>
-          <td>
-            <select name="chatarra_producto_id[]" class="rec-select">
-              <option value="">— Seleccionar —</option>
-              {% for p in catalogo_chatarra %}
-              <option value="{{ p.pk }}">{{ p.nombre }} ({{ p.get_unidad_medida_display }})</option>
-              {% endfor %}
-            </select>
+          <td class="rec-smart-cell">
+            <input type="hidden" name="chatarra_producto_id[]" class="rec-producto-id">
+            <input type="text" class="rec-input rec-producto-busqueda" autocomplete="off" placeholder="Buscar por código o nombre">
+            <div class="rec-suggest-panel" data-product-suggest-panel></div>
           </td>
-          <td><input type="number" name="chatarra_cantidad[]" class="rec-input rec-linea-cantidad" step="any" style="width:90px;"></td>
-          <td><input type="number" name="chatarra_precio[]" class="rec-input rec-linea-precio" step="any" style="width:110px;"></td>
+          <td>
+            <div class="rec-qty-wrap">
+              <input type="number" name="chatarra_cantidad[]" class="rec-input rec-linea-cantidad" step="any" style="width:90px;" placeholder="{% if country_code == "US" %}lb{% else %}kg{% endif %}">
+              <span class="rec-unit-pill">{% if country_code == "US" %}lb{% else %}kg{% endif %}</span>
+            </div>
+          </td>
+          <td>
+            <div class="rec-money-wrap">
+              <input type="text" class="rec-input rec-linea-precio rec-money-input" inputmode="numeric" autocomplete="off" placeholder="$0">
+              <input type="hidden" name="chatarra_precio[]" class="rec-linea-precio-raw">
+            </div>
+          </td>
           <td class="rec-linea-subtotal">$0</td>
           <td><button type="button" class="rec-btn-sm" onclick="agregarFila('tabla-chatarra', this)">+ fila</button></td>
         </tr>
@@ -123,32 +190,193 @@
 
 <script>
 var URL_CATALITICO_POR_CODIGO = "{% country_url 'reciclaje_staff:api_catalitico_por_codigo' %}";
+var URL_PRODUCTO_CHATARRA = "{% country_url 'reciclaje_staff:api_producto_chatarra' %}";
+var busquedaCataliticoTimers = new WeakMap();
+var busquedaProductoTimers = new WeakMap();
 
-function autocompletarCatalitico(inputCodigo) {
+function filaDeCodigo(inputCodigo) {
+  return inputCodigo.closest('tr');
+}
+
+function panelDeCodigo(inputCodigo) {
+  var celda = inputCodigo.closest('.rec-smart-cell');
+  return celda ? celda.querySelector('[data-suggest-panel]') : null;
+}
+
+function cerrarSugerencias(inputCodigo) {
+  var panel = panelDeCodigo(inputCodigo);
+  if (!panel) return;
+  panel.classList.remove('is-open');
+  panel.innerHTML = '';
+}
+
+function panelDeProducto(inputProducto) {
+  var celda = inputProducto.closest('.rec-smart-cell');
+  return celda ? celda.querySelector('[data-product-suggest-panel]') : null;
+}
+
+function cerrarSugerenciasProducto(inputProducto) {
+  var panel = panelDeProducto(inputProducto);
+  if (!panel) return;
+  panel.classList.remove('is-open');
+  panel.innerHTML = '';
+}
+
+function aplicarProducto(inputProducto, item) {
+  var fila = inputProducto.closest('tr');
+  if (!fila || !item) return;
+  inputProducto.value = (item.nombre || '') + ' (' + (item.codigo || '') + ')';
+  fila.querySelector('.rec-producto-id').value = item.id || '';
+  setPrecioFila(fila.querySelector('.rec-linea-precio'), item.precio_compra || '');
+  cerrarSugerenciasProducto(inputProducto);
+  recalcularTotales();
+}
+
+function renderSugerenciasProducto(inputProducto, sugerencias) {
+  var panel = panelDeProducto(inputProducto);
+  if (!panel) return;
+  panel.innerHTML = '';
+  if (!sugerencias.length) {
+    panel.innerHTML = '<div class="rec-suggest-empty">No hay productos con ese código o nombre.</div>';
+    panel.classList.add('is-open');
+    return;
+  }
+  sugerencias.forEach(function (item) {
+    var boton = document.createElement('button');
+    boton.type = 'button';
+    boton.className = 'rec-suggest-item';
+    boton.innerHTML = '<span class="rec-suggest-code"></span><span class="rec-suggest-name"></span><div class="rec-suggest-meta"></div>';
+    boton.querySelector('.rec-suggest-code').textContent = item.codigo || '';
+    boton.querySelector('.rec-suggest-name').textContent = item.nombre || '';
+    boton.querySelector('.rec-suggest-meta').textContent = [
+      item.unidad || '',
+      item.precio_compra ? 'Compra: ' + formatoCLP(item.precio_compra) : '',
+      item.cantidad_stock != null ? 'Stock: ' + item.cantidad_stock : ''
+    ].filter(Boolean).join(' · ');
+    boton.addEventListener('mousedown', function (event) {
+      event.preventDefault();
+      aplicarProducto(inputProducto, item);
+    });
+    panel.appendChild(boton);
+  });
+  panel.classList.add('is-open');
+}
+
+function buscarProducto(inputProducto) {
+  var termino = inputProducto.value.trim();
+  if (termino.length < 2) {
+    cerrarSugerenciasProducto(inputProducto);
+    return;
+  }
+  fetch(URL_PRODUCTO_CHATARRA + '?q=' + encodeURIComponent(termino))
+    .then(function (res) { return res.json(); })
+    .then(function (data) { renderSugerenciasProducto(inputProducto, data.suggestions || []); })
+    .catch(function () { cerrarSugerenciasProducto(inputProducto); });
+}
+
+function programarBusquedaProducto(inputProducto) {
+  window.clearTimeout(busquedaProductoTimers.get(inputProducto));
+  busquedaProductoTimers.set(inputProducto, window.setTimeout(function () {
+    buscarProducto(inputProducto);
+  }, 180));
+}
+
+function aplicarCatalitico(inputCodigo, data) {
+  var fila = filaDeCodigo(inputCodigo);
+  if (!fila || !data) return;
+  inputCodigo.value = data.codigo || inputCodigo.value;
+  var campoNombre = fila.querySelector('[name="catalitico_nombre[]"]');
+  var campoMarca = fila.querySelector('[name="catalitico_marca[]"]');
+  var campoModelo = fila.querySelector('[name="catalitico_modelo[]"]');
+  var campoPrecio = fila.querySelector('.rec-linea-precio');
+  if (campoNombre) campoNombre.value = data.nombre || '';
+  if (campoMarca) campoMarca.value = data.marca_vehiculo || '';
+  if (campoModelo) campoModelo.value = data.modelo_vehiculo || '';
+  if (campoPrecio) setPrecioFila(campoPrecio, data.precio_compra || '');
+  cerrarSugerencias(inputCodigo);
+  recalcularTotales();
+}
+
+function renderSugerencias(inputCodigo, sugerencias) {
+  var panel = panelDeCodigo(inputCodigo);
+  if (!panel) return;
+  panel.innerHTML = '';
+  if (!sugerencias.length) {
+    panel.innerHTML = '<div class="rec-suggest-empty">Sin coincidencias. Puedes ingresar un código nuevo.</div>';
+    panel.classList.add('is-open');
+    return;
+  }
+  sugerencias.forEach(function (item) {
+    var boton = document.createElement('button');
+    boton.type = 'button';
+    boton.className = 'rec-suggest-item';
+    boton.innerHTML =
+      '<span class="rec-suggest-code"></span>' +
+      '<span class="rec-suggest-name"></span>' +
+      '<div class="rec-suggest-meta"></div>';
+    boton.querySelector('.rec-suggest-code').textContent = item.codigo || '';
+    boton.querySelector('.rec-suggest-name').textContent = item.nombre || '';
+    boton.querySelector('.rec-suggest-meta').textContent = [
+      item.marca_vehiculo || '',
+      item.modelo_vehiculo || '',
+      item.precio_compra ? 'Compra: ' + formatoCLP(item.precio_compra) : '',
+      item.cantidad_stock != null ? 'Stock: ' + item.cantidad_stock : ''
+    ].filter(Boolean).join(' · ');
+    boton.addEventListener('mousedown', function (event) {
+      event.preventDefault();
+      aplicarCatalitico(inputCodigo, item);
+    });
+    panel.appendChild(boton);
+  });
+  panel.classList.add('is-open');
+}
+
+function buscarCatalitico(inputCodigo) {
   var codigo = inputCodigo.value.trim();
-  if (!codigo) return;
-  var fila = inputCodigo.closest('tr');
+  if (codigo.length < 2) {
+    cerrarSugerencias(inputCodigo);
+    return;
+  }
 
   fetch(URL_CATALITICO_POR_CODIGO + '?codigo=' + encodeURIComponent(codigo))
     .then(function (res) { return res.json(); })
     .then(function (data) {
-      if (!data.found) return;
-      var campoNombre = fila.querySelector('[name="catalitico_nombre[]"]');
-      var campoMarca = fila.querySelector('[name="catalitico_marca[]"]');
-      var campoModelo = fila.querySelector('[name="catalitico_modelo[]"]');
-      var campoPrecio = fila.querySelector('[name="catalitico_precio[]"]');
-      if (campoNombre && !campoNombre.value) campoNombre.value = data.nombre || '';
-      if (campoMarca && !campoMarca.value) campoMarca.value = data.marca_vehiculo || '';
-      if (campoModelo && !campoModelo.value) campoModelo.value = data.modelo_vehiculo || '';
-      if (campoPrecio && !campoPrecio.value) campoPrecio.value = data.precio_compra || '';
-      recalcularTotales();
+      renderSugerencias(inputCodigo, data.suggestions || []);
+      if (data.found && (data.codigo || '').toLowerCase() === codigo.toLowerCase()) {
+        aplicarCatalitico(inputCodigo, data);
+      }
     })
-    .catch(function () { /* código nuevo o error de red: se deja en blanco para completar a mano */ });
+    .catch(function () {
+      cerrarSugerencias(inputCodigo);
+    });
 }
+
+function programarBusquedaCatalitico(inputCodigo) {
+  window.clearTimeout(busquedaCataliticoTimers.get(inputCodigo));
+  busquedaCataliticoTimers.set(inputCodigo, window.setTimeout(function () {
+    buscarCatalitico(inputCodigo);
+  }, 180));
+}
+
+document.addEventListener('input', function (event) {
+  if (event.target.classList && event.target.classList.contains('rec-linea-codigo')) {
+    programarBusquedaCatalitico(event.target);
+  } else if (event.target.classList && event.target.classList.contains('rec-producto-busqueda')) {
+    var fila = event.target.closest('tr');
+    if (fila) fila.querySelector('.rec-producto-id').value = '';
+    programarBusquedaProducto(event.target);
+  }
+});
 
 document.addEventListener('focusout', function (event) {
   if (event.target.classList && event.target.classList.contains('rec-linea-codigo')) {
-    autocompletarCatalitico(event.target);
+    window.setTimeout(function () {
+      cerrarSugerencias(event.target);
+    }, 160);
+  } else if (event.target.classList && event.target.classList.contains('rec-producto-busqueda')) {
+    window.setTimeout(function () {
+      cerrarSugerenciasProducto(event.target);
+    }, 160);
   }
 });
 
@@ -163,13 +391,43 @@ function agregarFila(tablaId, boton) {
     }
   });
   fila.querySelectorAll('select').forEach(function (select) { select.selectedIndex = 0; });
+  fila.querySelectorAll('.rec-producto-id').forEach(function (input) { input.value = ''; });
+  fila.querySelectorAll('.rec-producto-busqueda').forEach(function (input) { input.value = ''; });
+  fila.querySelectorAll('.rec-suggest-panel').forEach(function (panel) {
+    panel.classList.remove('is-open');
+    panel.innerHTML = '';
+  });
   fila.querySelector('.rec-linea-subtotal').textContent = '$0';
   tabla.appendChild(fila);
   recalcularTotales();
 }
 
 function formatoCLP(numero) {
-  return '$' + Math.round(numero).toLocaleString('es-CL');
+  return '$' + Math.round(Number(numero) || 0).toLocaleString('es-CL');
+}
+
+function valorMonetario(raw) {
+  var texto = String(raw || '').replace(/\$/g, '').replace(/\s/g, '').trim();
+  if (!texto) return 0;
+  if (texto.indexOf(',') >= 0 && texto.indexOf('.') < 0) {
+    texto = texto.replace(',', '.');
+  } else {
+    texto = texto.replace(/\./g, '').replace(',', '.');
+  }
+  var numero = Number(texto);
+  return Number.isFinite(numero) ? numero : 0;
+}
+
+function setPrecioFila(inputPrecio, valor) {
+  var numero = valorMonetario(valor);
+  var fila = inputPrecio.closest('tr');
+  var raw = fila ? fila.querySelector('.rec-linea-precio-raw') : null;
+  inputPrecio.value = numero ? formatoCLP(numero) : '';
+  if (raw) raw.value = numero ? String(Math.round(numero)) : '';
+}
+
+function sincronizarPrecioInput(inputPrecio) {
+  setPrecioFila(inputPrecio, inputPrecio.value);
 }
 
 function recalcularTotales() {
@@ -180,7 +438,9 @@ function recalcularTotales() {
     let subtotalTabla = 0;
     tabla.querySelectorAll('tbody tr').forEach(function (fila) {
       const cantidad = parseFloat(fila.querySelector('.rec-linea-cantidad').value) || 0;
-      const precio = parseFloat(fila.querySelector('.rec-linea-precio').value) || 0;
+      const precioInput = fila.querySelector('.rec-linea-precio');
+      const precioRaw = fila.querySelector('.rec-linea-precio-raw');
+      const precio = precioRaw && precioRaw.value ? Number(precioRaw.value) : valorMonetario(precioInput ? precioInput.value : 0);
       const subtotal = cantidad * precio;
       fila.querySelector('.rec-linea-subtotal').textContent = formatoCLP(subtotal);
       subtotalTabla += subtotal;
@@ -194,9 +454,13 @@ function recalcularTotales() {
 }
 
 document.addEventListener('input', function (event) {
-  if (event.target.classList.contains('rec-linea-cantidad') || event.target.classList.contains('rec-linea-precio')) {
+  if (event.target.classList.contains('rec-linea-precio')) {
+    sincronizarPrecioInput(event.target);
+    recalcularTotales();
+  } else if (event.target.classList.contains('rec-linea-cantidad')) {
     recalcularTotales();
   }
 });
+
 </script>
 {% endblock %}

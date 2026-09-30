@@ -17,15 +17,15 @@ from django.conf import settings
 # USA - Inglés
 # ---------------------------
 UI_LABELS_US_EN = {
-    "documents_menu": "INVOICED",
-    "new_document": "New Invoice",
-    "document_center": "Invoices",
+    "documents_menu": "Documents",
+    "new_document": "New Document",
+    "document_center": "Documents",
     "document_type_invoice": "Invoice",
     "document_type_estimate": "Estimate",
     "document_type_work_order": "Work Order",
     "document_number": "Invoice Number",
-    "create_button": "Create Invoice",
-    "edit_button": "Edit Invoice",
+    "create_button": "Create Document",
+    "edit_button": "Edit Document",
 }
 
 
@@ -180,6 +180,40 @@ UI_LABELS_UY_ES = {
 # Desde settings (EGARAGE_DEFAULT_*) para una sola fuente de verdad; fallback Chile/es
 DEFAULT_COUNTRY_CODE = getattr(settings, "EGARAGE_DEFAULT_COUNTRY", "cl").upper()
 DEFAULT_LANGUAGE_CODE = getattr(settings, "EGARAGE_DEFAULT_LANG", "es")
+
+
+WORK_LABEL_RUBROS = {
+    "WORKSHOP",
+    "WORKSHOP_MOTO",
+    "WORKSHOP_HEAVY",
+    "EXHAUST",
+    "BODYSHOP",
+    "ELECTRIC",
+    "GLASS_AUDIO",
+    "FLEET",
+    "FLEET_REPAIR",
+    "DETAILING",
+    "SUSPENSION_STEERING",
+    "BRAKES",
+    "OBD_DIAGNOSTIC",
+    "CLASSIC_CARS",
+    "AUDIO_ENTERTAINMENT",
+    "GAS_CONVERSION",
+    "BODY_GLASS",
+    "TUNING",
+}
+
+
+def get_document_module_label(rubro, language_code=None):
+    """Return the business-facing name for the document workflow button."""
+    rubro = str(rubro or "WORKSHOP").strip().upper()
+    language_code = str(language_code or DEFAULT_LANGUAGE_CODE).lower()
+
+    if rubro in {"PARTS", "DESARMADURIA", "MIXED", "TIRE"}:
+        return "Sales" if language_code.startswith("en") else "Ventas"
+    if rubro in WORK_LABEL_RUBROS:
+        return "Work" if language_code.startswith("en") else "Trabajos"
+    return "Documents" if language_code.startswith("en") else "Documentos"
 
 
 def get_ui_labels(country_code=None, language_code=None):

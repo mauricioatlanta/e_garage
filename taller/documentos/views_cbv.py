@@ -7,6 +7,7 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from core.views import TenantViewMixin
 from taller.mixins import CountryLangTemplateMixin  # Agregar import del mixin
+from taller.services.empresa_service import get_empresa_safe
 
 from .forms import DocumentoForm
 from .models import Documento
@@ -110,7 +111,10 @@ class DocumentoDetailView(
 
     def get_queryset(self):
         """Optimizar consultas con select_related y prefetch_related"""
-        qs = super().get_queryset()
+        empresa = get_empresa_safe(self.request)
+        if not empresa:
+            return Documento.objects.none()
+        qs = Documento.objects.filter(empresa=empresa)
         qs = qs.select_related("cliente", "vehiculo", "tecnico_responsable")
         qs = qs.prefetch_related(
             "lineas_repuesto__repuesto",

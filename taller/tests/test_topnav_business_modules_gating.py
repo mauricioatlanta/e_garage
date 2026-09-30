@@ -82,6 +82,23 @@ def test_topnav_recycling_boton_compras_va_al_panel_de_reciclaje(empresa_recycli
 
 
 @pytest.mark.django_db
+def test_topnav_recycling_muestra_catalogo_y_ventas(empresa_recycling):
+    """Una recicladora necesita llegar directo al listado de materiales/metales
+    comprados y a las ventas, no solo a un botón genérico de compras."""
+    client = Client()
+    client.force_login(empresa_recycling.user)
+
+    response = client.get("/cl/es/reciclaje/")
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert ">Catálogo / stock<" in content
+    assert ">Ventas<" in content
+    assert "/cl/es/reciclaje/stock/" in content
+    assert "/cl/es/reciclaje/ventas/" in content
+
+
+@pytest.mark.django_db
 def test_topnav_workshop_sigue_mostrando_boton_documentos(empresa_workshop):
     """Regresión: el rubro WORKSHOP no debe perder el botón "Documentos"
     apuntando al formulario genérico."""

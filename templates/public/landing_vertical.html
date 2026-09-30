@@ -41,6 +41,7 @@
 
   <div class="flex flex-col sm:flex-row gap-4 justify-center mb-4">
     <a href="{% url 'account_signup' %}?rubro={{ rubro_key }}"
+       {% if canonical_path == "/cl/desarmadurias/" and vertical_key == "salvage" %}data-public-funnel-trial-cta="hero"{% endif %}
        class="px-8 py-4 rounded-xl {{ tw.btn_bg }} {{ tw.btn_text }} font-bold text-lg {{ tw.btn_hover }} transition-all shadow-lg {{ tw.btn_shadow }} font-orbitron">
       {{ hero_cta_primary }}
     </a>
@@ -242,6 +243,7 @@
   <h2 class="font-orbitron text-2xl font-black text-white mb-3">{{ cta_mid_heading }}</h2>
   <p class="text-slate-400 mb-8">{{ cta_mid_subtext }}</p>
   <a href="{% url 'account_signup' %}?rubro={{ rubro_key }}"
+     {% if canonical_path == "/cl/desarmadurias/" and vertical_key == "salvage" %}data-public-funnel-trial-cta="mid"{% endif %}
      class="inline-block px-10 py-5 rounded-xl {{ tw.btn_bg }} {{ tw.btn_text }} font-black text-xl {{ tw.btn_hover }} transition-all shadow-xl {{ tw.btn_shadow }} font-orbitron">
     {{ cta_button_primary }}
   </a>
@@ -300,6 +302,7 @@
   <p class="text-slate-400 mb-8">{{ cta_final_subtext }}</p>
 
   <a href="{% url 'account_signup' %}?rubro={{ rubro_key }}"
+     {% if canonical_path == "/cl/desarmadurias/" and vertical_key == "salvage" %}data-public-funnel-trial-cta="final"{% endif %}
      class="inline-block px-12 py-5 rounded-xl {{ tw.btn_bg }} {{ tw.btn_text }} font-black text-xl {{ tw.btn_hover }} transition-all shadow-xl {{ tw.btn_shadow }} font-orbitron mb-6">
     {{ cta_final_button }}
   </a>
@@ -308,4 +311,11 @@
 
 </section>
 
+{% endblock %}
+
+{% block extra_scripts %}
+  {{ block.super }}
+  {% if canonical_path == "/cl/desarmadurias/" and vertical_key == "salvage" %}
+    <script src="{% static 'public/js/public_funnel_tracking.js' %}" defer></script>
+  {% endif %}
 {% endblock %}

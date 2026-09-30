@@ -147,7 +147,9 @@ class VehiculoForm(forms.ModelForm):
         self._motor_nuevo = bool(self._pending_motor_nombre)
         self._caja_nuevo = bool(self._pending_caja_nombre)
 
-        empresa = getattr(self.user, "empresa", None)
+        # The request tenant is authoritative during QA context switching.
+        # Keep the owner's company as the fallback for regular requests.
+        empresa = getattr(self.request, "empresa", None) or getattr(self.user, "empresa", None)
         # Detectar país: primero de empresa, luego de request.path
         pais = self._resolve_country(self.user, self.request, default="CL")
 

@@ -22,7 +22,7 @@
     <div class="relative flex items-center gap-3 rounded-lg border border-cyan-500/30 bg-black/40 backdrop-blur-sm px-3 py-2">
       <div class="relative flex-1">
         <form method="get" id="search-form" data-search-url="{% country_url 'ajax:buscar_clientes' %}">
-          <input type="search" name="q" id="search-input" value="{{ request.GET.q }}" 
+          <input type="search" name="q" id="search-input" value="{{ search_query|default:request.GET.q }}"
                  placeholder="{% trans 'Search clients...' %}"
                  class="w-full pl-10 pr-4 py-3 bg-black/30 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 text-sm rounded-lg border border-cyan-400/20" autocomplete="off" />
           <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400">🔍</div>
@@ -676,11 +676,11 @@ tbody tr:hover::before {
         </div>
         <div class="flex gap-1">
             {% if page_obj.has_previous %}
-                <a href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}" class="page-btn"><i class="fas fa-angle-left"></i></a>
+                <a href="?q={{ search_query|default:request.GET.q }}&page={{ page_obj.previous_page_number }}" class="page-btn"><i class="fas fa-angle-left"></i></a>
             {% endif %}
             <span class="page-btn page-current">{{ page_obj.number }}</span>
             {% if page_obj.has_next %}
-                <a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}" class="page-btn"><i class="fas fa-angle-right"></i></a>
+                <a href="?q={{ search_query|default:request.GET.q }}&page={{ page_obj.next_page_number }}" class="page-btn"><i class="fas fa-angle-right"></i></a>
             {% endif %}
         </div>
     </div>

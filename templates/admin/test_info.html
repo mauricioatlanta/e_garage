@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Usuarios de prueba | {{ site_title|default:"eGarage admin" }}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <h1>Usuarios de prueba</h1>
+  <p class="help">Actualizado: {{ timestamp|date:"Y-m-d H:i:s" }}</p>
+
+  <div class="module">
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Usuario</th>
+          <th>Empresa</th>
+          <th>Staff</th>
+          <th>Superuser</th>
+          <th>Activo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for usuario in usuarios_prueba %}
+          <tr>
+            <td>{{ usuario.email }}</td>
+            <td>{{ usuario.get_username }}</td>
+            <td>{{ usuario.empresa|default:"-" }}</td>
+            <td>{{ usuario.is_staff|yesno:"Si,No" }}</td>
+            <td>{{ usuario.is_superuser|yesno:"Si,No" }}</td>
+            <td>{{ usuario.is_active|yesno:"Si,No" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6">No se encontraron usuarios de prueba.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

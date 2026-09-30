@@ -102,6 +102,41 @@ SIGNUP_RUBRO_GROUPS = [
 _GROUP_KEY_TO_RUBROS = {g["key"]: g["rubros"] for g in SIGNUP_RUBRO_GROUPS}
 _SIGNUP_GROUP_CHOICES = [(g["key"], g["label"]) for g in SIGNUP_RUBRO_GROUPS]
 _VALID_GROUP_KEYS = frozenset(_GROUP_KEY_TO_RUBROS)
+PUBLIC_RUBRO_ALIASES = {
+    "taller": "TALLER_MECANICO",
+    "talleres": "TALLER_MECANICO",
+    "workshop": "TALLER_MECANICO",
+    "desarmaduria": "DESARMADURIA",
+    "desarmadurias": "DESARMADURIA",
+    "salvage": "DESARMADURIA",
+    "repuestos": "CASA_REPUESTOS",
+    "repuesto": "CASA_REPUESTOS",
+    "parts": "CASA_REPUESTOS",
+    "casa_repuestos": "CASA_REPUESTOS",
+    "reciclaje": "RECICLAJE",
+    "recycling": "RECICLAJE",
+    "vulcanizacion": "NEUMATICOS",
+    "vulcanizaciones": "NEUMATICOS",
+    "neumaticos": "NEUMATICOS",
+    "neumatico": "NEUMATICOS",
+    "tire": "NEUMATICOS",
+    "tires": "NEUMATICOS",
+    "llantera": "NEUMATICOS",
+    "llantas": "NEUMATICOS",
+    "gomeria": "NEUMATICOS",
+    "carwash": "CARROCERIA_DETAILING",
+    "lavado": "CARROCERIA_DETAILING",
+}
+
+
+def normalize_public_rubro(value: str) -> str:
+    raw = (value or "").strip()
+    if not raw:
+        return ""
+    upper = raw.upper()
+    if upper in _VALID_GROUP_KEYS:
+        return upper
+    return PUBLIC_RUBRO_ALIASES.get(raw.lower(), "")
 
 
 class CustomSignupForm(SignupForm):
@@ -123,11 +158,11 @@ class CustomSignupForm(SignupForm):
     first_name = forms.CharField(
         max_length=100,
         label="Nombre",
-        required=False,  # ✅ Opcional
+        required=True,
         widget=forms.TextInput(
-            attrs={"class": "input-futurista", "placeholder": "Nombre (opcional)"}
+            attrs={"class": "input-futurista", "placeholder": "Tu nombre"}
         ),
-        help_text="Ingresa tu nombre (opcional)",
+        help_text="",
     )
     last_name = forms.CharField(
         max_length=100,
@@ -149,12 +184,12 @@ class CustomSignupForm(SignupForm):
     )
     nombre_taller = forms.CharField(
         max_length=100,
-        label="Nombre de tu Taller (Opcional)",
-        required=False,  # ✅ FLUJO "LITE": Campo opcional
+        label="Nombre del taller",
+        required=True,
         widget=forms.TextInput(
-            attrs={"class": "input-futurista", "placeholder": "Ej: Taller San Miguel (Opcional)"}
+            attrs={"class": "input-futurista", "placeholder": "Ej: Taller San Miguel"}
         ),
-        help_text="Puedes dejarlo en blanco y configurarlo después en Settings",
+        help_text="",
     )
     # ✅ PAÍS: Selector visible para que el usuario elija su país en todos los signups
     COUNTRY_CHOICES = [("", "--- Seleccione país / Select country ---")] + \
@@ -209,11 +244,11 @@ class CustomSignupForm(SignupForm):
                 {"class": "input-futurista", "placeholder": "email@ejemplo.com"}
             )
 
-        # ✅ CAMPOS OPCIONALES: first_name, last_name, telefono ahora son opcionales
+        # Campos mínimos del signup público.
         if "first_name" in self.fields:
-            self.fields["first_name"].required = False  # ✅ Opcional
+            self.fields["first_name"].required = True
             self.fields["first_name"].widget.attrs.update(
-                {"class": "input-futurista", "placeholder": "Nombre (opcional)"}
+                {"class": "input-futurista", "placeholder": "Tu nombre"}
             )
             # Asegurar que el widget sea visible
             if hasattr(self.fields["first_name"].widget, "input_type"):
@@ -232,11 +267,11 @@ class CustomSignupForm(SignupForm):
         if "telefono" in self.fields:
             self.fields["telefono"].required = True  # ✅ OBLIGATORIO
 
-        # Configurar nombre_taller como opcional
+        # Configurar nombre_taller como dato mínimo de alta.
         if "nombre_taller" in self.fields:
-            self.fields["nombre_taller"].required = False
+            self.fields["nombre_taller"].required = True
             self.fields["nombre_taller"].widget.attrs.update(
-                {"class": "input-futurista", "placeholder": "Ej: Taller San Miguel (Opcional)"}
+                {"class": "input-futurista", "placeholder": "Ej: Taller San Miguel"}
             )
 
         # ✅ Username opcional - usar email como username si no se proporciona
@@ -277,6 +312,13 @@ class CustomSignupForm(SignupForm):
         if self.country_code and "country" in self.fields:
             self.fields["country"].initial = self.country_code
 
+        rubro_from_url = ""
+        if request:
+            rubro_from_url = (request.GET.get("rubro", "") or "").strip().upper()
+        normalized_rubro = normalize_public_rubro(rubro_from_url)
+        if normalized_rubro and "rubro_principal_signup" in self.fields:
+            self.fields["rubro_principal_signup"].initial = normalized_rubro
+
         # Obtener configuración del país y prefijo telefónico
         if self.country_code:
             country_config = get_country_config(self.country_code)
@@ -314,8 +356,8 @@ class CustomSignupForm(SignupForm):
             self.fields["country"].choices = ch
         if "first_name" in self.fields:
             self.fields["first_name"].label = "First name"
-            self.fields["first_name"].help_text = "Optional"
-            self.fields["first_name"].widget.attrs["placeholder"] = "First name (optional)"
+            self.fields["first_name"].help_text = ""
+            self.fields["first_name"].widget.attrs["placeholder"] = "Your name"
         if "last_name" in self.fields:
             self.fields["last_name"].label = "Last name"
             self.fields["last_name"].help_text = "Optional"
@@ -324,13 +366,9 @@ class CustomSignupForm(SignupForm):
             self.fields["telefono"].label = "Mobile (WhatsApp)"
             self.fields["telefono"].help_text = "Mobile number with country code (E.164 format)"
         if "nombre_taller" in self.fields:
-            self.fields["nombre_taller"].label = "Workshop name (optional)"
-            self.fields["nombre_taller"].help_text = (
-                "You can leave this blank and set it later in Settings"
-            )
-            self.fields["nombre_taller"].widget.attrs[
-                "placeholder"
-            ] = "e.g. Main Street Auto (optional)"
+            self.fields["nombre_taller"].label = "Workshop name"
+            self.fields["nombre_taller"].help_text = ""
+            self.fields["nombre_taller"].widget.attrs["placeholder"] = "e.g. Main Street Auto"
         if "password1" in self.fields:
             self.fields["password1"].label = "Password"
         if "password2" in self.fields:
@@ -366,7 +404,7 @@ class CustomSignupForm(SignupForm):
         return "Este número de contacto ya está vinculado a un taller registrado en eGarage."
 
     def clean_rubro_principal_signup(self):
-        group = (self.cleaned_data.get("rubro_principal_signup") or "").strip()
+        group = normalize_public_rubro(self.cleaned_data.get("rubro_principal_signup") or "")
         if not group:
             raise forms.ValidationError(
                 "Please select your primary business type."

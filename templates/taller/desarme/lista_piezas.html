@@ -126,6 +126,14 @@
     margin-top: 4px;
   }
   .vehiculo-origen a { color: #67e8f9; }
+  .desarme-live-status {
+    color: #94a3b8;
+    font-size: 12px;
+    min-height: 18px;
+  }
+  .piece-card.is-live-hidden {
+    display: none;
+  }
 </style>
 {% endblock %}
 
@@ -169,8 +177,8 @@
 
 {% block search_bar %}
 <div class="desarme-search">
-  <form method="get" action="" class="flex flex-wrap items-center gap-3">
-    <input type="search" name="q" value="{{ q }}" placeholder="{% trans 'Código o nombre...' %}" aria-label="{% trans 'Buscar' %}">
+  <form method="get" action="" class="flex flex-wrap items-center gap-3" id="desarme-pieces-filter-form">
+    <input type="search" name="q" value="{{ q }}" placeholder="{% trans 'Código o nombre...' %}" aria-label="{% trans 'Buscar' %}" id="desarme-live-search" autocomplete="off">
     <select name="estado" class="text-sm">
       <option value="">{% trans "Estado" %}</option>
       {% for value, label in estado_pieza_choices %}
@@ -212,6 +220,7 @@
     <a href="{% country_url 'desarme:lista_piezas' %}" class="text-gray-400 hover:text-cyan-300 text-sm">{% trans "Limpiar" %}</a>
     {% endif %}
   </form>
+  <div class="desarme-live-status mt-2" id="desarme-live-status" aria-live="polite"></div>
   <a href="{% country_url 'desarme:piezas_reporte_pdf' %}?{{ querystring }}" target="_blank"
      class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 inline-flex items-center gap-1.5 mt-2">
     📄 {% trans "Generar PDF" %}
@@ -223,7 +232,7 @@
 {% if piezas %}
 <div class="pieces-grid">
   {% for p in piezas %}
-  <div class="piece-card estado-{{ p.estado_pieza }}" id="card-{{ p.pk }}">
+  <div class="piece-card estado-{{ p.estado_pieza }}" id="card-{{ p.pk }}" data-search="{{ p.codigo|default:''|lower }} {{ p.nombre|default:''|lower }} {{ p.nombre_sin_vehiculo|default:''|lower }} {{ p.estado_pieza|default:''|lower }} {{ p.zona|default:''|lower }} {{ p.ubicacion_fisica|default:''|lower }} {% if p.vehiculo_desarme %}{{ p.vehiculo_desarme.patente|default:''|lower }} {{ p.vehiculo_desarme.vin|default:''|lower }} {{ p.vehiculo_desarme.get_marca_display|default:''|lower }} {{ p.vehiculo_desarme.get_modelo_display|default:''|lower }} {{ p.vehiculo_desarme.anio|default:'' }}{% endif %}">
     <div class="flex justify-between items-start mb-2">
       <span class="font-mono text-cyan-300 font-semibold">{{ p.codigo }}</span>
       <span class="badge-estado badge-{{ p.estado_pieza }}">{{ p.get_estado_pieza_display|default:p.estado_pieza }}</span>
@@ -235,18 +244,11 @@
       {% else %}—{% endif %}
     </p>
     <p class="vehiculo-origen">
-      {% trans "Vehículo" %}: {% if p.vehiculo_desarme_id %}<a href="{% country_url 'desarme:inventario_inteligente' p.vehiculo_desarme_id %}">{{ p.vehiculo_desarme }}{% if p.vehiculo_desarme.anio %} ({{ p.vehiculo_desarme.anio }}){% endif %}</a>{% else %}—{% endif %}
+      {% trans "Vehículo" %}: {% if p.vehiculo_desarme_id %}<a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ p.vehiculo_desarme_id }}&modo=venta">{{ p.vehiculo_desarme }}{% if p.vehiculo_desarme.anio %} ({{ p.vehiculo_desarme.anio }}){% endif %}</a>{% else %}—{% endif %}
     </p>
     <div class="flex gap-1 mt-2 flex-wrap">
       <a href="{% country_url 'desarme:editar_pieza' p.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
-      {% if p.vehiculo_desarme_id %}<a href="{% country_url 'desarme:inventario_inteligente' p.vehiculo_desarme_id %}" class="interactive-btn">{% trans "Inventario" %}</a>{% endif %}
-      {% if request.user|is_vendedor %}
-      <a href="{% country_url 'desarme:avisar_owner_pieza' p.pk %}"
-         class="interactive-btn"
-         style="background:rgba(37,211,102,0.15);border-color:rgba(37,211,102,0.4);color:#4ade80;">
-        📱 {% trans "Avisar" %}
-      </a>
-      {% endif %}
+      {% if p.vehiculo_desarme_id %}<a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ p.vehiculo_desarme_id }}&modo=venta" class="interactive-btn">{% trans "Filtrar vehículo" %}</a>{% endif %}
       {% if select_field == 'pieza_desarme' and return_to %}
       <button type="button"
         onclick="seleccionarPieza({{ p.pk }}, '{{ p.codigo|escapejs }}', '{{ p.nombre|escapejs }}', {{ p.precio_venta_sugerido|default:0 }}, {{ p.costo_asignado|default:0 }})"
@@ -255,13 +257,16 @@
       </button>
       {% else %}
       <button type="button" class="btn-carrito" id="btn-{{ p.pk }}"
-        onclick="toggleCarrito({{ p.pk }}, '{{ p.codigo }}', '{{ p.nombre|escapejs }}', {{ p.precio_venta_sugerido|default:0 }})">
+        onclick="toggleCarrito({{ p.pk }}, '{{ p.codigo|escapejs }}', '{{ p.nombre|escapejs }}', {{ p.precio_venta_sugerido|default:0 }}, {{ p.cantidad|default:0 }})">
         🛒 Agregar
       </button>
       {% endif %}
     </div>
   </div>
   {% endfor %}
+</div>
+<div class="rounded-xl border border-cyan-400/30 bg-black/30 p-8 text-center text-gray-400" id="desarme-live-empty" style="display:none;">
+  <p class="mb-4">{% trans "No hay coincidencias con la búsqueda actual." %}</p>
 </div>
 {% else %}
 <div class="rounded-xl border border-cyan-400/30 bg-black/30 p-8 text-center text-gray-400">
@@ -276,20 +281,36 @@
 </div>
 {% endif %}
 
-{# ── Carrito flotante — fuera del <h1>, aquí es HTML válido ── #}
-<div id="carrito-flotante" style="display:none;position:fixed;bottom:24px;right:24px;z-index:999;width:320px;">
+{# ── Centro de venta flotante ── #}
+<div id="carrito-flotante" style="display:none;position:fixed;bottom:24px;right:24px;z-index:999;width:min(460px,calc(100vw - 24px));">
   <div style="background:#0f172a;border:1px solid rgba(0,255,255,0.3);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);overflow:hidden;">
     <div style="background:rgba(0,255,255,0.08);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,255,255,0.15);">
-      <span style="color:#67e8f9;font-weight:600;">🛒 Carrito <span id="carrito-count" style="background:rgba(0,255,255,0.2);border-radius:9999px;padding:1px 8px;">0</span></span>
+      <span style="color:#67e8f9;font-weight:600;">🧾 Venta activa <span id="carrito-count" style="background:rgba(0,255,255,0.2);border-radius:9999px;padding:1px 8px;">0</span></span>
       <button type="button" onclick="limpiarCarrito()" style="color:#94a3b8;font-size:11px;background:none;border:none;cursor:pointer;">✕ Limpiar</button>
     </div>
-    <div id="carrito-body" style="max-height:220px;overflow-y:auto;padding:8px 16px;"></div>
+    <div id="carrito-body" style="max-height:260px;overflow-y:auto;padding:8px 16px;"></div>
     <div style="padding:12px 16px;border-top:1px solid rgba(0,255,255,0.15);">
-      <form method="post" action="{% country_url 'desarme:iniciar_venta_rapida' %}" id="form-carrito">
+      <form method="post" action="{% country_url 'desarme:crear_venta_operaciones' %}" id="form-carrito">
         {% csrf_token %}
+        <input type="hidden" name="selected_data" id="selected-data-input" value="[]">
+        <input type="hidden" name="crear_cliente_rapido" id="crear-cliente-rapido-input" value="0">
+        <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:10px;">
+          <select name="cliente" id="venta-cliente-existente" style="width:100%;background:#020617;border:1px solid rgba(0,255,255,0.3);border-radius:10px;padding:8px 10px;color:#e2e8f0;">
+            <option value="">Cliente existente...</option>
+            {% for cliente in clientes_venta_choices %}
+            <option value="{{ cliente.id }}">{{ cliente }}</option>
+            {% endfor %}
+          </select>
+          <input name="cliente_nombre" id="venta-cliente-rapido" type="text" placeholder="Cliente rápido (si no existe)" style="width:100%;background:#020617;border:1px solid rgba(0,255,255,0.3);border-radius:10px;padding:8px 10px;color:#e2e8f0;">
+          <textarea name="observaciones" rows="2" placeholder="Observaciones de la venta" style="width:100%;background:#020617;border:1px solid rgba(0,255,255,0.3);border-radius:10px;padding:8px 10px;color:#e2e8f0;resize:vertical;"></textarea>
+        </div>
         <div id="carrito-inputs"></div>
-        <button type="submit" style="width:100%;padding:10px;border-radius:8px;background:linear-gradient(135deg,#059669,#16a34a);color:white;font-weight:600;font-size:13px;border:none;cursor:pointer;">
-          🧾 Crear recibo de venta
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;color:#cbd5e1;font-size:13px;">
+          <span>Total</span>
+          <strong id="carrito-total" style="color:#67e8f9;">$0</strong>
+        </div>
+        <button type="submit" onclick="return prepararVentaOperaciones()" style="width:100%;padding:10px;border-radius:8px;background:linear-gradient(135deg,#0891b2,#2563eb);color:white;font-weight:700;font-size:13px;border:none;cursor:pointer;">
+          🧾 Crear venta PTS
         </button>
       </form>
     </div>
@@ -312,11 +333,54 @@ function seleccionarPieza(pk, codigo, nombre, precio, costo) {
 }
 {% endif %}
 var carrito = {};
-function toggleCarrito(id, codigo, nombre, precio) {
+function normalizeSearchText(value) {
+  return (value || '')
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+function initDesarmeLiveSearch() {
+  var input = document.getElementById('desarme-live-search');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.piece-card[data-search]'));
+  var status = document.getElementById('desarme-live-status');
+  var empty = document.getElementById('desarme-live-empty');
+  if (!input || !cards.length) return;
+
+  var searchable = cards.map(function(card) {
+    return {
+      el: card,
+      text: normalizeSearchText(card.getAttribute('data-search') || card.textContent)
+    };
+  });
+
+  function applyLiveFilter() {
+    var terms = normalizeSearchText(input.value).split(/\s+/).filter(Boolean);
+    var visible = 0;
+    searchable.forEach(function(item) {
+      var match = terms.every(function(term) { return item.text.indexOf(term) !== -1; });
+      item.el.classList.toggle('is-live-hidden', !match);
+      if (match) visible += 1;
+    });
+    if (status) {
+      status.textContent = terms.length
+        ? visible + ' coincidencia' + (visible === 1 ? '' : 's') + ' en esta vista'
+        : '';
+    }
+    if (empty) empty.style.display = visible === 0 ? 'block' : 'none';
+  }
+
+  input.addEventListener('input', applyLiveFilter);
+  input.addEventListener('search', applyLiveFilter);
+  applyLiveFilter();
+}
+document.addEventListener('DOMContentLoaded', initDesarmeLiveSearch);
+function toggleCarrito(id, codigo, nombre, precio, stock) {
   if (carrito[id]) {
     quitarDelCarrito(id);
   } else {
-    carrito[id] = {id:id, codigo:codigo, nombre:nombre, precio:precio, cantidad:1};
+    carrito[id] = {id:id, codigo:codigo, nombre:nombre, precio:Number(precio || 0), cantidad:1, stock:Number(stock || 0)};
     var card = document.getElementById('card-'+id);
     var btn = document.getElementById('btn-'+id);
     if (card) card.classList.add('en-carrito');
@@ -335,19 +399,63 @@ function quitarDelCarrito(id) {
 function limpiarCarrito() {
   Object.keys(carrito).forEach(function(id){ quitarDelCarrito(parseInt(id)); });
 }
+function setCarritoCantidad(id, value) {
+  if (!carrito[id]) return;
+  var qty = parseInt(value, 10);
+  if (isNaN(qty) || qty < 1) qty = 1;
+  if (carrito[id].stock > 0 && qty > carrito[id].stock) qty = carrito[id].stock;
+  carrito[id].cantidad = qty;
+  actualizarUI();
+}
+function setCarritoPrecio(id, value) {
+  if (!carrito[id]) return;
+  var price = Number(value);
+  if (isNaN(price) || price < 0) price = 0;
+  carrito[id].precio = price;
+  actualizarUI();
+}
+function formatCLP(value) {
+  try {
+    return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(Number(value || 0));
+  } catch (e) {
+    return '$' + Number(value || 0).toLocaleString('es-CL');
+  }
+}
 function actualizarUI() {
   var items = Object.values(carrito);
   document.getElementById('carrito-flotante').style.display = items.length===0 ? 'none' : 'block';
   document.getElementById('carrito-count').textContent = items.length;
   document.getElementById('carrito-body').innerHTML = items.map(function(i){
-    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px;">'
-      + '<div><span style="color:#67e8f9;font-family:monospace;">'+i.codigo+'</span><p style="color:#e2e8f0;margin:0;">'+i.nombre+'</p></div>'
-      + '<button type="button" onclick="quitarDelCarrito('+i.id+')" style="color:#f87171;background:none;border:none;cursor:pointer;font-size:16px;">✕</button></div>';
+    return '<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:12px;">'
+      + '<div style="display:flex;justify-content:space-between;gap:8px;">'
+      + '<div style="min-width:0;"><span style="color:#67e8f9;font-family:monospace;">'+i.codigo+'</span><p style="color:#e2e8f0;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+i.nombre+'</p></div>'
+      + '<button type="button" onclick="quitarDelCarrito('+i.id+')" style="color:#f87171;background:none;border:none;cursor:pointer;font-size:16px;">✕</button></div>'
+      + '<div style="display:grid;grid-template-columns:80px 1fr 86px;gap:6px;margin-top:6px;align-items:center;">'
+      + '<input type="number" min="1" max="'+i.stock+'" value="'+i.cantidad+'" onchange="setCarritoCantidad('+i.id+', this.value)" style="background:#020617;border:1px solid rgba(148,163,184,.25);border-radius:8px;color:#e2e8f0;padding:5px 7px;">'
+      + '<input type="number" min="0" step="1" value="'+i.precio+'" onchange="setCarritoPrecio('+i.id+', this.value)" style="background:#020617;border:1px solid rgba(148,163,184,.25);border-radius:8px;color:#e2e8f0;padding:5px 7px;">'
+      + '<strong style="text-align:right;color:#86efac;">'+formatCLP(i.cantidad * i.precio)+'</strong></div></div>';
   }).join('');
-  document.getElementById('carrito-inputs').innerHTML = items.map(function(i){
-    return '<input type="hidden" name="pieza_ids" value="'+i.id+'">'
-         + '<input type="hidden" name="cantidad_'+i.id+'" value="'+i.cantidad+'">';
-  }).join('');
+  var total = items.reduce(function(acc, item){ return acc + item.cantidad * item.precio; }, 0);
+  document.getElementById('carrito-total').textContent = formatCLP(total);
+  document.getElementById('selected-data-input').value = JSON.stringify(items.map(function(i){
+    return {id:i.id, cantidad:i.cantidad, precio_venta:i.precio};
+  }));
+}
+function prepararVentaOperaciones() {
+  var items = Object.values(carrito);
+  if (!items.length) {
+    alert('Selecciona al menos un repuesto.');
+    return false;
+  }
+  var cliente = document.getElementById('venta-cliente-existente');
+  var rapido = document.getElementById('venta-cliente-rapido');
+  if ((!cliente || !cliente.value) && (!rapido || !rapido.value.trim())) {
+    alert('Selecciona un cliente existente o ingresa un cliente rápido.');
+    return false;
+  }
+  document.getElementById('crear-cliente-rapido-input').value = rapido && rapido.value.trim() ? 'on' : '0';
+  actualizarUI();
+  return true;
 }
 </script>
 {% endblock %}

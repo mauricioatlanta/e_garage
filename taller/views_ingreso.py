@@ -3,8 +3,11 @@ import zoneinfo
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.db.models.functions import Concat
+from django.db.models import Value
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
 
 from taller.models import Cliente
@@ -38,15 +41,52 @@ def _full_name(nombre, apellido):
     return " ".join(part for part in [nombre, apellido] if part).strip()
 
 
+def _compact_search(value):
+    return "".join(ch for ch in value if ch.isalnum())
+
+
+def _empresas_busqueda_workspace(request, empresa):
+    user = getattr(request, "user", None)
+    empresas = []
+
+    def add_empresa(candidate):
+        if candidate and candidate.pk not in {item.pk for item in empresas}:
+            empresas.append(candidate)
+
+    add_empresa(empresa)
+    add_empresa(getattr(request, "empresa", None))
+    add_empresa(get_user_empresa_safe(user))
+
+    if user and getattr(user, "is_authenticated", False):
+        for owned in getattr(user, "empresas", None).all() if hasattr(user, "empresas") else []:
+            add_empresa(owned)
+        try:
+            from taller.models.team_member import TeamMember
+
+            memberships = (
+                TeamMember.objects.filter(user=user, is_active=True)
+                .select_related("empresa")
+                .order_by("empresa_id")
+            )
+            for membership in memberships:
+                add_empresa(membership.empresa)
+        except Exception:
+            pass
+
+    return empresas
+
+
 def ingreso_centro(request, *args, **kwargs):
     from taller.views.workspace_dashboard import workspace_dashboard
     return workspace_dashboard(request, *args, **kwargs)
 
 
 @require_GET
+@never_cache
 @login_required
 def ingreso_buscar(request, *args, **kwargs):
     q = (request.GET.get("q") or "").strip()
+    q_compact = _compact_search(q)
     workspace_prefix = _workspace_prefix_from_request(request)
 
     if len(q) < 2:
@@ -81,34 +121,49 @@ def ingreso_buscar(request, *args, **kwargs):
                 },
             }
         )
+    empresas_busqueda = _empresas_busqueda_workspace(request, empresa)
+
+    vehiculo_filters = (
+        Q(patente__istartswith=q)
+        | Q(patente__icontains=q)
+        | Q(vin__icontains=q)
+        | Q(cliente__nombre__icontains=q)
+        | Q(cliente__apellido__icontains=q)
+        | Q(cliente__telefono__icontains=q)
+        | Q(cliente__email__icontains=q)
+        | Q(cliente__tax_id__istartswith=q)
+        | Q(cliente_full_name__icontains=q)
+    )
+    cliente_filters = (
+        Q(nombre__icontains=q)
+        | Q(apellido__icontains=q)
+        | Q(telefono__icontains=q)
+        | Q(email__icontains=q)
+        | Q(tax_id__istartswith=q)
+        | Q(full_name__icontains=q)
+    )
+    if q_compact and q_compact != q:
+        vehiculo_filters |= (
+            Q(patente__istartswith=q_compact)
+            | Q(patente__icontains=q_compact)
+            | Q(vin__icontains=q_compact)
+        )
 
     vehiculos = (
         Vehiculo.objects.select_related("cliente", "marca", "modelo")
+        .annotate(cliente_full_name=Concat("cliente__nombre", Value(" "), "cliente__apellido"))
         .filter(
-            empresa=empresa,
+            empresa__in=empresas_busqueda,
             tipo_uso=Vehiculo.TIPO_USO_CLIENTE,
         )
-        .filter(
-            Q(patente__istartswith=q)
-            | Q(vin__icontains=q)
-            | Q(cliente__nombre__icontains=q)
-            | Q(cliente__apellido__icontains=q)
-            | Q(cliente__telefono__icontains=q)
-            | Q(cliente__email__icontains=q)
-            | Q(cliente__tax_id__istartswith=q)
-        )
+        .filter(vehiculo_filters)
         .order_by("patente", "id")[:6]
     )
 
     clientes = (
-        Cliente.objects.filter(empresa=empresa)
-        .filter(
-            Q(nombre__icontains=q)
-            | Q(apellido__icontains=q)
-            | Q(telefono__icontains=q)
-            | Q(email__icontains=q)
-            | Q(tax_id__istartswith=q)
-        )
+        Cliente.objects.filter(empresa__in=empresas_busqueda)
+        .annotate(full_name=Concat("nombre", Value(" "), "apellido"))
+        .filter(cliente_filters)
         .order_by("nombre", "apellido", "id")[:6]
     )
 
@@ -175,7 +230,7 @@ def ingreso_buscar(request, *args, **kwargs):
 
 @login_required
 def panel_ingreso_vehiculo(request, pk, *args, **kwargs):
-    empresa = get_active_empresa(request) or get_user_empresa_safe(request.user)
+    empresa = getattr(request, "empresa", None) or get_active_empresa(request) or get_user_empresa_safe(request.user)
     vehiculo_filters = {"pk": pk}
     if empresa:
         vehiculo_filters["empresa"] = empresa

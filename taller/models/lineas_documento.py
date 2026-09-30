@@ -302,9 +302,11 @@ class LineaOtroServicio(models.Model):
 ORIGEN_EXTERNO = "EXTERNO"
 ORIGEN_STOCK_BODEGA = "STOCK_BODEGA"
 ORIGEN_DESARME = "DESARME"
+ORIGEN_COMPRA_TRABAJO = "COMPRA_TRABAJO"
 ORIGEN_REPUESTO_CHOICES = [
     (ORIGEN_EXTERNO, "Externo"),
     (ORIGEN_STOCK_BODEGA, "Stock bodega"),
+    (ORIGEN_COMPRA_TRABAJO, "Compra para este trabajo"),
     (ORIGEN_DESARME, "Desarme"),
 ]
 
@@ -391,6 +393,12 @@ class LineaRepuesto(models.Model):
         blank=True,
         help_text="Costo para rentabilidad (EXTERNO: costo compra; DESARME: puede venir de PiezaDesarme).",
     )
+    proveedor_compra = models.CharField(
+        max_length=200,
+        null=True,
+        blank=True,
+        help_text="Proveedor informado para una compra asociada a esta linea del documento.",
+    )
 
     def clean(self):
         """Validaciones de consistencia para LineaRepuesto."""
@@ -436,9 +444,10 @@ class LineaRepuesto(models.Model):
                 raise ValidationError(
                     f"Stock insuficiente en pieza de desarme. Disponible: {self.pieza_desarme.cantidad}"
                 )
-        elif self.origen_repuesto == ORIGEN_STOCK_BODEGA:
+        elif self.origen_repuesto in (ORIGEN_STOCK_BODEGA, ORIGEN_COMPRA_TRABAJO):
             if not (self.repuesto_id or self.part_id):
-                raise ValidationError("Origen Stock bodega requiere repuesto o part.")
+                if self.origen_repuesto == ORIGEN_STOCK_BODEGA:
+                    raise ValidationError("Origen Stock bodega requiere repuesto o part.")
             if hasattr(self, "documento") and self.documento_id:
                 doc_empresa_id = getattr(self.documento, "empresa_id", None)
                 if doc_empresa_id is not None:

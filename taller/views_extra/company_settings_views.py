@@ -431,6 +431,7 @@ def company_settings_view(request):
         "taller/company/settings.html",
         {
             "empresa": empresa,
+            "empresa_pais": getattr(empresa, "pais", "CL"),
             "tecnicos": tecnicos,
             "usuarios_sistema": usuarios_sistema,
             "config": config,

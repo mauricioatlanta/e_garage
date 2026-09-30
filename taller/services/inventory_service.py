@@ -22,6 +22,7 @@ from django.db.models import F
 from taller.models.documento import Documento
 from taller.models.lineas_documento import (
     LineaRepuesto,
+    ORIGEN_COMPRA_TRABAJO,
     ORIGEN_DESARME,
     ORIGEN_EXTERNO,
     ORIGEN_STOCK_BODEGA,
@@ -44,6 +45,8 @@ class InventoryService:
     Reglas por origen_repuesto:
     - STOCK_BODEGA: Repuesto (lógica actual)
     - DESARME: PiezaDesarme
+    - COMPRA_TRABAJO: compra directa para el documento; registra recepción
+      y consumo si hay Repuesto vinculado, sin exigir stock previo.
     - EXTERNO: no mover inventario
     """
 
@@ -140,7 +143,7 @@ class InventoryService:
         lineas_con_movimiento = [
             ln
             for ln in lineas
-            if (ln.origen_repuesto == ORIGEN_STOCK_BODEGA and ln.repuesto_id)
+            if (ln.origen_repuesto in (ORIGEN_STOCK_BODEGA, ORIGEN_COMPRA_TRABAJO) and ln.repuesto_id)
             or (ln.origen_repuesto == ORIGEN_DESARME and ln.pieza_desarme_id)
         ]
         if not lineas_con_movimiento:
@@ -183,7 +186,7 @@ class InventoryService:
         if accion in ("descontar", "reponer"):
             lineas_bodega = [
                 ln for ln in lineas_con_movimiento
-                if ln.origen_repuesto == ORIGEN_STOCK_BODEGA and ln.repuesto_id
+                if ln.origen_repuesto in (ORIGEN_STOCK_BODEGA, ORIGEN_COMPRA_TRABAJO) and ln.repuesto_id
             ]
             if lineas_bodega:
                 rep_ids = sorted({ln.repuesto_id for ln in lineas_bodega})
@@ -228,6 +231,134 @@ class InventoryService:
                 cantidad_actualizar = -diferencia
             else:
                 cantidad_actualizar = -linea.cantidad if multiplier < 0 else linea.cantidad
+
+            if linea.origen_repuesto == ORIGEN_COMPRA_TRABAJO and linea.repuesto_id:
+                saldo_antes = saldo_actual.get(linea.repuesto_id, linea.repuesto.cantidad_stock)
+
+                if accion == "descontar":
+                    recepcion_delta = linea.cantidad
+                    recepcion_key = InventoryLedgerService.build_idempotency_key(
+                        empresa_id=documento.empresa_id,
+                        tipo=MovimientoInventario.TipoMovimiento.RECEPCION,
+                        origen_stock=MovimientoInventario.OrigenStock.STOCK_BODEGA,
+                        repuesto_id=linea.repuesto_id,
+                        pieza_desarme_id=None,
+                        documento_id=documento.pk,
+                        linea_repuesto_id=linea.pk,
+                        cantidad_delta=recepcion_delta,
+                    )
+                    recepcion_exists = MovimientoInventario.objects.filter(
+                        idempotency_key=recepcion_key
+                    ).exists()
+                    if not recepcion_exists:
+                        saldo_recepcion = saldo_antes + recepcion_delta
+                        Repuesto.objects.filter(
+                            id=linea.repuesto_id, empresa=documento.empresa
+                        ).update(cantidad_stock=F("cantidad_stock") + recepcion_delta)
+                        saldo_actual[linea.repuesto_id] = saldo_recepcion
+                        InventoryLedgerService.record_stock_movement(
+                            empresa=documento.empresa,
+                            tipo=MovimientoInventario.TipoMovimiento.RECEPCION,
+                            repuesto=linea.repuesto,
+                            documento=documento,
+                            linea_repuesto=linea,
+                            cantidad_delta=recepcion_delta,
+                            saldo_resultante=saldo_recepcion,
+                            costo_unitario=linea.costo_linea,
+                            metadata={
+                                "inventory_ledger_version": InventoryLedgerService.HASH_VERSION,
+                                "documento_tipo": documento.tipo,
+                                "documento_estado": documento.estado,
+                                "accion": "recepcion_compra_trabajo",
+                                "proveedor_compra": linea.proveedor_compra or "",
+                            },
+                        )
+                    else:
+                        saldo_recepcion = saldo_antes
+
+                    cantidad_actualizar = -linea.cantidad
+                    saldo_antes_consumo = saldo_actual.get(linea.repuesto_id, saldo_recepcion)
+                    saldo_nuevo = saldo_antes_consumo + cantidad_actualizar
+                    if saldo_nuevo < 0:
+                        raise ValidationError(
+                            f"Stock insuficiente tras recepción de compra para '{linea.repuesto.nombre}'. "
+                            f"Saldo: {saldo_antes_consumo}, delta: {cantidad_actualizar}."
+                        )
+                    Repuesto.objects.filter(
+                        id=linea.repuesto_id, empresa=documento.empresa
+                    ).update(cantidad_stock=F("cantidad_stock") + cantidad_actualizar)
+                    saldo_actual[linea.repuesto_id] = saldo_nuevo
+
+                    InventoryLedgerService.record_stock_movement(
+                        empresa=documento.empresa,
+                        tipo=MovimientoInventario.TipoMovimiento.EMISION,
+                        repuesto=linea.repuesto,
+                        documento=documento,
+                        linea_repuesto=linea,
+                        cantidad_delta=cantidad_actualizar,
+                        saldo_resultante=saldo_nuevo,
+                        costo_unitario=linea.costo_linea,
+                        metadata={
+                            "inventory_ledger_version": InventoryLedgerService.HASH_VERSION,
+                            "documento_tipo": documento.tipo,
+                            "documento_estado": documento.estado,
+                            "accion": "consumo_compra_trabajo",
+                            "proveedor_compra": linea.proveedor_compra or "",
+                        },
+                    )
+                    movimientos.append(
+                        {
+                            "origen": ORIGEN_COMPRA_TRABAJO,
+                            "repuesto_id": linea.repuesto_id,
+                            "repuesto_nombre": linea.repuesto.nombre,
+                            "cantidad": linea.cantidad,
+                            "accion": "recibido_y_descontado",
+                            "stock_anterior": saldo_antes,
+                            "stock_actual": saldo_nuevo,
+                        }
+                    )
+                    log.info(
+                        f"  ✅ COMPRA_TRABAJO {linea.repuesto.nombre}: "
+                        f"{linea.cantidad} recibida y consumida."
+                    )
+                    continue
+
+                if accion == "reponer":
+                    cantidad_actualizar = linea.cantidad
+                    saldo_nuevo = saldo_antes + cantidad_actualizar
+                    Repuesto.objects.filter(
+                        id=linea.repuesto_id, empresa=documento.empresa
+                    ).update(cantidad_stock=F("cantidad_stock") + cantidad_actualizar)
+                    saldo_actual[linea.repuesto_id] = saldo_nuevo
+                    InventoryLedgerService.record_stock_movement(
+                        empresa=documento.empresa,
+                        tipo=MovimientoInventario.TipoMovimiento.ANULACION,
+                        repuesto=linea.repuesto,
+                        documento=documento,
+                        linea_repuesto=linea,
+                        cantidad_delta=cantidad_actualizar,
+                        saldo_resultante=saldo_nuevo,
+                        costo_unitario=linea.costo_linea,
+                        metadata={
+                            "inventory_ledger_version": InventoryLedgerService.HASH_VERSION,
+                            "documento_tipo": documento.tipo,
+                            "documento_estado": documento.estado,
+                            "accion": "anulacion_compra_trabajo",
+                            "proveedor_compra": linea.proveedor_compra or "",
+                        },
+                    )
+                    movimientos.append(
+                        {
+                            "origen": ORIGEN_COMPRA_TRABAJO,
+                            "repuesto_id": linea.repuesto_id,
+                            "repuesto_nombre": linea.repuesto.nombre,
+                            "cantidad": linea.cantidad,
+                            "accion": "repuesto",
+                            "stock_anterior": saldo_antes,
+                            "stock_actual": saldo_nuevo,
+                        }
+                    )
+                    continue
 
             if linea.origen_repuesto == ORIGEN_STOCK_BODEGA and linea.repuesto_id:
                 saldo_antes = saldo_actual.get(linea.repuesto_id, linea.repuesto.cantidad_stock)
@@ -442,7 +573,7 @@ class InventoryService:
         reservas_previas = InventoryService._build_reserved_stock_map(snapshot_previo)
         lineas = documento.lineas_repuesto.select_related("repuesto", "pieza_desarme")
         for linea in lineas:
-            if linea.origen_repuesto == ORIGEN_EXTERNO:
+            if linea.origen_repuesto in (ORIGEN_EXTERNO, ORIGEN_COMPRA_TRABAJO):
                 continue
             if linea.origen_repuesto == ORIGEN_STOCK_BODEGA and linea.repuesto_id:
                 if linea.repuesto.empresa_id != documento.empresa_id:

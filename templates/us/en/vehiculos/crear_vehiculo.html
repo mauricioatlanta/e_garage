@@ -20,6 +20,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 {# Select2/DAL: form.media se carga UNA SOLA VEZ en base.html (form.media.css en head, form.media.js al final). NO duplicar aquí. #}
 <style>
+.relative h1.bg-clip-text {
+  color: #00e6d0 !important;
+  -webkit-text-fill-color: #00e6d0 !important;
+  background-image: none !important;
+  text-shadow: 0 0 12px rgba(0, 230, 208, 0.35);
+}
+.relative p.text-gray-400 {
+  color: #d7f7f5 !important;
+}
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -78,6 +87,25 @@
   animation: borderGlow 3s ease-in-out infinite;
 }
 
+/* Keep headings readable over the dark futuristic background. */
+.form-card h1,
+.form-card h2,
+.form-card h3,
+.form-card h4,
+.form-card .section-title {
+  color: #00e6d0 !important;
+  -webkit-text-fill-color: #00e6d0 !important;
+  text-shadow: 0 0 10px rgba(0, 230, 208, 0.35);
+}
+.form-card p,
+.form-card .text-gray-500,
+.form-card .text-gray-600,
+.form-card .text-gray-700,
+.form-card .text-gray-800,
+.form-card .text-gray-900 {
+  color: #d7f7f5 !important;
+}
+
 .form-card::before {
   content: '';
   position: absolute;
@@ -122,6 +150,19 @@
   text-shadow: 0 0 10px rgba(0, 230, 208, 0.5);
   position: relative;
   padding-left: 8px;
+}
+
+.selected-customer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-left: 3px solid #00e6d0;
+  background: rgba(0, 230, 208, 0.1);
+  color: #d7f7f5;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .form-group label::before {
@@ -362,6 +403,12 @@ input:focus {
         <div class="form-group">
           <label for="{{ form.cliente.id_for_label }}">Customer</label>
           {{ form.cliente }}
+          {% if form.cliente.value %}
+            <div class="selected-customer" role="status">
+              <span aria-hidden="true">👤</span>
+              <span>Selected customer ID: {{ form.cliente.value }}</span>
+            </div>
+          {% endif %}
           {% if form.cliente.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.cliente.errors.0 }}</div>
           {% endif %}

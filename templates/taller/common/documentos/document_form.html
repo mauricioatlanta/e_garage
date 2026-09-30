@@ -139,13 +139,17 @@
           </div>
         </div>
 
-        <div class="doc-field-card">
-          <label for="doc_mode" data-i18n="operacion">Operación</label>
-          <select id="doc_mode" name="doc_mode">
-            <option value="services" data-i18n="op_servicios">Servicios</option>
-            <option value="parts" data-i18n="op_solo_repuestos">Solo venta de repuestos</option>
-          </select>
-        </div>
+        {% if ui_config.show_services or ui_config.show_otros_servicios %}
+          <div class="doc-field-card">
+            <label for="doc_mode" data-i18n="operacion">Operación</label>
+            <select id="doc_mode" name="doc_mode">
+              <option value="services" data-i18n="op_servicios">Servicios</option>
+              <option value="parts" data-i18n="op_solo_repuestos">Solo venta de repuestos</option>
+            </select>
+          </div>
+        {% else %}
+          <input type="hidden" id="doc_mode" name="doc_mode" value="parts">
+        {% endif %}
       </div>
 
       <div class="doc-entity-grid">
@@ -218,23 +222,22 @@
           </div>
         </section>
 
+        {% if ui_config.show_vehicle %}
         <section class="doc-panel doc-panel--entity" id="vehicle-section">
           <div class="doc-panel__heading">
             <h2 data-i18n="vehiculo">VEHÍCULO</h2>
-            {% if ui_config.show_vehicle %}
             <a
               id="btn-nuevo-vehiculo"
               href="{% country_url 'vehiculos:crear_vehiculo' %}?return_to={{ request.get_full_path|urlencode }}&select_field=vehiculo&cliente_id="
               data-url-crear-vehiculo="{% country_url 'vehiculos:crear_vehiculo' %}"
+              onclick="if (window.openVehiculoModal) { event.preventDefault(); window.openVehiculoModal(); return false; }"
               class="doc-action-btn doc-action-btn--cyan-alt"
             >
               <span aria-hidden="true">+</span>
               <span data-i18n="nuevo_vehiculo">Nuevo vehículo</span>
             </a>
-            {% endif %}
           </div>
 
-          {% if ui_config.show_vehicle %}
           <div class="doc-vehicle-controls">
             <div class="doc-select-wrap">
               <label for="id_vehiculo" class="sr-only">Vehículo</label>
@@ -253,7 +256,6 @@
             </div>
             {% endif %}
           </div>
-          {% endif %}
 
           {% if form.kilometraje_ingreso.errors %}
             <p class="doc-inline-error">{{ form.kilometraje_ingreso.errors.0 }}</p>
@@ -560,6 +562,7 @@
           {% endif %}
 
         </section>
+        {% endif %}
       </div>
     </section>
 
@@ -570,6 +573,15 @@
           <div class="doc-section-head">
             <div>
               <h2 data-i18n="repuestos">REPUESTOS</h2>
+            </div>
+            <div class="doc-section-actions">
+              <button type="button" id="add-repuesto" class="doc-action-btn doc-action-btn--cyan">
+                <span aria-hidden="true">+</span><span data-i18n="agregar">AGREGAR</span>
+              </button>
+              <a href="{% country_url 'repuestos:crear_repuesto' %}?return_to={{ request.get_full_path|urlencode }}&select_field=repuesto"
+                 class="doc-action-btn doc-action-btn--cyan-alt">
+                <span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span>
+              </a>
             </div>
           </div>
 

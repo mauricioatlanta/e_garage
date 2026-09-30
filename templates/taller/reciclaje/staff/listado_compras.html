@@ -1,5 +1,5 @@
 {% extends "layouts/base_egarage_panel.html" %}
-{% load country_url %}
+{% load country_url money %}
 
 {% block page_title %}Compras de reciclaje{% endblock %}
 {% block page_icon %}🧾{% endblock %}
@@ -22,7 +22,7 @@
     <tr>
       <td><a href="{% country_url 'reciclaje_staff:detalle_compra' compra.pk %}" style="color:#00fff7;">#{{ compra.pk }}</a></td>
       <td>{{ compra.cliente|default:"Mostrador" }}</td>
-      <td>${{ compra.total|floatformat:0 }}</td>
+      <td>{{ compra.total|money_clp }}</td>
       <td>{{ compra.created_at|date:"d/m/Y H:i" }}</td>
     </tr>
     {% empty %}

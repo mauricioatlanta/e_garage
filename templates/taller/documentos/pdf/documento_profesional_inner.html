@@ -39,7 +39,13 @@
   <section class="info-grid">
     <div class="info-card">
       <div class="info-card__title">Cliente</div>
-      <div class="info-main">{{ cliente.nombre|default:"Sin cliente" }}</div>
+      <div class="info-main">
+        {% if cliente %}
+          {{ cliente.nombre|default:"" }} {{ cliente.apellido|default:"" }}
+        {% else %}
+          Sin cliente
+        {% endif %}
+      </div>
       {% if cliente.tax_id %}<div class="info-line"><span>ID:</span> {{ cliente.tax_id }}</div>{% elif cliente.rut %}<div class="info-line"><span>ID:</span> {{ cliente.rut }}</div>{% endif %}
       {% if cliente.email %}<div class="info-line"><span>Email:</span> {{ cliente.email }}</div>{% endif %}
       {% if cliente.telefono %}<div class="info-line"><span>Teléfono:</span> {{ cliente.telefono }}</div>{% elif cliente.contacto %}<div class="info-line"><span>Contacto:</span> {{ cliente.contacto }}</div>{% endif %}

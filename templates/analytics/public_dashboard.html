@@ -354,26 +354,77 @@
     </header>
 
 
-    <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+    <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;">
         <div class="eg-kpi" style="color:var(--eg-cyan);text-align:center;">
-            <div class="eg-label">Visitas humanas</div>
-            <div class="eg-value">{{ funnel.visitas }}</div>
-            <div class="eg-mini">Tráfico real</div>
+            <div class="eg-label">Sesiones landing</div>
+            <div class="eg-value">{{ funnel.sesiones_landing }}</div>
+            <div class="eg-mini">Con sesión pública</div>
         </div>
         <div class="eg-kpi" style="color:var(--eg-blue);text-align:center;">
-            <div class="eg-label">Empresas registradas</div>
+            <div class="eg-label">Empresas atribuidas</div>
             <div class="eg-value">{{ funnel.empresas }}</div>
-            <div class="eg-mini">Cuentas creadas</div>
+            <div class="eg-mini">Vinculadas a sesión web</div>
         </div>
         <div class="eg-kpi" style="color:var(--eg-purple);text-align:center;">
-            <div class="eg-label">Trials activos</div>
+            <div class="eg-label">Trials atribuidos</div>
             <div class="eg-value">{{ funnel.trials }}</div>
-            <div class="eg-mini">En prueba</div>
+            <div class="eg-mini">Desde embudo web</div>
         </div>
         <div class="eg-kpi" style="color:var(--eg-green);text-align:center;">
-            <div class="eg-label">Suscripciones pagadas</div>
+            <div class="eg-label">Pagadas atribuidas</div>
             <div class="eg-value">{{ funnel.suscripciones }}</div>
-            <div class="eg-mini">Activas</div>
+            <div class="eg-mini">Activas desde sesión web</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-orange);text-align:center;">
+            <div class="eg-label">Conversión landing</div>
+            <div class="eg-value">{{ funnel.tasa_conversion }}%</div>
+            <div class="eg-mini">Empresas / sesiones landing</div>
+        </div>
+    </section>
+
+    <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+        <div class="eg-kpi" style="color:var(--eg-cyan);text-align:center;">
+            <div class="eg-label">Altas globales</div>
+            <div class="eg-value">{{ crecimiento_global.empresas }}</div>
+            <div class="eg-mini">Sistema completo</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-purple);text-align:center;">
+            <div class="eg-label">Trials globales</div>
+            <div class="eg-value">{{ crecimiento_global.trials }}</div>
+            <div class="eg-mini">Incluye canales no medidos</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-green);text-align:center;">
+            <div class="eg-label">Pagadas globales</div>
+            <div class="eg-value">{{ crecimiento_global.suscripciones }}</div>
+            <div class="eg-mini">Suscripciones activas</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-red);text-align:center;">
+            <div class="eg-label">Sin atribución web</div>
+            <div class="eg-value">{{ crecimiento_global.altas_sin_atribucion }}</div>
+            <div class="eg-mini">Admin, importadas o directas</div>
+        </div>
+    </section>
+
+    <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+        <div class="eg-kpi" style="color:var(--eg-orange);text-align:center;">
+            <div class="eg-label">CTA agrupados</div>
+            <div class="eg-value">{{ eventos_funnel.cta_clicks }}</div>
+            <div class="eg-mini">cta_click + CTA canónicos</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-blue);text-align:center;">
+            <div class="eg-label">Signup iniciados</div>
+            <div class="eg-value">{{ eventos_funnel.signup_starts }}</div>
+            <div class="eg-mini">signup_start + signup_started</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-purple);text-align:center;">
+            <div class="eg-label">Signup completados</div>
+            <div class="eg-value">{{ eventos_funnel.signup_completes }}</div>
+            <div class="eg-mini">signup_complete + signup_completed</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-red);text-align:center;">
+            <div class="eg-label">Ráfagas humanas</div>
+            <div class="eg-value">{{ visitas_rafaga }}</div>
+            <div class="eg-mini">Excluidas de prospectos</div>
         </div>
     </section>
 
@@ -388,7 +439,7 @@
         <article class="eg-kpi human">
             <div class="eg-label">Visitas humanas</div>
             <div class="eg-value">{{ humanos }}</div>
-            <div class="eg-mini">Tráfico útil para marketing</div>
+            <div class="eg-mini">Tráfico sin user-agent bot</div>
         </article>
 
         <article class="eg-kpi bot">

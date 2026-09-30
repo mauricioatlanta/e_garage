@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}POS Mostrador{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-950 text-white">
+  <main class="mx-auto max-w-6xl px-4 py-6">
+    <header class="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-cyan-200">POS Mostrador</h1>
+        <p class="text-sm text-gray-400">Venta rápida de repuestos, neumáticos y servicios de mesón.</p>
+      </div>
+      <a href="../" class="text-sm text-cyan-300 hover:text-cyan-100">Inventario</a>
+    </header>
+
+    <section class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+      <div class="rounded-lg border border-cyan-400/20 bg-gray-900 p-4">
+        <label class="mb-2 block text-sm font-semibold text-cyan-200" for="pos-search">
+          Buscar por código, OEM, equivalente, nombre o medida
+        </label>
+        <input id="pos-search" type="search" autocomplete="off" placeholder="205/55R16, D1184, Bosch..."
+               class="w-full rounded border border-cyan-400/30 bg-black px-3 py-3 text-white">
+        <div id="pos-results" class="mt-4 space-y-2"></div>
+      </div>
+
+      <div class="rounded-lg border border-cyan-400/20 bg-gray-900 p-4">
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-cyan-200">Carrito</h2>
+          <span id="pos-total" class="font-mono text-xl text-green-300">$0</span>
+        </div>
+        <div id="pos-cart" class="min-h-32 space-y-2 text-sm text-gray-300"></div>
+        <div class="mt-4 grid grid-cols-3 gap-2">
+          <button data-pay="efectivo" class="pos-pay rounded bg-green-600 px-3 py-2 text-sm font-semibold">Efectivo</button>
+          <button data-pay="tarjeta" class="pos-pay rounded bg-blue-600 px-3 py-2 text-sm font-semibold">Tarjeta</button>
+          <button data-pay="transferencia" class="pos-pay rounded bg-cyan-600 px-3 py-2 text-sm font-semibold">Transferencia</button>
+        </div>
+        <button id="pos-confirm" class="mt-3 w-full rounded bg-cyan-500 px-4 py-3 font-bold text-gray-950">
+          Confirmar venta
+        </button>
+        <p id="pos-status" class="mt-3 text-sm text-gray-400"></p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  const search = document.getElementById("pos-search");
+  const results = document.getElementById("pos-results");
+  const cartBox = document.getElementById("pos-cart");
+  const totalBox = document.getElementById("pos-total");
+  const status = document.getElementById("pos-status");
+  const cart = new Map();
+  let payment = "efectivo";
+
+  function money(value) {
+    return new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(value || 0);
+  }
+
+  function renderCart() {
+    let total = 0;
+    cartBox.innerHTML = "";
+    for (const item of cart.values()) {
+      total += item.cantidad * Number(item.precio_venta || 0);
+      const row = document.createElement("div");
+      row.className = "flex items-center justify-between rounded bg-black/40 px-3 py-2";
+      row.innerHTML = `<span>${item.nombre} <strong>x${item.cantidad}</strong></span><span>${money(item.cantidad * Number(item.precio_venta || 0))}</span>`;
+      cartBox.appendChild(row);
+    }
+    totalBox.textContent = money(total);
+    if (!cart.size) cartBox.textContent = "Agrega productos desde la búsqueda.";
+  }
+
+  function addItem(item) {
+    const current = cart.get(item.id) || { ...item, cantidad: 0 };
+    current.cantidad += 1;
+    cart.set(item.id, current);
+    renderCart();
+  }
+
+  search.addEventListener("input", async () => {
+    const q = search.value.trim();
+    if (q.length < 2) {
+      results.innerHTML = "";
+      return;
+    }
+    const res = await fetch(`buscar/?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    results.innerHTML = "";
+    for (const item of data.results || []) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "block w-full rounded border border-cyan-400/20 bg-black/50 p-3 text-left hover:bg-cyan-950/40";
+      btn.innerHTML = `<strong>${item.nombre}</strong><br><span class="text-xs text-gray-400">${item.part_number || item.codigo_oem || "Sin código"} · Stock ${item.stock} · ${item.ubicacion || "Sin ubicación"} ${item.medida ? "· " + item.medida : ""}</span>`;
+      btn.addEventListener("click", () => addItem(item));
+      results.appendChild(btn);
+    }
+  });
+
+  document.querySelectorAll(".pos-pay").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      payment = btn.dataset.pay;
+      status.textContent = `Pago seleccionado: ${btn.textContent}`;
+    });
+  });
+
+  document.getElementById("pos-confirm").addEventListener("click", async () => {
+    const items = Array.from(cart.values()).map((item) => ({
+      repuesto_id: item.id,
+      cantidad: item.cantidad,
+      precio_unitario: item.precio_venta,
+    }));
+    const res = await fetch("confirmar/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+      body: JSON.stringify({ payment_method: payment, items }),
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      status.textContent = (data.errors || ["No se pudo confirmar la venta."]).join(" ");
+      return;
+    }
+    status.innerHTML = `Venta ${data.numero} creada. <a class="text-cyan-300" href="${data.print_url}">Ver documento</a>`;
+    cart.clear();
+    renderCart();
+  });
+
+  renderCart();
+})();
+</script>
+{% endblock %}

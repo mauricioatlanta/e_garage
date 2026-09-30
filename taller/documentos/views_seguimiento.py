@@ -20,6 +20,7 @@ from taller.models.memoria_seguimiento import (
     SeguimientoPublico,
 )
 from taller.auth.decorators_role import is_staff_member
+from taller.services.empresa_service import get_empresa_safe
 
 
 def seguimiento_publico(request, token):
@@ -88,10 +89,9 @@ def gestionar_memoria_documento(request, documento_id):
     """
     Vista para gestionar memoria (notas y etiquetas) de un documento.
     Solo accesible para usuarios autenticados de la misma empresa.
-    Multi-tenant: empresa forzada desde request.user.empresa
+    Multi-tenant: empresa forzada desde el tenant activo del request.
     """
-    # Multi-tenant: forzar empresa del usuario
-    empresa = request.user.empresa
+    empresa = get_empresa_safe(request)
     documento = get_object_or_404(Documento.objects.filter(empresa=empresa), id=documento_id)
 
     # Verificar permisos
@@ -156,10 +156,9 @@ def gestionar_memoria_documento(request, documento_id):
 def crear_seguimiento_publico(request, documento_id):
     """
     Crea o activa un seguimiento público para un documento.
-    Multi-tenant: empresa forzada desde request.user.empresa
+    Multi-tenant: empresa forzada desde el tenant activo del request.
     """
-    # Multi-tenant: forzar empresa del usuario
-    empresa = request.user.empresa
+    empresa = get_empresa_safe(request)
     documento = get_object_or_404(Documento.objects.filter(empresa=empresa), id=documento_id)
 
     # Multi-tenant: empresa forzada (nunca confiar en POST)

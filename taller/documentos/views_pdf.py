@@ -10,16 +10,15 @@ from django.views.decorators.http import require_GET, require_POST
 
 from taller.models.documento import Documento
 from taller.services.document_output_service import DocumentOutputService
+from taller.services.empresa_service import get_empresa_safe
 
 
 def _get_documento_for_request(request, pk):
     queryset = Documento.objects.select_related("empresa", "cliente").prefetch_related(
         "lineas_repuesto__repuesto", "lineas_servicio", "lineas_otro_servicio"
     )
-    if getattr(request.user, "is_staff", False) or getattr(request.user, "is_superuser", False):
-        return get_object_or_404(queryset, pk=pk)
 
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         messages.error(request, "Usuario sin empresa asociada.")
         return None
@@ -77,7 +76,7 @@ def generar_enlace_whatsapp(request, pk):
     Returns:
         JsonResponse con URL de WhatsApp o error
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         return JsonResponse(
             {"success": False, "error": "Usuario sin empresa asociada."}, status=400
@@ -136,7 +135,7 @@ def enviar_por_whatsapp(request, pk):
     En el frontend, puedes usar un botón que haga POST a esta vista,
     y luego redirigir al usuario al enlace de WhatsApp.
     """
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_empresa_safe(request)
     if not empresa:
         messages.error(request, "Usuario sin empresa asociada.")
         return redirect("documentos:lista_documentos")

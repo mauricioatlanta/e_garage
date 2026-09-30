@@ -68,7 +68,7 @@ def _build_pdf_line_items(documento):
             {
                 "tipo": "Servicio externo",
                 "nombre": getattr(linea, "nombre", "") or str(getattr(linea, "servicio", "")),
-                "codigo": getattr(linea, "empresa_externa", "") or "",
+                "codigo": "",
                 "cantidad": getattr(linea, "cantidad", 1) or 1,
                 "precio_unitario": getattr(linea, "precio_cliente", 0) or 0,
                 "subtotal": _line_subtotal(linea),

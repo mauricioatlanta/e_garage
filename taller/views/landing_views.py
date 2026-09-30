@@ -1,11 +1,13 @@
 from django.http import Http404, HttpResponsePermanentRedirect
 from django.shortcuts import render
+from django.middleware.csrf import get_token
 
 from commerce.views.catalog import catalog_home
 from taller.country.engine import URL_SLUG_TO_VERTICAL, get_hub_landing_urls, get_landing_context
 from taller.country.hub import COUNTRY_HUB
 from taller.services.public_analytics import track_public_page
 from taller.models.public_page_view import PublicPageView
+from taller.services.public_attribution import attach_public_analytics_cookies
 
 
 def landing_home(request):
@@ -24,7 +26,9 @@ def landing_home(request):
         request,
         page_type=PublicPageView.PAGE_HOME,
     )
-    return render(request, "public/gateway.html")
+    get_token(request)
+    response = render(request, "public/gateway.html")
+    return attach_public_analytics_cookies(request, response)
 
 
 _HUB_CANONICAL_PATH = {
@@ -102,7 +106,10 @@ def landing_vertical(request, country_key: str, url_slug: str):
     )
 
     ctx = get_landing_context(country_key, vertical_key)
-    return render(request, "public/landing_vertical.html", ctx)
+    if ctx.get("canonical_path") == "/cl/desarmadurias/" and vertical_key == "salvage":
+        get_token(request)
+    response = render(request, "public/landing_vertical.html", ctx)
+    return attach_public_analytics_cookies(request, response)
 
 
 # ── Legacy country-agnostic routes — 301 to Chile equivalents ───────────────

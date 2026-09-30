@@ -3,6 +3,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 
 from taller.models.repuesto import Repuesto
+from taller.services.empresa_service import get_empresa_safe
 
 
 @login_required
@@ -16,7 +17,7 @@ def api_repuesto_por_codigo(request):
         if not code or len(code) < 2:
             return JsonResponse({"results": []})
 
-        empresa = getattr(request.user, "empresa", None)
+        empresa = get_empresa_safe(request)
         print(f"🏢 Empresa obtenida: {empresa}")
 
         qs = Repuesto.objects.all()

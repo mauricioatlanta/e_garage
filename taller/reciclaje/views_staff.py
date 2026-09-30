@@ -20,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import F, Sum
+from django.db.models import Count, F, Q, Sum
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -30,6 +30,7 @@ from django.utils.dateparse import parse_date
 from taller.auth.decorators_role import role_required
 from taller.models.clientes import Cliente
 from taller.models.reciclaje import (
+    CategoriaChatarra,
     Catalitico,
     CompraReciclaje,
     DetalleCompraCatalitico,
@@ -39,11 +40,20 @@ from taller.models.reciclaje import (
     ProductoChatarra,
     VentaReciclaje,
 )
-from taller.utils.empresa import get_user_empresa_safe
+from taller.services.empresa_service import get_empresa_safe
 
 
 def _empresa_o_403(request):
-    empresa = get_user_empresa_safe(request.user)
+    try:
+        from taller.qa_control.context import resolve_qa_empresa
+
+        qa_empresa = resolve_qa_empresa(request)
+        if qa_empresa is not None:
+            return qa_empresa
+    except Exception:
+        pass
+
+    empresa = get_empresa_safe(request)
     if empresa is None:
         raise PermissionDenied
     return empresa
@@ -231,17 +241,68 @@ def api_catalitico_por_codigo(request):
     if not codigo:
         return JsonResponse({"found": False})
 
-    catalitico = Catalitico.objects.filter(empresa=empresa, codigo__iexact=codigo).first()
+    queryset = Catalitico.objects.filter(empresa=empresa, activo=True)
+    catalitico = queryset.filter(codigo__iexact=codigo).first()
+    sugerencias = list(
+        queryset.filter(
+            Q(codigo__icontains=codigo)
+            | Q(nombre__icontains=codigo)
+            | Q(marca_vehiculo__icontains=codigo)
+            | Q(modelo_vehiculo__icontains=codigo)
+        )
+        .order_by("codigo")[:8]
+    )
+    payload_sugerencias = [
+        {
+            "codigo": item.codigo,
+            "nombre": item.nombre,
+            "marca_vehiculo": item.marca_vehiculo,
+            "modelo_vehiculo": item.modelo_vehiculo,
+            "precio_compra": str(item.precio_compra),
+            "cantidad_stock": item.cantidad_stock,
+        }
+        for item in sugerencias
+    ]
     if catalitico is None:
-        return JsonResponse({"found": False})
+        return JsonResponse({"found": False, "suggestions": payload_sugerencias})
 
     return JsonResponse({
         "found": True,
+        "codigo": catalitico.codigo,
         "nombre": catalitico.nombre,
         "marca_vehiculo": catalitico.marca_vehiculo,
         "modelo_vehiculo": catalitico.modelo_vehiculo,
         "precio_compra": str(catalitico.precio_compra),
         "cantidad_stock": catalitico.cantidad_stock,
+        "suggestions": payload_sugerencias,
+    })
+
+
+@login_required
+@role_required("Owner", "Admin")
+def api_producto_chatarra(request):
+    """Busca materiales activos por código o nombre para una compra."""
+    empresa = _empresa_o_403(request)
+    termino = (request.GET.get("q") or "").strip()
+    if not termino:
+        return JsonResponse({"suggestions": []})
+    productos = (
+        ProductoChatarra.objects.filter(empresa=empresa, activo=True)
+        .filter(Q(codigo__icontains=termino) | Q(nombre__icontains=termino))
+        .order_by("nombre", "codigo")[:10]
+    )
+    return JsonResponse({
+        "suggestions": [
+            {
+                "id": producto.pk,
+                "codigo": producto.codigo,
+                "nombre": producto.nombre,
+                "precio_compra": str(producto.precio_compra),
+                "cantidad_stock": str(producto.cantidad_stock),
+                "unidad": producto.get_unidad_medida_display(),
+            }
+            for producto in productos
+        ]
     })
 
 
@@ -407,12 +468,98 @@ def detalle_compra(request, pk):
     compra = get_object_or_404(
         CompraReciclaje.objects.select_related("cliente"), pk=pk, empresa=empresa
     )
+    pais = str(getattr(empresa, "pais", "") or "").upper()
     context = {
         "compra": compra,
         "detalles_catalitico": compra.detalles_catalitico.select_related("catalitico"),
-        "detalles_chatarra": compra.detalles_chatarra.select_related("producto"),
+        "detalles_chatarra": compra.detalles_chatarra.select_related("producto", "producto__categoria"),
+        "unidad_peso_larga": "libras" if pais == "US" else "kilos",
     }
     return render(request, "taller/reciclaje/staff/detalle_compra.html", context)
+
+
+@login_required
+@role_required("Owner", "Admin")
+def editar_compra(request, pk):
+    empresa = _empresa_o_403(request)
+    compra = get_object_or_404(
+        CompraReciclaje.objects.select_related("cliente"), pk=pk, empresa=empresa
+    )
+    if request.method == "POST":
+        cliente_id = request.POST.get("cliente_id")
+        compra.cliente = (
+            get_object_or_404(Cliente, pk=cliente_id, empresa=empresa)
+            if cliente_id
+            else Cliente.get_or_create_mostrador(empresa)
+        )
+        compra.notas = (request.POST.get("notas") or "").strip()
+        compra.save(update_fields=["cliente", "notas"])
+        messages.success(request, f"Compra #{compra.pk} actualizada.")
+        return redirect(_reciclaje_url(f"compras/{compra.pk}/"))
+
+    return render(
+        request,
+        "taller/reciclaje/staff/editar_compra.html",
+        {
+            "compra": compra,
+            "clientes": Cliente.objects.filter(empresa=empresa).order_by("nombre")[:200],
+        },
+    )
+
+
+@login_required
+@role_required("Owner", "Admin")
+def eliminar_compra(request, pk):
+    empresa = _empresa_o_403(request)
+    compra = get_object_or_404(CompraReciclaje.objects.filter(empresa=empresa), pk=pk)
+
+    if request.method == "POST":
+        with transaction.atomic():
+            detalles_catalitico = list(compra.detalles_catalitico.select_related("catalitico"))
+            detalles_chatarra = list(compra.detalles_chatarra.select_related("producto"))
+
+            for detalle in detalles_catalitico:
+                catalitico = detalle.catalitico
+                if catalitico.cantidad_stock < detalle.cantidad:
+                    messages.error(
+                        request,
+                        "No se puede eliminar: parte del stock comprado ya fue vendido.",
+                    )
+                    return redirect(_reciclaje_url(f"compras/{compra.pk}/"))
+            for detalle in detalles_chatarra:
+                producto = detalle.producto
+                if producto.cantidad_stock < detalle.cantidad:
+                    messages.error(
+                        request,
+                        "No se puede eliminar: parte del stock comprado ya fue vendido.",
+                    )
+                    return redirect(_reciclaje_url(f"compras/{compra.pk}/"))
+
+            for detalle in detalles_catalitico:
+                nuevo_stock = detalle.catalitico.cantidad_stock - detalle.cantidad
+                Catalitico.objects.filter(pk=detalle.catalitico.pk).update(
+                    cantidad_stock=nuevo_stock,
+                    estado=(
+                        Catalitico.ESTADO_VENDIDO
+                        if nuevo_stock <= 0
+                        else Catalitico.ESTADO_DISPONIBLE
+                    ),
+                )
+            for detalle in detalles_chatarra:
+                ProductoChatarra.objects.filter(pk=detalle.producto.pk).update(
+                    cantidad_stock=F("cantidad_stock") - detalle.cantidad
+                )
+
+            compra.delete()
+
+        messages.success(request, f"Compra #{pk} eliminada.")
+        return redirect(_reciclaje_url("compras/"))
+
+    return render(
+        request,
+        "taller/reciclaje/staff/eliminar_compra.html",
+        {"compra": compra},
+    )
 
 
 # ── Venta ─────────────────────────────────────────────────────────────────────
@@ -586,15 +733,122 @@ def detalle_venta(request, pk):
 @role_required("Owner", "Admin")
 def resumen_stock(request):
     empresa = _empresa_o_403(request)
+    categorias = (
+        CategoriaChatarra.objects.filter(empresa=empresa)
+        .annotate(producto_count=Count("productochatarra", filter=Q(productochatarra__activo=True)))
+        .order_by("nombre")
+    )
+    categoria_id = request.GET.get("categoria")
+    chatarra = ProductoChatarra.objects.filter(empresa=empresa, activo=True).select_related(
+        "categoria"
+    )
+    categoria_actual = None
+    if categoria_id:
+        try:
+            categoria_actual = categorias.get(pk=categoria_id)
+            chatarra = chatarra.filter(categoria=categoria_actual)
+        except (CategoriaChatarra.DoesNotExist, ValueError):
+            categoria_actual = None
+
     context = {
         "catalogo_disponible": Catalitico.objects.filter(
             empresa=empresa, estado=Catalitico.ESTADO_DISPONIBLE, activo=True
         ).order_by("codigo"),
-        "chatarra": ProductoChatarra.objects.filter(empresa=empresa, activo=True).order_by(
-            "nombre"
-        ),
+        "chatarra": chatarra.order_by("categoria__nombre", "nombre"),
+        "categorias": categorias,
+        "categoria_actual": categoria_actual,
+        "total_materiales": ProductoChatarra.objects.filter(empresa=empresa, activo=True).count(),
     }
     return render(request, "taller/reciclaje/staff/resumen_stock.html", context)
+
+
+@login_required
+@role_required("Owner", "Admin")
+def crear_categoria_chatarra(request):
+    empresa = _empresa_o_403(request)
+    if request.method == "POST":
+        nombre = (request.POST.get("nombre") or "").strip()
+        descripcion = (request.POST.get("descripcion") or "").strip()
+
+        if not nombre:
+            messages.error(request, "El nombre de la categoría es obligatorio.")
+        else:
+            categoria, created = CategoriaChatarra.objects.get_or_create(
+                empresa=empresa,
+                nombre=nombre,
+                defaults={"descripcion": descripcion},
+            )
+            if not created and descripcion and categoria.descripcion != descripcion:
+                categoria.descripcion = descripcion
+                categoria.save(update_fields=["descripcion"])
+            messages.success(
+                request,
+                "Categoría creada." if created else "Categoría actualizada.",
+            )
+            return redirect(_reciclaje_url("stock/"))
+
+    return render(
+        request,
+        "taller/reciclaje/staff/crear_categoria_chatarra.html",
+        {
+            "categorias": CategoriaChatarra.objects.filter(empresa=empresa).order_by("nombre"),
+        },
+    )
+
+
+@login_required
+@role_required("Owner", "Admin")
+def crear_producto_chatarra(request):
+    empresa = _empresa_o_403(request)
+    if request.method == "POST":
+        codigo = (request.POST.get("codigo") or "").strip().upper()
+        nombre = (request.POST.get("nombre") or "").strip()
+        categoria_nombre = (request.POST.get("categoria") or "").strip()
+        unidad_medida = request.POST.get("unidad_medida") or ProductoChatarra.UNIDAD_KG
+
+        precio_compra = _parse_decimal(request.POST.get("precio_compra"))
+        precio_venta = _parse_decimal(request.POST.get("precio_venta"))
+        cantidad_stock = _parse_decimal(request.POST.get("cantidad_stock"))
+        stock_minimo = _parse_decimal(request.POST.get("stock_minimo"))
+
+        if not codigo or not nombre:
+            messages.error(request, "Código y nombre son obligatorios.")
+        elif ProductoChatarra.objects.filter(empresa=empresa, codigo=codigo).exists():
+            messages.error(request, f"Ya existe un producto con código {codigo}.")
+        elif unidad_medida not in dict(ProductoChatarra.UNIDAD_CHOICES):
+            messages.error(request, "Unidad de medida inválida.")
+        else:
+            categoria = None
+            if categoria_nombre:
+                categoria, _ = CategoriaChatarra.objects.get_or_create(
+                    empresa=empresa,
+                    nombre=categoria_nombre,
+                )
+
+            ProductoChatarra.objects.create(
+                empresa=empresa,
+                codigo=codigo,
+                nombre=nombre,
+                categoria=categoria,
+                unidad_medida=unidad_medida,
+                precio_compra=precio_compra or Decimal("0.00"),
+                precio_venta=precio_venta or Decimal("0.00"),
+                cantidad_stock=cantidad_stock or Decimal("0.000"),
+                stock_minimo=stock_minimo,
+                proveedor=(request.POST.get("proveedor") or "").strip() or None,
+                activo=True,
+            )
+            messages.success(request, "Producto de reciclaje creado.")
+            return redirect(_reciclaje_url("stock/"))
+
+    return render(
+        request,
+        "taller/reciclaje/staff/crear_producto_chatarra.html",
+        {
+            "unidad_choices": ProductoChatarra.UNIDAD_CHOICES,
+            "categorias": CategoriaChatarra.objects.filter(empresa=empresa).order_by("nombre"),
+        },
+    )
 
 
 @login_required

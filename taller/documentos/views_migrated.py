@@ -7,15 +7,18 @@ import re
 from decimal import Decimal, InvalidOperation
 
 from django import forms
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import get_messages
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_POST
 from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from django.utils.translation import get_language
 from django.utils.decorators import method_decorator
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -58,8 +61,10 @@ from taller.models.clientes import Cliente
 from taller.models.lineas_documento import LineaOtroServicio, LineaRepuesto, LineaServicio
 from taller.models.vehiculos import Vehiculo
 from taller.models.repuesto import Repuesto
+from taller.services.empresa_service import get_empresa_safe as get_active_empresa_safe
 from taller.servicios.models import Servicio, ServicioExterno
-from taller.auth.decorators_role import RoleRequiredMixin
+from taller.templatetags.country_url import country_url
+from taller.auth.decorators_role import RoleRequiredMixin, is_admin_or_owner
 
 
 LANGUAGE_BY_COUNTRY = {
@@ -95,6 +100,27 @@ def _get_request_country_code(request, empresa=None):
     return str(resolved_country).upper() if resolved_country else "CL"
 
 
+def _path_country_code(path):
+    normalized = (path or "").lower()
+    if normalized.startswith("/cl/"):
+        return "CL"
+    if normalized.startswith("/uy/"):
+        return "UY"
+    if normalized.startswith("/us/"):
+        return "US"
+    if normalized.startswith("/mx/"):
+        return "MX"
+    if normalized.startswith("/pe/"):
+        return "PE"
+    if normalized.startswith("/ve/"):
+        return "VE"
+    if normalized.startswith("/br/"):
+        return "BR"
+    if normalized.startswith("/ar/"):
+        return "AR"
+    return None
+
+
 def _get_document_ui_config(request, empresa):
     ui_config = {}
     try:
@@ -115,19 +141,12 @@ def _get_document_ui_config(request, empresa):
             "show_vehicle": True,
         }
 
-    ui_config["show_otros_servicios"] = True
     return _ensure_ui_config_tax_and_currency(request, ui_config, empresa)
 
 
 def _get_empresa_safe(request):
-    """Obtiene la empresa del usuario sin lanzar DoesNotExist (OneToOne reverse)."""
-    user = getattr(request, "user", None)
-    if not user or not getattr(user, "is_authenticated", False):
-        return None
-    try:
-        return user.empresa
-    except (AttributeError, ObjectDoesNotExist, Exception):
-        return None
+    """Obtiene el tenant activo del request, con fallback compatible al usuario."""
+    return get_active_empresa_safe(request)
 
 
 def _ensure_ui_config_tax_and_currency(request, ui_config, empresa):
@@ -389,6 +408,7 @@ class DocumentoLineItemsMixin:
         "part_id",
         "pieza_desarme_id",
         "origen_repuesto",
+        "proveedor_compra",
     )
     SERVICIO_FIELDS = ("nombre", "cantidad", "precio_unitario")
     OTRO_FIELDS = ("proveedor", "descripcion", "costo_interno", "precio_cliente")
@@ -422,10 +442,15 @@ class DocumentoLineItemsMixin:
                 origen_repuesto = "DESARME"
 
             elif repuesto_id or part_id:
-                origen_repuesto = "STOCK_BODEGA"
+                if origen_repuesto not in {"STOCK_BODEGA", "COMPRA_TRABAJO"}:
+                    origen_repuesto = "STOCK_BODEGA"
 
             else:
-                origen_repuesto = "EXTERNO"
+                origen_repuesto = (
+                    "COMPRA_TRABAJO"
+                    if origen_repuesto == "COMPRA_TRABAJO"
+                    else "EXTERNO"
+                )
 
             linea = LineaRepuesto(
                 documento=documento,
@@ -437,6 +462,7 @@ class DocumentoLineItemsMixin:
                 part_id=part_id or None,
                 pieza_desarme_id=pieza_desarme_id or None,
                 origen_repuesto=origen_repuesto,
+                proveedor_compra=(data.get("proveedor_compra") or "").strip() or None,
             )
             linea.save()
 
@@ -941,7 +967,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
             self._document_form_initial_state = build_form_initial_state(
                 mode=self.get_form_mode(),
                 request=self.request,
-                empresa=getattr(self.request.user, "empresa", None),
+                empresa=_get_empresa_safe(self.request),
                 source_document=self.get_form_source_document(),
                 source_draft=self.get_form_source_draft(),
                 base_initial=super().get_initial() or {},
@@ -964,7 +990,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = self.request.empresa
+        empresa = _get_empresa_safe(self.request)
         form_mode = self.get_form_mode()
         initial_state = self.get_form_initial_state()
         source_document = self.get_form_source_document()
@@ -1311,12 +1337,10 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
     def get_form_kwargs(self):
         """Obtener argumentos para el formulario. Incluir initial explícito para preselección."""
         kwargs = super().get_form_kwargs()
+        empresa = _get_empresa_safe(self.request)
         kwargs["user"] = self.request.user
-        kwargs["empresa"] = getattr(self.request.user, "empresa", None)
-        kwargs["country"] = _get_request_country_code(
-            self.request,
-            getattr(self.request.user, "empresa", None),
-        )
+        kwargs["empresa"] = empresa
+        kwargs["country"] = _get_request_country_code(self.request, empresa)
         kwargs["language"] = LANGUAGE_BY_COUNTRY.get((kwargs["country"] or "CL").upper(), "es")
         if self.request.method == "GET":
             kwargs.setdefault("initial", self.get_initial())
@@ -1516,6 +1540,23 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
             return Documento.objects.none()
         return Documento.objects.filter(empresa=empresa)
 
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        path_country = _path_country_code(getattr(request, "path", ""))
+        document_country = str(getattr(self.object.empresa, "pais", "") or "").upper()
+
+        if path_country and document_country and path_country != document_country:
+            canonical_url = country_url(
+                {"request": request, "documento": self.object, "empresa": self.object.empresa},
+                "documentos:ver_documento",
+                self.object.pk,
+            )
+            if canonical_url and canonical_url != getattr(request, "path", ""):
+                return HttpResponseRedirect(canonical_url)
+
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         documento = self.object
@@ -1618,6 +1659,7 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
                 "puede_agregar_video": videos_count < 1,
                 "seguimiento_publico": seguimiento_publico,
                 "es_staff": es_staff,
+                "estados_operativos_ot": Documento.ESTADOS_OPERATIVOS_OT,
                 **action_urls,
             }
         )
@@ -1625,6 +1667,39 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
 
     def render_to_response(self, context, **response_kwargs):
         return self.render_country_lang(self.request, context)
+
+
+@login_required
+@require_POST
+def actualizar_estado_operativo_ot(request, pk):
+    """Actualiza solo el estado operativo de una OT sin tocar emisión, stock ni totales."""
+    if not is_admin_or_owner(request.user):
+        return HttpResponseForbidden(
+            "No tienes permisos para cambiar el estado operativo de la OT."
+        )
+
+    empresa = _get_empresa_safe(request)
+    documento = get_object_or_404(Documento.objects.filter(empresa=empresa), pk=pk)
+    redirect_url = country_url(
+        {"request": request, "documento": documento, "empresa": documento.empresa},
+        "documentos:ver_documento",
+        documento.pk,
+    )
+
+    if documento.tipo != "OT":
+        messages.error(request, "El estado operativo solo aplica a órdenes de trabajo.")
+        return HttpResponseRedirect(redirect_url)
+
+    nuevo_estado = (request.POST.get("estado_operativo_ot") or "").strip().upper()
+    estados_validos = {value for value, _label in Documento.ESTADOS_OPERATIVOS_OT}
+    if nuevo_estado not in estados_validos:
+        messages.error(request, "Estado operativo de OT inválido.")
+        return HttpResponseRedirect(redirect_url)
+
+    documento.estado_operativo_ot = nuevo_estado
+    documento.save(update_fields=["estado_operativo_ot"])
+    messages.success(request, "Estado operativo de la OT actualizado.")
+    return HttpResponseRedirect(redirect_url)
 
 
 @method_decorator(login_required, name="dispatch")
@@ -1649,12 +1724,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
         if not self.request.user.is_authenticated:
             return Documento.objects.none()
 
-        # Obtener empresa de forma robusta
-        empresa = getattr(self.request.user, "empresa", None)
-        if not empresa:
-            # Intentar obtener empresa desde el middleware
-            empresa = getattr(self.request, "empresa", None)
-
+        empresa = _get_empresa_safe(self.request)
         if not empresa:
             return Documento.objects.none()
 
@@ -1672,9 +1742,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
         pk = self.kwargs.get("pk")
 
         # Obtener empresa para verificación
-        empresa_user = getattr(self.request.user, "empresa", None) or getattr(
-            self.request, "empresa", None
-        )
+        empresa_user = _get_empresa_safe(self.request)
 
         # Intentar obtener del queryset filtrado
         try:
@@ -1725,9 +1793,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
 
             raise Http404("Documento no encontrado")
 
-        empresa = getattr(self.request.user, "empresa", None) or getattr(
-            self.request, "empresa", None
-        )
+        empresa = _get_empresa_safe(self.request)
         if not empresa:
             from django.http import Http404
 
@@ -1819,6 +1885,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
                         rep.pieza_desarme_id if getattr(rep, "pieza_desarme_id", None) else None
                     ),
                     "costo_linea": float(getattr(rep, "costo_linea", 0) or 0),
+                    "proveedor_compra": getattr(rep, "proveedor_compra", "") or "",
                 }
             )
 
@@ -1919,7 +1986,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
         """Inyectar empresa/usuario en el formulario para aislar datos del tenant"""
         kwargs = super().get_form_kwargs()
 
-        empresa_usuario = getattr(self.request.user, "empresa", None)
+        empresa_usuario = _get_empresa_safe(self.request)
         empresa_documento = getattr(self.object, "empresa", None)
         empresa = empresa_documento or empresa_usuario
 
@@ -1937,7 +2004,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = _get_empresa_safe(self.request)
         cliente = getattr(form.instance, "cliente", None)
 
         if empresa and cliente:

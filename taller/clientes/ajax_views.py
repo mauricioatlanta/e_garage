@@ -8,6 +8,7 @@ from django.views.decorators.http import require_POST
 
 from taller.models.ubicacion import Ciudad as CiudadUSA
 from taller.models.ubicacion import Estado as EstadoUSA
+from taller.services.empresa_service import get_empresa_safe
 
 
 @login_required
@@ -25,11 +26,8 @@ def ajax_crear_estado_usa(request):
             {"success": False, "error": "State name and code are required"}, status=400
         )
 
-    # Obtener país del usuario/empresa (OneToOne inversa puede lanzar DoesNotExist)
-    from taller.utils.empresa import get_user_empresa_safe
-
     pais = "US"  # Default
-    empresa = get_user_empresa_safe(request.user)
+    empresa = get_empresa_safe(request)
     if empresa:
         pais = getattr(empresa, "pais", pais) or pais
     elif getattr(request, "empresa", None):

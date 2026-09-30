@@ -101,6 +101,9 @@ from .registro_embudo import RegistroEmbudoSuscriptor
 
 # Analytics público
 from .public_page_view import PublicPageView, is_probable_bot
+from .public_analytics_session import PublicAnalyticsSession
+from .public_analytics_event import PublicAnalyticsEvent
+from .public_analytics_backfill_checkpoint import PublicAnalyticsBackfillCheckpoint
 
 # Sistema de notificaciones
 from .notificacion import (
@@ -214,6 +217,9 @@ __all__ = [
     "RegistroEmbudoSuscriptor",
     # Analytics público
     "PublicPageView",
+    "PublicAnalyticsSession",
+    "PublicAnalyticsEvent",
+    "PublicAnalyticsBackfillCheckpoint",
     # Notificaciones
     "TipoNotificacion",
     "NotificacionEnviada",
