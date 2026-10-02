@@ -18,7 +18,7 @@
         STORAGE_KEY: 'egarage_pwa_install_dismissed',
         STORAGE_KEY_INSTALLED: 'egarage_pwa_installed',
         // Días antes de volver a mostrar el prompt (si fue rechazado)
-        RE_SHOW_AFTER_DAYS: 7,
+        RE_SHOW_AFTER_DAYS: 30,
         // Tiempo mínimo antes de mostrar el prompt (segundos)
         MIN_TIME_BEFORE_SHOW: 5,
         // Solo mostrar en dispositivos móviles
@@ -582,11 +582,26 @@
         // IMPORTANTE: Escuchar beforeinstallprompt INMEDIATAMENTE (puede dispararse antes de que el script se cargue)
         // No usar setTimeout aquí porque el evento puede perderse
         let beforeInstallPromptListener = (e) => {
-            console.log('[PWA Install] ✅ beforeinstallprompt detectado!');
             e.preventDefault();
             deferredPrompt = e;
             
-            // Esperar un poco antes de mostrar el banner (mejor UX)
+            // 1. En PC no mostrar popup flotante
+            if (CONFIG.MOBILE_ONLY && !isMobile()) {
+                return;
+            }
+
+            // 2. Si ya está instalada o fue rechazado recientemente
+            if (isAppInstalled() || wasDismissedRecently()) {
+                return;
+            }
+
+            // 3. No molestar en pantallas de trabajo (solo en inicio/workspace)
+            const path = window.location.pathname;
+            const esInicio = path.includes('/workspace') || path.includes('/dashboard') || path.endsWith('/es/');
+            if (!esInicio) {
+                return;
+            }
+
             setTimeout(() => {
                 if (!isAppInstalled() && !wasDismissedRecently()) {
                     showAndroidBanner();
