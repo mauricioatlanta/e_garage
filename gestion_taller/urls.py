@@ -114,6 +114,8 @@ from taller.views_extra.admin_suscriptores import (
     eliminar_suscriptor_ajax,
     extender_suscripcion_ajax,
 )
+from taller.analytics.public_views import public_analytics_dashboard
+from taller.views_extra.admin_control import admin_control_center
 
 # Forzar importación del admin de WhatsApp (app top-level whatsapp) solo si está desplegado
 # Evita el warning "No se pudieron importar los modelos de WhatsApp" cuando la app no existe en el servidor
@@ -273,6 +275,8 @@ urlpatterns = [
     path("sitemap.xml", sitemap_xml, name="sitemap_xml"),
     # Commerce Engine — catálogo público por tenant (dominio propio en producción)
     path("commerce/", include(("commerce.urls", "commerce"), namespace="commerce")),
+    # QA Control Tower — debe ir antes de rutas variables como /<country>/<slug>/
+    path("qa/control/", include(("taller.qa_control.urls", "qa_control"), namespace="qa_control")),
     # Storefront público individual por empresa
     path("tienda/", include(("taller.urls_public", "tienda"), namespace="tienda")),
     # Reciclaje — storefront público de tenants RECYCLING (dominio propio, ver landing_home)
@@ -310,6 +314,8 @@ urlpatterns = [
     path("parts/", landing_parts, name="landing_parts"),
     # Panel de administración de suscriptores (ANTES de admin.site.urls para que no sea capturado)
     path("cl/admin/subcriptores/", include("taller.urls_admin_suscriptores")),
+    path("admin/control/", admin_control_center, name="admin_control_center"),
+    path("admin/visitas/", public_analytics_dashboard, name="admin_visitas"),
     path("admin/suscriptores/", admin_suscriptores, name="admin_suscriptores"),
     path(
         "admin/suscriptores/<int:empresa_id>/", detalle_suscriptor, name="admin_detalle_suscriptor"
