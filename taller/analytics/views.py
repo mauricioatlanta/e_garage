@@ -15,8 +15,10 @@ Diferenciación por país con tecnología avanzada
 import json
 
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.db.models import Avg, Sum
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -24,6 +26,9 @@ from django.views.decorators.http import require_GET
 
 from taller.auth.decorators import login_required_default
 from taller.middleware.rate_limiting import rate_limit
+from taller.models.clientes import Cliente
+from taller.models.documento import Documento
+from taller.models.vehiculos import Vehiculo
 from taller.services.empresa_service import get_empresa_safe
 
 from .ai_reports import AIReportEngine, ReportExporter
@@ -37,15 +42,8 @@ def dashboard_ai_view(request):
     # Verificar que el usuario tenga una empresa asociada
     empresa = get_empresa_safe(request)
     if not empresa:
-        from django.http import HttpResponseNotFound
-        from django.shortcuts import render
-
-        return render(
-            request,
-            "error.html",
-            {
-                "error": "No se encontró una empresa asociada a tu cuenta. Por favor, contacta al administrador.",
-            },
+        return HttpResponse(
+            "No se encontró una empresa asociada a tu cuenta. Por favor, contacta al administrador.",
             status=404,
         )
 
@@ -66,14 +64,8 @@ def dashboard_ai_view(request):
         return render(request, "analytics/dashboard_ai.html", context)
     except Exception as e:
         # Manejar errores del motor de reportes
-        from django.shortcuts import render
-
-        return render(
-            request,
-            "error.html",
-            {
-                "error": f"Error al cargar el dashboard: {str(e)}. Por favor, intenta nuevamente o contacta al soporte.",
-            },
+        return HttpResponse(
+            f"Error al cargar el dashboard: {str(e)}. Por favor, intenta nuevamente o contacta al soporte.",
             status=500,
         )
 
@@ -91,7 +83,9 @@ def revenue_analytics_api(request):
 
     data = {
         "revenue_timeline": engine._get_revenue_timeline(periodo),
-        "growth_rate": engine._calculate_growth(engine.empresa.documento_set.all(), "total"),
+        "growth_rate": engine._calculate_growth(
+            Documento.objects.filter(empresa=engine.empresa), "total"
+        ),
         "currency": engine.moneda,
         "symbol": engine.simbolo,
     }
@@ -151,9 +145,9 @@ def predictive_analytics_api(request):
     data = {
         "predictions": engine._get_predictive_data(),
         "insights": engine._generate_ai_insights(
-            engine.empresa.documento_set.all(),
-            engine.empresa.vehiculo_set.all(),
-            engine.empresa.cliente_set.all(),
+            Documento.objects.filter(empresa=engine.empresa),
+            Vehiculo.objects.filter(empresa=engine.empresa),
+            Cliente.objects.filter(empresa=engine.empresa),
         ),
         "confidence_score": 0.87,  # Score general de confianza del modelo
         "model_version": "AI-Engine-v2.1",
@@ -188,9 +182,9 @@ class AIInsightView(View):
                 insights = self._generate_predictive_insights(engine, timeframe)
             else:
                 insights = engine._generate_ai_insights(
-                    engine.empresa.documento_set.all(),
-                    engine.empresa.vehiculo_set.all(),
-                    engine.empresa.cliente_set.all(),
+                    Documento.objects.filter(empresa=engine.empresa),
+                    Vehiculo.objects.filter(empresa=engine.empresa),
+                    Cliente.objects.filter(empresa=engine.empresa),
                 )
 
             return JsonResponse(
@@ -209,10 +203,10 @@ class AIInsightView(View):
         """Insights financieros específicos"""
         from datetime import timedelta
 
-        from django.utils import timezone
-
         fecha_inicio = timezone.now() - timedelta(days=timeframe)
-        documentos = engine.empresa.documento_set.filter(created_at__gte=fecha_inicio)
+        documentos = Documento.objects.filter(
+            empresa=engine.empresa, created_at__gte=fecha_inicio
+        )
 
         insights = []
 
@@ -383,14 +377,10 @@ def real_time_metrics_api(request):
         return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
     engine = AIReportEngine(empresa)
 
-    # Métricas en tiempo real
-
-    from django.utils import timezone
-
     today = timezone.now().date()
 
     # Documentos de hoy
-    docs_today = engine.empresa.documento_set.filter(created_at__date=today)
+    docs_today = Documento.objects.filter(empresa=engine.empresa, created_at__date=today)
 
     # Métricas de rendimiento
     metrics = {

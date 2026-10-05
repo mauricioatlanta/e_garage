@@ -43,11 +43,11 @@ class AIReportEngine:
         from taller.models.clientes import Cliente
         from taller.models.documento import Documento
         from taller.models.repuesto import Repuesto
-        from taller.models.vehiculo import Vehiculo
+        from taller.models.vehiculos import Vehiculo
 
         # Métricas base por país
         documentos = Documento.objects.filter(
-            empresa=self.empresa, fecha_creacion__gte=fecha_inicio
+            empresa=self.empresa, created_at__gte=fecha_inicio
         )
 
         vehiculos = Vehiculo.objects.filter(empresa=self.empresa)
@@ -72,7 +72,10 @@ class AIReportEngine:
                 "documentos_total": documentos.count(),
                 "vehiculos_activos": vehiculos.count(),
                 "clientes_activos": clientes.count(),
-                "repuestos_stock": repuestos.aggregate(Sum("stock"))["stock__sum"] or 0,
+                "repuestos_stock": repuestos.aggregate(Sum("cantidad_stock"))[
+                    "cantidad_stock__sum"
+                ]
+                or 0,
                 "efficiency": self._calculate_efficiency(documentos),
             },
             # AI Insights por país
@@ -90,7 +93,9 @@ class AIReportEngine:
                 "moneda": self.moneda,
                 "simbolo": self.simbolo,
                 "timezone": self.empresa.zona_horaria,
-                "formato_fecha": ("MM/DD/YYYY" if self.empresa.pais == "US" else "DD/MM/YYYY"),
+                "formato_fecha": (
+                    "MM/DD/YYYY" if self.empresa.pais == "US" else "DD/MM/YYYY"
+                ),
             },
         }
 
@@ -111,15 +116,15 @@ class AIReportEngine:
         now = timezone.now()
         current_month = (
             queryset.filter(
-                fecha_creacion__month=now.month, fecha_creacion__year=now.year
+                created_at__month=now.month, created_at__year=now.year
             ).aggregate(Sum(field))[f"{field}__sum"]
             or 0
         )
 
         previous_month = (
             queryset.filter(
-                fecha_creacion__month=(now.month - 1) if now.month > 1 else 12,
-                fecha_creacion__year=now.year if now.month > 1 else now.year - 1,
+                created_at__month=(now.month - 1) if now.month > 1 else 12,
+                created_at__year=now.year if now.month > 1 else now.year - 1,
             ).aggregate(Sum(field))[f"{field}__sum"]
             or 0
         )
@@ -135,7 +140,7 @@ class AIReportEngine:
         for i in range(dias):
             fecha = timezone.now() - timedelta(days=dias - i)
             valor = (
-                queryset.filter(fecha_creacion__date=fecha.date()).aggregate(Sum(field))[
+                queryset.filter(created_at__date=fecha.date()).aggregate(Sum(field))[
                     f"{field}__sum"
                 ]
                 or 0
@@ -231,7 +236,7 @@ class AIReportEngine:
         for i in range(dias):
             fecha = timezone.now() - timedelta(days=dias - i)
             documentos_dia = Documento.objects.filter(
-                empresa=self.empresa, fecha_creacion__date=fecha.date()
+                empresa=self.empresa, created_at__date=fecha.date()
             )
 
             total = documentos_dia.aggregate(Sum("total"))["total__sum"] or 0
@@ -250,44 +255,54 @@ class AIReportEngine:
 
     def _get_vehicle_distribution(self):
         """Distribución de vehículos por marca"""
-        from taller.models.vehiculo import Vehiculo
+        from taller.models.vehiculos import Vehiculo
+
+        total_vehiculos = Vehiculo.objects.filter(empresa=self.empresa).count()
+        if total_vehiculos == 0:
+            return []
 
         distribution = (
             Vehiculo.objects.filter(empresa=self.empresa)
             .values("marca__nombre")
             .annotate(
                 count=Count("id"),
-                percentage=Count("id")
-                * 100.0
-                / Vehiculo.objects.filter(empresa=self.empresa).count(),
+                percentage=Count("id") * 100.0 / total_vehiculos,
             )
             .order_by("-count")[:10]
         )
 
-        return list(distribution)
+        data = list(distribution)
+        for item in data:
+            if not item["marca__nombre"]:
+                item["marca__nombre"] = "Sin marca"
+
+        return data
 
     def _get_clientes_distribution(self):
         """Distribución de clientes por región"""
         from taller.models.clientes import Cliente
+
+        total_clientes = Cliente.objects.filter(empresa=self.empresa).count()
+        if total_clientes == 0:
+            return []
 
         distribution = (
             Cliente.objects.filter(empresa=self.empresa)
             .values("region__nombre")
             .annotate(
                 count=Count("id"),
-                percentage=Count("id")
-                * 100.0
-                / Cliente.objects.filter(empresa=self.empresa).count(),
+                percentage=Count("id") * 100.0 / total_clientes,
             )
             .order_by("-count")[:10]
         )
 
         # Convertir None a 'Sin región' para mejor visualización
-        for item in distribution:
+        data = list(distribution)
+        for item in data:
             if not item["region__nombre"]:
                 item["region__nombre"] = "Sin región"
 
-        return list(distribution)
+        return data
 
     def _get_clientes_heatmap(self):
         """Mapa de calor de clientes por hora/día"""
@@ -315,8 +330,8 @@ class AIReportEngine:
             for day in range(7):  # 0=Monday, 6=Sunday
                 docs = Documento.objects.filter(
                     empresa=self.empresa,
-                    fecha_creacion__hour=hour,
-                    fecha_creacion__week_day=day + 1,  # Django uses 1=Sunday
+                    created_at__hour=hour,
+                    created_at__week_day=day + 1,  # Django uses 1=Sunday
                 ).count()
 
                 heatmap[f"{day}-{hour}"] = docs
@@ -330,7 +345,7 @@ class AIReportEngine:
         # Simulación de predicción basada en datos históricos
         recent_docs = Documento.objects.filter(
             empresa=self.empresa,
-            fecha_creacion__gte=timezone.now() - timedelta(days=90),
+            created_at__gte=timezone.now() - timedelta(days=90),
         )
 
         avg_weekly = recent_docs.count() / 12  # 12 semanas aproximadamente
