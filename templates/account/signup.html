@@ -586,11 +586,8 @@
                             password2.value = password1.value;
                         }
                         if (!principalInput || !principalInput.value) {
-                            e.preventDefault();
-                            var err = document.getElementById('rubro-principal-error');
-                            if (err) {
-                                err.style.display = 'block';
-                                err.scrollIntoView({ behavior: 'smooth', block: 'center' });
+						if (principalInput) principalInput.value = 'TALLER_MECANICO';
+					});
                             }
                         }
                     });
@@ -612,16 +609,90 @@
                     'parts': 'CASA_REPUESTOS',
                     'casa_repuestos': 'CASA_REPUESTOS',
                     'reciclaje': 'RECICLAJE',
-                    'recycling': 'RECICLAJE'
+                    'recycling': 'RECICLAJE',
+                    'vulcanizacion': 'NEUMATICOS',
+                    'vulcanizaciones': 'NEUMATICOS',
+                    'neumaticos': 'NEUMATICOS',
+                    'neumatico': 'NEUMATICOS',
+                    'llantera': 'NEUMATICOS',
+                    'llantas': 'NEUMATICOS',
+                    'gomeria': 'NEUMATICOS',
+                    'tire': 'NEUMATICOS',
+                    'tires': 'NEUMATICOS',
+                    'carwash': 'CARROCERIA_DETAILING',
+                    'lavado': 'CARROCERIA_DETAILING'
                 };
                 var rubroKey = rubroAliases[rubroFromUrl.toLowerCase()] || rubroFromUrl.toUpperCase();
-                var allowedRubros = ['TALLER_MECANICO', 'DESARMADURIA', 'CASA_REPUESTOS', 'RECICLAJE'];
+                var allowedRubros = ['TALLER_MECANICO', 'DESARMADURIA', 'CASA_REPUESTOS', 'RECICLAJE', 'NEUMATICOS', 'CARROCERIA_DETAILING'];
 
                 if (allowedRubros.indexOf(rubroKey) !== -1) {
                     selectPrincipalCard(rubroKey);
                     var rubroSection = document.getElementById('rubro-section');
                     if (rubroSection) rubroSection.style.display = 'none';
-                }
+                } else if (!principalInput.value) {
+					selectPrincipalCard('TALLER_MECANICO');
+				}
+            });
+        })();
+
+        (function () {
+            var lastPayload = "";
+
+            function getCookie(name) {
+                var value = "; " + document.cookie;
+                var parts = value.split("; " + name + "=");
+                if (parts.length === 2) return parts.pop().split(";").shift();
+                return "";
+            }
+
+            function field(name) {
+                return document.querySelector('[name="' + name + '"]');
+            }
+
+            function captureLead() {
+                var email = field('email');
+                var telefono = field('telefono');
+                if ((!email || !email.value.trim()) && (!telefono || !telefono.value.trim())) return;
+
+                var firstName = field('first_name');
+                var nombreTaller = field('nombre_taller');
+                var rubro = field('rubro_principal_signup');
+                var country = field('country');
+                var payload = {
+                    nombre: ((firstName && firstName.value) || (nombreTaller && nombreTaller.value) || '').trim(),
+                    email: email ? email.value.trim() : '',
+                    whatsapp: telefono ? telefono.value.trim() : '',
+                    rubro: rubro ? rubro.value.trim() : '',
+                    pais: country ? country.value.trim() : ''
+                };
+                var serialized = JSON.stringify(payload);
+                if (serialized === lastPayload) return;
+                lastPayload = serialized;
+
+                fetch('/analytics/public/lead/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    credentials: 'same-origin',
+                    body: serialized,
+                    keepalive: true
+                }).catch(function () {});
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                ['email', 'telefono', 'first_name', 'nombre_taller'].forEach(function (name) {
+                    var el = field(name);
+                    if (!el) return;
+                    el.addEventListener('blur', captureLead);
+                    el.addEventListener('change', captureLead);
+                });
+                document.querySelectorAll('.rubro-card').forEach(function (card) {
+                    card.addEventListener('click', function () {
+                        window.setTimeout(captureLead, 50);
+                    });
+                });
             });
         })();
 
