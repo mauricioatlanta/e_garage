@@ -93,7 +93,6 @@ def track_public_page(
         is_non_human = is_probable_non_human_request(request, user_agent)
         page_view = PublicPageView.objects.create(
             path=request.path[:255],
-            host=host[:255],
             page_type=page_type,
             country=(country or "").lower()[:8],
             language=(language or "").lower()[:8],
