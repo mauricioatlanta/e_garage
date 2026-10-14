@@ -17,6 +17,10 @@ class PerfilUsuario(models.Model):
     state = models.CharField(max_length=100, blank=True, null=True)
     zipcode = models.CharField(max_length=20, blank=True, null=True)
     fecha_creacion = models.DateTimeField(default=timezone.now)
+    must_change_password = models.BooleanField(
+        default=True,
+        verbose_name="Debe cambiar contraseña",
+    )
 
     def __str__(self):
         return f"Perfil de {self.user.username} ({self.pais})"

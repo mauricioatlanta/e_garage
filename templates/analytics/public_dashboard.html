@@ -406,6 +406,29 @@
     </section>
 
     <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+        <div class="eg-kpi" style="color:var(--eg-cyan);text-align:center;">
+            <div class="eg-label">Landings canónicas</div>
+            <div class="eg-value">{{ conversion_real.landings_canonicas }}</div>
+            <div class="eg-mini">Solo egarage.cl / www</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-orange);text-align:center;">
+            <div class="eg-label">CTA / WhatsApp</div>
+            <div class="eg-value">{{ conversion_real.cta_whatsapp }}</div>
+            <div class="eg-mini">Eventos de intención</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-purple);text-align:center;">
+            <div class="eg-label">Leads capturados</div>
+            <div class="eg-value">{{ conversion_real.leads_capturados }}</div>
+            <div class="eg-mini">{{ leads_pendientes }} pendientes de contacto</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-green);text-align:center;">
+            <div class="eg-label">Altas creadas</div>
+            <div class="eg-value">{{ conversion_real.altas_creadas }}</div>
+            <div class="eg-mini">Empresas reales</div>
+        </div>
+    </section>
+
+    <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
         <div class="eg-kpi" style="color:var(--eg-orange);text-align:center;">
             <div class="eg-label">CTA agrupados</div>
             <div class="eg-value">{{ eventos_funnel.cta_clicks }}</div>
@@ -592,6 +615,49 @@
                         <tr>
                             <td colspan="2" class="eg-empty">Sin datos todavía.</td>
                         </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="eg-panel wide">
+            <div class="eg-panel-title">
+                <h2>📞 Leads capturados del signup</h2>
+                <small>Prospectos antes de completar registro</small>
+            </div>
+            <div class="eg-table-wrap">
+                <table class="eg-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>WhatsApp</th>
+                            <th>Rubro</th>
+                            <th>País</th>
+                            <th>Contacto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for lead in leads_recientes %}
+                        <tr>
+                            <td>{{ lead.fecha_creacion|date:"Y-m-d H:i" }}</td>
+                            <td>{{ lead.nombre|default:"-" }}</td>
+                            <td>{{ lead.email|default:"-" }}</td>
+                            <td>{{ lead.whatsapp|default:"-" }}</td>
+                            <td>{{ lead.rubro|default:"-" }}</td>
+                            <td>{{ lead.pais|default:"-" }}</td>
+                            <td>
+                                {% if lead.whatsapp_url %}
+                                    <a class="eg-pill" href="{{ lead.whatsapp_url }}" target="_blank" rel="noopener">WhatsApp</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="7" class="eg-empty">Sin leads capturados todavía.</td></tr>
                     {% endfor %}
                     </tbody>
                 </table>

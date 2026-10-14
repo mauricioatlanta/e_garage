@@ -9,6 +9,8 @@ from django.template.response import TemplateResponse
 from taller.country.engine import URL_SLUG_TO_VERTICAL
 from taller.models.public_analytics_event import PublicAnalyticsEvent
 from taller.models.public_page_view import PublicPageView
+from taller.models.abandoned_lead import AbandonedLead
+from taller.services.public_traffic_classifier import CANONICAL_PUBLIC_HOSTS
 
 
 RUBRO_LABELS = {
@@ -91,7 +93,11 @@ def public_analytics_dashboard(request):
     """
 
     qs_all = PublicPageView.objects.all()
-    qs_human = qs_all.filter(is_bot=False, is_internal=False)
+    qs_human = qs_all.filter(
+        is_bot=False,
+        is_internal=False,
+        host__in=CANONICAL_PUBLIC_HOSTS,
+    )
     qs_bot = qs_all.filter(is_bot=True)
 
     total = qs_all.count()
@@ -361,6 +367,15 @@ def public_analytics_dashboard(request):
             ]
         ),
     }
+    leads_capturados = AbandonedLead.objects.count()
+    leads_pendientes = AbandonedLead.objects.filter(contactado=False).count()
+    conversion_real = {
+        "landings_canonicas": landings_humanas.count(),
+        "cta_whatsapp": eventos_funnel["cta_clicks"],
+        "leads_capturados": leads_capturados,
+        "altas_creadas": crecimiento_global["empresas"],
+    }
+    leads_recientes = AbandonedLead.objects.order_by("-fecha_creacion")[:25]
 
     # -------------------------------------------------------------
     # Referrers: humanos, sin vacíos, top 15.
@@ -414,6 +429,10 @@ def public_analytics_dashboard(request):
         "funnel": funnel,
         "crecimiento_global": crecimiento_global,
         "eventos_funnel": eventos_funnel,
+        "conversion_real": conversion_real,
+        "leads_capturados": leads_capturados,
+        "leads_pendientes": leads_pendientes,
+        "leads_recientes": leads_recientes,
         "por_referrer": por_referrer,
         "mobile_share": mobile_share,
         "por_idioma": por_idioma,

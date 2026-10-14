@@ -16,6 +16,7 @@ from django.views.decorators.csrf import csrf_protect
 # Usar directamente LoginView de Django
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth.backends import ModelBackend
+from taller.views.security import force_password_change
 
 
 class AdminAuthenticationForm(AuthenticationForm):
@@ -376,6 +377,11 @@ urlpatterns = [
     ),
     # Login personalizado con contexto de país
     path("accounts/login/", country_aware_login, name="account_login"),
+    path(
+        "accounts/password/force/",
+        force_password_change,
+        name="force_password_change",
+    ),
     # Signup personalizado con CustomSignupView (ANTES de allauth.urls para que tenga prioridad)
     path("accounts/signup/", CustomSignupView.as_view(), name="account_signup"),
     # Reenvio de confirmacion despues del signup (sin autenticar usuario)
@@ -508,8 +514,16 @@ urlpatterns = [
         usa_signup_view,
     ),
     path(
+        "us/en/accounts/password/force/",
+        force_password_change,
+    ),
+    path(
         "us/es/accounts/signup/",
         usa_signup_view_es,
+    ),
+    path(
+        "us/es/accounts/password/force/",
+        force_password_change,
     ),
     # Resto de /us/<lang>/accounts/* mantiene compatibilidad con namespace USA.
     path("us/en/accounts/", lambda r: redirect("/us/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))),

@@ -28,6 +28,9 @@ class TallerConfig(AppConfig):
         import taller.signals
         import taller.signals.tenant_guard  # noqa: F401
         import taller.signals.trust  # noqa: F401
+        from taller.auth.password_policy import install_user_password_change_property
+
+        install_user_password_change_property()
 
         # Señales de inventario (pre_save Documento → mover stock al cambiar estado)
         try:

@@ -23,6 +23,7 @@ class PublicAnalyticsSession(models.Model):
     first_path = models.CharField(max_length=255)
     last_path = models.CharField(max_length=255, blank=True)
     landing_path = models.CharField(max_length=255, blank=True, db_index=True)
+    host = models.CharField(max_length=255, blank=True, db_index=True)
 
     country = models.CharField(max_length=8, blank=True, db_index=True)
     language = models.CharField(max_length=8, blank=True, db_index=True)

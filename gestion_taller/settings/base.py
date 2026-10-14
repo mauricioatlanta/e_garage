@@ -23,6 +23,12 @@ SAFE_MODE = os.environ.get("EGARAGE_SAFE_MODE") == "1"
 # Seguridad básica
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 
+# Número centralizado para CTAs comerciales de WhatsApp (formato wa.me: solo dígitos).
+WHATSAPP_CONTACT_NUMBER = os.getenv(
+    "WHATSAPP_CONTACT_NUMBER",
+    os.getenv("SUPPORT_WHATSAPP_WA_ME", "56953574683"),
+)
+
 # Aplicaciones instaladas
 INSTALLED_APPS = [
     "allauth",
@@ -71,6 +77,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     # 6. Autenticación
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "taller.middleware.force_password_change.ForcePasswordChangeMiddleware",
     # Commerce Engine — resuelve tenant desde hostname antes de las vistas
     "commerce.middleware.CommerceTenantMiddleware",
     # 7. Mensajes (después de autenticación)

@@ -1,8 +1,13 @@
 import json
 
+from django import forms
 from django.contrib import admin
 from django.contrib.admin import AdminSite
+from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from django.db import models
+from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.utils.html import format_html
 
@@ -10,12 +15,14 @@ from taller.models.catalogo import CatalogoModeloAuto
 from taller.models.clientes import Cliente
 from taller.models.color_cliente import ColorCliente
 from taller.models.comprobante_pago import ComprobantePago
+from taller.models.configuracion import ConfiguracionEmpresa
 from taller.models.pago import PagoPendiente
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
 from taller.models.movimiento_inventario import MovimientoInventario
 from taller.models.extras_vehiculo import CajaVehiculoEmpresa, MotorVehiculoEmpresa
 from taller.models.perfil_usuario import PerfilUsuario
+from taller.models.abandoned_lead import AbandonedLead
 from taller.models.interchange_pieza import InterchangePieza
 from taller.models.pieza_desarme import PiezaDesarme, PiezaDesarmeCompanyLabel
 from taller.models.reciclaje import (
@@ -37,7 +44,284 @@ from taller.models.precio_suscripcion import PrecioSuscripcion
 from taller.models.subscription_change import SubscriptionChange
 from taller.models.suscripcion_transaccion import SuscripcionTransaccion
 from taller.models.tecnico import Tecnico
+from taller.services.plan_change_service import PlanLimitValidation
 from taller.services.suscripcion_transaccion_service import SuscripcionTransaccionService
+
+
+def generate_admin_temporary_password():
+    return f"Eg-{get_random_string(10)}-Aa1!"
+
+
+ADMIN_CLIENT_RUBRO_CHOICES = (
+    ("WORKSHOP", "Taller mecánico"),
+    ("DESARMADURIA", "Desarmaduría"),
+    ("TIRE", "Vulcanización"),
+    ("BODYSHOP", "Bodyshop"),
+    ("RECYCLING", "Recicladora"),
+)
+
+
+class AdminClienteCreationForm(UserCreationForm):
+    first_name = forms.CharField(required=False, label="Nombre")
+    last_name = forms.CharField(required=False, label="Apellido")
+    nombre_taller = forms.CharField(
+        required=False,
+        label="Nombre del negocio",
+        initial="Mi Taller",
+    )
+    telefono = forms.CharField(required=False, label="WhatsApp / Teléfono")
+    pais = forms.ChoiceField(choices=Empresa.PAIS_CHOICES, initial="CL", label="País")
+    rubro_principal = forms.ChoiceField(
+        choices=ADMIN_CLIENT_RUBRO_CHOICES,
+        initial="WORKSHOP",
+        label="Rubro principal",
+    )
+    plan = forms.ChoiceField(choices=Empresa.PLAN_CHOICES, initial="trial", label="Plan")
+    dias_prueba = forms.IntegerField(
+        min_value=0,
+        initial=14,
+        label="Días de prueba",
+        help_text="Para clientes creados manualmente desde WhatsApp.",
+    )
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ("username", "first_name", "last_name")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        temp_password = generate_admin_temporary_password()
+        for field_name in ("password1", "password2"):
+            self.fields[field_name].initial = temp_password
+            self.fields[field_name].widget = forms.TextInput(
+                attrs={
+                    "autocomplete": "new-password",
+                    "style": "font-family: monospace;",
+                }
+            )
+        self.fields["password1"].help_text = (
+            "Contraseña temporal autogenerada. Cópiala para enviarla por WhatsApp; "
+            "el cliente deberá cambiarla al primer inicio."
+        )
+        self.fields["username"].label = "Correo electrónico / usuario"
+        self.fields["username"].help_text = "Debe ser el correo del cliente. Se usará para iniciar sesión."
+
+    def clean_username(self):
+        username = super().clean_username().strip().lower()
+        email_field = forms.EmailField()
+        email_field.clean(username)
+        return username
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data.get("username", "")
+        user.first_name = self.cleaned_data.get("first_name", "")
+        user.last_name = self.cleaned_data.get("last_name", "")
+        if commit:
+            user.save()
+            self.save_related_records(user)
+        return user
+
+    def save_related_records(self, user):
+        dias_prueba = self.cleaned_data.get("dias_prueba") or 0
+        fecha_inicio = timezone.now()
+        fecha_fin = fecha_inicio + timezone.timedelta(days=dias_prueba) if dias_prueba else None
+        empresa, _ = Empresa.objects.get_or_create(
+            user=user,
+            defaults={
+                "nombre_taller": self.cleaned_data.get("nombre_taller") or "Mi Taller",
+                "email": self.cleaned_data.get("username", ""),
+                "telefono": self.cleaned_data.get("telefono", ""),
+                "pais": self.cleaned_data.get("pais") or "CL",
+                "plan": self.cleaned_data.get("plan") or "trial",
+                "dias_prueba": dias_prueba,
+                "suscripcion_activa": True,
+                "fecha_inicio": fecha_inicio,
+                "fecha_fin": fecha_fin,
+                "trial_started_at": fecha_inicio,
+                "trial_ends_at": fecha_fin,
+            },
+        )
+        PerfilUsuario.objects.update_or_create(
+            user=user,
+            defaults={
+                "pais": self.cleaned_data.get("pais") or "CL",
+                "must_change_password": True,
+            },
+        )
+        rubro_principal = self.cleaned_data.get("rubro_principal") or "WORKSHOP"
+        ConfiguracionEmpresa.objects.update_or_create(
+            empresa=empresa,
+            defaults={
+                "rubro_principal": rubro_principal,
+                "rubros": [rubro_principal],
+                "modules_configured_at": timezone.now(),
+            },
+        )
+
+
+class EmpresaUserInlineForm(forms.ModelForm):
+    rubro_principal = forms.ChoiceField(
+        choices=ConfiguracionEmpresa.RUBRO_CHOICES,
+        required=False,
+        label="Rubro principal",
+        help_text="Define el workspace operativo que verá el cliente al entrar.",
+    )
+    rubros = forms.MultipleChoiceField(
+        choices=ConfiguracionEmpresa.RUBRO_CHOICES,
+        required=False,
+        label="Rubros activos",
+        help_text="Mantén seleccionado el rubro principal; agrega otros solo si el negocio es mixto.",
+    )
+
+    class Meta:
+        model = Empresa
+        fields = (
+            "nombre_taller",
+            "empresa",
+            "email",
+            "telefono",
+            "pais",
+            "plan",
+            "dias_prueba",
+            "fecha_inicio",
+            "fecha_fin",
+            "suscripcion_activa",
+            "trial_started_at",
+            "trial_ends_at",
+            "trial_already_used",
+            "valor_mensual",
+            "moneda",
+            "rubro_principal",
+            "rubros",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        config = getattr(self.instance, "config", None) if self.instance and self.instance.pk else None
+        principal = getattr(config, "rubro_principal", "WORKSHOP") if config else "WORKSHOP"
+        rubros = list(getattr(config, "rubros", []) or [principal])
+        if principal not in rubros:
+            rubros.insert(0, principal)
+        self.fields["rubro_principal"].initial = principal
+        self.fields["rubros"].initial = rubros
+
+
+class PerfilUsuarioInline(admin.StackedInline):
+    model = PerfilUsuario
+    can_delete = False
+    extra = 0
+    fields = ("pais", "region", "ciudad", "state", "zipcode", "must_change_password")
+
+
+class EmpresaInline(admin.StackedInline):
+    model = Empresa
+    form = EmpresaUserInlineForm
+    can_delete = False
+    max_num = 1
+    verbose_name = "Empresa / Suscripción / Rubro"
+    verbose_name_plural = "Empresa / Suscripción / Rubro"
+    fields = (
+        "nombre_taller",
+        "empresa",
+        "email",
+        "telefono",
+        "pais",
+        "rubro_principal",
+        "rubros",
+        "plan",
+        "limite_usuarios_display",
+        "dias_prueba",
+        "fecha_inicio",
+        "fecha_fin",
+        "suscripcion_activa",
+        "trial_started_at",
+        "trial_ends_at",
+        "trial_already_used",
+        "valor_mensual",
+        "moneda",
+    )
+    readonly_fields = ("limite_usuarios_display",)
+
+    def get_extra(self, request, obj=None, **kwargs):
+        if obj and hasattr(obj, "empresa"):
+            return 0
+        return 1
+
+    @admin.display(description="Límite de usuarios")
+    def limite_usuarios_display(self, obj):
+        plan = (getattr(obj, "plan", "") or "trial").lower()
+        return PlanLimitValidation.LIMITES_PLANES.get(plan, 1)
+
+
+try:
+    admin.site.unregister(User)
+except admin.sites.NotRegistered:
+    pass
+
+
+@admin.register(User)
+class UserAdmin(DjangoUserAdmin):
+    add_form = AdminClienteCreationForm
+    add_fieldsets = (
+        (
+            "Acceso del cliente",
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "username",
+                    "password1",
+                    "password2",
+                    "first_name",
+                    "last_name",
+                ),
+            },
+        ),
+        (
+            "Configuración comercial inicial",
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "nombre_taller",
+                    "telefono",
+                    "pais",
+                    "rubro_principal",
+                    "plan",
+                    "dias_prueba",
+                ),
+            },
+        ),
+    )
+    inlines = (PerfilUsuarioInline, EmpresaInline)
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if not change and hasattr(form, "save_related_records"):
+            form.save_related_records(obj)
+
+    def save_formset(self, request, form, formset, change):
+        super().save_formset(request, form, formset, change)
+        if formset.model is not Empresa:
+            return
+
+        for inline_form in formset.forms:
+            if not getattr(inline_form, "cleaned_data", None):
+                continue
+            if inline_form.cleaned_data.get("DELETE"):
+                continue
+            empresa = inline_form.instance
+            if not getattr(empresa, "pk", None):
+                continue
+
+            rubro_principal = inline_form.cleaned_data.get("rubro_principal") or "WORKSHOP"
+            rubros = list(inline_form.cleaned_data.get("rubros") or [])
+            if rubro_principal not in rubros:
+                rubros.insert(0, rubro_principal)
+
+            config, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
+            config.rubro_principal = rubro_principal
+            config.rubros = rubros
+            config.save(update_fields=["rubro_principal", "rubros"])
 
 # ✅ Importar modelos de servicios de forma segura (puede fallar si no están disponibles)
 try:
@@ -65,8 +349,6 @@ except ImportError as e:
 
     logger = logging.getLogger(__name__)
     logger.warning(f"Modelos de servicios no disponibles: {e}")
-
-from .models import ConfiguracionEmpresa
 
 # Importar admins de catálogo I18N (se auto-registran con @admin.register)
 try:
@@ -268,8 +550,10 @@ class EmpresaAdmin(admin.ModelAdmin):
 
 @admin.register(PerfilUsuario, site=admin_site)
 class PerfilUsuarioAdmin(admin.ModelAdmin):
-    list_display = ("user",)
-    search_fields = ("user__username",)
+    list_display = ("user", "pais", "must_change_password")
+    list_editable = ("must_change_password",)
+    search_fields = ("user__username", "user__email")
+    list_filter = ("pais", "must_change_password")
 
     def has_add_permission(self, request):
         """
@@ -280,7 +564,7 @@ class PerfilUsuarioAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         """
-        Solo permitir ver, no editar
+        Permitir editar el flag de cambio obligatorio a superusuarios.
         """
         return request.user.is_superuser
 
@@ -289,6 +573,22 @@ class PerfilUsuarioAdmin(admin.ModelAdmin):
         Solo superusuarios pueden eliminar perfiles
         """
         return request.user.is_superuser
+
+
+@admin.register(AbandonedLead)
+class AbandonedLeadAdmin(admin.ModelAdmin):
+    list_display = ("fecha_creacion", "nombre", "email", "whatsapp_link", "rubro", "pais", "contactado")
+    list_filter = ("contactado", "pais", "rubro")
+    search_fields = ("nombre", "email", "whatsapp")
+    list_editable = ("contactado",)
+    readonly_fields = ("fecha_creacion", "updated_at", "whatsapp_link")
+
+    def whatsapp_link(self, obj):
+        if not obj.whatsapp_url:
+            return "-"
+        return format_html('<a href="{}" target="_blank" rel="noopener">WhatsApp</a>', obj.whatsapp_url)
+
+    whatsapp_link.short_description = "Contacto"
 
 
 @admin.register(Cliente, site=admin_site)

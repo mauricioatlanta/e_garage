@@ -94,6 +94,60 @@
 .pieza-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(6,182,212,0.06); }
 .pieza-row:last-child { border-bottom: none; }
 
+/* Gemelo digital / mapa visual */
+.visual-map-shell { overflow: hidden; border-color: rgba(6,182,212,.24); }
+.visual-map-pulse { width: 9px; height: 9px; border-radius: 999px; background: #22d3ee; box-shadow: 0 0 0 5px rgba(34,211,238,.08), 0 0 18px #06b6d4; animation: visualPulse 2s ease-in-out infinite; }
+.visual-map-status { border: 1px solid rgba(100,116,139,.25); border-radius: 999px; padding: 5px 10px; color: #64748b !important; font-size: .68rem; letter-spacing: .06em; text-transform: uppercase; }
+.visual-map-status.is-ready { border-color: rgba(34,211,238,.25); color: #67e8f9 !important; }
+.visual-map-status.is-error { border-color: rgba(239,68,68,.35); color: #fca5a5 !important; }
+.visual-legend-chip { display: grid; grid-template-columns: 9px 1fr auto; align-items: center; gap: 8px; min-height: 36px; border: 1px solid rgba(148,163,184,.12); border-radius: 10px; background: rgba(15,23,42,.54); padding: 7px 10px; color: #94a3b8 !important; font-size: .68rem; }
+.visual-legend-chip strong { color: #e2e8f0 !important; font-size: .78rem; }
+.legend-dot { width: 8px; height: 8px; border-radius: 999px; box-shadow: 0 0 10px currentColor; }
+.legend-mounted { color: #06b6d4; background: #06b6d4; }
+.legend-warehouse { color: #f59e0b; background: #f59e0b; }
+.legend-sold { color: #ef4444; background: #ef4444; }
+.legend-external { color: #a855f7; background: #a855f7; }
+.visual-viewport { position: relative; min-height: 330px; overflow: hidden; padding: 24px; background-color: rgba(2,6,23,.92); background-image: linear-gradient(rgba(6,182,212,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,.055) 1px, transparent 1px), radial-gradient(circle at 50% 45%, rgba(8,145,178,.15), transparent 48%); background-size: 28px 28px, 28px 28px, auto; }
+.visual-viewport::before { content: ""; position: absolute; inset: 12px; border: 1px solid rgba(6,182,212,.08); border-radius: 14px; pointer-events: none; }
+.vehicle-wireframe { position: relative; z-index: 2; display: block; width: 100%; height: auto; min-height: 280px; filter: drop-shadow(0 0 14px rgba(6,182,212,.12)); }
+.wireframe-shell path, .wireframe-detail { fill: none; stroke: rgba(103,232,249,.25); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 7 5; }
+.interactive-slot { --slot-color: #334155; --slot-fill: rgba(51,65,85,.08); outline: none; }
+.interactive-slot > * { fill: var(--slot-fill); stroke: var(--slot-color); stroke-width: 2.5; vector-effect: non-scaling-stroke; transition: fill .2s ease, stroke .2s ease, filter .2s ease, opacity .2s ease; }
+.interactive-slot:not(.has-parts) > * { stroke-dasharray: 5 7; opacity: .38; }
+.interactive-slot.has-parts:hover > *, .interactive-slot.has-parts:focus > *, .interactive-slot.is-selected > * { fill-opacity: .42; stroke-width: 4; filter: drop-shadow(0 0 7px var(--slot-color)); }
+.interactive-slot.slot-mounted { --slot-color: #06b6d4; --slot-fill: rgba(6,182,212,.14); }
+.interactive-slot.slot-warehouse { --slot-color: #f59e0b; --slot-fill: rgba(245,158,11,.14); }
+.interactive-slot.slot-sold { --slot-color: #ef4444; --slot-fill: rgba(239,68,68,.14); }
+.interactive-slot.slot-external { --slot-color: #a855f7; --slot-fill: rgba(168,85,247,.16); }
+.interactive-slot.slot-unavailable { --slot-color: #64748b; --slot-fill: rgba(100,116,139,.08); }
+.interactive-slot.slot-unavailable > * { stroke-dasharray: 4 6; }
+.doors-2 .cab-4p { display: none; }
+.doors-4 .cab-2p, .doors-5 .cab-2p { display: none; }
+.visual-scan-line { position: absolute; z-index: 3; left: 4%; right: 4%; top: 14%; height: 1px; pointer-events: none; background: linear-gradient(90deg, transparent, rgba(34,211,238,.6), transparent); box-shadow: 0 0 14px rgba(34,211,238,.8); animation: visualScan 5s linear infinite; }
+.visual-axis { position: absolute; z-index: 1; pointer-events: none; background: rgba(34,211,238,.11); }
+.visual-axis-x { left: 4%; right: 4%; top: 50%; height: 1px; }
+.visual-axis-y { top: 8%; bottom: 8%; left: 50%; width: 1px; }
+.visual-map-empty { position: absolute; z-index: 4; inset: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; background: rgba(2,6,23,.7); color: #94a3b8 !important; font-size: .82rem; text-align: center; }
+.visual-map-empty:not(.hidden) { display: flex; }
+.visual-map-empty small { color: #475569 !important; }
+.visual-piece-drawer { position: absolute; z-index: 10; top: 12px; right: 12px; bottom: 12px; width: min(360px, calc(100% - 24px)); overflow-y: auto; transform: translateX(calc(100% + 24px)); opacity: 0; pointer-events: none; border: 1px solid rgba(34,211,238,.28); border-radius: 16px; background: rgba(2,6,23,.96); padding: 20px; box-shadow: -18px 0 60px rgba(0,0,0,.55), 0 0 28px rgba(6,182,212,.1); backdrop-filter: blur(16px); transition: transform .25s ease, opacity .2s ease; }
+.visual-piece-drawer.is-open { transform: translateX(0); opacity: 1; pointer-events: auto; }
+.visual-drawer-kicker, .visual-drawer-label { color: #64748b !important; font-size: .62rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.visual-drawer-close { width: 34px; height: 34px; border: 1px solid rgba(148,163,184,.2); border-radius: 9px; color: #94a3b8 !important; font-size: 1.35rem; line-height: 1; }
+.visual-drawer-close:hover { border-color: rgba(34,211,238,.4); color: #67e8f9 !important; }
+.visual-detail-badge { display: inline-flex; margin-top: 5px; border: 1px solid rgba(148,163,184,.2); border-radius: 999px; padding: 4px 8px; color: #cbd5e1 !important; font-size: .7rem; }
+.visual-slot-choice { width: 100%; border: 1px solid rgba(148,163,184,.13); border-radius: 8px; padding: 7px 9px; color: #94a3b8 !important; font-size: .68rem; text-align: left; }
+.visual-slot-choice + .visual-slot-choice { margin-top: 5px; }
+.visual-slot-choice:hover, .visual-slot-choice.is-active { border-color: rgba(34,211,238,.35); background: rgba(6,182,212,.08); color: #cffafe !important; }
+@keyframes visualPulse { 50% { opacity: .55; transform: scale(.85); } }
+@keyframes visualScan { from { top: 12%; } to { top: 88%; } }
+@media (max-width: 640px) {
+  .visual-viewport { min-height: 250px; padding: 8px; }
+  .vehicle-wireframe { min-height: 220px; }
+  .visual-piece-drawer { position: fixed; top: auto; left: 10px; right: 10px; bottom: 10px; width: auto; max-height: 78vh; transform: translateY(calc(100% + 20px)); }
+  .visual-piece-drawer.is-open { transform: translateY(0); }
+}
+
 /* Override force_black_text.css para elementos dentro de paneles */
 .ds-panel h1, .ds-panel h2, .ds-panel h3,
 .ds-panel h4, .ds-panel h5, .ds-panel h6 { color: #94a3b8 !important; }
@@ -314,6 +368,8 @@
     </div>
   </div>
 </div>
+
+{% include "taller/desarme/partials/_vehiculo_mapa_visual.html" %}
 
 <!-- GRILLA 2 COLUMNAS -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
@@ -537,6 +593,216 @@ document.addEventListener('DOMContentLoaded', function() {
       if (inp) inp.value = inp.value.replace(/[^0-9]/g, '');
     });
   }
+  initVehicleVisualMap();
 });
+
+function initVehicleVisualMap() {
+  const root = document.getElementById('vehiculo-mapa-visual');
+  if (!root) return;
+
+  const viewport = document.getElementById('vehiculo-visual-viewport');
+  const drawer = document.getElementById('visual-piece-drawer');
+  const closeButton = document.getElementById('visual-drawer-close');
+  const statusNode = document.getElementById('visual-map-status');
+  const emptyNode = document.getElementById('visual-map-empty');
+  const slots = Array.from(root.querySelectorAll('.interactive-slot[data-visual-slot]'));
+  const partsBySlot = new Map();
+  let selectedSlot = null;
+
+  const nodes = {
+    title: document.getElementById('visual-drawer-title'),
+    code: document.getElementById('visual-drawer-code'),
+    status: document.getElementById('visual-drawer-status'),
+    location: document.getElementById('visual-drawer-location'),
+    origin: document.getElementById('visual-drawer-origin'),
+    externalNote: document.getElementById('visual-drawer-external-note'),
+    price: document.getElementById('visual-drawer-price'),
+    matches: document.getElementById('visual-drawer-matches'),
+    edit: document.getElementById('visual-action-edit'),
+    state: document.getElementById('visual-action-state'),
+    sell: document.getElementById('visual-action-sell')
+  };
+
+  const labels = {
+    status: {
+      DISPONIBLE: '{% trans "Disponible" %}',
+      RESERVADA: '{% trans "Reservada" %}',
+      VENDIDA: '{% trans "Vendida / Facturada" %}',
+      DANADA: '{% trans "Dañada" %}',
+      FALTANTE: '{% trans "Faltante" %}',
+      SCRAP: '{% trans "Sin stock / Scrap" %}'
+    },
+    location: {
+      VEHICULO: '{% trans "En Patio - Montada" %}',
+      BODEGA: '{% trans "En Bodega / Estante" %}',
+      TRANSITO: '{% trans "En tránsito" %}',
+      TERCERO: '{% trans "En instalación externa" %}'
+    },
+    origin: {
+      DESARME_PROPIO: '{% trans "Desarme original" %}',
+      COMPRA_EXTERNA: '{% trans "Compra externa / Tercero" %}',
+      LOTE_YARDA: '{% trans "Compra externa de yarda" %}',
+      RECOMPRA: '{% trans "Recompra / Devolución" %}'
+    }
+  };
+
+  function urlFor(template, id) {
+    return template.replace('/0/', '/' + encodeURIComponent(id) + '/');
+  }
+
+  function visualClass(part) {
+    if (['DANADA', 'FALTANTE', 'SCRAP'].includes(part.status)) return 'slot-unavailable';
+    if (part.origin !== 'DESARME_PROPIO') return 'slot-external';
+    if (part.status === 'VENDIDA') return 'slot-sold';
+    if (part.location_type === 'BODEGA') return 'slot-warehouse';
+    return 'slot-mounted';
+  }
+
+  function classPriority(className) {
+    return {
+      'slot-unavailable': 5,
+      'slot-external': 4,
+      'slot-sold': 3,
+      'slot-warehouse': 2,
+      'slot-mounted': 1
+    }[className] || 0;
+  }
+
+  function priceLabel(part) {
+    if (part.price === null || part.price === undefined) return '—';
+    try {
+      return new Intl.NumberFormat(document.documentElement.lang || 'es-CL', {
+        style: 'currency',
+        currency: part.currency || root.dataset.currency || 'CLP',
+        maximumFractionDigits: Number(part.price) % 1 === 0 ? 0 : 2
+      }).format(Number(part.price));
+    } catch (error) {
+      return String(part.price) + ' ' + (part.currency || root.dataset.currency || '');
+    }
+  }
+
+  function selectPart(part, slotParts) {
+    nodes.title.textContent = part.name || '{% trans "Pieza sin nombre" %}';
+    nodes.code.textContent = part.code || '—';
+    nodes.status.textContent = labels.status[part.status] || part.status || '—';
+    nodes.location.textContent = [
+      labels.location[part.location_type] || part.location_type || '',
+      part.location_detail || ''
+    ].filter(Boolean).join(' · ');
+    nodes.origin.textContent = labels.origin[part.origin] || part.origin || '—';
+    nodes.externalNote.classList.toggle('hidden', part.origin === 'DESARME_PROPIO');
+    nodes.price.textContent = priceLabel(part);
+    nodes.edit.href = urlFor(root.dataset.editUrlTemplate, part.id);
+    nodes.state.href = nodes.edit.href;
+    nodes.state.textContent = part.location_type === 'VEHICULO'
+      ? '{% trans "Cambiar estado / Marcar extraída" %}'
+      : '{% trans "Cambiar estado" %}';
+    nodes.sell.href = root.dataset.sellUrl + '&pieza=' + encodeURIComponent(part.id);
+
+    nodes.matches.replaceChildren();
+    nodes.matches.classList.toggle('hidden', slotParts.length < 2);
+    slotParts.forEach(function(candidate) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'visual-slot-choice' + (candidate.id === part.id ? ' is-active' : '');
+      button.textContent = (candidate.name || candidate.code) + ' · ' +
+        (labels.status[candidate.status] || candidate.status);
+      button.addEventListener('click', function() {
+        selectPart(candidate, slotParts);
+      });
+      nodes.matches.appendChild(button);
+    });
+  }
+
+  function openDrawer(slot, slotParts) {
+    if (!slotParts.length) return;
+    if (selectedSlot) selectedSlot.classList.remove('is-selected');
+    selectedSlot = slot;
+    selectedSlot.classList.add('is-selected');
+    selectPart(slotParts[0], slotParts);
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    closeButton.focus({preventScroll: true});
+  }
+
+  function closeDrawer() {
+    drawer.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    if (selectedSlot) {
+      selectedSlot.classList.remove('is-selected');
+      selectedSlot.focus({preventScroll: true});
+      selectedSlot = null;
+    }
+  }
+
+  slots.forEach(function(slot) {
+    slot.setAttribute('role', 'button');
+    slot.setAttribute('tabindex', '-1');
+    const activate = function() {
+      openDrawer(slot, partsBySlot.get(slot.dataset.visualSlot) || []);
+    };
+    slot.addEventListener('click', activate);
+    slot.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        activate();
+      }
+    });
+  });
+  closeButton.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer();
+  });
+  viewport.addEventListener('click', function(event) {
+    if (event.target === viewport && drawer.classList.contains('is-open')) closeDrawer();
+  });
+
+  fetch(root.dataset.apiUrl, {
+    headers: {'Accept': 'application/json'},
+    credentials: 'same-origin'
+  })
+    .then(function(response) {
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      return response.json();
+    })
+    .then(function(payload) {
+      const parts = Array.isArray(payload.parts) ? payload.parts : [];
+      parts.forEach(function(part) {
+        if (!part.visual_slot) return;
+        if (!partsBySlot.has(part.visual_slot)) partsBySlot.set(part.visual_slot, []);
+        partsBySlot.get(part.visual_slot).push(part);
+      });
+
+      slots.forEach(function(slot) {
+        const slotParts = partsBySlot.get(slot.dataset.visualSlot) || [];
+        if (!slotParts.length) return;
+        const dominantClass = slotParts
+          .map(visualClass)
+          .sort(function(a, b) { return classPriority(b) - classPriority(a); })[0];
+        slot.classList.add('has-parts', dominantClass);
+        slot.setAttribute('tabindex', '0');
+        slot.setAttribute('aria-label', slotParts.map(function(part) {
+          return part.name || part.code;
+        }).join(', '));
+      });
+
+      const summary = payload.summary || {};
+      document.getElementById('visual-count-mounted').textContent = summary.mounted || 0;
+      document.getElementById('visual-count-warehouse').textContent = summary.warehouse || 0;
+      document.getElementById('visual-count-sold').textContent = summary.sold || 0;
+      document.getElementById('visual-count-external').textContent = parts.filter(function(part) {
+        return part.origin !== 'DESARME_PROPIO';
+      }).length;
+      emptyNode.classList.toggle('hidden', partsBySlot.size > 0);
+      statusNode.textContent = parts.length + ' {% trans "piezas sincronizadas" %}';
+      statusNode.classList.add('is-ready');
+    })
+    .catch(function(error) {
+      statusNode.textContent = '{% trans "No se pudo cargar el mapa" %}';
+      statusNode.classList.add('is-error');
+      emptyNode.classList.remove('hidden');
+      console.error('Error cargando mapa visual:', error);
+    });
+}
 </script>
 {% endblock %}

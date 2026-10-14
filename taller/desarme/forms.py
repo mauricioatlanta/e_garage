@@ -121,6 +121,7 @@ class VehiculoDesarmeForm(forms.ModelForm):
             "caja",
             "color",
             "tipo_carroceria",
+            "numero_puertas",
             "precio_compra",
             "fecha_ingreso_desarme",
             "estado_desarme",

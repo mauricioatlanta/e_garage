@@ -197,6 +197,17 @@ class VehiculoDesarme(TenantScoped):
         null=True,
         verbose_name="Tipo de carrocería",
     )
+    numero_puertas = models.PositiveSmallIntegerField(
+        verbose_name="Número de puertas",
+        default=4,
+        choices=[
+            (2, "2 Puertas / Cabina Simple"),
+            (3, "3 Puertas / Portón"),
+            (4, "4 Puertas / Doble Cabina"),
+            (5, "5 Puertas"),
+        ],
+        help_text="Define la silueta visual y las opciones de carrocería en el mapa visual.",
+    )
     precio_compra = models.DecimalField(
         max_digits=14,
         decimal_places=2,

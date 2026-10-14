@@ -7,6 +7,7 @@ from django.urls import path
 from django.views.generic import RedirectView
 
 from . import admin_views, apis_avanzadas, public_views, views
+from taller.views.public_analytics_events import public_analytics_event, public_signup_lead
 from .admin_views import (
     api_admin_charts,
     dashboard_admin,
@@ -27,6 +28,8 @@ app_name = "analytics"
 urlpatterns = [
     # Analytics público de landings — separado del dashboard AI legacy
     path("public/", public_views.public_analytics_dashboard, name="public"),
+    path("public/event/", public_analytics_event, name="public_analytics_event"),
+    path("public/lead/", public_signup_lead, name="public_signup_lead"),
     # Dashboard principal
     path("", views.dashboard_ai_view, name="dashboard"),
     # Redirect sin trailing slash a con trailing slash

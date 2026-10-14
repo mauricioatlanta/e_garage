@@ -48,6 +48,11 @@ try:
         path("vehiculos/", views.lista_vehiculos, name="lista_vehiculos"),
         path("vehiculos/crear/", views.crear_vehiculo, name="crear_vehiculo"),
         path("vehiculos/<int:pk>/", views.ver_vehiculo, name="ver_vehiculo"),
+        path(
+            "vehiculos/<int:pk>/api/mapa-piezas/",
+            views.api_mapa_piezas_vehiculo,
+            name="desarme_api_mapa_piezas",
+        ),
         path("vehiculos/<int:pk>/revisar/", views.revisar_vehiculo, name="revisar_vehiculo"),
         path("vehiculos/<int:pk>/editar/", views.editar_vehiculo, name="editar_vehiculo"),
         path("vehiculos/<int:pk>/dar-de-baja/", views.dar_de_baja_vehiculo, name="dar_de_baja_vehiculo"),

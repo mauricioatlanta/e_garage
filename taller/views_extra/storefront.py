@@ -1,3 +1,4 @@
+from taller.services.compatibility_service import CompatibilityService
 """
 Vistas públicas del storefront individual de cada empresa, y kiosko centralizado.
 
@@ -132,11 +133,7 @@ def _tienda_storefront_render(request, empresa):
             filtro_texto |= Q(nombre__icontains=canon)
         piezas_qs = piezas_qs.filter(filtro_texto)
 
-    # ── Expansión por interchange (bidireccional) ─────────────────────────────
-    # Busca en ambas direcciones:
-    #   A) Mi vehículo aparece como "compatible" → hay piezas de otro origen que sirven en el mío
-    #   B) Mi vehículo aparece como "origen" → las mismas piezas también funcionan en compatibles
-    # En ambos casos se obtiene el codigo_pieza y se busca ese código en el inventario.
+    # ── Expansión por Interchange Canónico (CompatibilityService) ──────────────
     if marca_sel or modelo_sel:
         anio_int = None
         if anio_sel:
@@ -145,46 +142,17 @@ def _tienda_storefront_render(request, empresa):
             except (ValueError, TypeError):
                 pass
 
-        # Dirección A: vehículo del usuario es el "compatible"
-        ic_compat = Q(empresa=empresa)
-        if marca_sel:
-            ic_compat &= Q(marca_compatible__iexact=marca_sel)
-        if modelo_sel:
-            ic_compat &= Q(modelo_compatible__iexact=modelo_sel)
-        if anio_int:
-            ic_compat &= (
-                Q(anio_compatible_desde__lte=anio_int)
-                & Q(anio_compatible_hasta__gte=anio_int)
-            )
+        # Usamos nuestro servicio canónico para obtener las piezas físicas
+        # disponibles en la bodega de esta empresa que aplican para este vehículo.
+        piezas_compatibles_qs = CompatibilityService.find_parts_for_vehicle(
+            marca=marca_sel,
+            modelo=modelo_sel,
+            anio=anio_int,
+            motor=motor_sel if 'motor_sel' in locals() and motor_sel else None
+        ).filter(empresa=empresa)
 
-        # Dirección B: vehículo del usuario es el "origen"
-        ic_origen = Q(empresa=empresa)
-        if marca_sel:
-            ic_origen &= Q(marca_origen__iexact=marca_sel)
-        if modelo_sel:
-            ic_origen &= Q(modelo_origen__iexact=modelo_sel)
-        if anio_int:
-            ic_origen &= (
-                Q(anio_origen_desde__lte=anio_int)
-                & Q(anio_origen_hasta__gte=anio_int)
-            )
-
-        codigos_ic = set(
-            InterchangePieza.objects.filter(ic_compat | ic_origen)
-            .values_list("codigo_pieza", flat=True)
-        )
-        if codigos_ic:
-            ic_qs = base_qs.filter(codigo__in=codigos_ic)
-            if filtro_texto is not None:
-                ic_qs = ic_qs.filter(filtro_texto)
-            piezas_qs = base_qs.filter(
-                Q(pk__in=piezas_qs.values("pk")) | Q(pk__in=ic_qs.values("pk"))
-            ).select_related(
-                "vehiculo_desarme", "vehiculo_desarme__marca",
-                "vehiculo_desarme__modelo", "vehiculo_desarme__motor",
-            )
-
-    piezas_qs = piezas_qs.order_by("-prioridad", "nombre")
+        # Fusionamos las piezas encontradas por filtro directo con las encontradas por compatibilidad
+        piezas_qs = (piezas_qs | piezas_compatibles_qs).distinct()
 
     paginator = Paginator(piezas_qs, 24)
     piezas = paginator.get_page(request.GET.get("page", 1))

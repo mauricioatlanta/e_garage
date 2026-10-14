@@ -182,3 +182,4 @@ seed_datos_mauricio.py
 # Marketing masters pesados — fuentes locales, no versionar
 marketing/Assets/Master/*
 !marketing/Assets/Master/.gitkeep
+.aider*

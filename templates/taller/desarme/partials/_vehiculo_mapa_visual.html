@@ -1,0 +1,95 @@
+{% load i18n %}
+{% load country_url %}
+<section
+  id="vehiculo-mapa-visual"
+  class="ds-panel visual-map-shell mb-5"
+  data-api-url="{% country_url 'desarme:desarme_api_mapa_piezas' vehiculo.pk %}"
+  data-edit-url-template="{% country_url 'desarme:editar_pieza' 0 %}"
+  data-state-url-template="{% country_url 'desarme:api_pieza_estado' 0 %}"
+  data-sell-url="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ vehiculo.pk }}&modo=venta"
+  data-currency="{{ empresa_moneda.codigo|default:'CLP' }}"
+>
+  <div class="flex flex-col gap-4 border-b border-cyan-400/10 p-4 sm:p-5">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="visual-map-pulse"></span>
+          <h3 class="text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">{% trans "Gemelo digital" %}</h3>
+        </div>
+        <p class="mt-1 text-xs text-slate-500">{% trans "Selecciona una zona iluminada para inspeccionar sus repuestos." %}</p>
+      </div>
+      <span id="visual-map-status" class="visual-map-status" role="status">{% trans "Sincronizando inventario…" %}</span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 lg:grid-cols-4" aria-label="{% trans 'Leyenda del mapa visual' %}">
+      <div class="visual-legend-chip"><span class="legend-dot legend-mounted"></span><span>{% trans "En Chasis (Patio)" %}</span><strong id="visual-count-mounted">0</strong></div>
+      <div class="visual-legend-chip"><span class="legend-dot legend-warehouse"></span><span>{% trans "En Bodega" %}</span><strong id="visual-count-warehouse">0</strong></div>
+      <div class="visual-legend-chip"><span class="legend-dot legend-sold"></span><span>{% trans "Vendidas" %}</span><strong id="visual-count-sold">0</strong></div>
+      <div class="visual-legend-chip"><span class="legend-dot legend-external"></span><span>{% trans "Externas Compatibles" %}</span><strong id="visual-count-external">0</strong></div>
+    </div>
+  </div>
+
+  <div class="relative">
+    <div
+      id="vehiculo-visual-viewport"
+      class="visual-viewport doors-{{ vehiculo.numero_puertas|default:4 }}"
+      data-body-type="{{ vehiculo.tipo_carroceria|default:'sedan' }}"
+    >
+      <div class="visual-scan-line" aria-hidden="true"></div>
+      <div class="visual-axis visual-axis-x" aria-hidden="true"></div>
+      <div class="visual-axis visual-axis-y" aria-hidden="true"></div>
+      {% if vehiculo.tipo_carroceria == "pickup" %}
+        {% include "taller/desarme/partials/vehicles/pickup_wireframe.html" %}
+      {% elif vehiculo.tipo_carroceria == "suv" or vehiculo.tipo_carroceria == "crossover" %}
+        {% include "taller/desarme/partials/vehicles/suv_wireframe.html" %}
+      {% elif vehiculo.tipo_carroceria == "coupe" or vehiculo.tipo_carroceria == "convertible" %}
+        {% include "taller/desarme/partials/vehicles/coupe_wireframe.html" %}
+      {% elif vehiculo.tipo_carroceria == "van" or vehiculo.tipo_carroceria == "minivan" or vehiculo.tipo_carroceria == "utilitario" %}
+        {% include "taller/desarme/partials/vehicles/van_wireframe.html" %}
+      {% else %}
+        {% include "taller/desarme/partials/vehicles/sedan_wireframe.html" %}
+      {% endif %}
+      <div id="visual-map-empty" class="visual-map-empty hidden">
+        <span>{% trans "Sin piezas vinculadas a slots visuales." %}</span>
+        <small>{% trans "Asigna un slot visual al editar cada pieza." %}</small>
+      </div>
+    </div>
+
+    <aside id="visual-piece-drawer" class="visual-piece-drawer" aria-hidden="true" aria-labelledby="visual-drawer-title">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div class="visual-drawer-kicker">{% trans "Inspección de componente" %}</div>
+          <h4 id="visual-drawer-title" class="mt-1 text-lg font-bold text-white">—</h4>
+          <div id="visual-drawer-code" class="mt-1 font-mono text-xs text-cyan-300">—</div>
+        </div>
+        <button id="visual-drawer-close" type="button" class="visual-drawer-close" aria-label="{% trans 'Cerrar detalle' %}">×</button>
+      </div>
+
+      <div id="visual-drawer-matches" class="mt-4 hidden" aria-label="{% trans 'Piezas en este slot' %}"></div>
+      <div class="mt-5 space-y-3">
+        <div>
+          <div class="visual-drawer-label">{% trans "Estado y ubicación" %}</div>
+          <span id="visual-drawer-status" class="visual-detail-badge"></span>
+          <div id="visual-drawer-location" class="mt-1 text-xs text-slate-400"></div>
+        </div>
+        <div>
+          <div class="visual-drawer-label">{% trans "Procedencia" %}</div>
+          <span id="visual-drawer-origin" class="visual-detail-badge"></span>
+          <p id="visual-drawer-external-note" class="mt-2 hidden text-xs text-fuchsia-300">
+            {% trans "Pieza de yarda compatible disponible en stock" %}
+          </p>
+        </div>
+        <div>
+          <div class="visual-drawer-label">{% trans "Precio sugerido" %}</div>
+          <div id="visual-drawer-price" class="text-xl font-bold text-cyan-200">—</div>
+        </div>
+      </div>
+
+      <div class="mt-6 grid gap-2">
+        <a id="visual-action-edit" href="#" class="btn-ds btn-ds-cyan justify-center">{% trans "Editar pieza" %}</a>
+        <a id="visual-action-state" href="#" class="btn-ds btn-ds-outline justify-center">{% trans "Cambiar estado" %}</a>
+        <a id="visual-action-sell" href="#" class="btn-ds btn-ds-outline justify-center">{% trans "Vender" %}</a>
+      </div>
+    </aside>
+  </div>
+</section>

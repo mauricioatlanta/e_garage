@@ -9,6 +9,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from taller.models import CompanySettings, CompanySettingsHistory
+from taller.models.perfil_usuario import PerfilUsuario
 
 
 @receiver(pre_save, sender=CompanySettings)
@@ -106,6 +107,7 @@ def create_default_company_settings(sender, instance, created, **kwargs):
     Crea configuración por defecto para nuevos usuarios
     """
     if created:
+        PerfilUsuario.objects.get_or_create(user=instance)
         # Crear configuración básica por defecto
         CompanySettings.objects.create(
             user=instance,

@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
+from taller.services.abandoned_lead_service import capture_abandoned_lead
 from taller.services.public_event_tracking import (
     PublicEventValidationError,
     check_public_event_rate_limit,
@@ -46,3 +47,36 @@ def public_analytics_event(request):
         metadata=metadata,
     )
     return JsonResponse({"ok": True, "created": created, "event_id": event.pk})
+
+
+@require_POST
+def public_signup_lead(request):
+    try:
+        payload = parse_public_event_payload_for_lead(request)
+    except PublicEventValidationError as exc:
+        return JsonResponse({"ok": False, "error": exc.code}, status=exc.status)
+
+    lead, created = capture_abandoned_lead(request, payload)
+    return JsonResponse({"ok": True, "created": created, "lead_id": getattr(lead, "pk", None)})
+
+
+def parse_public_event_payload_for_lead(request) -> dict:
+    if request.content_type != "application/json":
+        raise PublicEventValidationError("unsupported_media_type", status=415)
+    if len(request.body or b"") > 4096:
+        raise PublicEventValidationError("payload_too_large", status=413)
+    try:
+        import json
+
+        payload = json.loads((request.body or b"{}").decode("utf-8"))
+    except Exception:
+        raise PublicEventValidationError("invalid_json")
+    if not isinstance(payload, dict):
+        raise PublicEventValidationError("invalid_payload")
+    return {
+        "nombre": payload.get("nombre") or "",
+        "whatsapp": payload.get("whatsapp") or payload.get("telefono") or "",
+        "email": payload.get("email") or "",
+        "rubro": payload.get("rubro") or "",
+        "pais": payload.get("pais") or "",
+    }

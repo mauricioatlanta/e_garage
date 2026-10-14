@@ -36,6 +36,7 @@ from taller.models.pieza_desarme import (
 )
 from taller.models.lineas_documento import LineaRepuesto, ORIGEN_DESARME
 from taller.models.interchange_pieza import InterchangePieza
+from taller.models.compatibility import PartApplication
 from taller.models.vehiculo_desarme import ESTADO_DESARME_CHOICES, VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 from taller.models.inspeccion_ingreso import DanoInspeccion, InspeccionIngreso
@@ -727,6 +728,107 @@ def ver_vehiculo(request, pk):
             "repuestos_recientes": repuestos_recientes,
             "ops": ops_summary,
         },
+    )
+
+
+@login_required
+@require_GET
+def api_mapa_piezas_vehiculo(request, pk):
+    """Inventario compacto para el mapa visual de un vehículo de desarme."""
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return JsonResponse({"detail": "Sin empresa"}, status=403)
+
+    vehiculo = get_object_or_404(VehiculoDesarme, pk=pk, empresa=empresa)
+    marca = vehiculo.get_marca_display()
+    modelo = vehiculo.get_modelo_display()
+
+    aplicaciones = PartApplication.objects.filter(
+        activo=True,
+        marca__iexact=marca,
+        modelo__iexact=modelo,
+    )
+    interchanges = InterchangePieza.objects.filter(
+        empresa=empresa,
+        marca_compatible__iexact=marca,
+        modelo_compatible__iexact=modelo,
+    )
+    if vehiculo.anio:
+        aplicaciones = aplicaciones.filter(
+            Q(anio_desde__isnull=True) | Q(anio_desde__lte=vehiculo.anio),
+            Q(anio_hasta__isnull=True) | Q(anio_hasta__gte=vehiculo.anio),
+        )
+        interchanges = interchanges.filter(
+            anio_compatible_desde__lte=vehiculo.anio,
+            anio_compatible_hasta__gte=vehiculo.anio,
+        )
+
+    codigos_compatibles = set(aplicaciones.values_list("codigo_pieza", flat=True))
+    codigos_compatibles.update(interchanges.values_list("codigo_pieza", flat=True))
+
+    piezas_filter = Q(vehiculo_desarme=vehiculo)
+    if codigos_compatibles:
+        piezas_filter |= Q(
+            codigo__in=codigos_compatibles,
+            origen__in=("COMPRA_EXTERNA", "LOTE_YARDA", "RECOMPRA"),
+        )
+
+    piezas = list(
+        PiezaDesarme.objects.filter(
+            piezas_filter,
+            empresa=empresa,
+            activo=True,
+        )
+        .select_related("vehiculo_desarme")
+        .prefetch_related("names", "company_labels")
+        .order_by("codigo", "id")
+    )
+
+    lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
+
+    def precio_json(precio):
+        if precio is None:
+            return None
+        return int(precio) if precio == precio.to_integral_value() else float(precio)
+
+    parts = [
+        {
+            "id": pieza.pk,
+            "code": pieza.codigo,
+            "name": pieza.get_display_label(empresa=empresa, language=lang),
+            "status": pieza.estado_pieza,
+            "location_type": pieza.ubicacion_tipo,
+            "location_detail": pieza.ubicacion_fisica or "",
+            "origin": pieza.origen,
+            "visual_slot": pieza.visual_slot,
+            "price": precio_json(pieza.precio_venta_sugerido),
+            "currency": empresa.moneda,
+        }
+        for pieza in piezas
+    ]
+    vendidas = sum(1 for pieza in piezas if pieza.estado_pieza == ESTADO_VENDIDA)
+    no_vendidas = [pieza for pieza in piezas if pieza.estado_pieza != ESTADO_VENDIDA]
+
+    return JsonResponse(
+        {
+            "vehicle": {
+                "id": vehiculo.pk,
+                "body_type": vehiculo.tipo_carroceria or "otro",
+                "doors": vehiculo.numero_puertas,
+                "yard_location": vehiculo.ubicacion_fisica or "",
+            },
+            "summary": {
+                "total": len(piezas),
+                "mounted": sum(
+                    1 for pieza in no_vendidas if pieza.ubicacion_tipo == "VEHICULO"
+                ),
+                "warehouse": sum(
+                    1 for pieza in no_vendidas if pieza.ubicacion_tipo == "BODEGA"
+                ),
+                "sold": vendidas,
+            },
+            "parts": parts,
+        }
     )
 
 

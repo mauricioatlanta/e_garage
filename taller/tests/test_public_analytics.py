@@ -36,6 +36,11 @@ def regular_user(db):
     return User.objects.create_user(username="regular_test", password="pass")
 
 
+@pytest.fixture(autouse=True)
+def public_analytics_hash_key(settings):
+    settings.PUBLIC_ANALYTICS_HASH_KEY = "test-public-analytics-key"
+
+
 @pytest.mark.django_db
 def test_dashboard_returns_200_for_staff(rf, staff_user):
     request = rf.get("/analytics/public/")
@@ -96,6 +101,7 @@ def test_eventos_funnel_groups_legacy_and_canonical_without_double_count(rf, sta
         first_path="/",
         last_path="/",
         landing_path="/",
+        host="egarage.cl",
         page_type="home",
         attribution_type=PublicAnalyticsSession.ATTRIBUTION_DIRECT,
         first_seen_at=now,
@@ -139,6 +145,7 @@ def test_prospectos_estimados_excludes_human_bursts(rf, staff_user):
     for index in range(21):
         PublicPageView.objects.create(
             path="/",
+            host="egarage.cl",
             page_type=PublicPageView.PAGE_HOME,
             visitor_hash="burst",
             user_agent="Mozilla/5.0",
@@ -146,6 +153,7 @@ def test_prospectos_estimados_excludes_human_bursts(rf, staff_user):
         )
     PublicPageView.objects.create(
         path="/",
+        host="egarage.cl",
         page_type=PublicPageView.PAGE_HOME,
         visitor_hash="single",
         user_agent="Mozilla/5.0",
@@ -229,6 +237,7 @@ def test_dashboard_separates_attributed_funnel_from_global_growth(rf, staff_user
         first_path="/cl/desarmadurias/",
         last_path="/cl/desarmadurias/",
         landing_path="/cl/desarmadurias/",
+        host="egarage.cl",
         country="cl",
         language="es",
         vertical_key="salvage",
@@ -240,6 +249,7 @@ def test_dashboard_separates_attributed_funnel_from_global_growth(rf, staff_user
     )
     PublicPageView.objects.create(
         path="/cl/desarmadurias/",
+        host="egarage.cl",
         page_type=PublicPageView.PAGE_LANDING,
         visitor_hash="visitor-dashboard",
         public_session=session,

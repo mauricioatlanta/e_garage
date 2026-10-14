@@ -4,12 +4,20 @@ Signals para notificaciones automáticas en eGarage
 
 from django.conf import settings
 from django.contrib.auth.signals import user_logged_in
+from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 
 from taller.models.pago import PagoPendiente
+from taller.models.perfil_usuario import PerfilUsuario
 from taller.utils.email_helper import get_branded_from_email, send_email_with_reply_to
+
+
+@receiver(post_save, sender=User)
+def crear_perfil_usuario(sender, instance, created, **kwargs):
+    if created:
+        PerfilUsuario.objects.get_or_create(user=instance)
 
 
 @receiver(post_save, sender=PagoPendiente)

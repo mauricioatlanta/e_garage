@@ -690,6 +690,12 @@ class CustomSignupForm(SignupForm):
         )  # Valor por defecto si está vacío
         user.last_name = data.get("last_name", "").strip() or ""  # Opcional
         user.save()
+        try:
+            from taller.auth.password_policy import set_user_must_change_password
+
+            set_user_must_change_password(user, False)
+        except Exception:
+            pass
 
         # 3. ✅ Detectar país: 1) selección del usuario en el formulario, 2) ?from=xx, 3) URL, 4) CL por defecto
         from_param = request.GET.get("from", "").upper()

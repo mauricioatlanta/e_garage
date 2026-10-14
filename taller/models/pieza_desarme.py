@@ -52,6 +52,20 @@ CONDICION_CHOICES = [
     (CONDICION_REGULAR, "Regular"),
 ]
 
+ORIGEN_PIEZA_CHOICES = [
+    ("DESARME_PROPIO", "Desarme propio"),
+    ("COMPRA_EXTERNA", "Compra externa / Tercero"),
+    ("LOTE_YARDA", "Lote externo de yarda"),
+    ("RECOMPRA", "Recompra / Devolución"),
+]
+
+UBICACION_TIPO_CHOICES = [
+    ("VEHICULO", "Montada en vehículo (Patio)"),
+    ("BODEGA", "Extraída en bodega / Estante"),
+    ("TRANSITO", "En tránsito"),
+    ("TERCERO", "Instalación externa / Consignación"),
+]
+
 
 class PiezaDesarme(TenantScoped):
     """
@@ -163,6 +177,31 @@ class PiezaDesarme(TenantScoped):
         help_text="Condición física de la pieza (visible en kiosko y storefront).",
     )
     ubicacion_fisica = models.CharField(max_length=120, null=True, blank=True)
+    origen = models.CharField(
+        max_length=24,
+        choices=ORIGEN_PIEZA_CHOICES,
+        default="DESARME_PROPIO",
+        db_index=True,
+        verbose_name="Origen de la pieza",
+    )
+    ubicacion_tipo = models.CharField(
+        max_length=20,
+        choices=UBICACION_TIPO_CHOICES,
+        default="VEHICULO",
+        db_index=True,
+        verbose_name="Tipo de ubicación física",
+    )
+    visual_slot = models.CharField(
+        max_length=80,
+        null=True,
+        blank=True,
+        db_index=True,
+        verbose_name="Slot visual anatómico",
+        help_text=(
+            "Identificador único del slot en el SVG "
+            "(ej: door.front.left, engine.alternator, bed.tailgate)"
+        ),
+    )
     observaciones = models.TextField(blank=True, null=True)
     lado = models.CharField(max_length=50, null=True, blank=True)
     zona = models.CharField(max_length=50, null=True, blank=True)
@@ -292,6 +331,14 @@ class PiezaDesarme(TenantScoped):
             raise ValidationError(
                 {"estado_pieza": "Solo se puede marcar como Vendida cuando la cantidad es 0."}
             )
+
+    def save(self, *args, **kwargs):
+        if self.fecha_extraccion and self.ubicacion_tipo == "VEHICULO":
+            self.ubicacion_tipo = "BODEGA"
+            update_fields = kwargs.get("update_fields")
+            if update_fields is not None:
+                kwargs["update_fields"] = set(update_fields) | {"ubicacion_tipo"}
+        return super().save(*args, **kwargs)
 
     class Meta(TenantScoped.Meta):
         verbose_name = "Pieza de desarme"

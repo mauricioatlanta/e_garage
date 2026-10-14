@@ -98,6 +98,7 @@ from .sesion_usuario import SesionUsuario
 
 # Embudo de adquisición / registro
 from .registro_embudo import RegistroEmbudoSuscriptor
+from .abandoned_lead import AbandonedLead
 
 # Analytics público
 from .public_page_view import PublicPageView, is_probable_bot
@@ -215,6 +216,7 @@ __all__ = [
     "SesionUsuario",
     # Embudo de adquisición / registro
     "RegistroEmbudoSuscriptor",
+    "AbandonedLead",
     # Analytics público
     "PublicPageView",
     "PublicAnalyticsSession",

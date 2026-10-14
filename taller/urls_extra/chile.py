@@ -45,6 +45,7 @@ from taller.views_extra.chile_password_reset import (
 from taller.views_extra.custom_signup import CustomSignupView
 from taller.views_extra.primer_paso import primer_paso_chile
 from taller.views_extra.first_victory_dashboard import first_victory_dashboard
+from taller.views.security import force_password_change
 
 # Configuración de logging para este módulo
 logger = logging.getLogger(__name__)
@@ -111,6 +112,7 @@ urlpatterns = [
         name="account_reset_password_done",
     ),
     path("accounts/password/change/", password_change, name="account_change_password"),
+    path("accounts/password/force/", force_password_change, name="force_password_change"),
     path("accounts/password/set/", password_set, name="account_set_password"),
     path("accounts/confirm-email/", EmailVerificationSentView.as_view(), name="account_email_verification_sent"),
     re_path(r"^accounts/confirm-email/(?P<key>[-:\w]+)/$", ConfirmEmailView.as_view(), name="account_confirm_email"),

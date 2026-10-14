@@ -12,6 +12,10 @@ from taller.country.engine import URL_SLUG_TO_VERTICAL
 from taller.models.public_analytics_session import PublicAnalyticsSession
 from taller.models.public_page_view import is_probable_bot
 from taller.services.public_analytics import _clean_referrer, _is_mobile
+from taller.services.public_traffic_classifier import (
+    is_probable_non_human_request,
+    normalize_host,
+)
 from taller.utils.smart_logging import get_client_ip
 
 
@@ -164,6 +168,11 @@ def get_or_create_public_session(
         visitor_cookie, session_cookie, visitor_hash, session_hash = _current_cookie_hashes(request)
         now = timezone.now()
         user_agent = (request.META.get("HTTP_USER_AGENT") or "")[:500]
+        try:
+            raw_host = request.get_host()
+        except Exception:
+            raw_host = request.META.get("HTTP_HOST", "")
+        host = normalize_host(raw_host)
         referrer = _clean_referrer(request)
         ip = get_client_ip(request) or ""
         ip_hash = hash_public_analytics_value(ip) if ip else ""
@@ -186,7 +195,7 @@ def get_or_create_public_session(
             }
             session = None
 
-        is_bot = is_probable_bot(user_agent)
+        is_bot = is_probable_bot(user_agent) or is_probable_non_human_request(request, user_agent)
         is_internal = _is_internal_request(request, ip_hash)
         expires_at = now + timezone.timedelta(seconds=_cookie_max_age())
 
@@ -197,6 +206,7 @@ def get_or_create_public_session(
                 first_path=path,
                 last_path=path,
                 landing_path=path if page_type else "",
+                host=host[:255],
                 country=(country or "").lower()[:8],
                 language=(language or "").lower()[:8],
                 vertical_key=vertical,
@@ -217,6 +227,9 @@ def get_or_create_public_session(
         else:
             update_fields = ["last_path", "last_referrer", "last_seen_at", "expires_at", "updated_at"]
             session.last_path = path
+            if host and session.host != host:
+                session.host = host[:255]
+                update_fields.append("host")
             session.last_referrer = referrer
             session.last_seen_at = now
             session.expires_at = expires_at
