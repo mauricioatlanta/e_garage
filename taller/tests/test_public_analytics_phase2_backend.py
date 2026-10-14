@@ -198,14 +198,14 @@ def test_desarmaduria_landing_sets_real_csrf_cookie_and_endpoint_accepts_it():
 
     assert landing.status_code == 200
     assert csrf_token
-    assert event.status_code == 200
+    assert event.status_code == 200, event.content
     assert event.json()["created"] is True
 
 
 def test_gateway_sets_real_csrf_cookie_and_endpoint_accepts_cta_click():
     client = Client(enforce_csrf_checks=True)
 
-    gateway = client.get("/", HTTP_USER_AGENT="Mozilla/5.0")
+    gateway = client.get("/", secure=True, HTTP_HOST="egarage.cl", HTTP_USER_AGENT="Mozilla/5.0")
     csrf_token = gateway.cookies["csrftoken"].value
     event = client.post(
         "/analytics/public/event/",
@@ -221,23 +221,63 @@ def test_gateway_sets_real_csrf_cookie_and_endpoint_accepts_cta_click():
         },
         content_type="application/json",
         HTTP_X_CSRFTOKEN=csrf_token,
+        HTTP_REFERER="https://egarage.cl/",
+        HTTP_HOST="egarage.cl",
+        secure=True,
     )
 
     assert gateway.status_code == 200
     assert csrf_token
-    assert event.status_code == 200
-    assert event.json()["created"] is True
+    page_view = PublicPageView.objects.get(path="/")
+    assert page_view.public_session_id, gateway.content[:200]
+    assert "eg_session_id" in gateway.cookies, gateway.cookies.output()
+    assert event.status_code == 200, event.content
+    assert event.json()["ok"] is True
     assert PublicAnalyticsEvent.objects.filter(event_type="cta_click").count() == 1
 
 
-def test_other_rubro_does_not_activate_csrf_instrumentation_cookie():
+def test_other_rubro_signup_ctas_set_csrf_and_are_tracked():
     client = Client(enforce_csrf_checks=True)
 
-    response = client.get("/cl/talleres/", HTTP_USER_AGENT="Mozilla/5.0")
+    landing = client.get(
+        "/cl/talleres/",
+        secure=True,
+        HTTP_HOST="egarage.cl",
+        HTTP_USER_AGENT="Mozilla/5.0",
+    )
+    csrf_token = landing.cookies["csrftoken"].value
+    html = landing.content.decode()
+    event = client.post(
+        "/analytics/public/event/",
+        data={
+            "event_type": "cta_click",
+            "path": "/cl/talleres/",
+            "dedupe_key": "/cl/talleres/:signup:hero",
+            "metadata": {
+                "cta_id": "signup_hero",
+                "cta_label": "Crear cuenta gratis",
+                "href": "/accounts/signup/?rubro=TALLER_MECANICO",
+                "country": "cl",
+                "vertical": "workshop",
+            },
+        },
+        content_type="application/json",
+        HTTP_X_CSRFTOKEN=csrf_token,
+        HTTP_REFERER="https://egarage.cl/cl/talleres/",
+        HTTP_HOST="egarage.cl",
+        secure=True,
+    )
 
-    assert response.status_code == 200
-    assert "csrftoken" not in response.cookies
-    assert "/static/public/js/public_funnel_tracking.js" not in response.content.decode()
+    assert landing.status_code == 200
+    assert csrf_token
+    assert "eg_session_id" in landing.cookies, landing.cookies.output()
+    assert html.count("data-public-signup-cta=") == 4
+    assert 'event_type: "cta_click"' in html
+    assert "a[data-public-signup-cta]" in html
+    assert "/static/public/js/public_funnel_tracking.js" not in html
+    assert event.status_code == 200
+    assert event.json()["ok"] is True
+    assert PublicAnalyticsEvent.objects.filter(event_type="cta_click", path="/cl/talleres/").count() == 1
 
 
 def test_gateway_instruments_country_ctas_without_public_funnel_script():

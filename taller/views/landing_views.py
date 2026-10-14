@@ -8,6 +8,7 @@ from taller.country.hub import COUNTRY_HUB
 from taller.services.public_analytics import track_public_page
 from taller.models.public_page_view import PublicPageView
 from taller.services.public_attribution import attach_public_analytics_cookies
+from taller.services.country_localization import get_whatsapp_cta_context
 
 
 def landing_home(request):
@@ -27,7 +28,13 @@ def landing_home(request):
         page_type=PublicPageView.PAGE_HOME,
     )
     get_token(request)
-    response = render(request, "public/gateway.html")
+    whatsapp_cta = get_whatsapp_cta_context("cl")
+    whatsapp_cta["secondary_label"] = "Hablar con un asesor"
+    response = render(
+        request,
+        "public/gateway.html",
+        {"whatsapp_cta": whatsapp_cta},
+    )
     return attach_public_analytics_cookies(request, response)
 
 
@@ -43,13 +50,22 @@ _HUB_HREFLANG = {
 
 
 def render_country_hub(request, country_key):
+    track_public_page(
+        request,
+        page_type=PublicPageView.PAGE_WELCOME,
+        country=country_key,
+        language=COUNTRY_HUB[country_key].get("language", ""),
+    )
     ctx = dict(COUNTRY_HUB[country_key])
     ctx["landing_urls"] = get_hub_landing_urls(country_key)
     ctx["canonical_path"] = _HUB_CANONICAL_PATH.get(
         country_key, f"/{COUNTRY_HUB[country_key]['country_code']}/"
     )
     ctx["hreflang_alternates"] = _HUB_HREFLANG.get(country_key, ())
-    return render(request, "public/hub_country.html", ctx)
+    ctx["whatsapp_cta"] = get_whatsapp_cta_context(country_key)
+    get_token(request)
+    response = render(request, "public/hub_country.html", ctx)
+    return attach_public_analytics_cookies(request, response)
 
 
 def hub_chile(request):
@@ -106,8 +122,11 @@ def landing_vertical(request, country_key: str, url_slug: str):
     )
 
     ctx = get_landing_context(country_key, vertical_key)
+    ctx["whatsapp_cta"] = get_whatsapp_cta_context(country_key, vertical_key)
+    get_token(request)
     if ctx.get("canonical_path") == "/cl/desarmadurias/" and vertical_key == "salvage":
-        get_token(request)
+        # Kept for the dedicated scroll/trial funnel script on this route.
+        pass
     response = render(request, "public/landing_vertical.html", ctx)
     return attach_public_analytics_cookies(request, response)
 

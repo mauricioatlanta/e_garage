@@ -53,6 +53,11 @@ SECURE_PROXY_SSL_HEADER = None
 SESSION_COOKIE_DOMAIN = None
 CSRF_COOKIE_DOMAIN = None
 
+# ── Analítica pública: clave determinística para cookies/sesiones de test ─────
+PUBLIC_ANALYTICS_HASH_KEY = "test-public-analytics-key"
+PUBLIC_ANALYTICS_COOKIE_SECURE = False
+PUBLIC_ANALYTICS_QA_EMAIL_DOMAIN = "egarage.test"
+
 # ── Media: directorio temporal (tests que suben archivos usan tmp_path) ───────
 MEDIA_ROOT = os.path.join(tempfile.gettempdir(), "egarage_test_media")
 MEDIA_URL = "/media/"

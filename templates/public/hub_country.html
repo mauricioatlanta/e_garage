@@ -98,6 +98,26 @@
       text-align: center;
       margin: 0;
     }
+    .hub-signup {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:3.45rem;
+      padding:.9rem 1.35rem;
+      border-radius:.9rem;
+      background:#22d3ee;
+      color:#082f49;
+      font-weight:900;
+      text-decoration:none;
+      box-shadow:0 18px 42px rgba(34,211,238,.24), inset 0 0 0 1px rgba(255,255,255,.30);
+      transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
+      animation: hub-fade-up 0.4s 0.15s ease-out both;
+    }
+    .hub-signup:hover {
+      background:#67e8f9;
+      transform:translateY(-1px);
+      box-shadow:0 22px 52px rgba(34,211,238,.32), inset 0 0 0 1px rgba(255,255,255,.34);
+    }
 
     /* Grid */
     .hub-grid {
@@ -199,6 +219,82 @@
     .hub-title   { animation: hub-fade-up 0.4s 0.10s ease-out both; }
     .hub-subtitle{ animation: hub-fade-up 0.4s 0.13s ease-out both; }
     .hub-grid    { animation: hub-fade-up 0.4s 0.18s ease-out both; }
+    .hub-whatsapp {
+      animation: hub-fade-up 0.4s 0.16s ease-out both;
+      width:100%;
+      display:flex;
+      justify-content:center;
+    }
+    .eg-whatsapp-cta {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.7rem;
+      min-height:3.55rem;
+      padding:.9rem 1.25rem;
+      border-radius:.9rem;
+      background:#25D366;
+      color:#042f18;
+      font-weight:900;
+      text-decoration:none;
+      box-shadow:0 18px 40px rgba(37,211,102,.28), inset 0 0 0 1px rgba(255,255,255,.28);
+      transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+    .eg-whatsapp-cta:hover {
+      background:#32e374;
+      transform:translateY(-1px);
+      box-shadow:0 22px 48px rgba(37,211,102,.36), inset 0 0 0 1px rgba(255,255,255,.32);
+    }
+    .eg-whatsapp-cta-icon {
+      width:1.65rem;
+      height:1.65rem;
+      flex:0 0 auto;
+    }
+    .eg-whatsapp-cta span {
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      line-height:1.1;
+      text-align:left;
+    }
+    .eg-whatsapp-cta strong {
+      font-size:1rem;
+      letter-spacing:0;
+    }
+    .eg-whatsapp-cta small {
+      margin-top:.18rem;
+      font-size:.72rem;
+      font-weight:800;
+      color:rgba(4,47,24,.76);
+    }
+    .eg-whatsapp-cta-floating {
+      position:fixed;
+      right:1rem;
+      bottom:1rem;
+      z-index:60;
+      min-height:3.35rem;
+      padding:.82rem 1rem;
+      border-radius:999px;
+    }
+    .eg-whatsapp-cta-floating small {
+      display:none;
+    }
+    @media (min-width:768px) {
+      .eg-whatsapp-cta-floating {
+        display:none;
+      }
+    }
+    @media (max-width:480px) {
+      .eg-whatsapp-cta,
+      .hub-signup,
+      .hub-whatsapp {
+        width:100%;
+      }
+      .eg-whatsapp-cta-floating {
+        width:auto;
+        max-width:calc(100vw - 2rem);
+      }
+    }
   </style>
   {% if egarage_analytics_id %}
   <script async src="https://www.googletagmanager.com/gtag/js?id={{ egarage_analytics_id }}"></script>
@@ -231,6 +327,19 @@
     {% else %}
     <h1 class="hub-title">Bienvenido a eGarage {{ country_name }}</h1>
     <p class="hub-subtitle">Elige el tipo de negocio que quieres gestionar.</p>
+    {% endif %}
+
+    <a href="{% if signup_url %}{{ signup_url }}{% else %}{% url 'account_signup' %}{% endif %}"
+       class="hub-signup"
+       data-public-signup-cta="hub"
+       data-country="{{ country_code|default:'' }}">
+      {% if language == "en" %}Start free trial{% else %}Crear cuenta gratis{% endif %}
+    </a>
+
+    {% if whatsapp_cta %}
+    <div class="hub-whatsapp">
+      {% include "components/whatsapp_cta_button.html" with cta_position="hub" %}
+    </div>
     {% endif %}
 
     <!-- Rubro cards -->
@@ -290,6 +399,70 @@
 
   </div><!-- /hub-content -->
 </div><!-- /hub-hero -->
+
+{% if whatsapp_cta %}
+  {% include "components/whatsapp_cta_button.html" with cta_variant="floating" cta_position="floating" %}
+{% endif %}
+
+<script>
+  (function () {
+    function getCookie(name) {
+      var prefix = name + "=";
+      var parts = document.cookie ? document.cookie.split(";") : [];
+      for (var i = 0; i < parts.length; i += 1) {
+        var value = parts[i].trim();
+        if (value.indexOf(prefix) === 0) {
+          return decodeURIComponent(value.slice(prefix.length));
+        }
+      }
+      return "";
+    }
+
+    function trackCtaClick(link, kind) {
+      var csrfToken = getCookie("csrftoken");
+      if (!csrfToken || typeof window.fetch !== "function" || !link) {
+        return;
+      }
+      var ctaKey = kind === "signup"
+        ? (link.getAttribute("data-public-signup-cta") || "signup")
+        : (link.getAttribute("data-public-whatsapp-cta") || "cta");
+      var ctaId = kind + "_" + ctaKey;
+      window.fetch("/analytics/public/event/", {
+        method: "POST",
+        credentials: "same-origin",
+        keepalive: true,
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({
+          event_type: "cta_click",
+          path: window.location.pathname,
+          dedupe_key: window.location.pathname + ":" + kind + ":" + ctaKey,
+          metadata: {
+            cta_id: ctaId,
+            cta_label: (link.textContent || "").trim().slice(0, 120),
+            country: link.getAttribute("data-country") || "",
+            vertical: link.getAttribute("data-vertical") || "",
+            href: link.getAttribute("href") || ""
+          }
+        })
+      }).catch(function () {});
+    }
+
+    document.addEventListener("click", function (event) {
+      var signupLink = event.target.closest("a[data-public-signup-cta]");
+      if (signupLink) {
+        trackCtaClick(signupLink, "signup");
+        return;
+      }
+      var whatsappLink = event.target.closest("a[data-event='cta_whatsapp_click']");
+      if (whatsappLink) {
+        trackCtaClick(whatsappLink, "whatsapp");
+      }
+    });
+  })();
+</script>
 
 </body>
 </html>

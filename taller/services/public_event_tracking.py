@@ -23,6 +23,18 @@ from taller.utils.smart_logging import get_client_ip
 DESARMADURIA_PATH = "/cl/desarmadurias/"
 DESARMADURIA_VERTICAL = "salvage"
 DESARMADURIA_COUNTRY = "cl"
+PUBLIC_CTA_HUB_PATHS = {
+    "/cl/",
+    "/ar/",
+    "/pe/",
+    "/mx/",
+    "/ec/",
+    "/uy/",
+    "/ve/",
+    "/br/",
+    "/us/en/",
+    "/us/es/",
+}
 
 logger = logging.getLogger(__name__)
 
@@ -45,9 +57,9 @@ BACKEND_EVENT_TYPES = {
 ALLOWED_METADATA_KEYS = {
     PublicAnalyticsEvent.EVENT_SCROLL_50: {"scroll_percent", "viewport_height", "document_height"},
     PublicAnalyticsEvent.EVENT_SCROLL_90: {"scroll_percent", "viewport_height", "document_height"},
-    PublicAnalyticsEvent.EVENT_CTA_CLICK: {"cta_id", "cta_label", "href"},
-    PublicAnalyticsEvent.EVENT_CTA_WHATSAPP_CLICK: {"cta_id", "cta_label", "href"},
-    PublicAnalyticsEvent.EVENT_CTA_TRIAL_30_CLICK: {"cta_id", "cta_label", "href"},
+    PublicAnalyticsEvent.EVENT_CTA_CLICK: {"cta_id", "cta_label", "href", "country", "vertical"},
+    PublicAnalyticsEvent.EVENT_CTA_WHATSAPP_CLICK: {"cta_id", "cta_label", "href", "country", "vertical"},
+    PublicAnalyticsEvent.EVENT_CTA_TRIAL_30_CLICK: {"cta_id", "cta_label", "href", "country", "vertical"},
 }
 
 BACKEND_ALLOWED_METADATA_KEYS = {
@@ -93,6 +105,12 @@ def _vertical_from_path(path: str) -> str:
         if vertical:
             return vertical
     return ""
+
+
+def _is_public_cta_path(path: str) -> bool:
+    if path == "/" or path in PUBLIC_CTA_HUB_PATHS:
+        return True
+    return bool(_vertical_from_path(path))
 
 
 def _configure_public_rate_limit():
@@ -156,7 +174,7 @@ def validate_public_event_payload(payload: dict) -> tuple[str, str, str, dict]:
 
     path = (payload.get("path") or "").strip()
     if event_type == PublicAnalyticsEvent.EVENT_CTA_CLICK:
-        if path != "/":
+        if not _is_public_cta_path(path):
             raise PublicEventValidationError("path_not_allowed")
     elif path != DESARMADURIA_PATH:
         raise PublicEventValidationError("path_not_allowed")

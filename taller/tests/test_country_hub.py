@@ -71,6 +71,16 @@ def test_chile_hub_terminology(rf):
 
 
 @pytest.mark.django_db
+def test_chile_hub_has_direct_signup_cta_and_tracking(rf):
+    html = _get_html(hub_chile, rf)
+    assert 'data-public-signup-cta="hub"' in html
+    assert 'href="/accounts/signup/"' in html
+    assert "Crear cuenta gratis" in html
+    assert 'event_type: "cta_click"' in html
+    assert "a[data-public-signup-cta]" in html
+
+
+@pytest.mark.django_db
 def test_argentina_hub_terminology(rf):
     html = _get_html(hub_argentina, rf)
     assert "Gomería" in html

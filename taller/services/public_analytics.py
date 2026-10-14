@@ -4,11 +4,15 @@ from urllib.parse import urlparse
 from django.utils import timezone
 
 from taller.models.public_page_view import PublicPageView, is_probable_bot
+from taller.services.public_traffic_classifier import (
+    is_canonical_public_host,
+    is_probable_non_human_request,
+    normalize_host,
+)
 from taller.utils.smart_logging import get_client_ip
 
 
 logger = logging.getLogger(__name__)
-PUBLIC_ANALYTICS_ATTRIBUTION_PATHS = {"/", "/cl/desarmadurias/"}
 
 
 def _is_mobile(user_agent: str) -> bool:
@@ -57,23 +61,27 @@ def track_public_page(
             return None
 
         user_agent = (request.META.get("HTTP_USER_AGENT") or "")[:500]
+        try:
+            raw_host = request.get_host()
+        except Exception:
+            raw_host = request.META.get("HTTP_HOST", "")
+        host = normalize_host(raw_host)
         ip = get_client_ip(request) or ""
         public_session = None
-        if request.path in PUBLIC_ANALYTICS_ATTRIBUTION_PATHS:
-            try:
-                from taller.services.public_attribution import get_or_create_public_session
+        try:
+            from taller.services.public_attribution import get_or_create_public_session
 
-                public_session = get_or_create_public_session(
-                    request,
-                    page_type=page_type,
-                    country=country,
-                    language=language,
-                )
-            except Exception:
-                logger.exception(
-                    "public_analytics: error resolving session path=%s",
-                    getattr(request, "path", ""),
-                )
+            public_session = get_or_create_public_session(
+                request,
+                page_type=page_type,
+                country=country,
+                language=language,
+            )
+        except Exception:
+            logger.exception(
+                "public_analytics: error resolving session path=%s",
+                getattr(request, "path", ""),
+            )
 
         now = timezone.now()
         visitor_hash = PublicPageView.build_visitor_hash(
@@ -82,8 +90,10 @@ def track_public_page(
             date_key=now.date().isoformat(),
         )
 
+        is_non_human = is_probable_non_human_request(request, user_agent)
         page_view = PublicPageView.objects.create(
             path=request.path[:255],
+            host=host[:255],
             page_type=page_type,
             country=(country or "").lower()[:8],
             language=(language or "").lower()[:8],
@@ -92,11 +102,16 @@ def track_public_page(
             referrer=_clean_referrer(request),
             user_agent=user_agent,
             is_mobile=_is_mobile(user_agent),
-            is_bot=is_probable_bot(user_agent),
+            is_bot=is_probable_bot(user_agent) or is_non_human,
             is_internal=bool(public_session and public_session.is_internal),
             created_at=now,
         )
-        if public_session and not public_session.is_bot and not public_session.is_internal:
+        if (
+            public_session
+            and not public_session.is_bot
+            and not public_session.is_internal
+            and is_canonical_public_host(host)
+        ):
             try:
                 from taller.models.public_analytics_event import PublicAnalyticsEvent
                 from taller.services.public_event_tracking import record_public_event

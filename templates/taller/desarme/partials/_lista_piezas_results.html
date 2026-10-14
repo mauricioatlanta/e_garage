@@ -1,0 +1,53 @@
+{% load i18n %}
+{% load humanize %}
+{% load custom_filters %}
+{% load country_url %}
+
+{% if piezas %}
+<div class="pieces-grid">
+  {% for p in piezas %}
+  <div class="piece-card estado-{{ p.estado_pieza }}" id="card-{{ p.pk }}" data-search="{{ p.codigo|default:''|lower }} {{ p.nombre|default:''|lower }} {{ p.nombre_sin_vehiculo|default:''|lower }} {{ p.estado_pieza|default:''|lower }} {{ p.zona|default:''|lower }} {{ p.ubicacion_fisica|default:''|lower }} {% if p.vehiculo_desarme %}{{ p.vehiculo_desarme.patente|default:''|lower }} {{ p.vehiculo_desarme.vin|default:''|lower }} {{ p.vehiculo_desarme.get_marca_display|default:''|lower }} {{ p.vehiculo_desarme.get_modelo_display|default:''|lower }} {{ p.vehiculo_desarme.anio|default:'' }}{% endif %}">
+    <div class="flex justify-between items-start mb-2">
+      <span class="font-mono text-cyan-300 font-semibold">{{ p.codigo }}</span>
+      <span class="badge-estado badge-{{ p.estado_pieza }}">{{ p.get_estado_pieza_display|default:p.estado_pieza }}</span>
+    </div>
+    <p class="text-white text-sm mb-1">{{ p.nombre_sin_vehiculo }}</p>
+    <p class="text-cyan-400 font-semibold text-sm mb-1">
+      {% if p.precio_venta_sugerido %}
+        {% if request.path|slice:':4' == '/us/' %}${{ p.precio_venta_sugerido|floatformat:2|intcomma }}{% else %}${{ p.precio_venta_sugerido|add_thousands_separator }}{% endif %}
+      {% else %}—{% endif %}
+    </p>
+    <p class="vehiculo-origen">
+      {% trans "Vehículo" %}: {% if p.vehiculo_desarme_id %}<a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ p.vehiculo_desarme_id }}&modo=venta">{{ p.vehiculo_desarme }}{% if p.vehiculo_desarme.anio %} ({{ p.vehiculo_desarme.anio }}){% endif %}</a>{% else %}—{% endif %}
+    </p>
+    <div class="flex gap-1 mt-2 flex-wrap">
+      <a href="{% country_url 'desarme:editar_pieza' p.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
+      {% if p.vehiculo_desarme_id %}<a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ p.vehiculo_desarme_id }}&modo=venta" class="interactive-btn">{% trans "Filtrar vehículo" %}</a>{% endif %}
+      {% if select_field == 'pieza_desarme' and return_to %}
+      <button type="button"
+        onclick="seleccionarPieza({{ p.pk }}, '{{ p.codigo|escapejs }}', '{{ p.nombre|escapejs }}', {{ p.precio_venta_sugerido|default:0 }}, {{ p.costo_asignado|default:0 }})"
+        style="background:rgba(243,154,19,0.2);border:1px solid rgba(243,154,19,0.6);border-radius:8px;padding:6px 12px;color:#fcd34d;font-size:12px;font-weight:600;cursor:pointer;">
+        ✓ Seleccionar
+      </button>
+      {% else %}
+      <button type="button" class="btn-carrito" id="btn-{{ p.pk }}"
+        onclick="toggleCarrito({{ p.pk }}, '{{ p.codigo|escapejs }}', '{{ p.nombre|escapejs }}', {{ p.precio_venta_sugerido|default:0 }}, {{ p.cantidad|default:0 }})">
+        🛒 Agregar
+      </button>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="rounded-xl border border-cyan-400/30 bg-black/30 p-8 text-center text-gray-400">
+  <p class="mb-4">{% if has_piece_filters %}{% trans "No hay resultados con los filtros aplicados." %}{% else %}{% trans "No hay repuestos de desarme." %}{% endif %}</p>
+  {% if has_piece_filters %}
+  <a href="{% country_url 'desarme:lista_piezas' %}" class="text-cyan-400 hover:text-cyan-300">{% trans "Ver todas" %}</a>
+  {% else %}
+  <a href="{% country_url 'desarme:crear_pieza' %}" class="text-cyan-400 hover:text-cyan-300">{% trans "Crear la primera" %}</a>
+  o
+  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="text-cyan-400 hover:text-cyan-300">{% trans "ir a vehículos" %}</a>
+  {% endif %}
+</div>
+{% endif %}

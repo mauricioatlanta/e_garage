@@ -35,6 +35,7 @@ from taller.models.pieza_desarme import (
     PiezaDesarmeCompanyLabel,
 )
 from taller.models.lineas_documento import LineaRepuesto, ORIGEN_DESARME
+from taller.models.interchange_pieza import InterchangePieza
 from taller.models.vehiculo_desarme import ESTADO_DESARME_CHOICES, VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 from taller.models.inspeccion_ingreso import DanoInspeccion, InspeccionIngreso
@@ -846,9 +847,21 @@ def _filtrar_piezas(request, empresa):
     q = request.GET.get("q", "").strip()
     if q:
         for term in q.split():
-            piezas = piezas.filter(
+            interchange_filter = (
+                Q(codigo_pieza__icontains=term)
+                | Q(nombre_pieza__icontains=term)
+                | Q(marca_origen__icontains=term)
+                | Q(modelo_origen__icontains=term)
+                | Q(marca_compatible__icontains=term)
+                | Q(modelo_compatible__icontains=term)
+                | Q(notas__icontains=term)
+            )
+            pieza_filter = (
                 Q(codigo__icontains=term)
                 | Q(nombre__icontains=term)
+                | Q(observaciones__icontains=term)
+                | Q(ubicacion_fisica__icontains=term)
+                | Q(zona__icontains=term)
                 | Q(vehiculo_desarme__patente__icontains=term)
                 | Q(vehiculo_desarme__vin__icontains=term)
                 | Q(vehiculo_desarme__marca_texto__icontains=term)
@@ -856,6 +869,21 @@ def _filtrar_piezas(request, empresa):
                 | Q(vehiculo_desarme__marca__nombre__icontains=term)
                 | Q(vehiculo_desarme__modelo__nombre__icontains=term)
             )
+            if term.isdigit():
+                year = int(term)
+                interchange_filter |= (
+                    Q(anio_origen_desde__lte=year, anio_origen_hasta__gte=year)
+                    | Q(anio_compatible_desde__lte=year, anio_compatible_hasta__gte=year)
+                )
+                pieza_filter |= Q(vehiculo_desarme__anio=year)
+
+            interchange_codes = (
+                InterchangePieza.objects.filter(empresa=empresa)
+                .filter(interchange_filter)
+                .values("codigo_pieza")
+            )
+
+            piezas = piezas.filter(pieza_filter | Q(codigo__in=Subquery(interchange_codes))).distinct()
 
     estado = request.GET.get("estado", "").strip()
     if estado:
@@ -914,6 +942,23 @@ def _filtrar_piezas(request, empresa):
     return piezas
 
 
+_PIEZA_FILTER_PARAMS = (
+    "q",
+    "estado",
+    "vehiculo",
+    "sin_foto",
+    "sin_precio",
+    "sin_ubicacion",
+    "condicion",
+    "zona",
+    "fecha_desde",
+    "fecha_hasta",
+    "costo_min",
+    "costo_max",
+    "proveedor",
+)
+
+
 @login_required
 def lista_piezas(request):
     """Listado de piezas con búsqueda y filtros combinables por estado,
@@ -952,33 +997,40 @@ def lista_piezas(request):
 
     return_to = request.GET.get("return_to", "").strip()
     select_field = request.GET.get("select_field", "").strip()
+    has_piece_filters = any(request.GET.get(param, "").strip() for param in _PIEZA_FILTER_PARAMS)
 
-    return render(
-        request,
-        "taller/desarme/lista_piezas.html",
-        {
-            "piezas": piezas,
-            "empresa": empresa,
-            "q": request.GET.get("q", "").strip(),
-            "estado_filtro": request.GET.get("estado", "").strip(),
-            "vehiculo_filtro": request.GET.get("vehiculo", "").strip(),
-            "vehiculos_choices": vehiculos_choices,
-            "estado_pieza_choices": ESTADO_PIEZA_CHOICES,
-            "condicion_choices": CONDICION_CHOICES,
-            "condicion_filtro": request.GET.get("condicion", "").strip(),
-            "zona_filtro": request.GET.get("zona", "").strip(),
-            "fecha_desde_filtro": request.GET.get("fecha_desde", "").strip(),
-            "fecha_hasta_filtro": request.GET.get("fecha_hasta", "").strip(),
-            "costo_min_filtro": request.GET.get("costo_min", "").strip(),
-            "costo_max_filtro": request.GET.get("costo_max", "").strip(),
-            "proveedor_filtro": request.GET.get("proveedor", "").strip(),
-            "proveedores_choices": proveedores_choices,
-            "clientes_venta_choices": clientes_venta_choices,
-            "return_to": return_to,
-            "select_field": select_field,
-            "querystring": request.GET.urlencode(),
-        },
+    context = {
+        "piezas": piezas,
+        "empresa": empresa,
+        "q": request.GET.get("q", "").strip(),
+        "estado_filtro": request.GET.get("estado", "").strip(),
+        "vehiculo_filtro": request.GET.get("vehiculo", "").strip(),
+        "vehiculos_choices": vehiculos_choices,
+        "estado_pieza_choices": ESTADO_PIEZA_CHOICES,
+        "condicion_choices": CONDICION_CHOICES,
+        "condicion_filtro": request.GET.get("condicion", "").strip(),
+        "zona_filtro": request.GET.get("zona", "").strip(),
+        "fecha_desde_filtro": request.GET.get("fecha_desde", "").strip(),
+        "fecha_hasta_filtro": request.GET.get("fecha_hasta", "").strip(),
+        "costo_min_filtro": request.GET.get("costo_min", "").strip(),
+        "costo_max_filtro": request.GET.get("costo_max", "").strip(),
+        "proveedor_filtro": request.GET.get("proveedor", "").strip(),
+        "proveedores_choices": proveedores_choices,
+        "clientes_venta_choices": clientes_venta_choices,
+        "return_to": return_to,
+        "select_field": select_field,
+        "querystring": request.GET.urlencode(),
+        "has_piece_filters": has_piece_filters,
+    }
+
+    is_partial = (
+        request.GET.get("partial") == "1"
+        or request.headers.get("x-requested-with") == "XMLHttpRequest"
     )
+    if is_partial:
+        return render(request, "taller/desarme/partials/_lista_piezas_results.html", context)
+
+    return render(request, "taller/desarme/lista_piezas.html", context)
 
 
 @login_required
