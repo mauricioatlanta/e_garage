@@ -14,6 +14,33 @@ from taller.services.empresa_service import get_empresa_safe
 from taller.services.workspace_service import WorkspaceService
 
 
+def _support_config(request, config):
+    """Return an in-memory config override for the superuser support bar."""
+    user = getattr(request, "user", None)
+    session = getattr(request, "session", {})
+    support_rubro = session.get("support_rubro")
+    if not getattr(user, "is_superuser", False) or not support_rubro:
+        return config
+
+    if config is None:
+        from types import SimpleNamespace
+
+        return SimpleNamespace(
+            rubro_principal=support_rubro,
+            rubros=[],
+            usa_vehiculos=True,
+            usa_servicios=True,
+        )
+
+    # Avoid mutating the ORM instance or writing support state to the tenant.
+    from copy import copy
+
+    override = copy(config)
+    override.rubro_principal = support_rubro
+    override.rubros = []
+    return override
+
+
 def _url_prefix_from_request(request) -> str:
     """Extrae el prefijo /país/lang del path actual (ej: /cl/es)."""
     path = (request.path or "").lstrip("/")
@@ -30,10 +57,12 @@ def business_modules(request):
 
     try:
         empresa = get_empresa_safe(request)
-        if not empresa:
-            return {}
-        config = getattr(empresa, "config", None)
+        config = _support_config(request, getattr(empresa, "config", None) if empresa else None)
     except Exception:
+        config = _support_config(request, None)
+        empresa = None
+
+    if config is None:
         return {}
 
     url_prefix = _url_prefix_from_request(request)
@@ -46,8 +75,13 @@ def business_modules(request):
     return {
         "business_modules":   active,
         "nav_items":          workspace["nav"],   # workspace nav replaces old nav_items
-        "needs_module_config": BusinessModuleService.needs_module_configuration(empresa),
+        "needs_module_config": BusinessModuleService.needs_module_configuration(empresa) if empresa else False,
         "product_profile":    BusinessModuleService.get_product_profile(config),
         "nav_url_prefix":     url_prefix,
         "workspace":          workspace,
+        "support_environment_active": bool(
+            getattr(user, "is_superuser", False)
+            and getattr(request, "session", {}).get("support_rubro")
+        ),
+        "support_rubro": getattr(request, "session", {}).get("support_rubro", ""),
     }

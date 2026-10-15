@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth.backends import ModelBackend
 from taller.views.security import force_password_change
+from taller.views.staff_switcher import switch_support_environment
 
 
 class AdminAuthenticationForm(AuthenticationForm):
@@ -271,6 +272,11 @@ def country_aware_workspace_redirect(request, subpath=""):
 
 
 urlpatterns = [
+    path(
+        "staff/support-environment/",
+        switch_support_environment,
+        name="switch_support_environment",
+    ),
     path("healthz/", healthz, name="healthz"),
     path("robots.txt", robots_txt, name="robots_txt"),
     path("sitemap.xml", sitemap_xml, name="sitemap_xml"),

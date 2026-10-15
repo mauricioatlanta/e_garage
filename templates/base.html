@@ -700,6 +700,8 @@
 
 <body class="min-h-screen flex flex-col{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %} eg-desarme-dashboard-compact{% endif %}">
 
+  {% include "components/support_switcher_bar.html" %}
+
   {% if qa_control_authorized %}
     {% include "qa_control/bar.html" %}
   {% endif %}

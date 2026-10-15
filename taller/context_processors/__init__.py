@@ -88,11 +88,19 @@ def company_country(request):
     if not user or not user.is_authenticated:
         return {"company_country": "CL"}
 
+    if getattr(user, "is_superuser", False):
+        support_country = (getattr(request, "session", {}).get("support_country") or "").strip().upper()
+        if support_country:
+            return {
+                "company_country": support_country,
+                "support_country": support_country,
+            }
+
     try:
         empresa = Empresa.objects.get(user=user)
-        return {"company_country": empresa.pais}
+        return {"company_country": empresa.pais, "support_country": ""}
     except Empresa.DoesNotExist:
-        return {"company_country": "CL"}
+        return {"company_country": "CL", "support_country": ""}
 
 
 def invalidate_company_cache(user):
