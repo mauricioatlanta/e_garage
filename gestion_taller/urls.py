@@ -272,7 +272,6 @@ def country_aware_workspace_redirect(request, subpath=""):
 
 
 urlpatterns = [
-    path('dev-login/', auto_login_view, name='auto_login_bypass'),
 
     path(
         "staff/support-environment/",
