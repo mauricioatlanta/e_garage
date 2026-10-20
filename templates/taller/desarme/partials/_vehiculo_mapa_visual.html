@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function() {
   if (typeof THREE.GLTFLoader !== 'undefined') {
     const loader = new THREE.GLTFLoader();
     loader.load(
-      "{% static 'artifacts/meshy_sedan_holographic_v02/meshy_sedan_holographic_v02.glb' %}",
+      "{% static 'artifacts/sedan_v02/graphite-four-door-sedan_cc0.glb' %}",
       function (gltf) {
         const vehicle = gltf.scene;
         const bounds = new THREE.Box3().setFromObject(vehicle);
@@ -136,7 +136,8 @@ document.addEventListener("DOMContentLoaded", function() {
           if (node.material) {
             node.material = node.material.clone();
             node.material.transparent = true;
-            node.material.opacity = 0.72;
+            node.material.opacity = 0.88;
+            if (node.material.color) node.material.color.multiplyScalar(0.72);
             node.material.depthWrite = false;
           }
         });
