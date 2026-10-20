@@ -177,6 +177,10 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(...pos);
+    // El slot es una zona de interacción, no una pieza ficticia superpuesta.
+    // Se oculta del render para conservar la silueta limpia del vehículo;
+    // Raycaster sigue pudiendo resolverlo para abrir el drawer.
+    mesh.visible = false;
     mesh.userData = { slotName, defaultColor, fallback: fallback || {}, parts: [] };
     // Aro y núcleo metálico: evita que las ruedas parezcan cubos luminosos.
     if (slotName.indexOf('wheel.') === 0) {
