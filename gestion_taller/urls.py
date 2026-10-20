@@ -1,5 +1,3 @@
-from bypass_login import login_directo_dev
-from bypass_login import auto_login_view
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -274,7 +272,6 @@ def country_aware_workspace_redirect(request, subpath=""):
 
 
 urlpatterns = [
-    path('entrar/', login_directo_dev, name='login_directo_dev'),
     path('dev-login/', auto_login_view, name='auto_login_bypass'),
 
     path(
