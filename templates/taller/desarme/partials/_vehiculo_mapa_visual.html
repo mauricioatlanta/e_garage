@@ -1,4 +1,4 @@
-{% load country_url %}
+{% load country_url static %}
 <!-- ================================================================= -->
 <!-- GEMELO DIGITAL 3D // eGarage Hologram Engine -->
 <!-- ================================================================= -->
@@ -47,6 +47,7 @@
 <!-- Three.js & OrbitControls -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -112,7 +113,43 @@ document.addEventListener("DOMContentLoaded", function() {
   const chassis = new THREE.Mesh(bodyGeo, solidMat);
   chassis.add(new THREE.Mesh(bodyGeo, wireMat));
   chassis.position.y = 0.2;
-  carGroup.add(chassis);
+  // Fallback geométrico: permanece oculto cuando carga el sedán GLB real.
+  chassis.visible = false;
+
+  // Geometría principal: sedán aprobado, con curvas de carrocería y cristales.
+  if (typeof THREE.GLTFLoader !== 'undefined') {
+    const loader = new THREE.GLTFLoader();
+    loader.load(
+      "{% static 'artifacts/meshy_sedan_holographic_v02/meshy_sedan_holographic_v02.glb' %}",
+      function (gltf) {
+        const vehicle = gltf.scene;
+        const bounds = new THREE.Box3().setFromObject(vehicle);
+        const size = bounds.getSize(new THREE.Vector3());
+        const center = bounds.getCenter(new THREE.Vector3());
+        const scale = 4.2 / Math.max(size.x, size.y, size.z);
+        vehicle.scale.setScalar(scale);
+        vehicle.position.set(-center.x * scale, -center.y * scale - 0.35, -center.z * scale);
+        vehicle.traverse(function (node) {
+          if (!node.isMesh) return;
+          node.castShadow = true;
+          node.receiveShadow = true;
+          if (node.material) {
+            node.material = node.material.clone();
+            node.material.transparent = true;
+            node.material.opacity = 0.72;
+            node.material.depthWrite = false;
+          }
+        });
+        carGroup.add(vehicle);
+        if (loading) loading.style.display = 'none';
+      },
+      undefined,
+      function () { if (loading) loading.style.display = 'none'; chassis.visible = true; }
+    );
+  } else {
+    chassis.visible = true;
+    if (loading) loading.style.display = 'none';
+  }
 
   // Mapa de Slots Anatómicos 3D
   const interactiveSlots = {};
