@@ -369,8 +369,6 @@
   </div>
 </div>
 
-{% include "taller/desarme/partials/_vehiculo_mapa_visual.html" %}
-
 <!-- GRILLA 2 COLUMNAS -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
 
@@ -568,6 +566,11 @@
   </div>
 </div>
 {% endif %}
+
+{# El gemelo digital se muestra al pie, después de la información operacional. #}
+<section class="mt-6" aria-label="Gemelo digital del vehículo">
+  {% include "taller/desarme/partials/_vehiculo_mapa_visual.html" %}
+</section>
 
 {% endblock %}
 
