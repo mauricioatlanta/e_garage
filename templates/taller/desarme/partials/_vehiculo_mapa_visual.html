@@ -1,95 +1,168 @@
-{% load i18n %}
-{% load country_url %}
-<section
-  id="vehiculo-mapa-visual"
-  class="ds-panel visual-map-shell mb-5"
-  data-api-url="{% country_url 'desarme:desarme_api_mapa_piezas' vehiculo.pk %}"
-  data-edit-url-template="{% country_url 'desarme:editar_pieza' 0 %}"
-  data-state-url-template="{% country_url 'desarme:api_pieza_estado' 0 %}"
-  data-sell-url="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ vehiculo.pk }}&modo=venta"
-  data-currency="{{ empresa_moneda.codigo|default:'CLP' }}"
->
-  <div class="flex flex-col gap-4 border-b border-cyan-400/10 p-4 sm:p-5">
-    <div class="flex flex-wrap items-start justify-between gap-3">
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="visual-map-pulse"></span>
-          <h3 class="text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">{% trans "Gemelo digital" %}</h3>
-        </div>
-        <p class="mt-1 text-xs text-slate-500">{% trans "Selecciona una zona iluminada para inspeccionar sus repuestos." %}</p>
-      </div>
-      <span id="visual-map-status" class="visual-map-status" role="status">{% trans "Sincronizando inventario…" %}</span>
-    </div>
+<!-- Cabecera de Botones Futuristas -->
+<div class="hologram-controls" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 10px; background: rgba(0, 5, 20, 0.85); padding: 10px; border-radius: 8px; border: 1px solid #00f0ff; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); font-family: monospace;">
+    <button onclick="filtrarCategoria3D('TODOS')" style="background: transparent; color: #00f0ff; border: 1px solid #00f0ff; padding: 8px 16px; cursor: pointer; font-weight: bold; text-transform: uppercase;">Ver Todo</button>
+    <button onclick="filtrarCategoria3D('motor')" style="background: transparent; color: #00f0ff; border: 1px solid #00f0ff; padding: 8px 16px; cursor: pointer; font-weight: bold; text-transform: uppercase;">Motor</button>
+    <button onclick="filtrarCategoria3D('refrigeracion')" style="background: transparent; color: #00f0ff; border: 1px solid #00f0ff; padding: 8px 16px; cursor: pointer; font-weight: bold; text-transform: uppercase;">Refrigeración</button>
+    <button onclick="filtrarCategoria3D('carroceria')" style="background: transparent; color: #00f0ff; border: 1px solid #00f0ff; padding: 8px 16px; cursor: pointer; font-weight: bold; text-transform: uppercase;">Carrocería</button>
+</div>
 
-    <div class="grid grid-cols-2 gap-2 lg:grid-cols-4" aria-label="{% trans 'Leyenda del mapa visual' %}">
-      <div class="visual-legend-chip"><span class="legend-dot legend-mounted"></span><span>{% trans "En Chasis (Patio)" %}</span><strong id="visual-count-mounted">0</strong></div>
-      <div class="visual-legend-chip"><span class="legend-dot legend-warehouse"></span><span>{% trans "En Bodega" %}</span><strong id="visual-count-warehouse">0</strong></div>
-      <div class="visual-legend-chip"><span class="legend-dot legend-sold"></span><span>{% trans "Vendidas" %}</span><strong id="visual-count-sold">0</strong></div>
-      <div class="visual-legend-chip"><span class="legend-dot legend-external"></span><span>{% trans "Externas Compatibles" %}</span><strong id="visual-count-external">0</strong></div>
-    </div>
-  </div>
+<!-- Contenedor del Visor 3D -->
+<div id="canvas-container" style="width: 100%; height: 600px; background: #000000; position: relative; border: 1px solid #002244;"></div>
 
-  <div class="relative">
-    <div
-      id="vehiculo-visual-viewport"
-      class="visual-viewport doors-{{ vehiculo.numero_puertas|default:4 }}"
-      data-body-type="{{ vehiculo.tipo_carroceria|default:'sedan' }}"
-    >
-      <div class="visual-scan-line" aria-hidden="true"></div>
-      <div class="visual-axis visual-axis-x" aria-hidden="true"></div>
-      <div class="visual-axis visual-axis-y" aria-hidden="true"></div>
-      {% if vehiculo.tipo_carroceria == "pickup" %}
-        {% include "taller/desarme/partials/vehicles/pickup_wireframe.html" %}
-      {% elif vehiculo.tipo_carroceria == "suv" or vehiculo.tipo_carroceria == "crossover" %}
-        {% include "taller/desarme/partials/vehicles/suv_wireframe.html" %}
-      {% elif vehiculo.tipo_carroceria == "coupe" or vehiculo.tipo_carroceria == "convertible" %}
-        {% include "taller/desarme/partials/vehicles/coupe_wireframe.html" %}
-      {% elif vehiculo.tipo_carroceria == "van" or vehiculo.tipo_carroceria == "minivan" or vehiculo.tipo_carroceria == "utilitario" %}
-        {% include "taller/desarme/partials/vehicles/van_wireframe.html" %}
-      {% else %}
-        {% include "taller/desarme/partials/vehicles/sedan_wireframe.html" %}
-      {% endif %}
-      <div id="visual-map-empty" class="visual-map-empty hidden">
-        <span>{% trans "Sin piezas vinculadas a slots visuales." %}</span>
-        <small>{% trans "Asigna un slot visual al editar cada pieza." %}</small>
-      </div>
-    </div>
+<!-- IMPORTACIÓN DE LIBRERÍAS CLÁSICAS FIJAS COMPROBADAS -->
+<script src="https://cloudflare.com"></script>
+<script src="https://jsdelivr.net"></script>
+<script src="https://jsdelivr.net"></script>
 
-    <aside id="visual-piece-drawer" class="visual-piece-drawer" aria-hidden="true" aria-labelledby="visual-drawer-title">
-      <div class="flex items-start justify-between gap-3">
-        <div>
-          <div class="visual-drawer-kicker">{% trans "Inspección de componente" %}</div>
-          <h4 id="visual-drawer-title" class="mt-1 text-lg font-bold text-white">—</h4>
-          <div id="visual-drawer-code" class="mt-1 font-mono text-xs text-cyan-300">—</div>
-        </div>
-        <button id="visual-drawer-close" type="button" class="visual-drawer-close" aria-label="{% trans 'Cerrar detalle' %}">×</button>
-      </div>
+<script>
+let escena, camara, renderizador, controles, autoModelo;
+let piezasDict = {};
+let datosPiezas = {}; 
 
-      <div id="visual-drawer-matches" class="mt-4 hidden" aria-label="{% trans 'Piezas en este slot' %}"></div>
-      <div class="mt-5 space-y-3">
-        <div>
-          <div class="visual-drawer-label">{% trans "Estado y ubicación" %}</div>
-          <span id="visual-drawer-status" class="visual-detail-badge"></span>
-          <div id="visual-drawer-location" class="mt-1 text-xs text-slate-400"></div>
-        </div>
-        <div>
-          <div class="visual-drawer-label">{% trans "Procedencia" %}</div>
-          <span id="visual-drawer-origin" class="visual-detail-badge"></span>
-          <p id="visual-drawer-external-note" class="mt-2 hidden text-xs text-fuchsia-300">
-            {% trans "Pieza de yarda compatible disponible en stock" %}
-          </p>
-        </div>
-        <div>
-          <div class="visual-drawer-label">{% trans "Precio sugerido" %}</div>
-          <div id="visual-drawer-price" class="text-xl font-bold text-cyan-200">—</div>
-        </div>
-      </div>
+function cargarDatosDesdeAPI() {
+    const jsonMOCK = {
+        "piezas": [
+            {"visual_slot": "engine", "categoria": "motor", "ubicacion_tipo": "VEHICULO", "nombre": "Motor Toyota 2.4", "sku": "MOT-24"},
+            {"visual_slot": "radiator", "categoria": "refrigeracion", "ubicacion_tipo": "BODEGA", "nombre": "Radiador de Agua", "sku": "RAD-01"}
+        ]
+    };
 
-      <div class="mt-6 grid gap-2">
-        <a id="visual-action-edit" href="#" class="btn-ds btn-ds-cyan justify-center">{% trans "Editar pieza" %}</a>
-        <a id="visual-action-state" href="#" class="btn-ds btn-ds-outline justify-center">{% trans "Cambiar estado" %}</a>
-        <a id="visual-action-sell" href="#" class="btn-ds btn-ds-outline justify-center">{% trans "Vender" %}</a>
-      </div>
-    </aside>
-  </div>
-</section>
+    console.log("Poblando mapa visual...");
+    jsonMOCK.piezas.forEach(pieza => {
+        if (pieza.visual_slot) {
+            datosPiezas[pieza.visual_slot] = {
+                categoria: pieza.categoria,
+                estado: pieza.ubicacion_tipo === "VEHICULO" ? "disponible_patio" : "disponible_bodega",
+                nombre: pieza.nombre,
+                sku: pieza.sku
+            };
+        }
+    });
+    actualizarColoresHologram();
+}
+
+function init3D() {
+    const contenedor = document.getElementById('canvas-container');
+    if(!contenedor) return;
+
+    escena = new THREE.Scene();
+    escena.background = new THREE.Color(0x000105);
+    
+    camara = new THREE.PerspectiveCamera(40, contenedor.clientWidth / contenedor.clientHeight, 0.1, 100); 
+    camara.position.set(5, 3, 6);
+
+    renderizador = new THREE.WebGLRenderer({ antialias: true });
+    renderizador.setSize(contenedor.clientWidth, contenedor.clientHeight);
+    renderizador.setPixelRatio(window.devicePixelRatio);
+    contenedor.appendChild(renderizador.domElement);
+
+    controles = new THREE.OrbitControls(camara, renderizador.domElement);
+    controles.enableDamping = true;
+    controles.maxPolarAngle = 85 * (Math.PI / 180); 
+
+    const rejilla = new THREE.GridHelper(20, 50, 0x004488, 0x001122);
+    rejilla.position.y = -0.6;
+    escena.add(rejilla);
+
+    const luzAmbiente = new THREE.AmbientLight(0x0a2244, 0.8);
+    escena.add(luzAmbiente);
+    
+    const luzDireccional = new THREE.DirectionalLight(0x00f0ff, 1.2);
+    luzDireccional.position.set(5, 10, 7);
+    escena.add(luzDireccional);
+
+    const loader = new THREE.GLTFLoader();
+    loader.load('/static/artifacts/meshy_sedan_diagnostic/working_copy.glb', function(gltf) {
+        autoModelo = gltf.scene;
+        
+        autoModelo.traverse((child) => {
+            if (child.isMesh) {
+                piezasDict[child.name] = child;
+                child.material = new THREE.MeshStandardMaterial({
+                    color: 0x002b4c,
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.25,
+                    emissive: 0x00aacc,
+                    emissiveIntensity: 0.4
+                });
+            }
+        });
+
+        escena.add(autoModelo);
+        
+        const box = new THREE.Box3().setFromObject(autoModelo);
+        const center = box.getCenter(new THREE.Vector3());
+        autoModelo.position.x += (autoModelo.position.x - center.x);
+        autoModelo.position.z += (autoModelo.position.z - center.z);
+        autoModelo.position.y = -0.5;
+
+        cargarDatosDesdeAPI();
+    });
+
+    animate();
+}
+
+function obtenerMaterialEstado(estado) {
+    let colorHex;
+    switch(estado) {
+        case 'disponible_patio':
+            colorHex = 0x00f0ff; 
+            break;
+        case 'disponible_bodega':
+            colorHex = 0xf59e0b; 
+            break;
+        case 'vendido':
+            colorHex = 0xef4444; 
+            break;
+        default:
+            colorHex = 0x0088aa;
+    }
+
+    return new THREE.MeshStandardMaterial({
+        color: colorHex,
+        wireframe: false, 
+        transparent: true,
+        opacity: 0.7,
+        emissive: colorHex,
+        emissiveIntensity: 0.8
+    });
+}
+
+function actualizarColoresHologram() {
+    for (let nombreMalla in piezasDict) {
+        const piezaInfo = datosPiezas[nombreMalla];
+        if (piezaInfo) {
+            piezasDict[nombreMalla].material = obtenerMaterialEstado(piezaInfo.estado);
+        }
+    }
+}
+
+window.filtrarCategoria3D = function(cat) {
+    for (let nombreMalla in piezasDict) {
+        const malla = piezasDict[nombreMalla];
+        const piezaInfo = datosPiezas[nombreMalla];
+
+        if (cat === 'TODOS') {
+            malleable = true;
+            malla.visible = true;
+            actualizarColoresHologram();
+        } else if (piezaInfo && piezaInfo.categoria === cat) {
+            malla.visible = true;
+            malla.material.opacity = 0.95;
+            malla.material.emissiveIntensity = 2.0;
+        } else {
+            malla.material.opacity = 0.04;
+            malla.material.emissiveIntensity = 0.05;
+        }
+    }
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    if(controles) controles.update();
+    renderizador.render(escena, camara);
+}
+
+window.addEventListener('load', init3D);
+</script>

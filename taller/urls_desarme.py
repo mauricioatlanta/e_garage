@@ -46,6 +46,7 @@ try:
         path("api/vendedores/", views.api_vendedores_buscar, name="api_vendedores_buscar"),
         path("api/vendedores/crear/", views.api_vendedor_crear, name="api_vendedor_crear"),
         path("vehiculos/", views.lista_vehiculos, name="lista_vehiculos"),
+    path("catalogo/", views.catalogo_desarme_empresa, name="catalogo_empresa"),
         path("vehiculos/crear/", views.crear_vehiculo, name="crear_vehiculo"),
         path("vehiculos/<int:pk>/", views.ver_vehiculo, name="ver_vehiculo"),
         path(

@@ -2384,3 +2384,73 @@ def configurar_catalogo(request):
             "empresa_moneda": empresa.formato_moneda,
         },
     )
+
+
+def catalogo_desarme_empresa(request):
+    """Configuración del catálogo de repuestos editable por el suscriptor."""
+    from taller.models.empresa import Empresa
+    from taller.models.catalogo_repuesto_empresa import CatalogoRepuestoEmpresa
+    from django.shortcuts import render, redirect, get_object_or_404
+    from django.contrib import messages
+
+    empresa = Empresa.objects.first()
+
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        if item_id:
+            item = get_object_or_404(CatalogoRepuestoEmpresa, id=item_id, empresa=empresa)
+            item.nombre = request.POST.get('nombre', item.nombre)
+            item.visual_slot = request.POST.get('visual_slot', item.visual_slot)
+            item.incluido = ('incluido' in request.POST)
+            precio = request.POST.get('precio_predeterminado')
+            if precio:
+                try: item.precio_predeterminado = float(precio)
+                except ValueError: pass
+            item.save()
+            messages.success(request, f'Repuesto "{item.nombre}" actualizado.')
+            return redirect('desarme:catalogo_empresa')
+
+    items = CatalogoRepuestoEmpresa.objects.filter(empresa=empresa).order_by('categoria', 'orden', 'nombre')
+
+    slots_disponibles = [
+        ('MOTOR', [
+            ('engine', 'Bloque de Motor'),
+            ('engine.alternator', 'Alternador'),
+            ('engine.starter', 'Motor de Arranque'),
+            ('cooling.radiator', 'Radiador / Enfriamiento'),
+            ('ac.compressor', 'Compresor A/C'),
+        ]),
+        ('TRANSMISION', [
+            ('transmission', 'Caja de Cambios'),
+        ]),
+        ('CARROCERIA', [
+            ('door.front.left', 'Puerta Delantera Izquierda'),
+            ('door.front.right', 'Puerta Delantera Derecha'),
+            ('door.rear.left', 'Puerta Trasera Izquierda'),
+            ('door.rear.right', 'Puerta Trasera Derecha'),
+            ('body.hood', 'Capó Delantero'),
+            ('body.trunk', 'Portalón / Maleta'),
+        ]),
+        ('RUEDAS', [
+            ('wheel.fl', 'Rueda Delantera Izquierda'),
+            ('wheel.fr', 'Rueda Delantera Derecha'),
+            ('wheel.rl', 'Rueda Trasera Izquierda'),
+            ('wheel.rr', 'Rueda Trasera Derecha'),
+        ])
+    ]
+
+    return render(request, 'taller/desarme/catalogo_empresa.html', {
+        'items': items,
+        'slots_disponibles': slots_disponibles,
+        'empresa': empresa,
+    })
+
+@login_required
+@require_POST
+def api_vendedor_crear(request):
+    """
+    Crear vendedor con validación anti-duplicado.
+    Body: {nombre, telefono?, email?, direccion?, lugar_compra?, tax_id?}
+    Si existe por nombre__iexact (o email/tel normalizado), devuelve el existente.
+    """
+    

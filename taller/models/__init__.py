@@ -130,6 +130,7 @@ from .extras_vehiculo import (
 )
 
 __all__ = [
+    'CatalogoRepuestoEmpresa',
     # Modelos básicos
     "Empresa",
     "Tecnico",

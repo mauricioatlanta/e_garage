@@ -11,6 +11,11 @@ from core.models import TenantScoped
 
 
 class CatalogoRepuestoEmpresa(TenantScoped):
+    nombre = models.CharField(max_length=160, default='', blank=True, help_text='Nombre comercial del repuesto')
+    categoria = models.CharField(max_length=50, default='MOTOR', help_text='Categoría: MOTOR, CARROCERIA, INTERIOR, etc.')
+    visual_slot = models.CharField(max_length=80, null=True, blank=True, db_index=True, help_text='Slot anatómico en el visor 3D')
+    orden = models.PositiveSmallIntegerField(default=100)
+
     codigo = models.CharField(max_length=20)
     incluido = models.BooleanField(default=True)
     precio_predeterminado = models.DecimalField(
