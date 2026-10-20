@@ -26,6 +26,18 @@
     </div>
   </div>
 
+  <div id="parts-command-panel" class="border-t border-slate-800 bg-slate-950/80 px-4 py-3">
+    <div class="flex flex-wrap items-center gap-2 mb-2 text-[10px] font-mono uppercase tracking-wider text-slate-500">
+      <span class="text-cyan-400">Inventario por categoría</span>
+      <button type="button" data-parts-filter="all" class="px-2 py-1 rounded border border-cyan-500/50 text-cyan-300">Todas</button>
+      <button type="button" data-parts-filter="motor" class="px-2 py-1 rounded border border-slate-700 text-slate-400">Motor</button>
+      <button type="button" data-parts-filter="carroceria" class="px-2 py-1 rounded border border-slate-700 text-slate-400">Carrocería</button>
+      <button type="button" data-parts-filter="ruedas" class="px-2 py-1 rounded border border-slate-700 text-slate-400">Ruedas</button>
+      <button type="button" data-parts-filter="electrico" class="px-2 py-1 rounded border border-slate-700 text-slate-400">Eléctrico</button>
+    </div>
+    <div id="parts-command-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2"></div>
+  </div>
+
   <!-- Drawer Lateral Informativo -->
   <div id="pieza-drawer" class="hidden absolute top-16 right-4 w-80 bg-slate-900/95 border border-cyan-500/50 rounded-xl p-5 backdrop-blur-md shadow-2xl text-xs z-20">
     <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
@@ -166,6 +178,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Mapa de Slots Anatómicos 3D
   const interactiveSlots = {};
+  const partsCatalog = [];
 
   function registerSlot(slotName, geo, pos, defaultColor, fallback) {
     const mat = new THREE.MeshStandardMaterial({
@@ -193,6 +206,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     carGroup.add(mesh);
     interactiveSlots[slotName] = mesh;
+    partsCatalog.push({ slot: slotName, part: mesh.userData.fallback || {}, mesh: mesh });
     return mesh;
   }
 
@@ -218,6 +232,44 @@ document.addEventListener("DOMContentLoaded", function() {
 
   scene.add(carGroup);
 
+  function categoryFor(slot, part) {
+    const value = (slot + ' ' + (part.name || '')).toLowerCase();
+    if (value.includes('wheel') || value.includes('rueda') || value.includes('neum')) return 'ruedas';
+    if (value.includes('alternador') || value.includes('bater') || value.includes('faro') || value.includes('electr')) return 'electrico';
+    if (value.includes('door') || value.includes('puerta') || value.includes('body') || value.includes('carro')) return 'carroceria';
+    return 'motor';
+  }
+
+  function showPart(info, slot, mesh) {
+    info = info || {};
+    document.getElementById('drawer-sku').textContent = info.code || 'SKU-00';
+    document.getElementById('drawer-nombre').textContent = info.name || 'Componente';
+    document.getElementById('drawer-slot').textContent = slot;
+    const ubicacion = info.location_type === 'BODEGA' ? 'En Bodega' : info.location_type === 'VEHICULO' ? 'Chasis (Patio)' : (info.location_type || 'Disponible');
+    document.getElementById('drawer-ubicacion').textContent = ubicacion + (info.location_detail ? ` (${info.location_detail})` : '');
+    document.getElementById('drawer-origen').textContent = info.origin || 'Desarme propio';
+    const precio = Number(info.price);
+    document.getElementById('drawer-precio').textContent = Number.isFinite(precio) && precio > 0 ? '$ ' + new Intl.NumberFormat('es-CL').format(precio) + ' CLP' : 'A consultar';
+    document.getElementById('pieza-drawer').classList.remove('hidden');
+    if (mesh) { mesh.visible = true; mesh.material.opacity = 0.12; window.setTimeout(() => { mesh.visible = false; }, 1200); }
+  }
+
+  function renderParts(filter) {
+    const list = document.getElementById('parts-command-list');
+    if (!list) return;
+    list.innerHTML = '';
+    partsCatalog.filter(item => !filter || filter === 'all' || categoryFor(item.slot, item.part) === filter).slice(0, 16).forEach(item => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'text-left rounded-lg border border-slate-800 bg-slate-900/70 hover:border-cyan-400 px-3 py-2 transition';
+      button.innerHTML = `<span class="block text-[10px] font-mono text-cyan-400">${categoryFor(item.slot, item.part).toUpperCase()} · ${item.part.code || item.slot}</span><span class="block text-xs text-slate-200 truncate">${item.part.name || 'Componente'}</span>`;
+      button.addEventListener('click', () => showPart(item.part, item.slot, item.mesh));
+      list.appendChild(button);
+    });
+  }
+  document.querySelectorAll('[data-parts-filter]').forEach(button => button.addEventListener('click', () => renderParts(button.dataset.partsFilter)));
+  renderParts('all');
+
   // Consumir API y poblar repuestos reales del inventario en los slots 3D
   const apiEndpoint = "{% country_url 'desarme:desarme_api_mapa_piezas' vehiculo.id %}";
   fetch(apiEndpoint)
@@ -242,7 +294,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const mesh = interactiveSlots[slotKey];
         if (mesh) {
-          mesh.userData.parts.push(p);
+          mesh.userData.parts = [p];
+          const catalogItem = partsCatalog.find(item => item.slot === slotKey);
+          if (catalogItem) catalogItem.part = p;
+          renderParts('all');
           
           // Color semáforo operativo
           let hex = 0x00f0ff; // Patio
@@ -275,15 +330,7 @@ document.addEventListener("DOMContentLoaded", function() {
       
       {
         const info = partsList[0] || target.userData.fallback || {}; // Siempre hay feedback, incluso si la API está vacía.
-        document.getElementById("drawer-sku").textContent = info.code || 'SKU-00';
-        document.getElementById("drawer-nombre").textContent = info.name;
-        document.getElementById("drawer-slot").textContent = target.userData.slotName;
-        const ubicacion = info.location_type === 'BODEGA' ? 'En Bodega' : info.location_type === 'VEHICULO' ? 'Chasis (Patio)' : (info.location_type || 'Disponible');
-        document.getElementById("drawer-ubicacion").textContent = ubicacion + (info.location_detail ? ` (${info.location_detail})` : '');
-        document.getElementById("drawer-origen").textContent = info.origin || 'Desarme propio';
-        const precio = Number(info.price);
-        document.getElementById("drawer-precio").textContent = Number.isFinite(precio) && precio > 0 ? '$ ' + new Intl.NumberFormat('es-CL').format(precio) + ' CLP' : 'A consultar';
-        document.getElementById("pieza-drawer").classList.remove("hidden");
+        showPart(info, target.userData.slotName, target);
       }
     }
   });
