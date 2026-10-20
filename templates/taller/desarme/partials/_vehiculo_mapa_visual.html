@@ -20,6 +20,7 @@
 
   <!-- Viewport 3D -->
   <div id="canvas-3d-container" class="w-full relative cursor-grab active:cursor-grabbing" style="height: 540px; min-height: 540px; background: radial-gradient(circle at center, #06162a 0%, #020617 80%);">
+    <img id="sedan-visual-fallback" src="{% static 'artifacts/sedan_v02/cc0_preview.png' %}" alt="Sedán de referencia eGarage" class="hidden absolute inset-0 w-full h-full object-contain p-8 opacity-90">
     <div id="loading-indicator" class="absolute inset-0 flex items-center justify-center text-cyan-400 font-mono text-xs tracking-widest bg-slate-950/80 z-10">
       <span class="animate-pulse">SINCRONIZANDO INVENTARIO 3D...</span>
     </div>
@@ -53,7 +54,12 @@
 document.addEventListener("DOMContentLoaded", function() {
   const container = document.getElementById("canvas-3d-container");
   const loading = document.getElementById("loading-indicator");
-  if (!container || typeof THREE === 'undefined') return;
+  const visualFallback = document.getElementById('sedan-visual-fallback');
+  if (!container || typeof THREE === 'undefined') {
+    if (visualFallback) visualFallback.classList.remove('hidden');
+    if (loading) loading.style.display = 'none';
+    return;
+  }
 
   const width = container.clientWidth || 900;
   const height = 540;
@@ -122,6 +128,7 @@ document.addEventListener("DOMContentLoaded", function() {
     loader.load(
       "{% static 'artifacts/sedan_v02/graphite-four-door-sedan_cc0.glb' %}",
       function (gltf) {
+        if (visualFallback) visualFallback.classList.add('hidden');
         const vehicle = gltf.scene;
         const bounds = new THREE.Box3().setFromObject(vehicle);
         const size = bounds.getSize(new THREE.Vector3());
@@ -148,7 +155,8 @@ document.addEventListener("DOMContentLoaded", function() {
       function () {
         console.warn('No se pudo cargar el modelo 3D del sedán; se usará la vista técnica de respaldo.');
         if (loading) loading.style.display = 'none';
-        chassis.visible = true;
+        chassis.visible = false;
+        if (visualFallback) visualFallback.classList.remove('hidden');
       }
     );
   } else {
