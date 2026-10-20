@@ -121,17 +121,33 @@ def _tienda_storefront_render(request, empresa):
     )
 
     # ── Filtro de texto con aliases ───────────────────────────────────────────
-    filtro_texto = None
     if q:
-        canonicos = set(
-            AliasRepuesto.objects.filter(termino_busqueda__icontains=q)
-            .values_list("pieza_canonica", flat=True)
-        )
-        canonicos.add(q)
-        filtro_texto = Q(nombre__icontains=q) | Q(codigo__icontains=q)
-        for canon in canonicos:
-            filtro_texto |= Q(nombre__icontains=canon)
-        piezas_qs = piezas_qs.filter(filtro_texto)
+        # La consulta se separa en términos para aceptar búsquedas naturales
+        # como "alternador versa", sin perder los sinónimos configurados en
+        # AliasRepuesto. Cada término debe coincidir en algún dato útil de la
+        # pieza o del vehículo, evitando resultados irrelevantes por un OR global.
+        tokens = re.findall(r"[\w]+", q, flags=re.UNICODE)
+        tokens = [token for token in tokens if len(token) >= 2]
+        search_terms = tokens or [q]
+        for term in search_terms:
+            canonicos = set(
+                AliasRepuesto.objects.filter(termino_busqueda__icontains=term)
+                .values_list("pieza_canonica", flat=True)
+            )
+            variantes = {term, *canonicos}
+            filtro_term = Q()
+            for variante in variantes:
+                filtro_term |= (
+                    Q(nombre__icontains=variante)
+                    | Q(codigo__icontains=variante)
+                    | Q(observaciones__icontains=variante)
+                    | Q(vehiculo_desarme__marca__nombre__icontains=variante)
+                    | Q(vehiculo_desarme__marca_texto__icontains=variante)
+                    | Q(vehiculo_desarme__modelo__nombre__icontains=variante)
+                    | Q(vehiculo_desarme__modelo_texto__icontains=variante)
+                    | Q(vehiculo_desarme__motor__nombre__icontains=variante)
+                )
+            piezas_qs = piezas_qs.filter(filtro_term)
 
     # ── Expansión por Interchange Canónico (CompatibilityService) ──────────────
     if marca_sel or modelo_sel:

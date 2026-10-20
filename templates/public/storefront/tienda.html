@@ -200,6 +200,7 @@
              class="search-input" autocomplete="off" autocapitalize="off">
       <button type="submit" class="search-btn">Buscar</button>
     </div>
+    <p id="live-search-status" class="text-xs text-slate-500 mt-2" role="status" aria-live="polite"></p>
 
     {# Filtros de vehículo #}
     <div class="vehicle-filters{% if motores_disponibles %} con-motor{% endif %}">
@@ -392,10 +393,83 @@
 
 {% block extra_js %}
 <script>
-  // Auto-foco en el buscador si no hay filtros activos
+  // Búsqueda en vivo: reutiliza la vista pública para mantener exactamente
+  // los mismos filtros, permisos y tarjetas que una búsqueda tradicional.
   document.addEventListener('DOMContentLoaded', function () {
     var q = document.getElementById('q-input');
     if (q && !q.value) q.focus();
+
+    var form = document.getElementById('search-form');
+    var status = document.getElementById('live-search-status');
+    var results = document.querySelector('main.max-w-6xl');
+    if (!form || !q || !results || !window.fetch) return;
+
+    var timer = null;
+    var controller = null;
+    var composing = false;
+
+    function setStatus(message) {
+      if (status) status.textContent = message || '';
+    }
+
+    function runLiveSearch() {
+      var url = new URL(window.location.href);
+      var value = q.value.trim();
+      if (value) url.searchParams.set('q', value);
+      else url.searchParams.delete('q');
+      url.searchParams.set('page', '1');
+
+      if (controller) controller.abort();
+      controller = new AbortController();
+      setStatus('Buscando…');
+
+      fetch(url.toString(), {
+        method: 'GET',
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' },
+        cache: 'no-store',
+        signal: controller.signal
+      }).then(function (response) {
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        return response.text();
+      }).then(function (html) {
+        var parsed = new DOMParser().parseFromString(html, 'text/html');
+        var nextResults = parsed.querySelector('main.max-w-6xl');
+        if (!nextResults) throw new Error('Resultados no encontrados');
+        results.replaceWith(nextResults);
+        results = nextResults;
+        var currentCount = document.querySelector('.resultado-count');
+        var nextCount = parsed.querySelector('.resultado-count');
+        if (currentCount && nextCount) currentCount.replaceWith(nextCount);
+        var currentChips = document.querySelector('.filtros-activos');
+        var nextChips = parsed.querySelector('.filtros-activos');
+        if (currentChips && nextChips) currentChips.replaceWith(nextChips);
+        else if (currentChips && !nextChips) currentChips.remove();
+        else if (!currentChips && nextChips) {
+          var filterRow = form.querySelector('.vehicle-filters');
+          if (filterRow) filterRow.insertAdjacentElement('afterend', nextChips);
+        }
+        window.history.replaceState({}, '', url.toString());
+        setStatus('');
+      }).catch(function (error) {
+        if (error.name !== 'AbortError') setStatus('No se pudo actualizar. Usa «Buscar» para reintentar.');
+      });
+    }
+
+    q.addEventListener('compositionstart', function () { composing = true; });
+    q.addEventListener('compositionend', function () {
+      composing = false;
+      runLiveSearch();
+    });
+    q.addEventListener('input', function () {
+      if (composing) return;
+      window.clearTimeout(timer);
+      timer = window.setTimeout(runLiveSearch, 300);
+    });
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      window.clearTimeout(timer);
+      runLiveSearch();
+    });
   });
 </script>
 <script src="{% static 'js/storefront_pieza_modal.js' %}?v=20260710-1"></script>
