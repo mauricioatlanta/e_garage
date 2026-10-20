@@ -248,3 +248,5 @@ try:
     )
 except ImportError:
     pass
+
+from .metrica_wizard import MetricaWizard

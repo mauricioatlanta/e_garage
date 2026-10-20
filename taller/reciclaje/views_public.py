@@ -1,3 +1,4 @@
+from taller.models import MetricaWizard
 """
 taller/reciclaje/views_public.py — vistas públicas (sin login) del storefront
 de un tenant RECYCLING sobre su dominio propio (ver taller/views/landing_views.py).
@@ -79,6 +80,24 @@ def consulta_catalitico(request):
                 resultado = resultados[0]
         else:
             sin_resultado = True
+
+        # Registro de métrica Wizard / Demanda
+        try:
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
+            if ip and ',' in ip:
+                ip = ip.split(',')[0].strip()
+            
+            primer_codigo = cataliticos[0].codigo if cataliticos else None
+            MetricaWizard.objects.create(
+                empresa=empresa,
+                marca=codigo[:100],
+                modelo='',
+                encontrado=bool(cataliticos),
+                codigo_catalitico=primer_codigo,
+                ip_origen=ip[:45] if ip else None
+            )
+        except Exception:
+            pass
 
     return render(
         request,
