@@ -1,168 +1,251 @@
-<!-- Cabecera de Botones Futuristas -->
-<div class="hologram-controls" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; gap: 10px; background: rgba(0, 5, 20, 0.85); padding: 10px; border-radius: 8px; border: 1px solid #00f0ff; box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); font-family: monospace;">
-    <button onclick="filtrarCategoria3D('TODOS')" style="background: transparent; color: #00f0ff; border: 1px solid #00f0ff; padding: 8px 16px; cursor: pointer; font-weight: bold; text-transform: uppercase;">Ver Todo</button>
-    <button onclick="filtrarCategoria3D('motor')" style="background: transparent; color: #00f0ff; border: 1px solid #00f0ff; padding: 8px 16px; cursor: pointer; font-weight: bold; text-transform: uppercase;">Motor</button>
-    <button onclick="filtrarCategoria3D('refrigeracion')" style="background: transparent; color: #00f0ff; border: 1px solid #00f0ff; padding: 8px 16px; cursor: pointer; font-weight: bold; text-transform: uppercase;">Refrigeración</button>
-    <button onclick="filtrarCategoria3D('carroceria')" style="background: transparent; color: #00f0ff; border: 1px solid #00f0ff; padding: 8px 16px; cursor: pointer; font-weight: bold; text-transform: uppercase;">Carrocería</button>
+{% load country_url %}
+<!-- ================================================================= -->
+<!-- GEMELO DIGITAL 3D // eGarage Hologram Engine -->
+<!-- ================================================================= -->
+<div class="relative w-full rounded-2xl overflow-hidden border border-cyan-500/30 bg-slate-950 shadow-2xl my-4">
+  
+  <!-- Barra Superior y Leyenda Operativa -->
+  <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 border-b border-slate-800 bg-slate-900/60">
+    <div class="flex items-center gap-2.5">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+      <h3 class="text-xs font-mono font-bold uppercase tracking-widest text-cyan-400">Gemelo Digital 3D // Inspección Interactiva de Sedán</h3>
+    </div>
+    <div class="flex flex-wrap gap-2 text-[11px] font-mono">
+      <span class="px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/40 text-cyan-300"><b class="text-cyan-400">●</b> Chasis (Patio)</span>
+      <span class="px-2 py-0.5 rounded bg-amber-950/80 border border-amber-500/40 text-amber-300"><b class="text-amber-400">●</b> En Bodega</span>
+      <span class="px-2 py-0.5 rounded bg-rose-950/80 border border-rose-500/40 text-rose-300"><b class="text-rose-400">●</b> Vendida</span>
+      <span class="px-2 py-0.5 rounded bg-purple-950/80 border border-purple-500/40 text-purple-300"><b class="text-purple-400">●</b> Externa / Yarda</span>
+    </div>
+  </div>
+
+  <!-- Viewport 3D -->
+  <div id="canvas-3d-container" class="w-full relative cursor-grab active:cursor-grabbing" style="height: 540px; min-height: 540px; background: radial-gradient(circle at center, #06162a 0%, #020617 80%);">
+    <div id="loading-indicator" class="absolute inset-0 flex items-center justify-center text-cyan-400 font-mono text-xs tracking-widest bg-slate-950/80 z-10">
+      <span class="animate-pulse">SINCRONIZANDO INVENTARIO 3D...</span>
+    </div>
+  </div>
+
+  <!-- Drawer Lateral Informativo -->
+  <div id="pieza-drawer" class="hidden absolute top-16 right-4 w-80 bg-slate-900/95 border border-cyan-500/50 rounded-xl p-5 backdrop-blur-md shadow-2xl text-xs z-20">
+    <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
+      <span id="drawer-sku" class="font-mono text-cyan-300 font-bold text-xs bg-cyan-950 px-2.5 py-1 rounded border border-cyan-800">SKU</span>
+      <button onclick="document.getElementById('pieza-drawer').classList.add('hidden')" class="text-slate-400 hover:text-white text-base leading-none">&times;</button>
+    </div>
+    <h4 id="drawer-nombre" class="font-bold text-white text-sm mb-1.5 leading-snug">Nombre Repuesto</h4>
+    <div class="space-y-1 mb-3 text-slate-300">
+      <div>Slot 3D: <span id="drawer-slot" class="font-mono text-cyan-400"></span></div>
+      <div>Ubicación: <span id="drawer-ubicacion" class="text-amber-400 font-semibold">Patio</span></div>
+      <div>Origen: <span id="drawer-origen" class="text-purple-300 font-medium"></span></div>
+    </div>
+    <div class="flex justify-between items-center pt-3 border-t border-slate-800">
+      <span class="text-slate-400 font-mono text-[11px]">PRECIO SUGERIDO:</span>
+      <span id="drawer-precio" class="font-mono font-bold text-emerald-400 text-base">$ 0</span>
+    </div>
+  </div>
 </div>
 
-<!-- Contenedor del Visor 3D -->
-<div id="canvas-container" style="width: 100%; height: 600px; background: #000000; position: relative; border: 1px solid #002244;"></div>
-
-<!-- IMPORTACIÓN DE LIBRERÍAS CLÁSICAS FIJAS COMPROBADAS -->
-<script src="https://cloudflare.com"></script>
-<script src="https://jsdelivr.net"></script>
-<script src="https://jsdelivr.net"></script>
+<!-- Three.js & OrbitControls -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
 <script>
-let escena, camara, renderizador, controles, autoModelo;
-let piezasDict = {};
-let datosPiezas = {}; 
+document.addEventListener("DOMContentLoaded", function() {
+  const container = document.getElementById("canvas-3d-container");
+  const loading = document.getElementById("loading-indicator");
+  if (!container || typeof THREE === 'undefined') return;
 
-function cargarDatosDesdeAPI() {
-    const jsonMOCK = {
-        "piezas": [
-            {"visual_slot": "engine", "categoria": "motor", "ubicacion_tipo": "VEHICULO", "nombre": "Motor Toyota 2.4", "sku": "MOT-24"},
-            {"visual_slot": "radiator", "categoria": "refrigeracion", "ubicacion_tipo": "BODEGA", "nombre": "Radiador de Agua", "sku": "RAD-01"}
-        ]
-    };
+  const width = container.clientWidth || 900;
+  const height = 540;
 
-    console.log("Poblando mapa visual...");
-    jsonMOCK.piezas.forEach(pieza => {
-        if (pieza.visual_slot) {
-            datosPiezas[pieza.visual_slot] = {
-                categoria: pieza.categoria,
-                estado: pieza.ubicacion_tipo === "VEHICULO" ? "disponible_patio" : "disponible_bodega",
-                nombre: pieza.nombre,
-                sku: pieza.sku
-            };
-        }
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x020617, 0.035);
+
+  const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+  camera.position.set(5.0, 2.8, 5.5);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.appendChild(renderer.domElement);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+  controls.maxPolarAngle = Math.PI / 2 + 0.03;
+
+  // Iluminación Holográfica
+  scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+  const dirLight = new THREE.DirectionalLight(0x00f0ff, 1.2);
+  dirLight.position.set(5, 12, 6);
+  scene.add(dirLight);
+
+  const rimLight = new THREE.DirectionalLight(0xa855f7, 1.5);
+  rimLight.position.set(-6, 4, -6);
+  scene.add(rimLight);
+
+  // Cuadrícula Cyber
+  const grid = new THREE.GridHelper(12, 24, 0x00f0ff, 0x1e293b);
+  grid.position.y = -0.55;
+  scene.add(grid);
+
+  const carGroup = new THREE.Group();
+
+  // Carrocería Sedan Estilizada (Perfil Aerodinámico)
+  const shape = new THREE.Shape();
+  shape.moveTo(-2.2, -0.1);
+  shape.lineTo(2.2, -0.1);
+  shape.lineTo(2.1, 0.3);
+  shape.lineTo(1.2, 0.42);
+  shape.lineTo(0.5, 1.0);
+  shape.lineTo(-0.8, 1.0);
+  shape.lineTo(-1.3, 0.42);
+  shape.lineTo(-2.2, 0.42);
+  shape.closePath();
+
+  const extrudeSettings = { steps: 1, depth: 1.5, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.06 };
+  const bodyGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  bodyGeo.center();
+
+  const wireMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.3 });
+  const solidMat = new THREE.MeshStandardMaterial({ color: 0x031525, roughness: 0.2, metalness: 0.8, transparent: true, opacity: 0.45 });
+  
+  const chassis = new THREE.Mesh(bodyGeo, solidMat);
+  chassis.add(new THREE.Mesh(bodyGeo, wireMat));
+  chassis.position.y = 0.2;
+  carGroup.add(chassis);
+
+  // Mapa de Slots Anatómicos 3D
+  const interactiveSlots = {};
+
+  function registerSlot(slotName, geo, pos, defaultColor, fallback) {
+    const mat = new THREE.MeshStandardMaterial({
+      color: defaultColor,
+      emissive: defaultColor,
+      emissiveIntensity: 0.4,
+      metalness: 0.7,
+      roughness: 0.2
     });
-    actualizarColoresHologram();
-}
-
-function init3D() {
-    const contenedor = document.getElementById('canvas-container');
-    if(!contenedor) return;
-
-    escena = new THREE.Scene();
-    escena.background = new THREE.Color(0x000105);
-    
-    camara = new THREE.PerspectiveCamera(40, contenedor.clientWidth / contenedor.clientHeight, 0.1, 100); 
-    camara.position.set(5, 3, 6);
-
-    renderizador = new THREE.WebGLRenderer({ antialias: true });
-    renderizador.setSize(contenedor.clientWidth, contenedor.clientHeight);
-    renderizador.setPixelRatio(window.devicePixelRatio);
-    contenedor.appendChild(renderizador.domElement);
-
-    controles = new THREE.OrbitControls(camara, renderizador.domElement);
-    controles.enableDamping = true;
-    controles.maxPolarAngle = 85 * (Math.PI / 180); 
-
-    const rejilla = new THREE.GridHelper(20, 50, 0x004488, 0x001122);
-    rejilla.position.y = -0.6;
-    escena.add(rejilla);
-
-    const luzAmbiente = new THREE.AmbientLight(0x0a2244, 0.8);
-    escena.add(luzAmbiente);
-    
-    const luzDireccional = new THREE.DirectionalLight(0x00f0ff, 1.2);
-    luzDireccional.position.set(5, 10, 7);
-    escena.add(luzDireccional);
-
-    const loader = new THREE.GLTFLoader();
-    loader.load('/static/artifacts/meshy_sedan_diagnostic/working_copy.glb', function(gltf) {
-        autoModelo = gltf.scene;
-        
-        autoModelo.traverse((child) => {
-            if (child.isMesh) {
-                piezasDict[child.name] = child;
-                child.material = new THREE.MeshStandardMaterial({
-                    color: 0x002b4c,
-                    wireframe: true,
-                    transparent: true,
-                    opacity: 0.25,
-                    emissive: 0x00aacc,
-                    emissiveIntensity: 0.4
-                });
-            }
-        });
-
-        escena.add(autoModelo);
-        
-        const box = new THREE.Box3().setFromObject(autoModelo);
-        const center = box.getCenter(new THREE.Vector3());
-        autoModelo.position.x += (autoModelo.position.x - center.x);
-        autoModelo.position.z += (autoModelo.position.z - center.z);
-        autoModelo.position.y = -0.5;
-
-        cargarDatosDesdeAPI();
-    });
-
-    animate();
-}
-
-function obtenerMaterialEstado(estado) {
-    let colorHex;
-    switch(estado) {
-        case 'disponible_patio':
-            colorHex = 0x00f0ff; 
-            break;
-        case 'disponible_bodega':
-            colorHex = 0xf59e0b; 
-            break;
-        case 'vendido':
-            colorHex = 0xef4444; 
-            break;
-        default:
-            colorHex = 0x0088aa;
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(...pos);
+    mesh.userData = { slotName, defaultColor, fallback: fallback || {}, parts: [] };
+    // Aro y núcleo metálico: evita que las ruedas parezcan cubos luminosos.
+    if (slotName.indexOf('wheel.') === 0) {
+      const rim = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.16, 0.16, 0.235, 24),
+        new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.95, roughness: 0.2, emissive: 0x083344, emissiveIntensity: 0.5 })
+      );
+      rim.rotation.x = Math.PI / 2;
+      mesh.add(rim);
     }
+    carGroup.add(mesh);
+    interactiveSlots[slotName] = mesh;
+    return mesh;
+  }
 
-    return new THREE.MeshStandardMaterial({
-        color: colorHex,
-        wireframe: false, 
-        transparent: true,
-        opacity: 0.7,
-        emissive: colorHex,
-        emissiveIntensity: 0.8
-    });
-}
+  // Creación de Slots Estándar en el Sedán
+  const fallback = (code, name, price, location='VEHICULO') => ({ code, name, price, location_type: location, origin: 'DESARME_PROPIO' });
+  registerSlot('engine.core', new THREE.BoxGeometry(0.7, 0.5, 0.6), [1.1, 0.15, 0], 0x00f0ff, fallback('MOT-001', 'Bloque de motor completo', 450000));
+  registerSlot('engine.alternator', new THREE.CylinderGeometry(0.12, 0.12, 0.2, 20), [1.3, 0.3, 0.25], 0x00f0ff, fallback('ALT-002', 'Alternador 90A', 85000));
+  registerSlot('engine.starter', new THREE.CylinderGeometry(0.1, 0.1, 0.22, 20), [0.8, -0.05, -0.25], 0xf59e0b, fallback('MOT-005', 'Motor de partida', 75000, 'BODEGA'));
+  registerSlot('cooling.radiator', new THREE.BoxGeometry(0.08, 0.45, 1.1), [1.95, 0.1, 0], 0x00f0ff, fallback('RAD-001', 'Radiador de enfriamiento', 55000));
+  const doorGeo = new THREE.ExtrudeGeometry(new THREE.Shape().absarc(0, 0, 0.5, 0, Math.PI * 2, false), { depth: 0.055, bevelEnabled: true, bevelSize: 0.035, bevelThickness: 0.02, bevelSegments: 3 });
+  doorGeo.scale(1.55, 0.72, 1);
+  registerSlot('door.front.left', doorGeo, [0.15, 0.25, 0.82], 0x00f0ff, fallback('PTA-DEL-IZQ', 'Puerta delantera izquierda', 110000));
+  registerSlot('door.front.right', doorGeo, [0.15, 0.25, -0.82], 0x00f0ff, fallback('PTA-DEL-DER', 'Puerta delantera derecha', 110000));
+  registerSlot('door.rear.left', doorGeo, [-0.75, 0.25, 0.82], 0x00f0ff, fallback('PTA-TRA-IZQ', 'Puerta trasera izquierda', 95000));
+  registerSlot('door.rear.right', doorGeo, [-0.75, 0.25, -0.82], 0x00f0ff, fallback('PTA-TRA-DER', 'Puerta trasera derecha', 95000));
 
-function actualizarColoresHologram() {
-    for (let nombreMalla in piezasDict) {
-        const piezaInfo = datosPiezas[nombreMalla];
-        if (piezaInfo) {
-            piezasDict[nombreMalla].material = obtenerMaterialEstado(piezaInfo.estado);
+  const wheelGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.22, 24);
+  wheelGeo.rotateX(Math.PI / 2);
+  registerSlot('wheel.fl', wheelGeo, [1.35, -0.28, 0.85], 0x00f0ff, fallback('RUE-FL', 'Rueda delantera izquierda', 45000));
+  registerSlot('wheel.fr', wheelGeo, [1.35, -0.28, -0.85], 0x00f0ff, fallback('RUE-FR', 'Rueda delantera derecha', 45000));
+  registerSlot('wheel.rl', wheelGeo, [-1.45, -0.28, 0.85], 0x00f0ff, fallback('RUE-RL', 'Rueda trasera izquierda', 45000));
+  registerSlot('wheel.rr', wheelGeo, [-1.45, -0.28, -0.85], 0x00f0ff, fallback('RUE-RR', 'Rueda trasera derecha', 45000));
+
+  scene.add(carGroup);
+
+  // Consumir API y poblar repuestos reales del inventario en los slots 3D
+  const apiEndpoint = "{% country_url 'desarme:desarme_api_mapa_piezas' vehiculo.id %}";
+  fetch(apiEndpoint)
+    .then(r => r.json())
+    .then(data => {
+      if (loading) loading.style.display = 'none';
+      const parts = data.parts || [];
+      
+      parts.forEach(p => {
+        // Encontrar slot coincidente o asignar por defecto a motor/carrocería
+        let slotKey = p.visual_slot;
+        if (!slotKey || !interactiveSlots[slotKey]) {
+          // Asignación inteligente por nombre si no tiene slot explícito
+          const n = (p.name || '').toLowerCase();
+          if (n.includes('alternador')) slotKey = 'engine.alternator';
+          else if (n.includes('partida') || n.includes('arranque')) slotKey = 'engine.starter';
+          else if (n.includes('radiador')) slotKey = 'cooling.radiator';
+          else if (n.includes('puerta')) slotKey = 'door.front.left';
+          else if (n.includes('rueda') || n.includes('neumatico')) slotKey = 'wheel.fl';
+          else slotKey = 'engine.core';
         }
-    }
-}
 
-window.filtrarCategoria3D = function(cat) {
-    for (let nombreMalla in piezasDict) {
-        const malla = piezasDict[nombreMalla];
-        const piezaInfo = datosPiezas[nombreMalla];
+        const mesh = interactiveSlots[slotKey];
+        if (mesh) {
+          mesh.userData.parts.push(p);
+          
+          // Color semáforo operativo
+          let hex = 0x00f0ff; // Patio
+          if (p.location_type === 'BODEGA') hex = 0xf59e0b; // Bodega
+          if (p.status === 'VENDIDA') hex = 0xef4444; // Vendida
+          if (p.origin === 'COMPRA_EXTERNA') hex = 0xa855f7; // Yarda
 
-        if (cat === 'TODOS') {
-            malleable = true;
-            malla.visible = true;
-            actualizarColoresHologram();
-        } else if (piezaInfo && piezaInfo.categoria === cat) {
-            malla.visible = true;
-            malla.material.opacity = 0.95;
-            malla.material.emissiveIntensity = 2.0;
-        } else {
-            malla.material.opacity = 0.04;
-            malla.material.emissiveIntensity = 0.05;
+          mesh.material.color.setHex(hex);
+          mesh.material.emissive.setHex(hex);
         }
-    }
-}
+      });
+    })
+    .catch(() => { if (loading) loading.style.display = 'none'; });
 
-function animate() {
+  // Raycasting para selección táctil
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  renderer.domElement.addEventListener("click", function(e) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(Object.values(interactiveSlots));
+
+    if (intersects.length > 0) {
+      const target = intersects[0].object;
+      const partsList = target.userData.parts || [];
+      
+      {
+        const info = partsList[0] || target.userData.fallback || {}; // Siempre hay feedback, incluso si la API está vacía.
+        document.getElementById("drawer-sku").textContent = info.code || 'SKU-00';
+        document.getElementById("drawer-nombre").textContent = info.name;
+        document.getElementById("drawer-slot").textContent = target.userData.slotName;
+        const ubicacion = info.location_type === 'BODEGA' ? 'En Bodega' : info.location_type === 'VEHICULO' ? 'Chasis (Patio)' : (info.location_type || 'Disponible');
+        document.getElementById("drawer-ubicacion").textContent = ubicacion + (info.location_detail ? ` (${info.location_detail})` : '');
+        document.getElementById("drawer-origen").textContent = info.origin || 'Desarme propio';
+        const precio = Number(info.price);
+        document.getElementById("drawer-precio").textContent = Number.isFinite(precio) && precio > 0 ? '$ ' + new Intl.NumberFormat('es-CL').format(precio) + ' CLP' : 'A consultar';
+        document.getElementById("pieza-drawer").classList.remove("hidden");
+      }
+    }
+  });
+
+  window.addEventListener("resize", function() {
+    const nw = container.clientWidth;
+    camera.aspect = nw / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(nw, height);
+  });
+
+  function animate() {
     requestAnimationFrame(animate);
-    if(controles) controles.update();
-    renderizador.render(escena, camara);
-}
-
-window.addEventListener('load', init3D);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+});
 </script>
