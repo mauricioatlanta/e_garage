@@ -303,6 +303,11 @@ def kiosko_centralizado(request):
     # ── Construir queryset final aplicando todos los filtros ───────────────────
     piezas_qs = qs_tras_marca
 
+    # Telemetría de la red completa, independiente de los filtros elegidos.
+    red_empresas = base_qs.values("empresa_id").distinct().count()
+    red_vehiculos = base_qs.values("vehiculo_desarme_id").distinct().count()
+    red_piezas = base_qs.count()
+
     if modelo_sel:
         piezas_qs = piezas_qs.filter(
             Q(vehiculo_desarme__modelo__nombre__icontains=modelo_sel)
@@ -387,4 +392,7 @@ def kiosko_centralizado(request):
         "regiones_disponibles": regiones_disponibles,
         "show_empresa": True,
         "qs_base": qs_base,
+        "red_empresas": red_empresas,
+        "red_vehiculos": red_vehiculos,
+        "red_piezas": red_piezas,
     })
