@@ -251,3 +251,5 @@ except ImportError:
     pass
 
 from .metrica_wizard import MetricaWizard
+
+from .system_error_log import SystemErrorLog
