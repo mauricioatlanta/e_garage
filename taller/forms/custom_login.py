@@ -90,6 +90,14 @@ class CustomLoginForm(LoginForm):
         # Llamar al clean del padre después de normalizar staff/superuser.
         cleaned_data = super().clean()
 
+        # Las plantillas país históricas envían ``remember_me`` mientras
+        # allauth consume ``remember``. Unificar ambos evita que la casilla
+        # parezca funcionar pero sea ignorada por el motor de sesiones.
+        if "remember_me" in self.fields:
+            cleaned_data["remember"] = bool(
+                cleaned_data.get("remember") or cleaned_data.get("remember_me")
+            )
+
         # Si hay un usuario y es superuser/staff, saltar verificación de email
         login = cleaned_data.get("login")
         if login:
@@ -133,7 +141,7 @@ class CustomLoginForm(LoginForm):
         ret = super().login(request, redirect_url)
 
         # Si el usuario marcó "recordar", extender la duración de la sesión
-        if self.cleaned_data.get("remember_me"):
+        if self.cleaned_data.get("remember") or self.cleaned_data.get("remember_me"):
             # Configurar sesión para que dure 30 días
             request.session.set_expiry(60 * 60 * 24 * 30)  # 30 días
         else:
