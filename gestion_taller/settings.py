@@ -8,6 +8,13 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://egarage.cl', 'https://www.egarage.cl', 'http://192.168.1.106:8000']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Desarrollo local por HTTP: una cookie Secure no viaja por 127.0.0.1.
+# settings_prod.py sobrescribe estos valores a True detrás de HTTPS.
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False
 
 INSTALLED_APPS = [
     'dal', 'dal_select2', 'django.contrib.admin', 'django.contrib.auth',
