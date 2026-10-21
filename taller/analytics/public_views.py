@@ -421,10 +421,11 @@ def public_analytics_dashboard(request):
             "cta_signup": signup_cta, "cta_whatsapp": whatsapp_cta,
             "altas": 0, "tasa_conversion": round(signup_cta / visits_count * 100, 2) if visits_count else 0,
         })
+    # Centroides proyectados en el mismo viewport del GeoJSON (lon/lat -> SVG 500x520).
     coordenadas = {
-        "CL": (265, 420, "Chile"), "AR": (290, 400, "Argentina"), "BR": (330, 320, "Brasil"),
-        "PE": (240, 330, "Perú"), "EC": (225, 295, "Ecuador"), "VE": (270, 250, "Venezuela"),
-        "MX": (170, 210, "México"), "US": (190, 140, "Estados Unidos"),
+        "CL": (343, 401, "Chile"), "AR": (366, 404, "Argentina"), "BR": (408, 321, "Brasil"),
+        "PE": (331, 321, "Perú"), "EC": (321, 290, "Ecuador"), "VE": (359, 258, "Venezuela"),
+        "MX": (244, 206, "México"), "US": (250, 150, "Estados Unidos"),
     }
     resumen_mapa = {}
     for iso, (x, y, nombre) in coordenadas.items():
