@@ -13,6 +13,7 @@ from taller.models.public_analytics_session import PublicAnalyticsSession
 from taller.models.public_page_view import PublicPageView
 from taller.models.abandoned_lead import AbandonedLead
 from taller.services.public_traffic_classifier import CANONICAL_PUBLIC_HOSTS
+from taller.services.public_traffic_classifier import classify_traffic_channel
 
 
 RUBRO_LABELS = {
@@ -397,6 +398,39 @@ def public_analytics_dashboard(request):
             created_at__gte=start_at, is_bot=False, is_internal=False,
         ).order_by("-created_at")[:10],
     }
+    channel_counter = Counter()
+    channel_sessions = {}
+    for visit in qs_human.select_related("public_session").only("referrer", "public_session", "visitor_hash"):
+        session = visit.public_session
+        channel = classify_traffic_channel(visit.referrer, getattr(session, "utm_source", ""))
+        channel_counter[channel] += 1
+        channel_sessions.setdefault(channel, set()).add(getattr(session, "id", None) or visit.visitor_hash)
+    metricas_canales = []
+    for channel, visits_count in channel_counter.most_common():
+        session_ids = {sid for sid in channel_sessions.get(channel, set()) if isinstance(sid, int)}
+        signup_cta = PublicAnalyticsEvent.objects.filter(
+            session_id__in=session_ids, event_type=PublicAnalyticsEvent.EVENT_CTA_SIGNUP_CLICK,
+            created_at__gte=start_at, is_bot=False, is_internal=False,
+        ).values("session_id").distinct().count() if session_ids else 0
+        whatsapp_cta = PublicAnalyticsEvent.objects.filter(
+            session_id__in=session_ids, event_type=PublicAnalyticsEvent.EVENT_CTA_WHATSAPP_CLICK,
+            created_at__gte=start_at, is_bot=False, is_internal=False,
+        ).values("session_id").distinct().count() if session_ids else 0
+        metricas_canales.append({
+            "nombre": channel, "visitas": visits_count,
+            "cta_signup": signup_cta, "cta_whatsapp": whatsapp_cta,
+            "altas": 0, "tasa_conversion": round(signup_cta / visits_count * 100, 2) if visits_count else 0,
+        })
+    coordenadas = {
+        "CL": (265, 420, "Chile"), "AR": (290, 400, "Argentina"), "BR": (330, 320, "Brasil"),
+        "PE": (240, 330, "Perú"), "EC": (225, 295, "Ecuador"), "VE": (270, 250, "Venezuela"),
+        "MX": (170, 210, "México"), "US": (190, 140, "Estados Unidos"),
+    }
+    resumen_mapa = {}
+    for iso, (x, y, nombre) in coordenadas.items():
+        visitas_pais = qs_human.filter(country__iexact=iso.lower()).count()
+        altas_pais = qs_real.filter(pais__iexact=iso).count()
+        resumen_mapa[iso] = {"x": x, "y": y, "nombre": nombre, "visitas": visitas_pais, "altas": altas_pais, "activo": bool(visitas_pais or altas_pais)}
     funnel_real_time = [
         {"label": "Landings", "value": landing_sessions, "pct": 100 if landing_sessions else 0},
         {"label": "CTA registro", "value": eventos_funnel["cta_signup"], "pct": round(eventos_funnel["cta_signup"] / landing_sessions * 100, 2) if landing_sessions else 0},
@@ -479,6 +513,8 @@ def public_analytics_dashboard(request):
         "atribucion": atribucion,
         "salud": salud,
         "funnel_real_time": funnel_real_time,
+        "metricas_canales": metricas_canales,
+        "resumen_mapa": resumen_mapa,
     }
 
     return TemplateResponse(

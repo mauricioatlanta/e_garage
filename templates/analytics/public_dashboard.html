@@ -416,6 +416,37 @@
         <div class="eg-live-funnel">{% for step in funnel_real_time %}<div class="eg-live-step"><strong>{{ step.pct }}%</strong><span>{{ step.label }} · {{ step.value }}</span></div>{% endfor %}</div>
     </section>
 
+    <section class="eg-luxury-card" style="margin-bottom:20px;">
+        <h3>// Telemetría continental // Tráfico y conversión panamericana</h3>
+        <div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(220px,1fr);gap:16px;align-items:center;">
+            <svg viewBox="0 0 500 520" style="width:100%;height:360px;background:rgba(2,6,23,.55);border:1px solid rgba(34,211,238,.15);border-radius:12px;">
+                <path d="M120 70L260 70L290 120L250 170L200 170L170 230L140 210L110 130Z M170 230L240 260L220 270L180 250Z M220 270L290 260L370 310L360 380L290 470L250 440L230 330Z" fill="#082f49" fill-opacity=".35" stroke="#0891b2" stroke-dasharray="3 3"/>
+                {% for iso,data in resumen_mapa.items %}<g onclick="mostrarDetallePais('{{ iso }}','{{ data.nombre }}','{{ data.visitas }}','{{ data.altas }}')" style="cursor:pointer"><circle cx="{{ data.x }}" cy="{{ data.y }}" r="{% if data.activo %}12{% else %}4{% endif %}" fill="{% if data.activo %}#00f0ff{% else %}#334155{% endif %}" opacity="{% if data.activo %}.85{% else %}.7{% endif %}"/><text x="{{ data.x|add:8 }}" y="{{ data.y|add:3 }}" fill="{% if data.activo %}#a5f3fc{% else %}#64748b{% endif %}" font-size="10" font-family="monospace">{{ iso }}</text></g>{% endfor %}
+            </svg>
+            <div id="map-country-detail" style="padding:16px;border:1px solid rgba(34,211,238,.18);border-radius:12px;background:rgba(2,6,23,.52);color:#cbd5e1;font-size:12px;">
+                <div style="color:#67e8f9;font:700 11px ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;">Terminal de país</div>
+                <h4 id="map-country-name" style="color:#fff;font-size:18px;margin:14px 0;">Chile</h4>
+                <div>Visitas humanas: <strong id="map-country-visits" style="color:#67e8f9;">—</strong></div>
+                <div style="margin-top:8px;">Altas: <strong id="map-country-signups" style="color:#86efac;">—</strong></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="eg-luxury-card" style="margin-bottom:20px;overflow:auto;">
+        <h3>// Rendimiento por canal de adquisición</h3>
+        <table class="eg-table" style="min-width:680px;"><thead><tr><th>Canal</th><th>Visitas</th><th>CTA registro</th><th>WhatsApp</th><th>Conversión</th></tr></thead><tbody>
+        {% for canal in metricas_canales %}<tr><td><strong>{{ canal.nombre }}</strong></td><td>{{ canal.visitas }}</td><td>{{ canal.cta_signup }}</td><td>{{ canal.cta_whatsapp }}</td><td>{{ canal.tasa_conversion }}%</td></tr>{% empty %}<tr><td colspan="5" class="eg-empty">Sin datos de canal en la ventana.</td></tr>{% endfor %}
+        </tbody></table>
+    </section>
+
+    <script>
+    function mostrarDetallePais(iso, nombre, visitas, altas) {
+      document.getElementById('map-country-name').textContent = iso + ' · ' + nombre;
+      document.getElementById('map-country-visits').textContent = Number(visitas).toLocaleString('es-CL');
+      document.getElementById('map-country-signups').textContent = Number(altas).toLocaleString('es-CL');
+    }
+    </script>
+
 
     <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;">
         <div class="eg-kpi" style="color:var(--eg-cyan);text-align:center;">

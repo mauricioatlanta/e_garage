@@ -1,4 +1,5 @@
 import ipaddress
+from urllib.parse import urlparse
 from django.conf import settings
 
 
@@ -63,6 +64,42 @@ def is_allowed_public_analytics_host(host: str) -> bool:
     if normalized in CANONICAL_PUBLIC_HOSTS:
         return True
     return bool(getattr(settings, "DEBUG", False) and normalized in {"testserver", "localhost", "127.0.0.1"})
+
+
+def classify_traffic_channel(referrer: str = "", utm_source: str = "") -> str:
+    """Returns a stable commercial channel instead of exposing raw URLs."""
+    src = (utm_source or "").strip().lower()
+    ref = (referrer or "").strip().lower()
+    haystack = src
+    if haystack:
+        for keys, label in ((
+            (("fb", "facebook", "meta"), "FACEBOOK"),
+            (("ig", "instagram"), "INSTAGRAM"),
+            (("tt", "tiktok"), "TIKTOK"),
+            (("goog", "google", "adwords", "cpc"), "GOOGLE"),
+            (("wa", "whatsapp"), "WHATSAPP"),
+        )):
+            if any(key in haystack for key in keys):
+                return label
+        return f"CAMPAÑA ({src.upper()[:40]})"
+    if ref:
+        try:
+            domain = urlparse(ref).netloc.lower()
+        except Exception:
+            domain = ref
+        for keys, label in ((
+            (("google.com", "google.cl", "google."), "GOOGLE"),
+            (("facebook.com", "m.facebook.com", "l.facebook.com", "fb.me"), "FACEBOOK"),
+            (("instagram.com", "l.instagram.com"), "INSTAGRAM"),
+            (("tiktok.com", "link.tiktok.com"), "TIKTOK"),
+            (("whatsapp.com", "api.whatsapp.com", "web.whatsapp.com", "wa.me"), "WHATSAPP"),
+        )):
+            if any(key in domain for key in keys):
+                return label
+        if any(key in domain for key in ("egarage.cl", "localhost", "127.0.0.1")):
+            return "INTERNO"
+        return "OTRO_REFERRER"
+    return "DIRECTO"
 
 
 def is_scanner_path(path: str) -> bool:
