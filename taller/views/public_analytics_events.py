@@ -10,13 +10,29 @@ from taller.services.public_event_tracking import (
     record_public_event,
     validate_public_event_payload,
 )
+from taller.services.public_attribution import attach_public_analytics_cookies, get_or_create_public_session
+from taller.services.public_traffic_classifier import is_allowed_public_analytics_host, is_scanner_path, normalize_host
 
 
 @require_POST
 def public_analytics_event(request):
+    host = normalize_host(request.get_host())
+    user = getattr(request, "user", None)
+    if (
+        not is_allowed_public_analytics_host(host)
+        or is_scanner_path(request.path)
+        or (user is not None and getattr(user, "is_staff", False))
+    ):
+        return JsonResponse({"ok": True, "created": False, "ignored": True})
     session = get_session_from_request_cookie(request)
     if session is None:
-        return JsonResponse({"ok": False, "error": "session_required"}, status=400)
+        session = get_or_create_public_session(request, page_type="event")
+    if (
+        session is not None and session.is_internal
+    ):
+        return attach_public_analytics_cookies(request, JsonResponse({"ok": True, "created": False, "ignored": True}))
+    if session is None:
+        return JsonResponse({"ok": False, "error": "session_unavailable"}, status=503)
 
     allowed, retry_after = check_public_event_rate_limit(
         request,
@@ -28,16 +44,16 @@ def public_analytics_event(request):
             status=429,
         )
         response["Retry-After"] = str(retry_after)
-        return response
+        return attach_public_analytics_cookies(request, response)
 
     try:
         payload = parse_public_event_payload(request)
         event_type, path, dedupe_key, metadata = validate_public_event_payload(payload)
     except PublicEventValidationError as exc:
-        return JsonResponse({"ok": False, "error": exc.code}, status=exc.status)
+        return attach_public_analytics_cookies(request, JsonResponse({"ok": False, "error": exc.code}, status=exc.status))
 
     if session.is_bot or session.is_internal:
-        return JsonResponse({"ok": True, "created": False, "ignored": True})
+        return attach_public_analytics_cookies(request, JsonResponse({"ok": True, "created": False, "ignored": True}))
 
     event, created = record_public_event(
         session=session,
@@ -46,7 +62,7 @@ def public_analytics_event(request):
         dedupe_key=dedupe_key,
         metadata=metadata,
     )
-    return JsonResponse({"ok": True, "created": created, "event_id": event.pk})
+    return attach_public_analytics_cookies(request, JsonResponse({"ok": True, "created": created, "event_id": event.pk}))
 
 
 @require_POST

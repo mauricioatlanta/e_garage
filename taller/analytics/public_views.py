@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.template.response import TemplateResponse
+from django.utils import timezone
 
 from taller.country.engine import URL_SLUG_TO_VERTICAL
 from taller.models.public_analytics_event import PublicAnalyticsEvent
@@ -67,12 +68,14 @@ def _rubro_from_path(path):
     return ""
 
 
-def _count_event_sessions(event_types):
+def _count_event_sessions(event_types, start_at=None):
     events = PublicAnalyticsEvent.objects.filter(
         event_type__in=event_types,
         is_bot=False,
         is_internal=False,
     )
+    if start_at:
+        events = events.filter(Q(occurred_at__gte=start_at) | Q(occurred_at__isnull=True, created_at__gte=start_at))
     with_session = events.exclude(session_id__isnull=True).values("session_id").distinct().count()
     without_session = events.filter(session_id__isnull=True).count()
     return with_session + without_session
@@ -92,7 +95,18 @@ def public_analytics_dashboard(request):
       el rubro se deriva del slug/path de la landing.
     """
 
-    qs_all = PublicPageView.objects.all()
+    period = (request.GET.get("period") or "month").strip().lower()
+    if period not in {"today", "7d", "month"}:
+        period = "month"
+    now = timezone.now()
+    if period == "today":
+        start_at = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif period == "7d":
+        start_at = now - timezone.timedelta(days=7)
+    else:
+        start_at = now - timezone.timedelta(days=30)
+
+    qs_all = PublicPageView.objects.filter(created_at__gte=start_at)
     qs_human = qs_all.filter(
         is_bot=False,
         is_internal=False,
@@ -271,7 +285,7 @@ def public_analytics_dashboard(request):
         Q(nombre_taller__iregex=r"(prueba|demo)")
         | Q(user__email__endswith="@egarage.test")
     )
-    qs_real = Empresa.objects.exclude(_DEMO_Q)
+    qs_real = Empresa.objects.exclude(_DEMO_Q).filter(fecha_inicio__gte=start_at)
 
     # -------------------------------------------------------------
     # Empresas registradas por día (via fecha_inicio, solo reales).
@@ -293,6 +307,7 @@ def public_analytics_dashboard(request):
         Q(user__empresa__nombre_taller__iregex=r"(prueba|demo)")
         | Q(user__email__endswith="@egarage.test")
     )
+    attributed_embudos = attributed_embudos.filter(public_session__first_seen_at__gte=start_at)
     attributed_empresa_user_ids = attributed_embudos.filter(
         empresa_creada_at__isnull=False,
         user__empresa__isnull=False,
@@ -347,31 +362,24 @@ def public_analytics_dashboard(request):
     }
 
     eventos_funnel = {
-        "cta_clicks": _count_event_sessions(
+        "cta_whatsapp": _count_event_sessions(
             [
-                PublicAnalyticsEvent.EVENT_CTA_CLICK,
                 PublicAnalyticsEvent.EVENT_CTA_WHATSAPP_CLICK,
-                PublicAnalyticsEvent.EVENT_CTA_TRIAL_30_CLICK,
-            ]
+            ], start_at
         ),
-        "signup_starts": _count_event_sessions(
-            [
-                PublicAnalyticsEvent.EVENT_SIGNUP_START,
-                PublicAnalyticsEvent.EVENT_SIGNUP_STARTED,
-            ]
+        "cta_signup": _count_event_sessions(
+            [PublicAnalyticsEvent.EVENT_CTA_SIGNUP_CLICK], start_at
         ),
-        "signup_completes": _count_event_sessions(
-            [
-                PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETE,
-                PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETED,
-            ]
-        ),
+        "signup_views": _count_event_sessions([PublicAnalyticsEvent.EVENT_SIGNUP_VIEW], start_at),
+        "signup_submit_attempts": _count_event_sessions([PublicAnalyticsEvent.EVENT_SIGNUP_SUBMIT_ATTEMPT], start_at),
+        "signup_validation_errors": _count_event_sessions([PublicAnalyticsEvent.EVENT_SIGNUP_VALIDATION_ERROR], start_at),
+        "signup_success": _count_event_sessions([PublicAnalyticsEvent.EVENT_SIGNUP_SUCCESS], start_at),
     }
     leads_capturados = AbandonedLead.objects.count()
     leads_pendientes = AbandonedLead.objects.filter(contactado=False).count()
     conversion_real = {
         "landings_canonicas": landings_humanas.count(),
-        "cta_whatsapp": eventos_funnel["cta_clicks"],
+        "cta_whatsapp": eventos_funnel["cta_whatsapp"],
         "leads_capturados": leads_capturados,
         "altas_creadas": crecimiento_global["empresas"],
     }
@@ -437,6 +445,9 @@ def public_analytics_dashboard(request):
         "mobile_share": mobile_share,
         "por_idioma": por_idioma,
         "empresas_por_dia": empresas_por_dia,
+        "period": period,
+        "period_start": start_at,
+        "period_choices": [("today", "Hoy"), ("7d", "Últimos 7 días"), ("month", "Mes")],
     }
 
     return TemplateResponse(

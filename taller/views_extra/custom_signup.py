@@ -10,8 +10,9 @@ from taller.config.country_settings import CountrySettings
 from taller.forms.custom_signup import CustomSignupForm
 from taller.services.public_event_tracking import (
     record_signup_completed_from_request,
-    record_signup_started_from_request,
+    record_signup_lifecycle_from_request,
 )
+from taller.models.public_analytics_event import PublicAnalyticsEvent
 from taller.utils.country_config import get_country_config
 
 
@@ -55,8 +56,14 @@ class CustomSignupView(SignupView):
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
         if getattr(response, "status_code", None) == 200:
-            record_signup_started_from_request(request)
+            record_signup_lifecycle_from_request(request, PublicAnalyticsEvent.EVENT_SIGNUP_VIEW)
         return response
+
+    def post(self, request, *args, **kwargs):
+        record_signup_lifecycle_from_request(
+            request, PublicAnalyticsEvent.EVENT_SIGNUP_SUBMIT_ATTEMPT
+        )
+        return super().post(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         """Pasa request, country_code y default_phone_prefix al formulario"""
@@ -162,6 +169,9 @@ class CustomSignupView(SignupView):
         )
 
     def form_invalid(self, form):
+        record_signup_lifecycle_from_request(
+            self.request, PublicAnalyticsEvent.EVENT_SIGNUP_VALIDATION_ERROR
+        )
         loc = getattr(self.request, "eg_us_public_signup_lang", None)
         path = (self.request.path or "").rstrip("/") or "/"
         if loc == "en" or (loc is None and path == "/us/signup"):

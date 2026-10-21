@@ -5,7 +5,8 @@ from django.utils import timezone
 
 from taller.models.public_page_view import PublicPageView, is_probable_bot
 from taller.services.public_traffic_classifier import (
-    is_canonical_public_host,
+    is_allowed_public_analytics_host,
+    is_scanner_path,
     is_probable_non_human_request,
     normalize_host,
 )
@@ -66,6 +67,13 @@ def track_public_page(
         except Exception:
             raw_host = request.META.get("HTTP_HOST", "")
         host = normalize_host(raw_host)
+        user = getattr(request, "user", None)
+        if (
+            not is_allowed_public_analytics_host(host)
+            or is_scanner_path(getattr(request, "path", ""))
+            or (user is not None and getattr(user, "is_staff", False))
+        ):
+            return None
         ip = get_client_ip(request) or ""
         public_session = None
         try:
@@ -103,13 +111,14 @@ def track_public_page(
             is_mobile=_is_mobile(user_agent),
             is_bot=is_probable_bot(user_agent) or is_non_human,
             is_internal=bool(public_session and public_session.is_internal),
+            is_staff=bool(user is not None and getattr(user, "is_staff", False)),
             created_at=now,
         )
         if (
             public_session
             and not public_session.is_bot
             and not public_session.is_internal
-            and is_canonical_public_host(host)
+            and is_allowed_public_analytics_host(host)
         ):
             try:
                 from taller.models.public_analytics_event import PublicAnalyticsEvent

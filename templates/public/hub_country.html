@@ -436,7 +436,7 @@
           "X-CSRFToken": csrfToken
         },
         body: JSON.stringify({
-          event_type: "cta_click",
+          event_type: kind === "signup" ? "cta_signup_click" : "cta_whatsapp_click",
           path: window.location.pathname,
           dedupe_key: window.location.pathname + ":" + kind + ":" + ctaKey,
           metadata: {

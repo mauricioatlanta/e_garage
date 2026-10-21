@@ -13,6 +13,7 @@ from taller.models.public_analytics_session import PublicAnalyticsSession
 from taller.models.public_page_view import is_probable_bot
 from taller.services.public_analytics import _clean_referrer, _is_mobile
 from taller.services.public_traffic_classifier import (
+    is_allowed_public_analytics_host,
     is_probable_non_human_request,
     normalize_host,
 )
@@ -173,6 +174,9 @@ def get_or_create_public_session(
         except Exception:
             raw_host = request.META.get("HTTP_HOST", "")
         host = normalize_host(raw_host)
+        if not is_allowed_public_analytics_host(host):
+            request._public_analytics_pending_cookies = {}
+            return None
         referrer = _clean_referrer(request)
         ip = get_client_ip(request) or ""
         ip_hash = hash_public_analytics_value(ip) if ip else ""
@@ -207,8 +211,8 @@ def get_or_create_public_session(
                 last_path=path,
                 landing_path=path if page_type else "",
                 host=host[:255],
-                country=(country or "").lower()[:8],
-                language=(language or "").lower()[:8],
+                country=(country or "").strip().lower()[:8],
+                language=(language or "").strip().lower()[:8],
                 vertical_key=vertical,
                 page_type=(page_type or "")[:20],
                 initial_referrer=referrer,

@@ -41,8 +41,8 @@ logger = logging.getLogger(__name__)
 PUBLIC_ENDPOINT_EVENT_TYPES = {
     PublicAnalyticsEvent.EVENT_SCROLL_50,
     PublicAnalyticsEvent.EVENT_SCROLL_90,
-    PublicAnalyticsEvent.EVENT_CTA_CLICK,
     PublicAnalyticsEvent.EVENT_CTA_WHATSAPP_CLICK,
+    PublicAnalyticsEvent.EVENT_CTA_SIGNUP_CLICK,
     PublicAnalyticsEvent.EVENT_CTA_TRIAL_30_CLICK,
 }
 
@@ -54,11 +54,18 @@ BACKEND_EVENT_TYPES = {
     PublicAnalyticsEvent.EVENT_FIRST_LOGIN,
 }
 
+SIGNUP_LIFECYCLE_EVENT_TYPES = {
+    PublicAnalyticsEvent.EVENT_SIGNUP_VIEW,
+    PublicAnalyticsEvent.EVENT_SIGNUP_SUBMIT_ATTEMPT,
+    PublicAnalyticsEvent.EVENT_SIGNUP_VALIDATION_ERROR,
+    PublicAnalyticsEvent.EVENT_SIGNUP_SUCCESS,
+}
+
 ALLOWED_METADATA_KEYS = {
     PublicAnalyticsEvent.EVENT_SCROLL_50: {"scroll_percent", "viewport_height", "document_height"},
     PublicAnalyticsEvent.EVENT_SCROLL_90: {"scroll_percent", "viewport_height", "document_height"},
-    PublicAnalyticsEvent.EVENT_CTA_CLICK: {"cta_id", "cta_label", "href", "country", "vertical"},
     PublicAnalyticsEvent.EVENT_CTA_WHATSAPP_CLICK: {"cta_id", "cta_label", "href", "country", "vertical"},
+    PublicAnalyticsEvent.EVENT_CTA_SIGNUP_CLICK: {"cta_id", "cta_label", "href", "country", "vertical"},
     PublicAnalyticsEvent.EVENT_CTA_TRIAL_30_CLICK: {"cta_id", "cta_label", "href", "country", "vertical"},
 }
 
@@ -173,14 +180,18 @@ def validate_public_event_payload(payload: dict) -> tuple[str, str, str, dict]:
         raise PublicEventValidationError("event_type_not_allowed")
 
     path = (payload.get("path") or "").strip()
-    if event_type == PublicAnalyticsEvent.EVENT_CTA_CLICK:
+    if event_type in {
+        PublicAnalyticsEvent.EVENT_CTA_WHATSAPP_CLICK,
+        PublicAnalyticsEvent.EVENT_CTA_SIGNUP_CLICK,
+        PublicAnalyticsEvent.EVENT_CTA_TRIAL_30_CLICK,
+    }:
         if not _is_public_cta_path(path):
             raise PublicEventValidationError("path_not_allowed")
     elif path != DESARMADURIA_PATH:
         raise PublicEventValidationError("path_not_allowed")
 
     vertical = _vertical_from_path(path)
-    if event_type != PublicAnalyticsEvent.EVENT_CTA_CLICK and vertical != DESARMADURIA_VERTICAL:
+    if event_type == PublicAnalyticsEvent.EVENT_CTA_TRIAL_30_CLICK and vertical != DESARMADURIA_VERTICAL:
         raise PublicEventValidationError("vertical_not_allowed")
 
     metadata = payload.get("metadata") or {}
@@ -280,34 +291,32 @@ def _is_valid_desarmaduria_attribution(session: PublicAnalyticsSession) -> bool:
 
 
 def record_signup_started_from_request(request):
-    """
-    Registra signup_started desde backend, sin interrumpir el render de signup.
-    """
+    """Compatibilidad histórica: las nuevas altas registran ``signup_view``."""
+    return record_signup_lifecycle_from_request(request, PublicAnalyticsEvent.EVENT_SIGNUP_VIEW)
+
+
+def record_signup_lifecycle_from_request(request, event_type: str):
+    """Registra una etapa real del formulario sin bloquear el flujo de alta."""
+    if event_type not in SIGNUP_LIFECYCLE_EVENT_TYPES:
+        return None, False
     try:
-        session = find_first_touch_session_for_request(
-            request,
-            country=DESARMADURIA_COUNTRY,
-            vertical_key=DESARMADURIA_VERTICAL,
-            path=DESARMADURIA_PATH,
-            active_only=True,
-        )
-        if not _is_valid_desarmaduria_attribution(session):
+        session = get_session_from_request_cookie(request)
+        if session is None:
+            from taller.services.public_attribution import get_or_create_public_session
+            session = get_or_create_public_session(request, page_type="signup")
+        if session is None or session.is_bot or session.is_internal:
             return None, False
-
-        metadata = {"source": "backend", "source_path": DESARMADURIA_PATH}
-        if set(metadata) - BACKEND_ALLOWED_METADATA_KEYS[PublicAnalyticsEvent.EVENT_SIGNUP_STARTED]:
-            return None, False
-
         return record_public_event(
             session=session,
-            event_type=PublicAnalyticsEvent.EVENT_SIGNUP_STARTED,
+            event_type=event_type,
             path=(request.path or "")[:255],
-            dedupe_key=PublicAnalyticsEvent.EVENT_SIGNUP_STARTED,
-            metadata=metadata,
+            dedupe_key=event_type,
+            metadata={"source": "backend"},
         )
     except Exception:
         logger.exception(
-            "public_analytics: error tracking signup_started path=%s",
+            "public_analytics: error tracking signup lifecycle=%s path=%s",
+            event_type,
             getattr(request, "path", ""),
         )
         return None, False
@@ -345,9 +354,9 @@ def record_signup_completed_from_request(request, user, country):
             event_session = embudo.public_session or session
             return record_public_event(
                 session=event_session,
-                event_type=PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETED,
+                event_type=PublicAnalyticsEvent.EVENT_SIGNUP_SUCCESS,
                 path=(request.path or "")[:255],
-                dedupe_key=PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETED,
+                dedupe_key=PublicAnalyticsEvent.EVENT_SIGNUP_SUCCESS,
                 metadata={"source": "backend"},
             )
         except Exception:

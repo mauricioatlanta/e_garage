@@ -15,15 +15,22 @@ class PublicAnalyticsEvent(models.Model):
     EVENT_SCROLL_50 = "scroll_50"
     EVENT_SCROLL_90 = "scroll_90"
     EVENT_CTA_WHATSAPP_CLICK = "cta_whatsapp_click"
+    EVENT_CTA_SIGNUP_CLICK = "cta_signup_click"
     EVENT_CTA_TRIAL_30_CLICK = "cta_trial_30_click"
     EVENT_SIGNUP_STARTED = "signup_started"
     EVENT_SIGNUP_COMPLETED = "signup_completed"
     EVENT_COMPANY_CREATED = "company_created"
     EVENT_FIRST_LOGIN = "first_login"
+    EVENT_SIGNUP_VIEW = "signup_view"
+    EVENT_SIGNUP_SUBMIT_ATTEMPT = "signup_submit_attempt"
+    EVENT_SIGNUP_VALIDATION_ERROR = "signup_validation_error"
+    EVENT_SIGNUP_SUCCESS = "signup_success"
 
     EVENT_TYPE_CHOICES = [
         (EVENT_LANDING_VIEW, "Landing vista"),
         (EVENT_CTA_CLICK, "CTA presionado"),
+        (EVENT_CTA_WHATSAPP_CLICK, "CTA WhatsApp"),
+        (EVENT_CTA_SIGNUP_CLICK, "CTA registro"),
         (EVENT_SIGNUP_START, "Registro iniciado"),
         (EVENT_SIGNUP_COMPLETE, "Registro completado"),
         (EVENT_ONBOARDING_COMPLETE, "Onboarding completado"),

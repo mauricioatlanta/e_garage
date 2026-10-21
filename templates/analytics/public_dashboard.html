@@ -353,6 +353,13 @@
         </a>
     </header>
 
+    <form method="get" style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+        <label for="analytics-period" style="color:var(--eg-muted);font-size:13px;">Ventana de medición</label>
+        <select id="analytics-period" name="period" onchange="this.form.submit()" style="padding:8px 12px;border-radius:8px;background:#0f172a;color:#e2e8f0;border:1px solid var(--eg-border);">
+            {% for value,label in period_choices %}<option value="{{ value }}" {% if value == period %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+    </form>
+
 
     <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;">
         <div class="eg-kpi" style="color:var(--eg-cyan);text-align:center;">
@@ -430,19 +437,19 @@
 
     <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
         <div class="eg-kpi" style="color:var(--eg-orange);text-align:center;">
-            <div class="eg-label">CTA agrupados</div>
-            <div class="eg-value">{{ eventos_funnel.cta_clicks }}</div>
-            <div class="eg-mini">cta_click + CTA canónicos</div>
+            <div class="eg-label">CTA WhatsApp</div>
+            <div class="eg-value">{{ eventos_funnel.cta_whatsapp }}</div>
+            <div class="eg-mini">cta_whatsapp_click</div>
         </div>
         <div class="eg-kpi" style="color:var(--eg-blue);text-align:center;">
-            <div class="eg-label">Signup iniciados</div>
-            <div class="eg-value">{{ eventos_funnel.signup_starts }}</div>
-            <div class="eg-mini">signup_start + signup_started</div>
+            <div class="eg-label">CTA registro</div>
+            <div class="eg-value">{{ eventos_funnel.cta_signup }}</div>
+            <div class="eg-mini">cta_signup_click</div>
         </div>
         <div class="eg-kpi" style="color:var(--eg-purple);text-align:center;">
-            <div class="eg-label">Signup completados</div>
-            <div class="eg-value">{{ eventos_funnel.signup_completes }}</div>
-            <div class="eg-mini">signup_complete + signup_completed</div>
+            <div class="eg-label">Signup exitosos</div>
+            <div class="eg-value">{{ eventos_funnel.signup_success }}</div>
+            <div class="eg-mini">signup_success</div>
         </div>
         <div class="eg-kpi" style="color:var(--eg-red);text-align:center;">
             <div class="eg-label">Ráfagas humanas</div>
