@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from taller.country.engine import URL_SLUG_TO_VERTICAL
 from taller.models.public_analytics_event import PublicAnalyticsEvent
+from taller.models.public_analytics_session import PublicAnalyticsSession
 from taller.models.public_page_view import PublicPageView
 from taller.models.abandoned_lead import AbandonedLead
 from taller.services.public_traffic_classifier import CANONICAL_PUBLIC_HOSTS
@@ -375,6 +376,33 @@ def public_analytics_dashboard(request):
         "signup_validation_errors": _count_event_sessions([PublicAnalyticsEvent.EVENT_SIGNUP_VALIDATION_ERROR], start_at),
         "signup_success": _count_event_sessions([PublicAnalyticsEvent.EVENT_SIGNUP_SUCCESS], start_at),
     }
+    signup_attempts = eventos_funnel["signup_submit_attempts"]
+    signup_errors = eventos_funnel["signup_validation_errors"]
+    dropoff_rate = round((max(signup_attempts - eventos_funnel["signup_success"], 0) / signup_attempts) * 100, 2) if signup_attempts else 0
+    system_error_rate = round((signup_errors / signup_attempts) * 100, 2) if signup_attempts else 0
+    public_sessions = PublicAnalyticsSession.objects.filter(
+        first_seen_at__gte=start_at, is_bot=False, is_internal=False
+    )
+    atribucion = list(
+        public_sessions.values("attribution_type").annotate(total=Count("id")).order_by("-total")[:8]
+    )
+    kiosko_consultas = qs_human.filter(path__icontains="kiosko").count()
+    salud = {
+        "dropoff_rate": dropoff_rate,
+        "system_error_rate": system_error_rate,
+        "kiosko_consultas": kiosko_consultas,
+        "clientes_activos": qs_real.filter(suscripcion_activa=True, is_trial=False).count(),
+        "errores_formulario": PublicAnalyticsEvent.objects.filter(
+            event_type=PublicAnalyticsEvent.EVENT_SIGNUP_VALIDATION_ERROR,
+            created_at__gte=start_at, is_bot=False, is_internal=False,
+        ).order_by("-created_at")[:10],
+    }
+    funnel_real_time = [
+        {"label": "Landings", "value": landing_sessions, "pct": 100 if landing_sessions else 0},
+        {"label": "CTA registro", "value": eventos_funnel["cta_signup"], "pct": round(eventos_funnel["cta_signup"] / landing_sessions * 100, 2) if landing_sessions else 0},
+        {"label": "Formulario", "value": eventos_funnel["signup_views"], "pct": round(eventos_funnel["signup_views"] / landing_sessions * 100, 2) if landing_sessions else 0},
+        {"label": "Cuenta creada", "value": eventos_funnel["signup_success"], "pct": round(eventos_funnel["signup_success"] / landing_sessions * 100, 2) if landing_sessions else 0},
+    ]
     leads_capturados = AbandonedLead.objects.count()
     leads_pendientes = AbandonedLead.objects.filter(contactado=False).count()
     conversion_real = {
@@ -448,6 +476,9 @@ def public_analytics_dashboard(request):
         "period": period,
         "period_start": start_at,
         "period_choices": [("today", "Hoy"), ("7d", "Últimos 7 días"), ("month", "Mes")],
+        "atribucion": atribucion,
+        "salud": salud,
+        "funnel_real_time": funnel_real_time,
     }
 
     return TemplateResponse(

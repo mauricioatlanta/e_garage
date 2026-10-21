@@ -101,6 +101,27 @@
     margin-bottom: 24px;
 }
 
+.eg-command {
+    margin: 0 0 22px;
+    padding: 18px 20px;
+    border: 1px solid rgba(34,211,238,.28);
+    border-radius: 18px;
+    background: linear-gradient(120deg, rgba(8,20,37,.96), rgba(15,23,42,.88));
+    box-shadow: 0 0 35px rgba(34,211,238,.07), inset 0 1px rgba(255,255,255,.05);
+}
+.eg-command-title { color:#67e8f9; font:700 12px/1.2 ui-monospace,monospace; letter-spacing:.18em; text-transform:uppercase; }
+.eg-luxury-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin:0 0 20px; }
+.eg-luxury-card { padding:18px; border:1px solid var(--eg-border); border-radius:16px; background:rgba(15,23,42,.78); }
+.eg-luxury-card h3 { margin:0 0 14px; color:#f8fafc; font-size:14px; letter-spacing:.04em; }
+.eg-health { display:flex; align-items:center; gap:9px; color:#86efac; font-size:12px; font-weight:700; }
+.eg-health-dot { width:9px; height:9px; border-radius:50%; background:#22c55e; box-shadow:0 0 12px #22c55e; }
+.eg-source-row,.eg-error-row { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid rgba(148,163,184,.10); color:#cbd5e1; font-size:12px; }
+.eg-source-row:last-child,.eg-error-row:last-child { border-bottom:0; }
+.eg-live-funnel { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.eg-live-step { position:relative; padding:13px; border-radius:12px; background:rgba(2,6,23,.72); border:1px solid rgba(34,211,238,.18); }
+.eg-live-step strong { display:block; color:#67e8f9; font-size:21px; }
+.eg-live-step span { color:#94a3b8; font-size:11px; }
+
 .eg-kpi {
     position: relative;
     overflow: hidden;
@@ -359,6 +380,41 @@
             {% for value,label in period_choices %}<option value="{{ value }}" {% if value == period %}selected{% endif %}>{{ label }}</option>{% endfor %}
         </select>
     </form>
+
+    <section class="eg-command">
+        <div class="eg-command-title">eGarage Command Center // Analytics &amp; Health Monitor</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:10px;">
+            <span style="color:#cbd5e1;font-size:13px;">Estado operativo de la ventana seleccionada</span>
+            <span class="eg-health"><i class="eg-health-dot"></i>SISTEMA ESTABLE</span>
+        </div>
+    </section>
+
+    <section class="eg-kpis" style="margin-bottom:20px;">
+        <article class="eg-kpi human"><div class="eg-label">Visitas humanas</div><div class="eg-value">{{ humanos }}</div><div class="eg-mini">Ventana {{ period }}</div></article>
+        <article class="eg-kpi" style="color:var(--eg-green);"><div class="eg-label">Signups exitosos</div><div class="eg-value">{{ eventos_funnel.signup_success }}</div><div class="eg-mini">signup_success</div></article>
+        <article class="eg-kpi" style="color:var(--eg-orange);"><div class="eg-label">Drop-off formulario</div><div class="eg-value">{{ salud.dropoff_rate }}%</div><div class="eg-mini">Submit vs cuenta creada</div></article>
+        <article class="eg-kpi" style="color:var(--eg-purple);"><div class="eg-label">Clientes activos</div><div class="eg-value">{{ salud.clientes_activos }}</div><div class="eg-mini">Pago vigente</div></article>
+        <article class="eg-kpi" style="color:var(--eg-red);"><div class="eg-label">Error de formulario</div><div class="eg-value">{{ salud.system_error_rate }}%</div><div class="eg-mini">Validaciones rechazadas</div></article>
+        <article class="eg-kpi" style="color:var(--eg-cyan);"><div class="eg-label">Consultas Kiosko</div><div class="eg-value">{{ salud.kiosko_consultas }}</div><div class="eg-mini">Rutas públicas kiosko</div></article>
+    </section>
+
+    <section class="eg-luxury-grid">
+        <article class="eg-luxury-card">
+            <h3>01 // Atribución comercial</h3>
+            {% for row in atribucion %}<div class="eg-source-row"><span>{{ row.attribution_type|default:"direct"|title }}</span><strong>{{ row.total }}</strong></div>{% empty %}<div class="eg-source-row"><span>Sin sesiones en ventana</span><strong>0</strong></div>{% endfor %}
+            <div style="margin-top:12px;color:#94a3b8;font-size:11px;">Mayor intención por rubro: {{ por_rubro.0.label|default:"Sin datos" }}</div>
+        </article>
+        <article class="eg-luxury-card">
+            <h3>02 // Salud y errores de usuarios</h3>
+            <div class="eg-source-row"><span>Errores de validación</span><strong>{{ eventos_funnel.signup_validation_errors }}</strong></div>
+            {% for error in salud.errores_formulario %}<div class="eg-error-row"><span>{{ error.path|default:"Formulario" }}</span><strong>{{ error.created_at|date:"H:i" }}</strong></div>{% empty %}<div class="eg-error-row"><span>Sin errores recientes</span><strong>OK</strong></div>{% endfor %}
+        </article>
+    </section>
+
+    <section class="eg-luxury-card" style="margin-bottom:20px;">
+        <h3>03 // Embudo en tiempo real</h3>
+        <div class="eg-live-funnel">{% for step in funnel_real_time %}<div class="eg-live-step"><strong>{{ step.pct }}%</strong><span>{{ step.label }} · {{ step.value }}</span></div>{% endfor %}</div>
+    </section>
 
 
     <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;">
