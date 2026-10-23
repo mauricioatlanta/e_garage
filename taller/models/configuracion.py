@@ -163,6 +163,7 @@ class ConfiguracionEmpresa(models.Model):
         ("TUNING", "Taller de Tuning / Personalización"),
         ("RECYCLING", "Reciclaje / Chatarra electrónica y catalíticos"),
         ("MIXED", "Mixto (multi-rubro — varios giros)"),
+        ("TOWING", "Grúas y asistencia vial"),
     ]
 
     rubro_principal = models.CharField(

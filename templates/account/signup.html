@@ -394,6 +394,12 @@
                         <span class="rubro-card-label">Otro / Mixto</span>
                         <span class="rubro-card-desc">No listado o multi-giro</span>
                     </div>
+                    <div class="rubro-card" data-rubro="GRUAS" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">🚛</span>
+                        <span class="rubro-card-label">Grúas y asistencia vial</span>
+                        <span class="rubro-card-desc">Traslado y rescate vehicular</span>
+                    </div>
                 </div>
 
                 {# Paso 2: actividades adicionales (aparece tras elegir principal) #}
@@ -452,6 +458,12 @@
                             <span class="rubro-card-icon">⊞</span>
                             <span class="rubro-card-label">Otro / Mixto</span>
                             <span class="rubro-card-desc">No listado o multi-giro</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="GRUAS" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">🚛</span>
+                            <span class="rubro-card-label">Grúas y asistencia vial</span>
+                            <span class="rubro-card-desc">Traslado y rescate vehicular</span>
                         </div>
                     </div>
                 </div>
@@ -620,10 +632,12 @@
                     'tire': 'NEUMATICOS',
                     'tires': 'NEUMATICOS',
                     'carwash': 'CARROCERIA_DETAILING',
-                    'lavado': 'CARROCERIA_DETAILING'
+                    'lavado': 'CARROCERIA_DETAILING',
+                    'gruas': 'GRUAS',
+                    'towing': 'GRUAS'
                 };
                 var rubroKey = rubroAliases[rubroFromUrl.toLowerCase()] || rubroFromUrl.toUpperCase();
-                var allowedRubros = ['TALLER_MECANICO', 'DESARMADURIA', 'CASA_REPUESTOS', 'RECICLAJE', 'NEUMATICOS', 'CARROCERIA_DETAILING'];
+                var allowedRubros = ['TALLER_MECANICO', 'DESARMADURIA', 'CASA_REPUESTOS', 'RECICLAJE', 'NEUMATICOS', 'CARROCERIA_DETAILING', 'GRUAS'];
 
                 if (allowedRubros.indexOf(rubroKey) !== -1) {
                     selectPrincipalCard(rubroKey);

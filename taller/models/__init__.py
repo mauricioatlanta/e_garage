@@ -87,6 +87,18 @@ from .marcas_usa import MarcaVehiculo, ModeloVehiculo
 from .comision import ConfiguracionComisionEmpresa, VendedorComision
 from .alias_repuesto import AliasRepuesto
 
+# Grúas y asistencia vial (MVP)
+from .gruas import (
+    TowingAssignment,
+    TowingDriver,
+    TowingEvidence,
+    TowingEvent,
+    TowingLedgerEntry,
+    TowingOrder,
+    TowingQuote,
+    TowingUnit,
+)
+
 # Inspección de ingreso de vehículos
 from .inspeccion_ingreso import InspeccionIngreso, DanoInspeccion, EvidenciaInspeccion
 

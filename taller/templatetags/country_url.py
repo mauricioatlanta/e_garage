@@ -144,7 +144,7 @@ def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
         view_path_for_ns = view_path
     else:
         # Chile, Uruguay, etc.: rutas que viven bajo chile:taller: (include taller.urls)
-        if view_path.startswith(("servicios:", "repuestos:", "team:")):
+        if view_path.startswith(("servicios:", "repuestos:", "team:", "gruas:")):
             view_path_for_ns = f"taller:{view_path}"
         else:
             view_path_for_ns = view_path

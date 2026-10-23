@@ -17,6 +17,7 @@ from taller.constants.business_modules import (
     MOD_DESARME,
     MOD_DOCUMENTOS,
     MOD_FLOTA,
+    MOD_GRUAS,
     MOD_INICIO,
     MOD_RECICLAJE,
     MOD_REPORTES,
@@ -31,6 +32,7 @@ PRODUCT_CASA_REPUESTOS = "CASA_REPUESTOS"
 PRODUCT_TIRE           = "TIRE"
 PRODUCT_CARWASH        = "CARWASH"
 PRODUCT_RECYCLING      = "RECYCLING"
+PRODUCT_TOWING         = "TOWING"
 
 # Maps every rubro_principal value to a product family.
 RUBRO_TO_PRODUCT = {
@@ -57,6 +59,7 @@ RUBRO_TO_PRODUCT = {
     "TIRE":                PRODUCT_TIRE,
     "DETAILING":           PRODUCT_CARWASH,
     "RECYCLING":           PRODUCT_RECYCLING,
+    "TOWING":              PRODUCT_TOWING,
 }
 
 PRODUCT_PROFILES = {
@@ -193,6 +196,28 @@ PRODUCT_PROFILES = {
         "quick_access": [
             {"label": "Registrar Servicio", "icon": "fas fa-tint",      "path": "documentos/form/"},
             {"label": "Nuevo Cliente",      "icon": "fas fa-user-plus", "path": "clientes/crear/"},
+        ],
+    },
+
+    PRODUCT_TOWING: {
+        "name": "eGarage Grúas",
+        "tagline": "Despacho, traslado y cobranza de asistencia vial",
+        "icon": "fas fa-truck-pickup",
+        "color_class": "cyan",
+        "default_rubro": "TOWING",
+        "nav": [
+            {"key": MOD_INICIO, "label": "Inicio", "icon": "fas fa-home"},
+            {"key": MOD_GRUAS, "label": "Órdenes de traslado", "icon": "fas fa-truck-pickup"},
+            {"key": MOD_CLIENTES, "label": "Clientes", "icon": "fas fa-users"},
+            {"key": MOD_DOCUMENTOS, "label": "Documentos", "icon": "fas fa-file-invoice"},
+            {"key": MOD_REPORTES, "label": "Reportes", "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": "Configuración", "icon": "fas fa-cog"},
+        ],
+        "kpi_labels": ["Órdenes hoy", "Pendientes de asignación", "Saldo por cobrar", "Margen registrado"],
+        "quick_access": [
+            {"label": "Nueva orden", "icon": "fas fa-plus", "path": "gruas/ordenes/nueva/"},
+            {"label": "Despacho", "icon": "fas fa-route", "path": "gruas/"},
+            {"label": "Conductores", "icon": "fas fa-id-card", "path": "gruas/conductores/"},
         ],
     },
 }

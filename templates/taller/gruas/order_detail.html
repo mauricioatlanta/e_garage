@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}<main class="container py-4">
+<div class="d-flex justify-content-between"><h1>{{ order.numero }}</h1><span class="badge bg-info">{{ order.get_status_display }}</span></div>
+<p>{{ order.origen }} → {{ order.destino }} · {{ order.patente_snapshot|default:"Sin patente" }}</p>
+<hr><h2>Cotizaciones</h2>
+{% for quote in order.quotes.all %}<div class="card bg-dark text-light mb-2"><div class="card-body">Versión {{ quote.version }} · {{ quote.total_amount }} {{ quote.currency }} · {{ quote.status }}
+{% if quote.status != 'ACCEPTED' %}<form method="post" class="d-inline">{% csrf_token %}<input type="hidden" name="action" value="accept_quote"><input type="hidden" name="quote_id" value="{{ quote.id }}"><button class="btn btn-sm btn-success">Aceptar</button></form>{% endif %}</div></div>{% empty %}<p>No hay cotización.</p>{% endfor %}
+<form method="post" class="card card-body bg-light mb-4">{% csrf_token %}<input type="hidden" name="action" value="quote"><h3>Nueva versión</h3>{{ quote_form.as_p }}<button class="btn btn-primary">Guardar cotización</button></form>
+<form method="post" class="card card-body bg-light mb-4">{% csrf_token %}<input type="hidden" name="action" value="assign"><h3>Asignar grúa y conductor</h3>{{ assignment_form.as_p }}<button class="btn btn-primary">Asignar</button></form>
+<h2>Finanzas</h2><p>Aceptado: {{ summary.accepted_total }} · Cobrado neto: {{ summary.net_collected }} · Saldo: {{ summary.balance }} · Margen registrado: {{ summary.recorded_margin }}</p>
+<form method="post" class="card card-body bg-light">{% csrf_token %}<input type="hidden" name="action" value="ledger">{{ ledger_form.as_p }}<button class="btn btn-secondary">Registrar movimiento</button></form>
+<h2 class="mt-4">Evidencia</h2><form method="post" enctype="multipart/form-data">{% csrf_token %}<input type="hidden" name="action" value="evidence"><input type="file" name="file" required><input name="kind" placeholder="RETIRO / ENTREGA"><button class="btn btn-outline-info">Subir</button></form>
+</main>{% endblock %}

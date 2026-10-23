@@ -34,6 +34,7 @@ from taller.constants.business_modules import (
     MOD_DESARME,
     MOD_DOCUMENTOS,
     MOD_FLOTA,
+    MOD_GRUAS,
     MOD_INICIO,
     MOD_RECICLAJE,
     MOD_REPORTES,
@@ -47,6 +48,7 @@ from taller.constants.product_profiles import (
     PRODUCT_CASA_REPUESTOS,
     PRODUCT_DESARMADURIA,
     PRODUCT_RECYCLING,
+    PRODUCT_TOWING,
     PRODUCT_TALLER,
     PRODUCT_TIRE,
     RUBRO_TO_PRODUCT,
@@ -542,6 +544,32 @@ WORKSPACE_RECYCLING = WorkspaceDef(
 )
 
 
+# Workspace for towing MVP.  Kept declarative like the other products.
+WORKSPACE_TOWING = WorkspaceDef(
+    product_key=PRODUCT_TOWING,
+    brand=WorkspaceBrand("workspace.towing.brand.name", "workspace.towing.brand.tagline", "fas fa-truck-pickup", "cyan"),
+    nav=(
+        WorkspaceNavDef(MOD_INICIO, "workspace.towing.nav.home", "fas fa-home", nav_key="towing_home", path="dashboard/"),
+        WorkspaceNavDef(MOD_GRUAS, "workspace.towing.nav.orders", "fas fa-truck-pickup", nav_key="towing_orders", path="gruas/"),
+        WorkspaceNavDef(MOD_CLIENTES, "workspace.towing.nav.clients", "fas fa-users", nav_key="towing_clients", path="clientes/"),
+        WorkspaceNavDef(MOD_DOCUMENTOS, "workspace.towing.nav.documents", "fas fa-file-invoice", nav_key="towing_documents", path="documentos/"),
+        WorkspaceNavDef(MOD_REPORTES, "workspace.towing.nav.reports", "fas fa-chart-bar", nav_key="towing_reports", path="reportes/"),
+        WorkspaceNavDef(MOD_CONFIGURACION, "workspace.towing.nav.settings", "fas fa-cog", nav_key="towing_settings", path="settings/"),
+    ),
+    widget_keys=(),
+    quick_actions=(
+        WorkspaceActionDef("workspace.towing.action.new_order", "fas fa-plus", "gruas/ordenes/nueva/"),
+        WorkspaceActionDef("workspace.towing.action.dispatch", "fas fa-route", "gruas/"),
+    ),
+    theme={"--eg-primary": "#00f5ff", "--eg-accent": "#2563eb"},
+    texts=WorkspaceTextsDef(
+        "workspace.towing.texts.search_title", "workspace.towing.texts.search_label",
+        "workspace.towing.texts.search_placeholder", "workspace.towing.texts.search_hint",
+        "workspace.towing.texts.live_title", "workspace.towing.texts.live_metric",
+        "workspace.towing.texts.quick_actions", "workspace.towing.texts.activity_feed",
+    ),
+)
+
 # ---------------------------------------------------------------------------
 # Registry — maps product key to its WorkspaceDef.
 # Add a new product here without touching anything else.
@@ -554,6 +582,7 @@ WORKSPACE_DEFINITIONS: dict[str, WorkspaceDef] = {
     PRODUCT_TIRE:           WORKSPACE_TIRE,
     PRODUCT_CARWASH:        WORKSPACE_CARWASH,
     PRODUCT_RECYCLING:      WORKSPACE_RECYCLING,
+    PRODUCT_TOWING:         WORKSPACE_TOWING,
 }
 
 

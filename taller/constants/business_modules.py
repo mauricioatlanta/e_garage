@@ -17,6 +17,7 @@ MOD_RECICLAJE = "reciclaje"
 MOD_FLOTA = "flota"
 MOD_REPORTES = "reportes"
 MOD_CONFIGURACION = "configuracion"
+MOD_GRUAS = "gruas"
 
 # Navigation item definitions: label, URL path suffix, icon CSS class, display order.
 # Labels/icons here are defaults; product profiles may override them per rubro.
@@ -32,6 +33,7 @@ NAV_ITEMS = {
     MOD_FLOTA:         {"label": "Flota",         "path": "flota/",           "icon": "fas fa-truck",        "order": 8},
     MOD_REPORTES:      {"label": "Reportes",      "path": "reportes/",        "icon": "fas fa-chart-bar",    "order": 9},
     MOD_CONFIGURACION: {"label": "Configuración", "path": "settings/",        "icon": "fas fa-cog",          "order": 99},
+    MOD_GRUAS:         {"label": "Grúas",         "path": "gruas/",           "icon": "fas fa-truck-pickup",  "order": 6},
 }
 
 # Always shown regardless of rubro
@@ -50,6 +52,7 @@ PATH_HINTS = {
     MOD_FLOTA:         "/flota",
     MOD_REPORTES:      "/reportes",
     MOD_CONFIGURACION: "/settings",
+    MOD_GRUAS:         "/gruas",
 }
 
 # Modules unlocked per rubro (added to ALWAYS_ON)
@@ -77,4 +80,5 @@ MODULES_BY_RUBRO = {
     "TUNING":              frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS}),
     "DESARMADURIA":        frozenset({MOD_DESARME, MOD_REPUESTOS}),
     "MIXED":               frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS, MOD_DESARME}),
+    "TOWING":              frozenset({MOD_GRUAS, MOD_CLIENTES, MOD_REPORTES}),
 }

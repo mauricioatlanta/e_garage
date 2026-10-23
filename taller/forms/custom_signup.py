@@ -97,6 +97,15 @@ SIGNUP_RUBRO_GROUPS = [
         "icon": "⊞",
         "rubros": ["MIXED"],
     },
+    {
+        "key": "GRUAS",
+        "label": "Grúas y asistencia vial",
+        "label_en": "Towing and roadside assistance",
+        "description": "Traslado, rescate y asistencia de vehículos",
+        "description_en": "Vehicle towing, recovery and roadside assistance",
+        "icon": "🚛",
+        "rubros": ["TOWING"],
+    },
 ]
 
 _GROUP_KEY_TO_RUBROS = {g["key"]: g["rubros"] for g in SIGNUP_RUBRO_GROUPS}
@@ -126,6 +135,10 @@ PUBLIC_RUBRO_ALIASES = {
     "gomeria": "NEUMATICOS",
     "carwash": "CARROCERIA_DETAILING",
     "lavado": "CARROCERIA_DETAILING",
+    "gruas": "GRUAS",
+    "grua": "GRUAS",
+    "towing": "GRUAS",
+    "asistencia_vial": "GRUAS",
 }
 
 

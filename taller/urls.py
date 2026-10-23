@@ -80,6 +80,7 @@ urlpatterns = [
     ),
     # Agregar el namespace de reportes para que funcione 'taller:reportes:reportes_dashboard'
     path("reportes/", include(("taller.reportes.urls", "reportes"), namespace="reportes")),
+    path("gruas/", include(("taller.gruas.urls", "gruas"), namespace="gruas")),
     # === RUTAS PRINCIPALES PARA COMPATIBILIDAD ===
     path("dashboard/", workspace_dashboard, name="dashboard"),  # Dashboard principal
     path("dashboard/live-feed/", workspace_live_feed, name="dashboard_live_feed"),  # alias para workspace_live_kpi.js

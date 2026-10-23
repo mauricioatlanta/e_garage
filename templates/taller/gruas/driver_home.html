@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="container py-4" style="max-width: 720px">
+  <h1 class="mb-4">Mis traslados</h1>
+  {% for order in orders %}
+  <article class="card bg-dark text-light mb-3 shadow-sm">
+    <div class="card-body">
+      <div class="d-flex justify-content-between gap-3">
+        <div><h2 class="h4 mb-1">{{ order.numero }}</h2><p class="mb-3 text-light-emphasis">{{ order.origen }} → {{ order.destino }}</p></div>
+        <span class="badge bg-info align-self-start">{{ order.get_status_display }}</span>
+      </div>
+      <form method="post" action="{% country_url 'gruas:driver_update' order.id %}" class="mb-4">
+        {% csrf_token %}
+        <label class="form-label" for="status-{{ order.id }}">Actualizar estado</label>
+        <div class="input-group"><select id="status-{{ order.id }}" name="to_status" class="form-select"><option value="EN_CAMINO">En camino</option><option value="EN_RETIRO">Llegué al retiro</option><option value="CARGADA">Vehículo cargado</option><option value="EN_TRASLADO">En traslado</option><option value="ENTREGADA">Entregada</option></select><button class="btn btn-primary">Guardar</button></div>
+      </form>
+      <form method="post" action="{% country_url 'gruas:driver_evidence_upload' order.id %}" enctype="multipart/form-data" class="border-top border-secondary pt-3">
+        {% csrf_token %}
+        <h3 class="h6">Añadir foto de evidencia</h3>
+        <div class="mb-2"><label class="form-label" for="photo-{{ order.id }}">Foto desde cámara o galería</label><input id="photo-{{ order.id }}" class="form-control" type="file" name="file" accept="image/jpeg,image/png,image/webp" capture="environment" required></div>
+        <div class="row g-2"><div class="col-sm-5"><label class="form-label" for="kind-{{ order.id }}">Tipo</label><select id="kind-{{ order.id }}" name="kind" class="form-select"><option value="RETIRO">Retiro</option><option value="ENTREGA">Entrega</option><option value="DANOS">Daños observados</option><option value="GENERAL">Otra</option></select></div><div class="col-sm-7"><label class="form-label" for="description-{{ order.id }}">Descripción (opcional)</label><input id="description-{{ order.id }}" class="form-control" type="text" name="description" maxlength="500"></div></div>
+        <button class="btn btn-outline-info mt-3" type="submit">Subir foto privada</button>
+      </form>
+    </div>
+  </article>
+  {% empty %}<p>No tienes órdenes asignadas.</p>{% endfor %}
+</main>
+{% endblock %}
