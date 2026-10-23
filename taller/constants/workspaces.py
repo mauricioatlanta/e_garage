@@ -244,6 +244,24 @@ TERMINOLOGY: dict[str, object] = {
     "workspace.carwash.action.new_service": _("workspace.carwash.action.new_service"),
     "workspace.carwash.action.new_client":  _("workspace.carwash.action.new_client"),
 
+    # -- Grúas y asistencia vial: marca y navegación --
+    "workspace.towing.brand.name":    _("workspace.towing.brand.name"),
+    "workspace.towing.brand.tagline": _("workspace.towing.brand.tagline"),
+    "workspace.towing.nav.home":      _("workspace.towing.nav.home"),
+    "workspace.towing.nav.orders":    _("workspace.towing.nav.orders"),
+    "workspace.towing.nav.clients":   _("workspace.towing.nav.clients"),
+    "workspace.towing.nav.documents": _("workspace.towing.nav.documents"),
+    "workspace.towing.nav.reports":   _("workspace.towing.nav.reports"),
+    "workspace.towing.nav.settings":  _("workspace.towing.nav.settings"),
+    "workspace.towing.texts.search_title":       _("workspace.towing.texts.search_title"),
+    "workspace.towing.texts.search_label":       _("workspace.towing.texts.search_label"),
+    "workspace.towing.texts.search_placeholder": _("workspace.towing.texts.search_placeholder"),
+    "workspace.towing.texts.search_hint":        _("workspace.towing.texts.search_hint"),
+    "workspace.towing.texts.live_title":         _("workspace.towing.texts.live_title"),
+    "workspace.towing.texts.live_metric":        _("workspace.towing.texts.live_metric"),
+    "workspace.towing.texts.quick_actions":      _("workspace.towing.texts.quick_actions"),
+    "workspace.towing.texts.activity_feed":      _("workspace.towing.texts.activity_feed"),
+
     # -- Taller: texts --
     "workspace.taller.texts.search_title":       _("workspace.taller.texts.search_title"),
     "workspace.taller.texts.search_label":       _("workspace.taller.texts.search_label"),

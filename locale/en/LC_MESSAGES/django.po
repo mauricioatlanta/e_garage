@@ -751,6 +751,55 @@ msgstr "Quick services"
 msgid "workspace.carwash.texts.activity_feed"
 msgstr "Today's services"
 
+# -- Towing and roadside assistance --
+msgid "workspace.towing.brand.name"
+msgstr "eGarage Towing"
+
+msgid "workspace.towing.brand.tagline"
+msgstr "Dispatch, transport and roadside assistance billing"
+
+msgid "workspace.towing.nav.home"
+msgstr "Home"
+
+msgid "workspace.towing.nav.orders"
+msgstr "Transport orders"
+
+msgid "workspace.towing.nav.clients"
+msgstr "Clients"
+
+msgid "workspace.towing.nav.documents"
+msgstr "Documents"
+
+msgid "workspace.towing.nav.reports"
+msgstr "Reports"
+
+msgid "workspace.towing.nav.settings"
+msgstr "Settings"
+
+msgid "workspace.towing.texts.search_title"
+msgstr "Search order or client"
+
+msgid "workspace.towing.texts.search_label"
+msgstr "Order or client"
+
+msgid "workspace.towing.texts.search_placeholder"
+msgstr "Search by order number, plate or client"
+
+msgid "workspace.towing.texts.search_hint"
+msgstr "coordinate your transports in real time"
+
+msgid "workspace.towing.texts.live_title"
+msgstr "live dispatch"
+
+msgid "workspace.towing.texts.live_metric"
+msgstr "transports today"
+
+msgid "workspace.towing.texts.quick_actions"
+msgstr "Quick actions"
+
+msgid "workspace.towing.texts.activity_feed"
+msgstr "Recent activity"
+
 # -- Widget titles (dashboard_service) --
 msgid "OT Abiertas"
 msgstr "Open Work Orders"
