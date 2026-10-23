@@ -13,6 +13,7 @@ from django.utils import timezone
 
 from taller.gruas.permissions import ensure_order_access
 from taller.gruas.forms import TowingEvidenceForm
+from taller.gruas.forms import TowingOrderForm
 from taller.gruas import views as gruas_views
 from taller.gruas.services.assignment_service import assign_order
 from taller.gruas.services.financial_service import add_entry, financial_summary
@@ -40,6 +41,27 @@ class TowingMVPTests(TestCase):
         self.assertEqual(self.order.quotes.count(), 2)
         self.assertEqual(self.order.quotes.filter(is_current=True).count(), 1)
         self.assertFalse(self.order.quotes.get(pk=first.id).is_current)
+
+    def test_order_form_can_copy_payer_to_receiver(self):
+        form = TowingOrderForm(
+            data={
+                "pagador_nombre": "Cliente de prueba",
+                "same_as_payer": "on",
+                "receptor_nombre": "",
+                "origen": "Origen",
+                "destino": "Destino",
+            },
+            empresa=self.empresa,
+        )
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["receptor_nombre"], "Cliente de prueba")
+
+        missing_payer = TowingOrderForm(
+            data={"same_as_payer": "on", "pagador_nombre": "", "origen": "Origen", "destino": "Destino"},
+            empresa=self.empresa,
+        )
+        self.assertFalse(missing_payer.is_valid())
+        self.assertIn("pagador_nombre", missing_payer.errors)
 
     def test_assignment_rejects_overlapping_resource(self):
         quote = create_quote(order_id=self.order.id, empresa=self.empresa, user=self.owner, net_amount=Decimal("100"), tax_rate=Decimal("0"))

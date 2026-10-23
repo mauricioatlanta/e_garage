@@ -7,6 +7,13 @@ from taller.models import Cliente, TowingDriver, TowingLedgerEntry, TowingOrder,
 
 
 class TowingOrderForm(forms.ModelForm):
+    same_as_payer = forms.BooleanField(
+        label="El receptor es el mismo pagador",
+        required=False,
+        help_text="Copia automáticamente el nombre del pagador.",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+    )
+
     class Meta:
         model = TowingOrder
         fields = [
@@ -18,6 +25,21 @@ class TowingOrderForm(forms.ModelForm):
     def __init__(self, *args, empresa=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["solicitante"].queryset = Cliente.objects.filter(empresa=empresa) if empresa else Cliente.objects.none()
+        self.order_fields([
+            "solicitante", "patente_snapshot", "vehiculo_snapshot", "pagador_nombre",
+            "same_as_payer", "receptor_nombre", "origen", "destino",
+            "planned_start_at", "planned_end_at",
+        ])
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("same_as_payer"):
+            payer = (cleaned.get("pagador_nombre") or "").strip()
+            if not payer:
+                self.add_error("pagador_nombre", "Ingresa primero el nombre del pagador.")
+            else:
+                cleaned["receptor_nombre"] = payer
+        return cleaned
 
 
 class TowingQuoteForm(forms.Form):
