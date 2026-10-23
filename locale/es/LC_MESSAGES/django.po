@@ -909,6 +909,55 @@ msgstr "Servicios rápidos"
 msgid "workspace.carwash.texts.activity_feed"
 msgstr "Servicios del día"
 
+# -- Grúas y asistencia vial --
+msgid "workspace.towing.brand.name"
+msgstr "eGarage Grúas"
+
+msgid "workspace.towing.brand.tagline"
+msgstr "Despacho, traslado y cobranza de asistencia vial"
+
+msgid "workspace.towing.nav.home"
+msgstr "Inicio"
+
+msgid "workspace.towing.nav.orders"
+msgstr "Órdenes de traslado"
+
+msgid "workspace.towing.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.towing.nav.documents"
+msgstr "Documentos"
+
+msgid "workspace.towing.nav.reports"
+msgstr "Reportes"
+
+msgid "workspace.towing.nav.settings"
+msgstr "Configuración"
+
+msgid "workspace.towing.texts.search_title"
+msgstr "Buscar orden o cliente"
+
+msgid "workspace.towing.texts.search_label"
+msgstr "Orden o cliente"
+
+msgid "workspace.towing.texts.search_placeholder"
+msgstr "Busca número de orden, patente o cliente"
+
+msgid "workspace.towing.texts.search_hint"
+msgstr "coordina tus traslados en tiempo real"
+
+msgid "workspace.towing.texts.live_title"
+msgstr "despacho en vivo"
+
+msgid "workspace.towing.texts.live_metric"
+msgstr "traslados hoy"
+
+msgid "workspace.towing.texts.quick_actions"
+msgstr "Acciones rápidas"
+
+msgid "workspace.towing.texts.activity_feed"
+msgstr "Actividad reciente"
+
 msgid "workspace.recycling.texts.search_title"
 msgstr "Buscar catalítico"
 
