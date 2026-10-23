@@ -34,6 +34,24 @@ def test_superuser_can_apply_and_reset_support_environment():
 
 
 @pytest.mark.django_db
+def test_support_gruas_opens_dispatch_board():
+    user = UserFactory(is_superuser=True, is_staff=True)
+    EmpresaFactory(user=user)
+    client = Client()
+    client.force_login(user)
+
+    response = client.post(
+        "/staff/support-environment/",
+        {"country": "cl", "rubro": "GRUAS"},
+        HTTP_REFERER="/cl/es/documentos/",
+    )
+
+    assert response.status_code == 302
+    assert response["Location"] == "/cl/es/gruas/"
+    assert client.session["support_rubro"] == "TOWING"
+
+
+@pytest.mark.django_db
 def test_non_superuser_cannot_switch_support_environment():
     user = UserFactory()
     client = Client()

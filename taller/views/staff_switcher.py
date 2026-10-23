@@ -7,6 +7,8 @@ the superuser's Empresa or ConfiguracionEmpresa records.
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import redirect
 
+from taller.utils.country import prefix_from_path
+
 
 SUPPORTED_COUNTRIES = frozenset({"cl", "us", "mx", "ve", "br", "ar", "co", "pe", "ec", "uy"})
 
@@ -33,5 +35,12 @@ def switch_support_environment(request):
             if country in SUPPORTED_COUNTRIES and rubro in SUPPORTED_RUBROS:
                 request.session["support_country"] = country
                 request.session["support_rubro"] = SUPPORTED_RUBROS[rubro]
+
+                # Switching to Grúas must open its operational board. Keeping
+                # the previous URL (for example /documentos/) leaves the
+                # towing navigation active over a workshop-oriented screen.
+                if rubro == "GRUAS":
+                    prefix = prefix_from_path(request.path) or f"{country}/es"
+                    return redirect(f"/{prefix}/gruas/")
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
