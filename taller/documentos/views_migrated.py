@@ -880,6 +880,7 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
             ultimos_30_dias=Count("id", filter=Q(fecha_emision__gte=hace_30_dias)),
             pendientes_pago=Count("id", filter=Q(estado_pago="NO_PAGADO", estado="EMITIDO")),
             presupuestos_pendientes=Count("id", filter=Q(tipo="PRES", estado="EMITIDO")),
+            ventas_repuestos=Count("id", filter=Q(tipo="PTS")),
             ots_sin_cerrar=Count("id", filter=Q(tipo="OT", estado__in=["EMITIDO", "BORRADOR"])),
         )
 
