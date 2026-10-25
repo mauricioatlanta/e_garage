@@ -163,7 +163,24 @@ def _path_country_code(path):
 
 @login_required_default
 def reportes_dashboard(request):
-    return render(request, "taller/reportes/reportes.html")
+    empresa = _active_empresa_reportes(request)
+    config = getattr(empresa, "config", None) if empresa else None
+    configured_rubros = []
+    if config and hasattr(config, "get_effective_rubros"):
+        configured_rubros = list(config.get_effective_rubros())
+    support_rubros = request.session.get("modo_soporte_rubros", [])
+    if isinstance(support_rubros, str):
+        support_rubros = [support_rubros]
+    # Modo Soporte representa la selección operativa actual; para suscriptores
+    # normales se usa el conjunto de rubros configurado en la empresa.
+    active_rubros = support_rubros or configured_rubros
+    active_rubros = {str(r or "").strip().upper() for r in active_rubros}
+    parts_reports_mode = "PARTS" in active_rubros and "WORKSHOP" not in active_rubros
+    return render(
+        request,
+        "taller/reportes/reportes.html",
+        {"parts_reports_mode": parts_reports_mode},
+    )
 
 
 @login_required_default
