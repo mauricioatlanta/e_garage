@@ -52,6 +52,34 @@ def test_support_gruas_opens_dispatch_board():
 
 
 @pytest.mark.django_db
+def test_superuser_can_apply_multiple_support_rubros():
+    user = UserFactory(is_superuser=True, is_staff=True)
+    EmpresaFactory(user=user)
+    client = Client()
+    client.force_login(user)
+
+    response = client.post(
+        "/staff/support-environment/",
+        {
+            "country": "cl",
+            "rubros": ["DESARMADURIA", "REPUESTOS"],
+        },
+        HTTP_REFERER="/cl/es/centro-operaciones/",
+    )
+
+    assert response.status_code == 302
+    assert client.session["support_rubro"] == "DESARMADURIA"
+    assert client.session["modo_soporte_rubros"] == ["DESARMADURIA", "PARTS"]
+
+    request = RequestFactory().get("/cl/es/centro-operaciones/")
+    request.user = user
+    request.session = client.session
+    context = business_modules(request)
+    assert "desarme" in context["business_modules"]
+    assert "repuestos" in context["business_modules"]
+
+
+@pytest.mark.django_db
 def test_non_superuser_cannot_switch_support_environment():
     user = UserFactory()
     client = Client()
