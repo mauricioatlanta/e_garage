@@ -49,7 +49,7 @@
                  class="w-full rounded border border-cyan-400/30 bg-black px-3 py-2 text-white">
         </div>
         <label class="mt-3 flex items-center gap-2 text-sm text-gray-300">
-          <input id="pos-apply-tax" type="checkbox" checked class="accent-cyan-400">
+          <input id="pos-apply-tax" type="checkbox" checked data-tax-rate="{{ tax_rate|default:'0' }}" class="accent-cyan-400">
           Aplicar {{ tax_name|default:"impuesto" }} ({{ tax_rate|default:0 }}%)
         </label>
         <div class="mt-3">
@@ -85,7 +85,7 @@
   const nameInput = document.getElementById("pos-client-name");
   const clientStatus = document.getElementById("pos-client-status");
   const taxInput = document.getElementById("pos-apply-tax");
-  const taxRate = Number("{{ tax_rate|default:0 }}") || 0;
+  const taxRate = Number.parseFloat(String(taxInput.dataset.taxRate || "0").replace(",", ".")) || 0;
   const cart = new Map();
   let payment = "efectivo";
   let clientId = null;
@@ -131,6 +131,8 @@
   }
 
   taxInput.addEventListener("change", renderCart);
+  taxInput.addEventListener("input", renderCart);
+  taxInput.addEventListener("click", () => window.setTimeout(renderCart, 0));
 
   function addItem(item) {
     const current = cart.get(item.id) || { ...item, cantidad: 0 };
