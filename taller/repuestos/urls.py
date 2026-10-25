@@ -10,6 +10,7 @@ from taller.repuestos.views import (
     lista_repuestos,
     ver_repuesto,
     pos_buscar_repuestos,
+    pos_buscar_clientes,
     pos_confirmar_venta,
     pos_mostrador,
 )
@@ -28,6 +29,7 @@ urlpatterns = [
     path("crear/", crear_repuesto, name="crear_repuesto"),
     path("pos/", pos_mostrador, name="pos_mostrador"),
     path("pos/buscar/", pos_buscar_repuestos, name="pos_buscar"),
+    path("pos/clientes/buscar/", pos_buscar_clientes, name="pos_buscar_clientes"),
     path("pos/confirmar/", pos_confirmar_venta, name="pos_confirmar"),
     path("<int:pk>/", ver_repuesto, name="ver_repuesto"),
     path("editar/<int:pk>/", editar_repuesto, name="editar_repuesto"),

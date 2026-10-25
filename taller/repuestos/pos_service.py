@@ -50,8 +50,15 @@ class PartsPOSService:
         if payment_method not in PartsPOSService.PAYMENT_METHODS:
             raise ValidationError("Método de pago inválido.")
 
-        cliente = PartsPOSService._resolve_cliente(empresa, payload.get("cliente_id"))
+        cliente = PartsPOSService._resolve_cliente(
+            empresa,
+            payload.get("cliente_id"),
+            nombre=payload.get("cliente_nombre"),
+            telefono=payload.get("cliente_telefono"),
+            user=user,
+        )
         repuestos = PartsPOSService._lock_repuestos(empresa, items)
+        apply_vat = PartsPOSService._as_bool(payload.get("apply_vat"), default=True)
 
         documento = Documento.objects.create(
             empresa=empresa,
@@ -61,7 +68,7 @@ class PartsPOSService:
             metodo_pago=payment_method,
             estado_pago="PAGADO",
             pagado=True,
-            apply_vat=True,
+            apply_vat=apply_vat,
             observaciones=(payload.get("observaciones") or "Venta rápida POS").strip(),
             created_by=user if getattr(user, "is_authenticated", False) else None,
         )
@@ -106,12 +113,35 @@ class PartsPOSService:
         return documento
 
     @staticmethod
-    def _resolve_cliente(empresa, cliente_id):
+    def _resolve_cliente(empresa, cliente_id, nombre="", telefono="", user=None):
         if cliente_id:
             cliente = Cliente.objects.filter(empresa=empresa, pk=cliente_id).first()
             if cliente:
                 return cliente
+
+        telefono = str(telefono or "").strip()
+        nombre = str(nombre or "").strip()
+        if telefono:
+            cliente = Cliente.objects.filter(empresa=empresa, telefono=telefono).first()
+            if cliente:
+                return cliente
+            if not nombre:
+                raise ValidationError("Para registrar un cliente nuevo debes indicar su nombre.")
+            cliente, _ = Cliente.objects.get_or_create(
+                empresa=empresa,
+                telefono=telefono,
+                defaults={"nombre": nombre, "created_by": user},
+            )
+            return cliente
         return Cliente.get_or_create_mostrador(empresa)
+
+    @staticmethod
+    def _as_bool(value, default=False):
+        if value is None:
+            return default
+        if isinstance(value, bool):
+            return value
+        return str(value).strip().lower() in {"1", "true", "yes", "on", "si"}
 
     @staticmethod
     def _lock_repuestos(empresa, items):
