@@ -1,5 +1,6 @@
 import json
 import logging
+from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -137,6 +138,7 @@ def pos_confirmar_venta(request):
         "tax_amount": str(documento.tax_amount or 0),
         "apply_vat": bool(documento.apply_vat),
         "print_url": reverse_country_url(request, "documentos:ver_documento", documento.pk),
+        "sales_url": f"{reverse_country_url(request, 'documentos:lista_documentos')}?{urlencode({'tipo': 'PTS'})}",
     })
 
 
