@@ -30,6 +30,13 @@ CATEGORY_ORDER = {
     "especialidades": 40,
 }
 
+LEGACY_CATEGORY_RUBROS = {
+    "mantenimiento": {"WORKSHOP", "TIRE"},
+    "motor": {"WORKSHOP"},
+    "bodyshop": {"BODYSHOP"},
+    "especialidades": {"WORKSHOP"},
+}
+
 CATEGORY_CONFIG = {
     "mantenimiento": {
         "CL": {"label": "Mantenimiento Periódico", "aliases": ["mantenimiento", "preventivo"]},
@@ -70,6 +77,14 @@ TYPE_LABELS = {
     "en": "In-shop",
     "pt": "Interno",
 }
+
+DETAILING_CATALOG = (
+    ("DETAIL_WASH", "Lavado exterior e interior", "Exterior and interior wash"),
+    ("DETAIL_INTERIOR", "Limpieza profunda de tapicería", "Deep upholstery cleaning"),
+    ("DETAIL_POLISH", "Pulido y abrillantado de carrocería", "Paint polishing and brightening"),
+    ("DETAIL_WAX", "Encerado y protección de pintura", "Wax and paint protection"),
+    ("DETAIL_UPHOLSTERY", "Limpieza de tapices y plásticos", "Trim and plastic cleaning"),
+)
 
 
 @lru_cache(maxsize=1)
@@ -116,18 +131,45 @@ def get_master_catalog_service_items(
     category_code="",
     subcategory_code="",
     limit=50,
+    rubros=None,
 ):
     country_code = _normalize_country_code(country_code)
     language = language or LANGUAGE_BY_COUNTRY.get(country_code, "es")
     category_code = (category_code or "").strip()
     subcategory_code = (subcategory_code or "").strip()
     query_text = (query or "").strip().lower()
+    active_rubros = {str(value or "").strip().upper() for value in (rubros or []) if str(value or "").strip()}
 
     if subcategory_code:
         return []
 
     items = []
+    if "DETAILING" in active_rubros and "WORKSHOP" not in active_rubros:
+        for code, label_es, label_en in DETAILING_CATALOG:
+            if category_code and category_code != "especialidades":
+                continue
+            label = label_en if language == "en" else label_es
+            if query_text and query_text not in f"{label} {code}".lower():
+                continue
+            items.append({
+                "id": "", "pk": "", "nombre": label, "label": label, "text": label,
+                "descripcion": "", "codigo_interno": code, "categoria": _get_category_config("especialidades", country_code)[0],
+                "categoria_code": "especialidades", "subcategoria": "", "subcategoria_code": "",
+                "precio": 0.0, "precio_base": 0.0, "precio_sugerido": 0.0,
+                "precio_cliente": 0.0, "tipo": TYPE_LABELS.get(language, TYPE_LABELS["es"]),
+            })
+        if limit and len(items) >= limit:
+            return items[:limit]
     for item in _load_master_catalog():
+        item_rubros = {str(value or "").strip().upper() for value in (item.get("rubros") or []) if str(value or "").strip()}
+        if not item_rubros:
+            item_rubros = LEGACY_CATEGORY_RUBROS.get(item.get("category"), {"WORKSHOP"})
+        if active_rubros and "WORKSHOP" not in active_rubros and item_rubros and not active_rubros.intersection(item_rubros):
+            continue
+        if active_rubros and "WORKSHOP" not in active_rubros and not item_rubros:
+            # Legacy entries without classification are workshop-only for a
+            # specialized workspace; never leak them into Car Wash.
+            continue
         item_category_code = (item.get("category") or "").strip() or "especialidades"
         if category_code and item_category_code != category_code:
             continue
@@ -249,6 +291,7 @@ def ensure_company_services_catalog(empresa, country_code):
                     "descripcion": "",
                     "precio_base": Decimal("0.00"),
                     "activo": True,
+                    "rubro_sugerido": (item.get("rubros") or [None])[0],
                 },
             )
             ServicioName.objects.update_or_create(
