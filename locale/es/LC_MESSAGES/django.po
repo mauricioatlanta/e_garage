@@ -683,7 +683,7 @@ msgid "workspace.desarm.nav.parts"
 msgstr "Inventario de desarme"
 
 msgid "workspace.desarm.nav.documents"
-msgstr "Ventas"
+msgstr "Ventas de desarme"
 
 msgid "workspace.desarm.nav.clients"
 msgstr "Clientes"
@@ -706,7 +706,7 @@ msgstr "Ver Inventario"
 
 # -- Casa de Repuestos: marca --
 msgid "workspace.parts.brand.name"
-msgstr "eGarage Repuestos"
+msgstr "eGarage Casa de repuestos"
 
 msgid "workspace.parts.brand.tagline"
 msgstr "Tu casa de repuestos digitalizada"
@@ -719,7 +719,7 @@ msgid "workspace.parts.nav.parts"
 msgstr "Inventario de repuestos"
 
 msgid "workspace.parts.nav.documents"
-msgstr "Ventas"
+msgstr "Ventas de repuestos"
 
 msgid "workspace.parts.nav.clients"
 msgstr "Clientes"

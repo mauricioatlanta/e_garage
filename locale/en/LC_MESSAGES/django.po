@@ -558,7 +558,7 @@ msgid "workspace.desarm.nav.parts"
 msgstr "Dismantling inventory"
 
 msgid "workspace.desarm.nav.documents"
-msgstr "Sales"
+msgstr "Dismantling sales"
 
 msgid "workspace.desarm.nav.clients"
 msgstr "Clients"
@@ -594,7 +594,7 @@ msgid "workspace.parts.nav.parts"
 msgstr "Parts inventory"
 
 msgid "workspace.parts.nav.documents"
-msgstr "Sales"
+msgstr "Parts sales"
 
 msgid "workspace.parts.nav.clients"
 msgstr "Clients"
