@@ -14,7 +14,13 @@
     <section class="hero">
       <div>
         <p class="eyebrow">{{ country_code }} · {{ language|upper }}</p>
-        <h1>{% trans "Servicios Mecanicos" %}</h1>
+        <h1>
+          {% if is_carwash_services %}
+            {% trans "Servicios de Car Wash" %}
+          {% else %}
+            {% trans "Servicios Mecanicos" %}
+          {% endif %}
+        </h1>
         <p>
           {% if empresa %}
             {{ empresa.nombre_taller }} · {% trans "catalogo operativo con carga diferida para reducir el tiempo de respuesta inicial." %}

@@ -1,6 +1,9 @@
+from types import SimpleNamespace
+
 from django.test import SimpleTestCase
 
 from taller.servicios.catalog_bootstrap import get_master_catalog_service_items
+from taller.servicios.views import _active_service_rubros
 
 
 class CarWashServiceCatalogTests(SimpleTestCase):
@@ -20,3 +23,17 @@ class CarWashServiceCatalogTests(SimpleTestCase):
 
         self.assertIn("aceite", labels)
         self.assertIn("motor", labels)
+
+    def test_support_mode_overrides_company_rubro_for_catalog_scope(self):
+        empresa = SimpleNamespace(
+            config=SimpleNamespace(
+                get_effective_rubros=lambda: ["WORKSHOP"],
+                rubro_principal="WORKSHOP",
+            )
+        )
+        request = SimpleNamespace(
+            user=SimpleNamespace(is_superuser=True),
+            session={"modo_soporte_rubros": ["detailing"]},
+        )
+
+        self.assertEqual(_active_service_rubros(empresa, request), {"DETAILING"})
