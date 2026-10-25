@@ -49,14 +49,29 @@
   .eg-support-switcher__rubros {
     display: flex;
     flex-wrap: wrap;
-    gap: .35rem .55rem;
-    max-width: 31rem;
-    padding: .25rem .4rem;
-    border: 1px solid rgba(148, 163, 184, .35);
-    border-radius: 5px;
-    background: #1f2937;
+    gap: .3rem;
+    max-width: 38rem;
+    padding: .3rem;
+    border: 1px solid rgba(34, 211, 238, .32);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, .95);
   }
-  .eg-support-switcher__rubros label { white-space: nowrap; font-size: .68rem; }
+  .eg-support-switcher__rubros label {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    min-height: 27px;
+    padding: .25rem .5rem;
+    border: 1px solid rgba(148, 163, 184, .3);
+    border-radius: 6px;
+    color: #cbd5e1;
+    background: rgba(30, 41, 59, .82);
+    white-space: nowrap;
+    font-size: .68rem;
+    cursor: pointer;
+  }
+  .eg-support-switcher__rubros label:hover { border-color: #22d3ee; color: #ecfeff; }
+  .eg-support-switcher__rubros input { accent-color: #22d3ee; }
   .eg-support-switcher__reset {
     color: #cbd5e1 !important;
     background: transparent !important;
@@ -85,21 +100,14 @@
       <option value="ec" {% if support_country|lower == 'ec' %}selected{% endif %}>Ecuador (EC)</option>
       <option value="uy" {% if support_country|lower == 'uy' %}selected{% endif %}>Uruguay (UY)</option>
     </select>
-    <label for="support-rubro" class="sr-only">Rubro</label>
-    <select id="support-rubro" name="rubro" aria-label="Rubro" title="Compatibilidad: rubro principal">
-      <option value="TALLER" {% if support_rubro == 'WORKSHOP' %}selected{% endif %}>Taller Mecánico</option>
-      <option value="DESARME" {% if support_rubro == 'DESARMADURIA' %}selected{% endif %}>Desarmaduría</option>
-      <option value="REPUESTOS" {% if support_rubro == 'PARTS' %}selected{% endif %}>Casa de repuestos</option>
-      <option value="VULCANIZACION" {% if support_rubro == 'TIRE' %}selected{% endif %}>Vulcanización</option>
-      <option value="CARWASH" {% if support_rubro == 'DETAILING' %}selected{% endif %}>Carwash</option>
-      <option value="GRUAS" {% if support_rubro == 'TOWING' %}selected{% endif %}>Grúas y asistencia vial</option>
-    </select>
     <fieldset class="eg-support-switcher__rubros" aria-label="Rubros activos en soporte">
-      <legend class="sr-only">Rubros activos en soporte</legend>
-      <label><input type="checkbox" name="rubros" value="TALLER" {% if 'WORKSHOP' in support_rubros %}checked{% endif %}> Taller</label>
+      <legend>Rubros a activar</legend>
+      <label><input type="checkbox" name="rubros" value="TALLER" {% if 'WORKSHOP' in support_rubros %}checked{% endif %}> Taller mecánico</label>
       <label><input type="checkbox" name="rubros" value="DESARMADURIA" {% if 'DESARMADURIA' in support_rubros %}checked{% endif %}> Desarmaduría</label>
       <label><input type="checkbox" name="rubros" value="REPUESTOS" {% if 'PARTS' in support_rubros %}checked{% endif %}> Casa de repuestos</label>
-      <label><input type="checkbox" name="rubros" value="GRUAS" {% if 'TOWING' in support_rubros %}checked{% endif %}> Grúas</label>
+      <label><input type="checkbox" name="rubros" value="VULCANIZACION" {% if 'TIRE' in support_rubros %}checked{% endif %}> Vulcanización</label>
+      <label><input type="checkbox" name="rubros" value="CARWASH" {% if 'DETAILING' in support_rubros %}checked{% endif %}> Carwash</label>
+      <label><input type="checkbox" name="rubros" value="GRUAS" {% if 'TOWING' in support_rubros %}checked{% endif %}> Grúas y asistencia vial</label>
     </fieldset>
     <button type="submit">Aplicar</button>
   </form>
