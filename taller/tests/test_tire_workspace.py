@@ -45,7 +45,12 @@ class TireWorkspaceTests(TestCase):
 
         self.assertEqual(workspace["product_key"], PRODUCT_TIRE)
         self.assertEqual(workspace["brand"]["product_name"], "eGarage Neumáticos & Vulcanización")
-        self.assertTrue(any(item["url"].endswith("/repuestos/pos/") for item in workspace["nav"]))
+        nav = {item["nav_key"]: item for item in workspace["nav"]}
+        self.assertEqual(nav["tire_inventory"]["label"], "Inventario de Neumáticos")
+        self.assertEqual(nav["tire_services"]["label"], "Servicios de Vulcanización")
+        self.assertEqual(nav["tire_pos"]["label"], "Ventas de Mostrador")
+        self.assertTrue(nav["tire_pos"]["url"].endswith("/repuestos/pos/"))
+        self.assertEqual(nav["tire_reports"]["url"], "/cl/es/reportes/")
 
     def test_registration_service_accepts_direct_tire_rubro(self):
         user = UserFactory(email="tire-owner@example.com", username="tire-owner")
