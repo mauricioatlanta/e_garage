@@ -220,8 +220,8 @@
     <div class="reportes-header">
       <span class="header-icon">📊</span>
       <div>
-        <h1>{% if request.path|slice:':3' == '/cl' %}Centro de Reportes{% else %}Reports Center{% endif %}</h1>
-        <p>{% if request.path|slice:':3' == '/cl' %}Análisis inteligente y visualización de datos{% else %}Smart analysis and real-time data visualization{% endif %}</p>
+        <h1>{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Centro de Reportes de Repuestos{% else %}Centro de Reportes{% endif %}{% else %}Reports Center{% endif %}</h1>
+        <p>{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Ventas, inventario y rentabilidad en tiempo real{% else %}Análisis inteligente y visualización de datos{% endif %}{% else %}Smart analysis and real-time data visualization{% endif %}</p>
       </div>
     </div>
 
@@ -253,23 +253,23 @@
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>
 
-        <a href="mecanicos/" class="reporte-card featured">
+        {% if not parts_reports_mode %}<a href="mecanicos/" class="reporte-card featured">
           <div class="reporte-icon">🧠</div>
           <div class="reporte-text">
             <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Reportes por Técnico{% else %}Technician Reports{% endif %}</div>
             <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Rendimiento individual, proyecciones{% else %}Individual metrics, projections{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
-        </a>
+        </a>{% endif %}
 
-        <a href="kilometraje/recordatorios/" class="reporte-card featured">
+        {% if not parts_reports_mode %}<a href="kilometraje/recordatorios/" class="reporte-card featured">
           <div class="reporte-icon">🚨</div>
           <div class="reporte-text">
             <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Recordatorios{% else %}Maintenance Reminders{% endif %}</div>
             <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Vehículos próximos a mantenimiento{% else %}Vehicles due for maintenance{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
-        </a>
+        </a>{% endif %}
 
       </div>
     </div>
@@ -310,23 +310,23 @@
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>
 
-        <a href="comparativo-precios/" class="reporte-card">
+        {% if not parts_reports_mode %}<a href="comparativo-precios/" class="reporte-card">
           <div class="reporte-icon">💰</div>
           <div class="reporte-text">
             <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Comparativo Precios{% else %}Price Comparison{% endif %}</div>
             <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Precio cliente vs. costo proveedor{% else %}Customer price vs. supplier cost{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
-        </a>
+        </a>{% endif %}
 
-        <a href="servicios-subcontratados/" class="reporte-card">
+        {% if not parts_reports_mode %}<a href="servicios-subcontratados/" class="reporte-card">
           <div class="reporte-icon">🔧</div>
           <div class="reporte-text">
             <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Servicios Subcontratados{% else %}Outsourced Services{% endif %}</div>
             <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Externos frecuentes, tendencias{% else %}Frequent external, trends{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
-        </a>
+        </a>{% endif %}
         {% endif %}
 
       </div>
@@ -340,50 +340,50 @@
       </h2>
       <div class="reportes-grid">
 
-        <a href="servicios/" class="reporte-card">
+        {% if not parts_reports_mode %}<a href="servicios/" class="reporte-card">
           <div class="reporte-icon">🛠️</div>
           <div class="reporte-text">
             <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Servicios Realizados{% else %}Services Performed{% endif %}</div>
             <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Ingresos, frecuencia, tipos más solicitados{% else %}Revenue, frequency, most requested{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
-        </a>
+        </a>{% endif %}
 
-        <a href="servicios/?enfoque=vehiculos" class="reporte-card">
+        {% if not parts_reports_mode %}<a href="servicios/?enfoque=vehiculos" class="reporte-card">
           <div class="reporte-icon">🚗</div>
           <div class="reporte-text">
             <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Vehículos Atendidos{% else %}Vehicles Serviced{% endif %}</div>
             <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Modelos, marcas, años frecuentes{% else %}Models, brands, frequent years{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
-        </a>
+        </a>{% endif %}
 
-        <a href="servicios/?enfoque=clientes" class="reporte-card">
+        <a href="{% if parts_reports_mode %}../clientes/{% else %}servicios/?enfoque=clientes{% endif %}" class="reporte-card">
           <div class="reporte-icon">👤</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Clientes{% else %}Customers{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Activos, nuevos, históricos, recurrencia{% else %}Active, new, historical, recurrence{% endif %}</div>
+            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Clientes y compradores{% else %}Clientes{% endif %}{% else %}Customers{% endif %}</div>
+            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Compradores activos y recurrencia{% else %}Activos, nuevos, históricos, recurrencia{% endif %}{% else %}Active, new, historical, recurrence{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>
 
-        <a href="servicios/?enfoque=facturacion_total" class="reporte-card">
+        <a href="{% if parts_reports_mode %}../documentos/?tipo=PTS{% else %}servicios/?enfoque=facturacion_total{% endif %}" class="reporte-card">
           <div class="reporte-icon">💸</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Facturación{% else %}Billing{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Ingresos por periodo, servicio y cliente{% else %}Revenue by period, service, customer{% endif %}</div>
+            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Ventas y facturación{% else %}Facturación{% endif %}{% else %}Billing{% endif %}</div>
+            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Ingresos por periodo y venta{% else %}Ingresos por periodo, servicio y cliente{% endif %}{% else %}Revenue by period, service, customer{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>
 
-        <a href="servicios/?enfoque=agenda" class="reporte-card">
+        {% if not parts_reports_mode %}<a href="servicios/?enfoque=agenda" class="reporte-card">
           <div class="reporte-icon">📅</div>
           <div class="reporte-text">
             <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Agenda y Turnos{% else %}Schedule & Appointments{% endif %}</div>
             <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Historial, ocupación, eficiencia{% else %}History, occupancy, efficiency{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
-        </a>
+        </a>{% endif %}
 
       </div>
     </div>
