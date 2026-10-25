@@ -139,6 +139,8 @@ def _active_service_rubros(empresa, request=None):
         support_values = session.get("modo_soporte_rubros")
         if support_values is None:
             support_values = session.get("support_rubros")
+        if support_values is None and session.get("support_rubro"):
+            support_values = [session.get("support_rubro")]
         if support_values:
             return {
                 _SERVICE_RUBRO_ALIASES.get(str(value or "").strip().upper(), str(value or "").strip().upper())
