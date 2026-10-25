@@ -704,10 +704,12 @@ class Documento(AuditMixin, models.Model):
         otr = Decimal(otr or 0)
 
         # ✅ Usar función centralizada de cálculo de impuestos
-        from taller.impuestos.engine import calcular_impuesto
+        from taller.impuestos.engine import calcular_impuesto, get_tax_rate_simple
 
         # Calcular impuesto solo sobre repuestos (según convención del proyecto)
-        iva_val = calcular_impuesto(rep, self.empresa, applies_to="parts")
+        apply_vat = getattr(self, "apply_vat", True)
+        tax_rate = get_tax_rate_simple(self.empresa, applies_to="parts") if apply_vat else Decimal("0")
+        iva_val = calcular_impuesto(rep, self.empresa, applies_to="parts") if apply_vat else Decimal("0")
 
         total = rep + srv + otr + iva_val
 
@@ -721,6 +723,7 @@ class Documento(AuditMixin, models.Model):
         self.neto_servicios = neto_srv_q
         self.neto_otros_servicios = neto_otr_q
         self.tax_amount = iva_q
+        self.tax_rate_applied = (tax_rate * Decimal("100")).quantize(Decimal("0.01"))
         self.total = total_q
 
         # Mantener columnas legacy sincronizadas
@@ -736,6 +739,7 @@ class Documento(AuditMixin, models.Model):
                 "neto_servicios",
                 "neto_otros_servicios",
                 "tax_amount",
+                "tax_rate_applied",
                 "total",
                 "legacy_total_repuestos",
                 "legacy_total_servicios",

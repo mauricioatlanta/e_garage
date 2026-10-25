@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group
 from django.test import TestCase
 
 from taller.models.documento import Documento
+from taller.models.clientes import Cliente
 from taller.models.lineas_documento import LineaRepuesto, ORIGEN_STOCK_BODEGA
 from taller.repuestos.pos_service import PartsPOSService
 from taller.tests.factories import EmpresaFactory, RepuestoFactory
@@ -97,3 +98,41 @@ class PartsPOSTests(TestCase):
         repuesto.refresh_from_db()
         self.assertEqual(repuesto.cantidad_stock, 1)
         self.assertFalse(Documento.objects.filter(tipo="PTS").exists())
+
+    def test_pos_registers_customer_by_phone_and_can_disable_tax(self):
+        repuesto = RepuestoFactory(
+            empresa=self.empresa,
+            nombre="Filtro Cabina",
+            part_number="FIL-002",
+            precio_venta=Decimal("10000.00"),
+            cantidad_stock=2,
+        )
+        response = self.client.post(
+            "/cl/es/repuestos/pos/confirmar/",
+            data=json.dumps({
+                "payment_method": "efectivo",
+                "items": [{"repuesto_id": repuesto.pk, "cantidad": 1}],
+                "cliente_nombre": "Ana Pérez",
+                "cliente_telefono": "+56911112222",
+                "apply_vat": False,
+            }),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        documento = Documento.objects.get(pk=response.json()["documento_id"])
+        self.assertFalse(documento.apply_vat)
+        self.assertEqual(documento.tax_amount, Decimal("0"))
+        self.assertEqual(documento.cliente.nombre, "Ana Pérez")
+        self.assertEqual(documento.cliente.telefono, "+56911112222")
+
+    def test_pos_client_lookup_is_scoped_to_empresa(self):
+        cliente = Cliente.objects.create(
+            empresa=self.empresa,
+            nombre="Cliente POS",
+            telefono="+56933334444",
+        )
+        response = self.client.get(
+            "/cl/es/repuestos/pos/clientes/buscar/?telefono=%2B56933334444"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["cliente"]["id"], cliente.pk)

@@ -30,6 +30,20 @@
           <span id="pos-total" class="font-mono text-xl text-green-300">$0</span>
         </div>
         <div id="pos-cart" class="min-h-32 space-y-2 text-sm text-gray-300"></div>
+        <div class="mt-4 rounded border border-cyan-400/20 bg-black/30 p-3">
+          <h3 class="mb-2 text-sm font-semibold text-cyan-200">Cliente de la compra</h3>
+          <label class="mb-1 block text-xs text-gray-400" for="pos-phone">Teléfono (buscar cliente)</label>
+          <input id="pos-phone" type="tel" autocomplete="tel" placeholder="Ej: +56912345678"
+                 class="mb-2 w-full rounded border border-cyan-400/30 bg-black px-3 py-2 text-white">
+          <p id="pos-client-status" class="mb-2 min-h-5 text-xs text-gray-400"></p>
+          <label class="mb-1 block text-xs text-gray-400" for="pos-client-name">Nombre</label>
+          <input id="pos-client-name" type="text" autocomplete="name" placeholder="Nombre del cliente"
+                 class="w-full rounded border border-cyan-400/30 bg-black px-3 py-2 text-white">
+        </div>
+        <label class="mt-3 flex items-center gap-2 text-sm text-gray-300">
+          <input id="pos-apply-tax" type="checkbox" checked class="accent-cyan-400">
+          Aplicar {{ tax_name|default:"impuesto" }} ({{ tax_rate|default:0 }}%)
+        </label>
         <div class="mt-4 grid grid-cols-3 gap-2">
           <button data-pay="efectivo" class="pos-pay rounded bg-green-600 px-3 py-2 text-sm font-semibold">Efectivo</button>
           <button data-pay="tarjeta" class="pos-pay rounded bg-blue-600 px-3 py-2 text-sm font-semibold">Tarjeta</button>
@@ -51,8 +65,13 @@
   const cartBox = document.getElementById("pos-cart");
   const totalBox = document.getElementById("pos-total");
   const status = document.getElementById("pos-status");
+  const phoneInput = document.getElementById("pos-phone");
+  const nameInput = document.getElementById("pos-client-name");
+  const clientStatus = document.getElementById("pos-client-status");
+  const taxInput = document.getElementById("pos-apply-tax");
   const cart = new Map();
   let payment = "efectivo";
+  let clientId = null;
 
   function money(value) {
     return new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(value || 0);
@@ -64,8 +83,17 @@
     for (const item of cart.values()) {
       total += item.cantidad * Number(item.precio_venta || 0);
       const row = document.createElement("div");
-      row.className = "flex items-center justify-between rounded bg-black/40 px-3 py-2";
-      row.innerHTML = `<span>${item.nombre} <strong>x${item.cantidad}</strong></span><span>${money(item.cantidad * Number(item.precio_venta || 0))}</span>`;
+      row.className = "flex flex-wrap items-center justify-between gap-2 rounded bg-black/40 px-3 py-2";
+      row.innerHTML = `<span class="min-w-0 flex-1">${item.nombre} <span class="text-xs text-gray-500">${item.part_number || ""}</span></span>
+        <span class="flex items-center gap-1">
+          <button type="button" data-qty="dec" class="rounded bg-gray-700 px-2 py-1">−</button>
+          <input type="number" min="1" max="${Math.max(1, item.stock || 1)}" value="${item.cantidad}" data-qty="input" class="w-14 rounded bg-black px-1 py-1 text-center text-white">
+          <button type="button" data-qty="inc" class="rounded bg-gray-700 px-2 py-1">+</button>
+          <span class="ml-2 w-24 text-right">${money(item.cantidad * Number(item.precio_venta || 0))}</span>
+        </span>`;
+      row.querySelector('[data-qty="dec"]').addEventListener("click", () => changeQty(item, item.cantidad - 1));
+      row.querySelector('[data-qty="inc"]').addEventListener("click", () => changeQty(item, item.cantidad + 1));
+      row.querySelector('[data-qty="input"]').addEventListener("change", (event) => changeQty(item, event.target.value));
       cartBox.appendChild(row);
     }
     totalBox.textContent = money(total);
@@ -78,6 +106,41 @@
     cart.set(item.id, current);
     renderCart();
   }
+
+  function changeQty(item, value) {
+    const max = Math.max(1, Number(item.stock || 1));
+    const quantity = Math.min(max, Math.max(1, Number.parseInt(value, 10) || 1));
+    item.cantidad = quantity;
+    cart.set(item.id, item);
+    renderCart();
+  }
+
+  let phoneTimer;
+  phoneInput.addEventListener("input", () => {
+    clientId = null;
+    clearTimeout(phoneTimer);
+    const phone = phoneInput.value.trim();
+    if (phone.length < 3) {
+      clientStatus.textContent = "Ingresa un teléfono para buscar o registrar al cliente.";
+      return;
+    }
+    clientStatus.textContent = "Buscando cliente…";
+    phoneTimer = setTimeout(async () => {
+      try {
+        const response = await fetch(`clientes/buscar/?telefono=${encodeURIComponent(phone)}`);
+        const data = await response.json();
+        if (data.found) {
+          clientId = data.cliente.id;
+          nameInput.value = [data.cliente.nombre, data.cliente.apellido].filter(Boolean).join(" ");
+          clientStatus.textContent = "Cliente encontrado en esta empresa.";
+        } else {
+          clientStatus.textContent = "Cliente no encontrado. Escribe su nombre para registrarlo.";
+        }
+      } catch (_) {
+        clientStatus.textContent = "No se pudo consultar el cliente; puedes continuar con sus datos.";
+      }
+    }, 300);
+  });
 
   search.addEventListener("input", async () => {
     const q = search.value.trim();
@@ -114,14 +177,21 @@
     const res = await fetch("confirmar/", {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-      body: JSON.stringify({ payment_method: payment, items }),
+      body: JSON.stringify({
+        payment_method: payment,
+        items,
+        cliente_id: clientId,
+        cliente_nombre: nameInput.value.trim(),
+        cliente_telefono: phoneInput.value.trim(),
+        apply_vat: taxInput.checked,
+      }),
     });
     const data = await res.json();
     if (!data.ok) {
       status.textContent = (data.errors || ["No se pudo confirmar la venta."]).join(" ");
       return;
     }
-    status.innerHTML = `Venta ${data.numero} creada. <a class="text-cyan-300" href="${data.print_url}">Ver documento</a>`;
+    status.innerHTML = `Venta ${data.numero} creada. Total ${money(data.total)} · Impuesto ${money(data.tax_amount || 0)}. <a class="text-cyan-300" href="${data.print_url}">Ver documento</a>`;
     cart.clear();
     renderCart();
   });

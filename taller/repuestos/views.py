@@ -13,9 +13,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 from taller.models.empresa import Empresa
+from taller.models.clientes import Cliente
 from taller.models.repuesto import Repuesto
 from taller.repuestos.pos_service import PartsPOSService
 from taller.services.empresa_service import get_empresa_safe
+from taller.utils.country_config import get_tax_name, get_tax_rate
 
 from .views_cbv import (
     RepuestoCreateView,
@@ -50,10 +52,15 @@ def editar_repuesto(request, *args, **kwargs):
 @login_required
 def pos_mostrador(request):
     empresa = get_empresa_safe(request)
+    country = getattr(empresa, "pais", "CL") if empresa else "CL"
     return render(
         request,
         "taller/common/repuestos/pos_mostrador.html",
-        {"empresa": empresa},
+        {
+            "empresa": empresa,
+            "tax_name": get_tax_name(country),
+            "tax_rate": get_tax_rate(country),
+        },
     )
 
 
@@ -70,6 +77,23 @@ def pos_buscar_repuestos(request):
         for repuesto in PartsPOSService.search(empresa, query)
     ]
     return JsonResponse({"results": results})
+
+
+@require_GET
+@login_required
+def pos_buscar_clientes(request):
+    empresa = get_empresa_safe(request)
+    telefono = (request.GET.get("telefono") or "").strip()
+    if not empresa or len(telefono) < 3:
+        return JsonResponse({"found": False})
+    cliente = (
+        Cliente.objects.filter(empresa=empresa, telefono__iexact=telefono)
+        .values("id", "nombre", "apellido", "telefono")
+        .first()
+    )
+    if not cliente:
+        return JsonResponse({"found": False})
+    return JsonResponse({"found": True, "cliente": cliente})
 
 
 @require_POST
@@ -96,6 +120,8 @@ def pos_confirmar_venta(request):
         "documento_id": documento.pk,
         "numero": documento.numero,
         "total": str(documento.total),
+        "tax_amount": str(documento.tax_amount or 0),
+        "apply_vat": bool(documento.apply_vat),
         "print_url": f"../documentos/ver/{documento.pk}/",
     })
 
