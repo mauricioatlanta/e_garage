@@ -77,6 +77,13 @@ def business_modules(request):
 
     # Workspace resuelto: 0 queries ORM, labels i18n, URLs completas.
     workspace = WorkspaceService.resolve(config, url_prefix, request.path)
+    # El acceso desde el workspace debe abrir el kiosco privado del tenant,
+    # no el marketplace centralizado que mezcla empresas.
+    empresa_slug = getattr(empresa, "slug", "") if empresa else ""
+    if empresa_slug:
+        for item in workspace["nav"]:
+            if item.get("nav_key") == "desarm_kiosko":
+                item["url"] = f"/tienda/{empresa_slug}/"
 
     return {
         "business_modules":   active,
