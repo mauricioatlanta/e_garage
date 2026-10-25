@@ -259,7 +259,13 @@ def kiosko_centralizado(request):
         publicada=True,
         estado_pieza=ESTADO_DISPONIBLE,
         cantidad__gt=0,
-    ).select_related("vehiculo_desarme", "vehiculo_desarme__marca", "vehiculo_desarme__modelo", "empresa")
+    ).select_related(
+        "vehiculo_desarme",
+        "vehiculo_desarme__marca",
+        "vehiculo_desarme__modelo",
+        "empresa",
+        "empresa__config",
+    )
 
     # ── Lectura de parámetros GET ──────────────────────────────────────────────
     anio_sel = request.GET.get("anio", "").strip()
@@ -349,6 +355,16 @@ def kiosko_centralizado(request):
 
     # Pre-calcular wa_url para cada pieza usando el teléfono de su propia empresa
     for pieza in piezas:
+        config = getattr(pieza.empresa, "config", None)
+        pieza.empresa.kiosko_tagline = (getattr(config, "tagline", "") or "").strip()
+        pieza.empresa.kiosko_direccion = (
+            getattr(config, "direccion", "") or getattr(pieza.empresa, "direccion", "") or ""
+        ).strip()
+        pieza.empresa.kiosko_sitio_web = (getattr(config, "sitio_web", "") or "").strip()
+        try:
+            pieza.empresa.kiosko_rubro = config.get_rubro_principal_display() if config else ""
+        except Exception:
+            pieza.empresa.kiosko_rubro = getattr(config, "rubro_principal", "") if config else ""
         pieza.tel_url = f"tel:{_telefono_tel(pieza.empresa.telefono)}" if pieza.empresa.telefono else None
         tel = _telefono_wa(pieza.empresa.telefono)
         if tel:

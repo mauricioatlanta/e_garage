@@ -34,13 +34,19 @@
     </div>
 
     {% if show_empresa %}
-      <div class="flex items-center justify-between gap-2">
-        <p class="text-xs text-cyan-400/70 truncate">{{ pieza.empresa.nombre_taller }}</p>
-        <a href="{% url 'tienda:tienda_storefront' empresa_id=pieza.empresa.id %}"
-           class="flex-shrink-0 text-xs text-slate-400 hover:text-cyan-400 underline underline-offset-2 transition-colors"
-           data-stop-modal>
-          Ver tienda
-        </a>
+      <div class="rounded-lg border border-cyan-400/15 bg-slate-950/45 p-2.5 space-y-1">
+        <div class="flex items-center justify-between gap-2">
+          <p class="text-xs font-semibold text-cyan-300 truncate">{{ pieza.empresa.nombre_taller }}</p>
+          <a href="{% url 'tienda:tienda_storefront' empresa_id=pieza.empresa.id %}"
+             class="flex-shrink-0 text-xs text-slate-400 hover:text-cyan-400 underline underline-offset-2 transition-colors"
+             data-stop-modal>
+            Ver tienda
+          </a>
+        </div>
+        {% if pieza.empresa.kiosko_tagline %}<p class="text-[11px] italic text-slate-300">{{ pieza.empresa.kiosko_tagline }}</p>{% endif %}
+        {% if pieza.empresa.kiosko_rubro %}<p class="text-[10px] uppercase tracking-wide text-amber-300/80">{{ pieza.empresa.kiosko_rubro }}</p>{% endif %}
+        {% if pieza.empresa.kiosko_direccion %}<p class="text-[11px] text-slate-400">📍 {{ pieza.empresa.kiosko_direccion }}</p>{% endif %}
+        {% if pieza.empresa.kiosko_sitio_web %}<a href="{{ pieza.empresa.kiosko_sitio_web }}" target="_blank" rel="noopener noreferrer" class="block text-[11px] text-blue-300 hover:text-cyan-300 truncate" data-stop-modal>{{ pieza.empresa.kiosko_sitio_web }}</a>{% endif %}
       </div>
     {% endif %}
 
