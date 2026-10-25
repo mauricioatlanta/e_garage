@@ -379,12 +379,19 @@ class ProductProfileTests(TestCase):
         self.assertEqual(desarme["label"], "Vehículos de Desarme")
         self.assertEqual(desarme["icon"], "fas fa-car-crash")
 
-    def test_casa_repuestos_label_inventario(self):
+    def test_desarmaduria_label_inventario_de_desarme(self):
+        self._set_rubro("DESARMADURIA")
+        items = BusinessModuleService.get_nav_items(self.config, "/cl/es", "")
+        repuestos = next((i for i in items if i["key"] == MOD_REPUESTOS), None)
+        self.assertIsNotNone(repuestos)
+        self.assertEqual(repuestos["label"], "Inventario de desarme")
+
+    def test_casa_repuestos_label_inventario_de_repuestos(self):
         self._set_rubro("PARTS")
         items = BusinessModuleService.get_nav_items(self.config, "/cl/es", "")
         repuestos = next((i for i in items if i["key"] == MOD_REPUESTOS), None)
         self.assertIsNotNone(repuestos)
-        self.assertEqual(repuestos["label"], "Inventario")
+        self.assertEqual(repuestos["label"], "Inventario de repuestos")
 
     def test_carwash_label_caja_para_documentos(self):
         self._set_rubro("DETAILING")

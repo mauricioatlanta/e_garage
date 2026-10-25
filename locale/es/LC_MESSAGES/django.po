@@ -680,7 +680,7 @@ msgid "workspace.desarm.nav.vehicles"
 msgstr "Vehículos de Desarme"
 
 msgid "workspace.desarm.nav.parts"
-msgstr "Inventario"
+msgstr "Inventario de desarme"
 
 msgid "workspace.desarm.nav.documents"
 msgstr "Ventas"
@@ -716,7 +716,7 @@ msgid "workspace.parts.nav.home"
 msgstr "Inicio"
 
 msgid "workspace.parts.nav.parts"
-msgstr "Inventario"
+msgstr "Inventario de repuestos"
 
 msgid "workspace.parts.nav.documents"
 msgstr "Ventas"

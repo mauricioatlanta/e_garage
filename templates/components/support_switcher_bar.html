@@ -89,7 +89,7 @@
     <select id="support-rubro" name="rubro" aria-label="Rubro" title="Compatibilidad: rubro principal">
       <option value="TALLER" {% if support_rubro == 'WORKSHOP' %}selected{% endif %}>Taller Mecánico</option>
       <option value="DESARME" {% if support_rubro == 'DESARMADURIA' %}selected{% endif %}>Desarmaduría</option>
-      <option value="REPUESTOS" {% if support_rubro == 'PARTS' %}selected{% endif %}>Repuestos</option>
+      <option value="REPUESTOS" {% if support_rubro == 'PARTS' %}selected{% endif %}>Casa de repuestos</option>
       <option value="VULCANIZACION" {% if support_rubro == 'TIRE' %}selected{% endif %}>Vulcanización</option>
       <option value="CARWASH" {% if support_rubro == 'DETAILING' %}selected{% endif %}>Carwash</option>
       <option value="GRUAS" {% if support_rubro == 'TOWING' %}selected{% endif %}>Grúas y asistencia vial</option>
@@ -98,7 +98,7 @@
       <legend class="sr-only">Rubros activos en soporte</legend>
       <label><input type="checkbox" name="rubros" value="TALLER" {% if 'WORKSHOP' in support_rubros %}checked{% endif %}> Taller</label>
       <label><input type="checkbox" name="rubros" value="DESARMADURIA" {% if 'DESARMADURIA' in support_rubros %}checked{% endif %}> Desarmaduría</label>
-      <label><input type="checkbox" name="rubros" value="REPUESTOS" {% if 'PARTS' in support_rubros %}checked{% endif %}> Repuestos</label>
+      <label><input type="checkbox" name="rubros" value="REPUESTOS" {% if 'PARTS' in support_rubros %}checked{% endif %}> Casa de repuestos</label>
       <label><input type="checkbox" name="rubros" value="GRUAS" {% if 'TOWING' in support_rubros %}checked{% endif %}> Grúas</label>
     </fieldset>
     <button type="submit">Aplicar</button>
