@@ -46,6 +46,27 @@ SERVICIO_TYPE_LABELS = {
     },
 }
 
+# El catálogo histórico se creó antes de que los servicios tuvieran rubro.
+# Estas claves permiten filtrar el caso legado sin ocultar servicios a talleres.
+_SERVICE_RUBRO_ALIASES = {
+    "TALLER": "WORKSHOP",
+    "TALLER_MECANICO": "WORKSHOP",
+    "CARWASH": "DETAILING",
+    "LAVADO": "DETAILING",
+    "DETAILING": "DETAILING",
+    "VULCANIZACION": "TIRE",
+    "NEUMATICOS": "TIRE",
+    "REPUESTOS": "PARTS",
+}
+
+_DETAILING_CODES = {
+    "DETAIL_WASH",
+    "DETAIL_INTERIOR",
+    "DETAIL_POLISH",
+    "DETAIL_WAX",
+    "DETAIL_UPHOLSTERY",
+}
+
 
 SERVICIOS_MENU_UI_LABELS = {
     "es": {
@@ -109,6 +130,45 @@ def _safe_reverse_country_url(request, view_path, fallback="#", *args, **kwargs)
         return fallback
 
 
+def _active_service_rubros(empresa):
+    config = getattr(empresa, "config", None) if empresa else None
+    if not config:
+        return set()
+    try:
+        values = config.get_effective_rubros()
+    except Exception:
+        values = [getattr(config, "rubro_principal", "WORKSHOP")]
+    return {
+        _SERVICE_RUBRO_ALIASES.get(str(value or "").strip().upper(), str(value or "").strip().upper())
+        for value in (values or [])
+        if str(value or "").strip()
+    }
+
+
+def _scope_services_by_rubro(queryset, empresa):
+    """Limit the service catalog for non-workshop workspaces.
+
+    Workshop remains backward compatible and sees the complete company catalog.
+    For a pure Car Wash (or another specialized workspace), unclassified legacy
+    mechanic services are excluded; explicitly classified services remain visible.
+    """
+    rubros = _active_service_rubros(empresa)
+    if not rubros or "WORKSHOP" in rubros:
+        return queryset
+
+    supported = rubros.intersection({"DETAILING", "TIRE", "BODYSHOP", "EXHAUST", "ELECTRIC", "GLASS_AUDIO"})
+    if not supported:
+        return queryset.none()
+
+    query = Q(rubro_efectivo__in=supported) | Q(rubro_sugerido__in=supported)
+    if "DETAILING" in supported:
+        query |= Q(codigo_interno__in=_DETAILING_CODES)
+        query |= Q(nombre__icontains="lavado") | Q(nombre__icontains="detailing")
+        query |= Q(nombre__icontains="pulido") | Q(nombre__icontains="encerado")
+        query |= Q(nombre__icontains="tapicer")
+    return queryset.filter(query).distinct()
+
+
 def _resolve_servicios_menu_scope(request):
     empresa = get_empresa_safe(request)
     country_code = _detectar_pais(request)
@@ -126,6 +186,7 @@ def _resolve_servicios_menu_scope(request):
         if servicios_empresa_count:
             servicios_qs = servicios_empresa
 
+    servicios_qs = _scope_services_by_rubro(servicios_qs, empresa)
     servicios_qs = (
         servicios_qs.select_related("categoria", "subcategoria")
         .prefetch_related("names", "categoria__names", "subcategoria__names")
@@ -302,7 +363,8 @@ def servicios_menu_data_api(request):
     empresa = scope["empresa"]
     country = scope["country_code"]
 
-    cache_key = f"servicios_menu:{empresa.id if empresa else 0}:{country}:{language}:{query}:{categoria_code}:{subcategoria_code}:{limit}"
+    active_rubros = _active_service_rubros(empresa)
+    cache_key = f"servicios_menu:{empresa.id if empresa else 0}:{country}:{language}:{','.join(sorted(active_rubros))}:{query}:{categoria_code}:{subcategoria_code}:{limit}"
 
     cached = cache.get(cache_key)
     if cached:
@@ -337,6 +399,7 @@ def servicios_menu_data_api(request):
             category_code=categoria_code,
             subcategory_code=subcategoria_code,
             limit=limit,
+            rubros=active_rubros,
         )
         data = [
             {
@@ -369,6 +432,7 @@ def buscar_servicios_api(request):
 
     if not empresa:
         return JsonResponse({"servicios": [], "total": 0})
+    active_rubros = _active_service_rubros(empresa)
 
     servicios = (
         Servicio.objects.filter(
@@ -379,6 +443,7 @@ def buscar_servicios_api(request):
         .select_related("categoria", "subcategoria")
         .prefetch_related("names", "categoria__names", "subcategoria__names")
     )
+    servicios = _scope_services_by_rubro(servicios, empresa)
 
     # Aplicar filtros de búsqueda
     if query:
@@ -438,6 +503,7 @@ def buscar_servicios_api(request):
             category_code=categoria_code,
             subcategory_code=subcategoria_code,
             limit=20,
+            rubros=active_rubros,
         )
         total = len(data)
 
