@@ -128,11 +128,29 @@ class PartsPOSTests(TestCase):
     def test_pos_client_lookup_is_scoped_to_empresa(self):
         cliente = Cliente.objects.create(
             empresa=self.empresa,
-            nombre="Cliente POS",
+            nombre="Ana",
+            apellido="Pérez",
             telefono="+56933334444",
         )
+        for query in ("Ana", "Pérez", "+56933334444"):
+            response = self.client.get(
+                "/cl/es/repuestos/pos/clientes/buscar/",
+                {"q": query},
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()["cliente"]["id"], cliente.pk)
+
+    def test_pos_client_lookup_does_not_leak_other_empresa(self):
+        otra_empresa = EmpresaFactory()
+        Cliente.objects.create(
+            empresa=otra_empresa,
+            nombre="Cliente Oculto",
+            apellido="Compartido",
+            telefono="+56977778888",
+        )
         response = self.client.get(
-            "/cl/es/repuestos/pos/clientes/buscar/?telefono=%2B56933334444"
+            "/cl/es/repuestos/pos/clientes/buscar/",
+            {"q": "Cliente Oculto"},
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["cliente"]["id"], cliente.pk)
+        self.assertFalse(response.json()["found"])

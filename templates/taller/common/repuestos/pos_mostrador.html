@@ -32,7 +32,11 @@
         <div id="pos-cart" class="min-h-32 space-y-2 text-sm text-gray-300"></div>
         <div class="mt-4 rounded border border-cyan-400/20 bg-black/30 p-3">
           <h3 class="mb-2 text-sm font-semibold text-cyan-200">Cliente de la compra</h3>
-          <label class="mb-1 block text-xs text-gray-400" for="pos-phone">Teléfono (buscar cliente)</label>
+          <label class="mb-1 block text-xs text-gray-400" for="pos-client-search">Buscar por nombre, apellido o teléfono</label>
+          <input id="pos-client-search" type="search" autocomplete="off" placeholder="Ej: Ana Pérez o +56912345678"
+                 class="mb-2 w-full rounded border border-cyan-400/30 bg-black px-3 py-2 text-white">
+          <div id="pos-client-results" class="mb-2 hidden space-y-1 rounded border border-cyan-400/20 bg-black/80 p-2"></div>
+          <label class="mb-1 block text-xs text-gray-400" for="pos-phone">Teléfono</label>
           <input id="pos-phone" type="tel" autocomplete="tel" placeholder="Ej: +56912345678"
                  class="mb-2 w-full rounded border border-cyan-400/30 bg-black px-3 py-2 text-white">
           <p id="pos-client-status" class="mb-2 min-h-5 text-xs text-gray-400"></p>
@@ -66,6 +70,8 @@
   const totalBox = document.getElementById("pos-total");
   const status = document.getElementById("pos-status");
   const phoneInput = document.getElementById("pos-phone");
+  const clientSearch = document.getElementById("pos-client-search");
+  const clientResults = document.getElementById("pos-client-results");
   const nameInput = document.getElementById("pos-client-name");
   const clientStatus = document.getElementById("pos-client-status");
   const taxInput = document.getElementById("pos-apply-tax");
@@ -117,6 +123,58 @@
   }
 
   let phoneTimer;
+  let clientSearchTimer;
+
+  function selectClient(cliente) {
+    clientId = cliente.id;
+    nameInput.value = [cliente.nombre, cliente.apellido].filter(Boolean).join(" ");
+    phoneInput.value = cliente.telefono || "";
+    clientSearch.value = nameInput.value || phoneInput.value;
+    clientResults.innerHTML = "";
+    clientResults.classList.add("hidden");
+    clientStatus.textContent = "Cliente seleccionado de esta empresa.";
+  }
+
+  function renderClientResults(clientes) {
+    clientResults.innerHTML = "";
+    if (!clientes.length) {
+      clientResults.classList.add("hidden");
+      return;
+    }
+    for (const cliente of clientes) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "block w-full rounded px-2 py-2 text-left text-sm text-gray-200 hover:bg-cyan-950/60";
+      button.textContent = `${[cliente.nombre, cliente.apellido].filter(Boolean).join(" ")} · ${cliente.telefono || "Sin teléfono"}`;
+      button.addEventListener("click", () => selectClient(cliente));
+      clientResults.appendChild(button);
+    }
+    clientResults.classList.remove("hidden");
+  }
+
+  clientSearch.addEventListener("input", () => {
+    clientId = null;
+    clearTimeout(clientSearchTimer);
+    const query = clientSearch.value.trim();
+    if (query.length < 2) {
+      renderClientResults([]);
+      return;
+    }
+    clientStatus.textContent = "Buscando cliente…";
+    clientSearchTimer = setTimeout(async () => {
+      try {
+        const response = await fetch(`clientes/buscar/?q=${encodeURIComponent(query)}`);
+        if (!response.ok) throw new Error("client_search_failed");
+        const data = await response.json();
+        renderClientResults(data.results || []);
+        clientStatus.textContent = data.results?.length ? "Selecciona el cliente encontrado." : "Cliente no encontrado. Puedes registrarlo al confirmar.";
+      } catch (_) {
+        renderClientResults([]);
+        clientStatus.textContent = "No se pudo consultar el cliente; puedes continuar con sus datos.";
+      }
+    }, 300);
+  });
+
   phoneInput.addEventListener("input", () => {
     clientId = null;
     clearTimeout(phoneTimer);
@@ -131,8 +189,7 @@
         const response = await fetch(`clientes/buscar/?telefono=${encodeURIComponent(phone)}`);
         const data = await response.json();
         if (data.found) {
-          clientId = data.cliente.id;
-          nameInput.value = [data.cliente.nombre, data.cliente.apellido].filter(Boolean).join(" ");
+          selectClient(data.cliente);
           clientStatus.textContent = "Cliente encontrado en esta empresa.";
         } else {
           clientStatus.textContent = "Cliente no encontrado. Escribe su nombre para registrarlo.";

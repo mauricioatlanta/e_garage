@@ -83,17 +83,24 @@ def pos_buscar_repuestos(request):
 @login_required
 def pos_buscar_clientes(request):
     empresa = get_empresa_safe(request)
-    telefono = (request.GET.get("telefono") or "").strip()
-    if not empresa or len(telefono) < 3:
-        return JsonResponse({"found": False})
-    cliente = (
-        Cliente.objects.filter(empresa=empresa, telefono__iexact=telefono)
-        .values("id", "nombre", "apellido", "telefono")
-        .first()
+    query = (request.GET.get("q") or request.GET.get("telefono") or "").strip()
+    if not empresa or len(query) < 2:
+        return JsonResponse({"found": False, "results": []})
+
+    clientes = (
+        Cliente.objects.filter(empresa=empresa)
+        .filter(
+            Q(nombre__icontains=query)
+            | Q(apellido__icontains=query)
+            | Q(telefono__icontains=query)
+        )
+        .order_by("apellido", "nombre", "id")
+        .values("id", "nombre", "apellido", "telefono")[:10]
     )
-    if not cliente:
-        return JsonResponse({"found": False})
-    return JsonResponse({"found": True, "cliente": cliente})
+    results = list(clientes)
+    if not results:
+        return JsonResponse({"found": False, "results": []})
+    return JsonResponse({"found": True, "cliente": results[0], "results": results})
 
 
 @require_POST
