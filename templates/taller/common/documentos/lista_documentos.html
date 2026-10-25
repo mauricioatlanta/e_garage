@@ -890,7 +890,7 @@
 {% block main_actions %}
 <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
   {% if request.user|is_admin_or_owner %}
-  <a href="{% if request.empresa.config.rubro_principal == 'DESARMADURIA' %}{% country_url 'desarme:lista_piezas' %}{% else %}{% country_url 'documentos:crear_documento' %}{% endif %}" class="crear-documento-btn">
+  <a href="{% if parts_sales_mode %}{% country_url 'repuestos:pos_mostrador' %}{% elif request.empresa.config.rubro_principal == 'DESARMADURIA' %}{% country_url 'desarme:lista_piezas' %}{% else %}{% country_url 'documentos:crear_documento' %}{% endif %}" class="crear-documento-btn">
     <i class="fas fa-plus-circle"></i>
     <span>{{ ui_labels.new_document }}</span>
   </a>
@@ -925,10 +925,13 @@
     <div class="kpi-label">📋 {{ ui_labels.document_type_estimate }} {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Pending{% else %}Pendientes{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.presupuestos_pendientes|default:"0" }}</div>
   </div>
-  <div class="kpi-card">
+  {% if parts_sales_mode %}<div class="kpi-card">
+    <div class="kpi-label">🛒 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Parts Sales{% else %}Ventas de repuestos{% endif %}</div>
+    <div class="kpi-value">{{ estadisticas.ventas_repuestos|default:"0" }}</div>
+  </div>{% else %}<div class="kpi-card">
     <div class="kpi-label">🔧 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Open Work Orders{% else %}OTs Sin Cerrar{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.ots_sin_cerrar|default:"0" }}</div>
-  </div>
+  </div>{% endif %}
   <div class="kpi-card">
     <div class="kpi-label">📊 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Last 30 Days{% else %}Últimos 30 días{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.ultimos_30_dias|default:"0" }}</div>
@@ -954,6 +957,7 @@
       <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}{{ ui_labels.documents_menu }} Type{% else %}Tipo de {{ ui_labels.workflow_singular }}{% endif %}</label>
       <select name="tipo" class="filtro-input">
         <option value="">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}All types{% else %}Todos los tipos{% endif %}</option>
+        <option value="PTS" {% if filtros_activos.tipo == 'PTS' %}selected{% endif %}>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Parts Sale{% else %}Venta de repuestos{% endif %}</option>
         <option value="FAC" {% if filtros_activos.tipo == 'FAC' %}selected{% endif %}>{{ ui_labels.document_type_invoice }}</option>
         <option value="OT" {% if filtros_activos.tipo == 'OT' %}selected{% endif %}>{{ ui_labels.document_type_work_order }}</option>
         <option value="PRES" {% if filtros_activos.tipo == 'PRES' %}selected{% endif %}>{{ ui_labels.document_type_estimate }}</option>

@@ -60,6 +60,18 @@ def ui_labels_context(request):
 
     active_config = getattr(active_empresa, "config", None) if active_empresa else None
     rubro = getattr(active_config, "rubro_principal", None)
+    support_rubros = request.session.get("modo_soporte_rubros", []) if hasattr(request, "session") else []
+    if isinstance(support_rubros, str):
+        support_rubros = [support_rubros]
+    effective_rubros = []
+    if active_config and hasattr(active_config, "get_effective_rubros"):
+        effective_rubros.extend(active_config.get_effective_rubros())
+    effective_rubros.extend(support_rubros or [])
+    effective_rubros = {str(value or "").strip().upper() for value in effective_rubros}
+    parts_sales_mode = (
+        str(request.GET.get("tipo", "")).strip().upper() == "PTS"
+        and bool(effective_rubros.intersection({"PARTS", "DESARMADURIA", "MIXED"}))
+    )
     if rubro:
         module_label = get_document_module_label(rubro, language_code)
         labels["documents_menu"] = module_label
@@ -77,7 +89,16 @@ def ui_labels_context(request):
         else:
             labels["workflow_singular"] = "Document" if is_english else "Documento"
 
+    if parts_sales_mode:
+        labels["documents_menu"] = "Sales" if is_english else "Ventas"
+        labels["document_center"] = labels["documents_menu"]
+        labels["workflow_singular"] = "Sale" if is_english else "Venta"
+        labels["new_document"] = "New Sale" if is_english else "Nueva Venta"
+        labels["create_button"] = "Create Sale" if is_english else "Crear Venta"
+        labels["edit_button"] = "Edit Sale" if is_english else "Editar Venta"
+
     return {
         "ui_labels": labels,
         "ui_country_code": country_code,
+        "parts_sales_mode": parts_sales_mode,
     }
