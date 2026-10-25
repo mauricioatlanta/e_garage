@@ -812,7 +812,7 @@
   {% if not eg_us_signup_slim_header|default:False and '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
   <div id="main-navigation" class="{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}flex flex-row flex-wrap items-center justify-center mt-1 gap-1{% else %}flex flex-col items-center justify-center mt-3 gap-2{% endif %}">
     {% if request.user.is_authenticated %}
-      {% if workspace.product_key == "DESARMADURIA" or workspace.product_key == "RECYCLING" or workspace.product_key == "TOWING" %}
+      {% if workspace.product_key == "DESARMADURIA" or workspace.product_key == "RECYCLING" or workspace.product_key == "TOWING" or workspace.product_key == "TIRE" %}
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
         {% for item in workspace.nav %}
         <a href="{{ item.url }}" class="nav-button-standard{% if item.is_active %} bg-gray-100 text-gray-900{% endif %}">
