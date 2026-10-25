@@ -29,6 +29,10 @@
           <h2 class="text-lg font-semibold text-cyan-200">Carrito</h2>
           <span id="pos-total" class="font-mono text-xl text-green-300">$0</span>
         </div>
+        <div class="mb-3 grid grid-cols-2 gap-x-3 gap-y-1 border-b border-cyan-400/10 pb-3 text-xs">
+          <span class="text-gray-500">Subtotal</span><span id="pos-subtotal" class="text-right text-gray-300">$0</span>
+          <span id="pos-tax-label" class="text-gray-500">{{ tax_name|default:"Impuesto" }} ({{ tax_rate|default:0 }}%)</span><span id="pos-tax" class="text-right text-amber-300">$0</span>
+        </div>
         <div id="pos-cart" class="min-h-32 space-y-2 text-sm text-gray-300"></div>
         <div class="mt-4 rounded border border-cyan-400/20 bg-black/30 p-3">
           <h3 class="mb-2 text-sm font-semibold text-cyan-200">Cliente de la compra</h3>
@@ -72,6 +76,8 @@
   const results = document.getElementById("pos-results");
   const cartBox = document.getElementById("pos-cart");
   const totalBox = document.getElementById("pos-total");
+  const subtotalBox = document.getElementById("pos-subtotal");
+  const taxBox = document.getElementById("pos-tax");
   const status = document.getElementById("pos-status");
   const phoneInput = document.getElementById("pos-phone");
   const clientSearch = document.getElementById("pos-client-search");
@@ -79,6 +85,7 @@
   const nameInput = document.getElementById("pos-client-name");
   const clientStatus = document.getElementById("pos-client-status");
   const taxInput = document.getElementById("pos-apply-tax");
+  const taxRate = Number("{{ tax_rate|default:0 }}") || 0;
   const cart = new Map();
   let payment = "efectivo";
   let clientId = null;
@@ -96,10 +103,10 @@
   }
 
   function renderCart() {
-    let total = 0;
+    let subtotal = 0;
     cartBox.innerHTML = "";
     for (const item of cart.values()) {
-      total += item.cantidad * Number(item.precio_venta || 0);
+      subtotal += item.cantidad * Number(item.precio_venta || 0);
       const row = document.createElement("div");
       row.className = "flex flex-wrap items-center justify-between gap-2 rounded bg-black/40 px-3 py-2";
       const remaining = Math.max(0, Number(item.stock || 0) - item.cantidad);
@@ -115,9 +122,15 @@
       row.querySelector('[data-qty="input"]').addEventListener("change", (event) => changeQty(item, event.target.value));
       cartBox.appendChild(row);
     }
+    const tax = taxInput.checked ? subtotal * taxRate / 100 : 0;
+    const total = subtotal + tax;
+    subtotalBox.textContent = money(subtotal);
+    taxBox.textContent = money(tax);
     totalBox.textContent = money(total);
     if (!cart.size) cartBox.textContent = "Agrega productos desde la búsqueda.";
   }
+
+  taxInput.addEventListener("change", renderCart);
 
   function addItem(item) {
     const current = cart.get(item.id) || { ...item, cantidad: 0 };

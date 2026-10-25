@@ -18,7 +18,7 @@ from taller.models.repuesto import Repuesto
 from taller.repuestos.pos_service import PartsPOSService
 from taller.services.empresa_service import get_empresa_safe
 from taller.templatetags.country_url import reverse_country_url
-from taller.utils.country_config import get_tax_name, get_tax_rate
+from taller.impuestos.engine import get_tax_info
 
 from .views_cbv import (
     RepuestoCreateView,
@@ -53,14 +53,14 @@ def editar_repuesto(request, *args, **kwargs):
 @login_required
 def pos_mostrador(request):
     empresa = get_empresa_safe(request)
-    country = getattr(empresa, "pais", "CL") if empresa else "CL"
+    tax_info = get_tax_info(empresa, applies_to="parts") if empresa else {"name": "Impuesto", "rate_percentage": 0}
     return render(
         request,
         "taller/common/repuestos/pos_mostrador.html",
         {
             "empresa": empresa,
-            "tax_name": get_tax_name(country),
-            "tax_rate": get_tax_rate(country),
+            "tax_name": tax_info["name"],
+            "tax_rate": tax_info["rate_percentage"],
         },
     )
 
