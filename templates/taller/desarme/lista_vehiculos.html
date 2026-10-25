@@ -86,6 +86,7 @@
   <a href="{% country_url 'desarme:lista_interchange' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🔄 {% trans "Interchange" %}</a>
   <a href="{% country_url 'desarme:lista_ventas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🧾 {% trans "Ventas" %}</a>
   <a href="{% country_url 'desarme:reportes' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📊 {% trans "Reportes" %}</a>
+  {% if empresa.slug %}<a href="{% url 'tienda:tienda_storefront_slug' slug=empresa.slug %}" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-emerald-500/20 border border-emerald-400/50 text-emerald-200 hover:bg-emerald-500/30">🛒 {% trans "Ver kiosko" %}</a>{% endif %}
 </div>
 {% endblock %}
 
@@ -105,6 +106,7 @@
   <span>📊</span>
   <span>{% trans "Dashboard" %}</span>
 </a>
+{% if empresa.slug %}<a href="{% url 'tienda:tienda_storefront_slug' slug=empresa.slug %}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600/80 hover:bg-emerald-500 text-white text-sm font-semibold border border-emerald-400/40">🛒 {% trans "Ver kiosko" %}</a>{% endif %}
 {% endblock %}
 
 {% block search_bar %}
