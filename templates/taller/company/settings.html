@@ -1260,10 +1260,6 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}RUT / ID Fiscal{% else %}Tax ID / EIN{% endif %}</label>
-                            <input type="text" name="tax_id" id="id_tax_id" class="form-control" value="{{ config.tax_id|default:'' }}" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}12.345.678-9{% else %}12-3456789{% endif %}">
-                        </div>
-                        <div class="col-md-6 mb-3">
                             <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Licencia Comercial{% else %}Business License{% endif %}</label>
                             <input type="text" name="business_license" id="id_business_license" class="form-control" value="{{ config.business_license|default:'' }}" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Licencia comercial o registro{% else %}Business license or registration{% endif %}">
                         </div>
