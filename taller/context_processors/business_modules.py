@@ -12,22 +12,28 @@ dashboard_data NO se expone aquí; el dashboard view lo agrega al contexto
 from taller.services.business_module_service import BusinessModuleService
 from taller.services.empresa_service import get_empresa_safe
 from taller.services.workspace_service import WorkspaceService
+from taller.utils.permisos import normalizar_rubros
 
 
 def _support_config(request, config):
     """Return an in-memory config override for the superuser support bar."""
     user = getattr(request, "user", None)
     session = getattr(request, "session", {})
-    support_rubro = session.get("support_rubro")
-    if not getattr(user, "is_superuser", False) or not support_rubro:
+    support_rubros = session.get("modo_soporte_rubros") or session.get("support_rubros")
+    if not support_rubros and session.get("support_rubro"):
+        support_rubros = [session.get("support_rubro")]
+    support_rubros = normalizar_rubros(support_rubros)
+    if not getattr(user, "is_superuser", False) or not support_rubros:
         return config
+
+    support_rubro = support_rubros[0]
 
     if config is None:
         from types import SimpleNamespace
 
         return SimpleNamespace(
             rubro_principal=support_rubro,
-            rubros=[],
+            rubros=support_rubros,
             usa_vehiculos=True,
             usa_servicios=True,
         )
@@ -37,7 +43,7 @@ def _support_config(request, config):
 
     override = copy(config)
     override.rubro_principal = support_rubro
-    override.rubros = []
+    override.rubros = support_rubros
     return override
 
 
@@ -84,4 +90,9 @@ def business_modules(request):
             and getattr(request, "session", {}).get("support_rubro")
         ),
         "support_rubro": getattr(request, "session", {}).get("support_rubro", ""),
+        "support_rubros": normalizar_rubros(
+            getattr(request, "session", {}).get("modo_soporte_rubros")
+            or getattr(request, "session", {}).get("support_rubros")
+            or getattr(request, "session", {}).get("support_rubro", "")
+        ),
     }

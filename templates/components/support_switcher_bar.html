@@ -28,6 +28,7 @@
     margin: 0;
   }
   .eg-support-switcher select,
+  .eg-support-switcher fieldset,
   .eg-support-switcher button {
     min-height: 29px;
     border: 1px solid rgba(148, 163, 184, .45);
@@ -45,6 +46,17 @@
     font-weight: 800;
   }
   .eg-support-switcher button:hover { background: #fcd34d; }
+  .eg-support-switcher__rubros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem .55rem;
+    max-width: 31rem;
+    padding: .25rem .4rem;
+    border: 1px solid rgba(148, 163, 184, .35);
+    border-radius: 5px;
+    background: #1f2937;
+  }
+  .eg-support-switcher__rubros label { white-space: nowrap; font-size: .68rem; }
   .eg-support-switcher__reset {
     color: #cbd5e1 !important;
     background: transparent !important;
@@ -74,7 +86,7 @@
       <option value="uy" {% if support_country|lower == 'uy' %}selected{% endif %}>Uruguay (UY)</option>
     </select>
     <label for="support-rubro" class="sr-only">Rubro</label>
-    <select id="support-rubro" name="rubro" aria-label="Rubro">
+    <select id="support-rubro" name="rubro" aria-label="Rubro" title="Compatibilidad: rubro principal">
       <option value="TALLER" {% if support_rubro == 'WORKSHOP' %}selected{% endif %}>Taller Mecánico</option>
       <option value="DESARME" {% if support_rubro == 'DESARMADURIA' %}selected{% endif %}>Desarmaduría</option>
       <option value="REPUESTOS" {% if support_rubro == 'PARTS' %}selected{% endif %}>Repuestos</option>
@@ -82,6 +94,13 @@
       <option value="CARWASH" {% if support_rubro == 'DETAILING' %}selected{% endif %}>Carwash</option>
       <option value="GRUAS" {% if support_rubro == 'TOWING' %}selected{% endif %}>Grúas y asistencia vial</option>
     </select>
+    <fieldset class="eg-support-switcher__rubros" aria-label="Rubros activos en soporte">
+      <legend class="sr-only">Rubros activos en soporte</legend>
+      <label><input type="checkbox" name="rubros" value="TALLER" {% if 'WORKSHOP' in support_rubros %}checked{% endif %}> Taller</label>
+      <label><input type="checkbox" name="rubros" value="DESARMADURIA" {% if 'DESARMADURIA' in support_rubros %}checked{% endif %}> Desarmaduría</label>
+      <label><input type="checkbox" name="rubros" value="REPUESTOS" {% if 'PARTS' in support_rubros %}checked{% endif %}> Repuestos</label>
+      <label><input type="checkbox" name="rubros" value="GRUAS" {% if 'TOWING' in support_rubros %}checked{% endif %}> Grúas</label>
+    </fieldset>
     <button type="submit">Aplicar</button>
   </form>
   <form method="post" action="{% url 'switch_support_environment' %}">

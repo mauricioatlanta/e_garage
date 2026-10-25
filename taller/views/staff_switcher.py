@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import redirect
 
 from taller.utils.country import prefix_from_path
+from taller.utils.permisos import normalizar_rubros
 
 
 SUPPORTED_COUNTRIES = frozenset({"cl", "us", "mx", "ve", "br", "ar", "co", "pe", "ec", "uy"})
@@ -21,6 +22,13 @@ SUPPORTED_RUBROS = {
     "GRUAS": "TOWING",
 }
 
+SUPPORTED_RUBROS_MULTI = {
+    "TALLER": "WORKSHOP",
+    "DESARMADURIA": "DESARMADURIA",
+    "REPUESTOS": "PARTS",
+    "GRUAS": "TOWING",
+}
+
 
 @user_passes_test(lambda user: user.is_superuser)
 def switch_support_environment(request):
@@ -29,17 +37,25 @@ def switch_support_environment(request):
         if request.POST.get("action") == "reset":
             request.session.pop("support_country", None)
             request.session.pop("support_rubro", None)
+            request.session.pop("modo_soporte_rubros", None)
         else:
             country = (request.POST.get("country") or "").strip().lower()
             rubro = (request.POST.get("rubro") or "").strip().upper()
-            if country in SUPPORTED_COUNTRIES and rubro in SUPPORTED_RUBROS:
+            selected = request.POST.getlist("rubros")
+            selected = [SUPPORTED_RUBROS_MULTI.get(str(value).strip().upper(), "") for value in selected]
+            selected = normalizar_rubros([value for value in selected if value])
+            if not selected and rubro in SUPPORTED_RUBROS:
+                selected = [SUPPORTED_RUBROS[rubro]]
+
+            if country in SUPPORTED_COUNTRIES and selected:
                 request.session["support_country"] = country
-                request.session["support_rubro"] = SUPPORTED_RUBROS[rubro]
+                request.session["support_rubro"] = selected[0]
+                request.session["modo_soporte_rubros"] = selected
 
                 # Switching to Grúas must open its operational board. Keeping
                 # the previous URL (for example /documentos/) leaves the
                 # towing navigation active over a workshop-oriented screen.
-                if rubro == "GRUAS":
+                if selected[0] == "TOWING":
                     prefix = prefix_from_path(request.path) or f"{country}/es"
                     return redirect(f"/{prefix}/gruas/")
 

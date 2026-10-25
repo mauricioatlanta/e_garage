@@ -8,6 +8,68 @@ from taller.models.auditoria import LogAuditoria
 from taller.models.perfil_usuario import PerfilUsuario
 
 
+RUBRO_ALIASES = {
+    "TALLER": "WORKSHOP",
+    "TALLER_MECANICO": "WORKSHOP",
+    "DESARME": "DESARMADURIA",
+    "DESARMADURIA": "DESARMADURIA",
+    "REPUESTOS": "PARTS",
+    "CASA_REPUESTOS": "PARTS",
+    "GRUAS": "TOWING",
+    "GRUA": "TOWING",
+}
+
+
+def normalizar_rubro(value):
+    """Devuelve la clave canónica de un rubro, tolerando aliases públicos."""
+    value = str(value or "").strip().upper()
+    return RUBRO_ALIASES.get(value, value)
+
+
+def normalizar_rubros(values):
+    """Normaliza una colección conservando orden y eliminando duplicados."""
+    if isinstance(values, str):
+        values = [values]
+    result = []
+    for value in values or []:
+        rubro = normalizar_rubro(value)
+        if rubro and rubro not in result:
+            result.append(rubro)
+    return result
+
+
+def rubros_estan_activos(request, rubros_requeridos):
+    """Comprueba acceso a cualquier rubro activo de la empresa o soporte."""
+    requeridos = set(normalizar_rubros(rubros_requeridos))
+    if not requeridos or not getattr(request, "user", None) or not request.user.is_authenticated:
+        return False
+
+    if request.user.is_superuser:
+        session = getattr(request, "session", {})
+        soporte = session.get("modo_soporte_rubros")
+        if soporte is None:
+            soporte = session.get("support_rubros")
+        if soporte is None and session.get("support_rubro"):
+            soporte = [session.get("support_rubro")]
+        # Sin selección explícita, el superusuario conserva acceso de soporte total.
+        if not soporte:
+            return True
+        return bool(requeridos.intersection(normalizar_rubros(soporte)))
+
+    empresa = getattr(request, "empresa", None)
+    if empresa is None:
+        try:
+            empresa = getattr(request.user, "empresa", None)
+        except Exception:
+            empresa = None
+    try:
+        config = getattr(empresa, "config", None) if empresa else None
+    except Exception:
+        config = None
+    activos = config.get_effective_rubros() if config and hasattr(config, "get_effective_rubros") else []
+    return bool(requeridos.intersection(normalizar_rubros(activos)))
+
+
 def verificar_empresa(view_func):
     """
     Decorador para verificar que el usuario solo accede a datos de su empresa
