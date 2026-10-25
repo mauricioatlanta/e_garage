@@ -130,7 +130,21 @@ def _safe_reverse_country_url(request, view_path, fallback="#", *args, **kwargs)
         return fallback
 
 
-def _active_service_rubros(empresa):
+def _active_service_rubros(empresa, request=None):
+    # En Modo Soporte la selección de sesión representa el alcance efectivo
+    # de la pantalla y debe prevalecer sobre el rubro principal de la empresa.
+    user = getattr(request, "user", None) if request is not None else None
+    if getattr(user, "is_superuser", False):
+        session = getattr(request, "session", {})
+        support_values = session.get("modo_soporte_rubros")
+        if support_values is None:
+            support_values = session.get("support_rubros")
+        if support_values:
+            return {
+                _SERVICE_RUBRO_ALIASES.get(str(value or "").strip().upper(), str(value or "").strip().upper())
+                for value in support_values
+                if str(value or "").strip()
+            }
     config = getattr(empresa, "config", None) if empresa else None
     if not config:
         return set()
@@ -145,14 +159,14 @@ def _active_service_rubros(empresa):
     }
 
 
-def _scope_services_by_rubro(queryset, empresa):
+def _scope_services_by_rubro(queryset, empresa, request=None):
     """Limit the service catalog for non-workshop workspaces.
 
     Workshop remains backward compatible and sees the complete company catalog.
     For a pure Car Wash (or another specialized workspace), unclassified legacy
     mechanic services are excluded; explicitly classified services remain visible.
     """
-    rubros = _active_service_rubros(empresa)
+    rubros = _active_service_rubros(empresa, request)
     if not rubros or "WORKSHOP" in rubros:
         return queryset
 
@@ -186,7 +200,7 @@ def _resolve_servicios_menu_scope(request):
         if servicios_empresa_count:
             servicios_qs = servicios_empresa
 
-    servicios_qs = _scope_services_by_rubro(servicios_qs, empresa)
+    servicios_qs = _scope_services_by_rubro(servicios_qs, empresa, request)
     servicios_qs = (
         servicios_qs.select_related("categoria", "subcategoria")
         .prefetch_related("names", "categoria__names", "subcategoria__names")
@@ -292,6 +306,7 @@ def servicios_menu(request):
     country_code = scope["country_code"]
     language = scope["language"]
     filters = _get_servicios_filters(country_code, language)
+    active_rubros = _active_service_rubros(empresa, request)
 
     logger.info(
         f"servicios_menu - country_code: {country_code}, language: {language}, empresa: {empresa}"
@@ -305,6 +320,8 @@ def servicios_menu(request):
     debug_info = {
         "country_code": country_code,
         "language": language,
+        "active_service_rubros": sorted(active_rubros),
+        "is_carwash_services": "DETAILING" in active_rubros and "WORKSHOP" not in active_rubros,
         "total_servicios_raw": scope["total_servicios_pais"],
         "servicios_empresa_raw": scope["servicios_empresa_count"],
         "empresa_id": empresa.id if empresa else None,
@@ -363,7 +380,7 @@ def servicios_menu_data_api(request):
     empresa = scope["empresa"]
     country = scope["country_code"]
 
-    active_rubros = _active_service_rubros(empresa)
+    active_rubros = _active_service_rubros(empresa, request)
     cache_key = f"servicios_menu:{empresa.id if empresa else 0}:{country}:{language}:{','.join(sorted(active_rubros))}:{query}:{categoria_code}:{subcategoria_code}:{limit}"
 
     cached = cache.get(cache_key)
@@ -443,7 +460,7 @@ def buscar_servicios_api(request):
         .select_related("categoria", "subcategoria")
         .prefetch_related("names", "categoria__names", "subcategoria__names")
     )
-    servicios = _scope_services_by_rubro(servicios, empresa)
+    servicios = _scope_services_by_rubro(servicios, empresa, request)
 
     # Aplicar filtros de búsqueda
     if query:
