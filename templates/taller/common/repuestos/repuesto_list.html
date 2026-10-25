@@ -209,10 +209,17 @@
       </div>
       {% endif %}
 
-      <div class="flex justify-between items-center mt-4">
+      <div class="flex justify-between items-center mt-4 gap-3">
         <div class="part-price">{{ repuesto.precio_venta|money_by_country:country }}</div>
-        <div class="text-sm text-slate-400">
-          {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Stock{% else %}Stock{% endif %}: <span class="text-lime-300 font-bold">{{ repuesto.cantidad_stock|default:"0" }}</span>
+        <div class="text-right">
+          <div class="text-[10px] uppercase tracking-wider text-slate-500">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Live stock{% else %}Stock en vivo{% endif %}</div>
+          {% if repuesto.cantidad_stock|default:0 <= 0 %}
+          <span class="inline-flex items-center gap-1 rounded-full border border-red-400/50 bg-red-950/50 px-2 py-1 text-xs font-bold text-red-300">● Agotado</span>
+          {% elif repuesto.cantidad_stock|default:0 < 5 %}
+          <span class="inline-flex items-center gap-1 rounded-full border border-amber-400/50 bg-amber-950/50 px-2 py-1 text-xs font-bold text-amber-300">⚠ {{ repuesto.cantidad_stock }} · Comprar</span>
+          {% else %}
+          <span class="inline-flex items-center gap-1 rounded-full border border-emerald-400/40 bg-emerald-950/40 px-2 py-1 text-xs font-bold text-emerald-300">✓ {{ repuesto.cantidad_stock }} disponibles</span>
+          {% endif %}
         </div>
       </div>
 
