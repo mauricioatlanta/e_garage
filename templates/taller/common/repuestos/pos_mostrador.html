@@ -48,14 +48,18 @@
           <input id="pos-apply-tax" type="checkbox" checked class="accent-cyan-400">
           Aplicar {{ tax_name|default:"impuesto" }} ({{ tax_rate|default:0 }}%)
         </label>
-        <div class="mt-4 grid grid-cols-3 gap-2">
-          <button data-pay="efectivo" class="pos-pay rounded bg-green-600 px-3 py-2 text-sm font-semibold">Efectivo</button>
-          <button data-pay="tarjeta" class="pos-pay rounded bg-blue-600 px-3 py-2 text-sm font-semibold">Tarjeta</button>
-          <button data-pay="transferencia" class="pos-pay rounded bg-cyan-600 px-3 py-2 text-sm font-semibold">Transferencia</button>
+        <div class="mt-3">
+          <p class="mb-1 text-[11px] uppercase tracking-wide text-gray-500">Medio de pago</p>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" data-pay="efectivo" class="pos-pay rounded border border-green-500/40 bg-green-600/80 px-3 py-1.5 text-xs font-semibold">Efectivo</button>
+            <button type="button" data-pay="tarjeta" class="pos-pay rounded border border-blue-500/40 bg-blue-600/80 px-3 py-1.5 text-xs font-semibold">Tarjeta</button>
+            <button type="button" data-pay="transferencia" class="pos-pay rounded border border-cyan-500/40 bg-cyan-600/80 px-3 py-1.5 text-xs font-semibold">Transferencia</button>
+          </div>
         </div>
-        <button id="pos-confirm" class="mt-3 w-full rounded bg-cyan-500 px-4 py-3 font-bold text-gray-950">
+        <button id="pos-confirm" type="button" class="mt-3 w-full rounded-lg bg-cyan-500 px-3 py-2 text-sm font-bold text-gray-950 transition hover:bg-cyan-300 disabled:cursor-wait disabled:opacity-60">
           Confirmar venta
         </button>
+        {% csrf_token %}
         <p id="pos-status" class="mt-3 text-sm text-gray-400"></p>
       </div>
     </section>
@@ -244,36 +248,52 @@
   document.querySelectorAll(".pos-pay").forEach((btn) => {
     btn.addEventListener("click", () => {
       payment = btn.dataset.pay;
+      document.querySelectorAll(".pos-pay").forEach((option) => option.classList.remove("ring-2", "ring-white"));
+      btn.classList.add("ring-2", "ring-white");
       status.textContent = `Pago seleccionado: ${btn.textContent}`;
     });
   });
 
-  document.getElementById("pos-confirm").addEventListener("click", async () => {
+  document.getElementById("pos-confirm").addEventListener("click", async (event) => {
+    const confirmButton = event.currentTarget;
     const items = Array.from(cart.values()).map((item) => ({
       repuesto_id: item.id,
       cantidad: item.cantidad,
       precio_unitario: item.precio_venta,
     }));
-    const res = await fetch("confirmar/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
-      body: JSON.stringify({
-        payment_method: payment,
-        items,
-        cliente_id: clientId,
-        cliente_nombre: nameInput.value.trim(),
-        cliente_telefono: phoneInput.value.trim(),
-        apply_vat: taxInput.checked,
-      }),
-    });
-    const data = await res.json();
-    if (!data.ok) {
-      status.textContent = (data.errors || ["No se pudo confirmar la venta."]).join(" ");
+    if (!items.length) {
+      status.textContent = "Agrega al menos un producto antes de confirmar la venta.";
       return;
     }
-    status.innerHTML = `Venta ${data.numero} creada. Total ${money(data.total)} · Impuesto ${money(data.tax_amount || 0)}. <a class="text-cyan-300" href="${data.print_url}">Ver documento</a>`;
-    cart.clear();
-    renderCart();
+    confirmButton.disabled = true;
+    status.textContent = "Procesando venta…";
+    try {
+      const csrf = document.querySelector("[name=csrfmiddlewaretoken]")?.value || "{{ csrf_token }}";
+      const res = await fetch("confirmar/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrf },
+        body: JSON.stringify({
+          payment_method: payment,
+          items,
+          cliente_id: clientId,
+          cliente_nombre: nameInput.value.trim(),
+          cliente_telefono: phoneInput.value.trim(),
+          apply_vat: taxInput.checked,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        status.textContent = (data.errors || [`No se pudo confirmar la venta (${res.status}).`]).join(" ");
+        return;
+      }
+      status.innerHTML = `Venta ${data.numero} creada. Total ${money(data.total)} · Impuesto ${money(data.tax_amount || 0)}. <a class="text-cyan-300" href="${data.print_url}">Ver documento</a>`;
+      cart.clear();
+      renderCart();
+    } catch (_) {
+      status.textContent = "No se pudo conectar con el servidor. La venta no fue confirmada.";
+    } finally {
+      confirmButton.disabled = false;
+    }
   });
 
   renderCart();
