@@ -65,6 +65,12 @@ def pos_mostrador(request):
     )
 
 
+@login_required
+def pos_documento_redirect(request, pk):
+    """Compatibilidad para enlaces antiguos emitidos por el POS."""
+    return redirect(reverse_country_url(request, "documentos:ver_documento", pk))
+
+
 @require_GET
 @login_required
 def pos_buscar_repuestos(request):
