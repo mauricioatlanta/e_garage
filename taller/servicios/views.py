@@ -296,6 +296,26 @@ def _get_servicios_menu_ui_labels(language):
     return SERVICIOS_MENU_UI_LABELS.get(language, SERVICIOS_MENU_UI_LABELS["es"]).copy()
 
 
+def _augment_detailing_items(data, *, country, language, query, category_code, subcategory_code, limit, active_rubros):
+    """Completa un catálogo Car Wash parcialmente creado por el usuario."""
+    if "DETAILING" not in active_rubros or "WORKSHOP" in active_rubros:
+        return data[:limit]
+    extras = get_master_catalog_service_items(
+        country,
+        language=language,
+        query=query,
+        category_code=category_code,
+        subcategory_code=subcategory_code,
+        limit=limit,
+        rubros=active_rubros,
+    )
+    existing_codes = {str(item.get("codigo_interno") or "").upper() for item in data}
+    for item in extras:
+        if str(item.get("codigo_interno") or "").upper() not in existing_codes:
+            data.append({**item, "view_url": "", "edit_url": "", "delete_url": ""})
+    return data[:limit]
+
+
 # Menú principal de servicios con diseño moderno
 def servicios_menu(request):
     import logging
@@ -429,6 +449,18 @@ def servicios_menu_data_api(request):
         ]
         total = len(data)
 
+    data = _augment_detailing_items(
+        data,
+        country=country,
+        language=language,
+        query=query,
+        category_code=categoria_code,
+        subcategory_code=subcategoria_code,
+        limit=limit,
+        active_rubros=active_rubros,
+    )
+    total = len(data)
+
     result = {"servicios": data, "total": total}
 
     cache.set(cache_key, result, 300)
@@ -523,6 +555,18 @@ def buscar_servicios_api(request):
             rubros=active_rubros,
         )
         total = len(data)
+
+    data = _augment_detailing_items(
+        data,
+        country=country,
+        language=language,
+        query=query,
+        category_code=categoria_code,
+        subcategory_code=subcategoria_code,
+        limit=20,
+        active_rubros=active_rubros,
+    )
+    total = len(data)
 
     return JsonResponse(
         {
