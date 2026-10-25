@@ -12,8 +12,9 @@
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
 
   .part-card {
-    background: rgba(0, 0, 0, 0.7);
-    border: 1px solid rgba(0, 255, 255, 0.3);
+    background: #101d31;
+    color: #f8fafc;
+    border: 1px solid rgba(71, 214, 255, 0.55);
     border-radius: 10px;
     padding: 20px;
     transition: all 0.3s ease;
@@ -39,10 +40,34 @@
   }
 
   .part-price {
-    color: #00ff00;
+    color: #86efac;
     font-weight: bold;
     font-size: 1.3em;
   }
+
+  .stock-live-label {
+    color: #cbd5e1;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .stock-live {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    margin-top: .25rem;
+    padding: .3rem .55rem;
+    border-radius: 999px;
+    font-size: .78rem;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .stock-live--ok { color: #d1fae5; background: #064e3b; border: 1px solid #34d399; }
+  .stock-live--low { color: #fef3c7; background: #78350f; border: 1px solid #fbbf24; }
+  .stock-live--empty { color: #fee2e2; background: #7f1d1d; border: 1px solid #f87171; }
 
   .data-grid {
     display: grid;
@@ -212,13 +237,13 @@
       <div class="flex justify-between items-center mt-4 gap-3">
         <div class="part-price">{{ repuesto.precio_venta|money_by_country:country }}</div>
         <div class="text-right">
-          <div class="text-[10px] uppercase tracking-wider text-slate-500">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Live stock{% else %}Stock en vivo{% endif %}</div>
+          <div class="stock-live-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Live stock{% else %}Stock en vivo{% endif %}</div>
           {% if repuesto.cantidad_stock|default:0 <= 0 %}
-          <span class="inline-flex items-center gap-1 rounded-full border border-red-400/50 bg-red-950/50 px-2 py-1 text-xs font-bold text-red-300">● Agotado</span>
+          <span class="stock-live stock-live--empty">● Agotado</span>
           {% elif repuesto.cantidad_stock|default:0 < 5 %}
-          <span class="inline-flex items-center gap-1 rounded-full border border-amber-400/50 bg-amber-950/50 px-2 py-1 text-xs font-bold text-amber-300">⚠ {{ repuesto.cantidad_stock }} · Comprar</span>
+          <span class="stock-live stock-live--low">⚠ {{ repuesto.cantidad_stock }} · Comprar</span>
           {% else %}
-          <span class="inline-flex items-center gap-1 rounded-full border border-emerald-400/40 bg-emerald-950/40 px-2 py-1 text-xs font-bold text-emerald-300">✓ {{ repuesto.cantidad_stock }} disponibles</span>
+          <span class="stock-live stock-live--ok">✓ {{ repuesto.cantidad_stock }} disponibles</span>
           {% endif %}
         </div>
       </div>
