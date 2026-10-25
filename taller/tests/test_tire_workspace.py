@@ -48,6 +48,8 @@ class TireWorkspaceTests(TestCase):
         nav = {item["nav_key"]: item for item in workspace["nav"]}
         self.assertEqual(nav["tire_inventory"]["label"], "Inventario de Neumáticos")
         self.assertEqual(nav["tire_services"]["label"], "Servicios de Vulcanización")
+        self.assertEqual(nav["tire_extra_services"]["label"], "Servicios extras")
+        self.assertTrue(nav["tire_extra_services"]["url"].endswith("/servicios/otros-servicios/"))
         self.assertEqual(nav["tire_pos"]["label"], "Ventas de Mostrador")
         self.assertTrue(nav["tire_pos"]["url"].endswith("/repuestos/pos/"))
         self.assertEqual(nav["tire_reports"]["url"], "/cl/es/reportes/")

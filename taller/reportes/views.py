@@ -176,10 +176,11 @@ def reportes_dashboard(request):
     active_rubros = support_rubros or configured_rubros
     active_rubros = {str(r or "").strip().upper() for r in active_rubros}
     parts_reports_mode = "PARTS" in active_rubros and "WORKSHOP" not in active_rubros
+    tire_reports_mode = "TIRE" in active_rubros and "WORKSHOP" not in active_rubros
     return render(
         request,
         "taller/reportes/reportes.html",
-        {"parts_reports_mode": parts_reports_mode},
+        {"parts_reports_mode": parts_reports_mode, "tire_reports_mode": tire_reports_mode},
     )
 
 
@@ -193,7 +194,7 @@ def reporte_repuestos(request):
     # Top 10 repuestos más vendidos - FILTRADO POR EMPRESA
     repuesto_ventas = (
         LineaRepuesto.objects.filter(
-            documento__tipo="FAC",
+            documento__tipo__in=["FAC", "BOL", "PTS"],
             documento__empresa=empresa,  # 🔒 FILTRO EMPRESA
         )
         .values("codigo", "nombre")
@@ -285,7 +286,7 @@ def reporte_repuestos(request):
     # Histórico de ventas mensuales - FILTRADO POR EMPRESA
     ventas = (
         LineaRepuesto.objects.filter(
-            documento__tipo="FAC",
+            documento__tipo__in=["FAC", "BOL", "PTS"],
             documento__empresa=empresa,  # 🔒 FILTRO EMPRESA
         )
         .annotate(mes=F("documento__fecha_emision"))
@@ -303,7 +304,7 @@ def reporte_repuestos(request):
     # Repuestos nunca vendidos - FILTRADO POR EMPRESA
     vendidos_codigos = set(
         LineaRepuesto.objects.filter(
-            documento__tipo="FAC",
+            documento__tipo__in=["FAC", "BOL", "PTS"],
             documento__empresa=empresa,  # 🔒 FILTRO EMPRESA
         ).values_list("codigo", flat=True)
     )
