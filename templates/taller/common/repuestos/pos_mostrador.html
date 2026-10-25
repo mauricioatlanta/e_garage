@@ -177,6 +177,10 @@
     const item = resultItems.get(button.dataset.partId);
     if (!item) return;
     addItem(item);
+    resultItems.clear();
+    results.innerHTML = "";
+    search.value = "";
+    search.focus();
     status.textContent = `${item.nombre} agregado al carrito.`;
   });
 
