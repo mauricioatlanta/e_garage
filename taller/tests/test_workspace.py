@@ -1882,11 +1882,11 @@ class DesarmaduriaSingleRubroNavTests(TestCase):
         self.assertIsNotNone(repuestos_item, "MOD_REPUESTOS debe aparecer en nav de DESARMADURIA")
         self.assertIn("desarme/piezas", repuestos_item["url"])
 
-    def test_desarmaduria_nav_documentos_url_has_tipo_pts(self):
+    def test_desarmaduria_nav_documentos_url_uses_desarme_sales_flow(self):
         ws = WorkspaceService.resolve(self.config, "/cl/es", "")
         docs_item = next((i for i in ws["nav"] if i["key"] == MOD_DOCUMENTOS), None)
         self.assertIsNotNone(docs_item)
-        self.assertIn("tipo=PTS", docs_item["url"])
+        self.assertTrue(docs_item["url"].endswith("/desarme/ventas/"))
 
     def test_desarmaduria_nav_repuestos_nav_key_is_desarm_parts(self):
         ws = WorkspaceService.resolve(self.config, "/cl/es", "")
@@ -1959,7 +1959,7 @@ class WorkshopNavKeyTests(TestCase):
 class PartsSingleRubroNavKeyTests(TestCase):
     """
     PARTS (CASA_REPUESTOS) debe usar nav_key 'parts_inventory' para MOD_REPUESTOS
-    y URL de documentos con ?tipo=PTS.
+    y dirigir Ventas al POS de mostrador.
 
     Fallan hasta Phase 2+3.
     """
@@ -1973,11 +1973,51 @@ class PartsSingleRubroNavKeyTests(TestCase):
         self.assertIsNotNone(repuestos_item)
         self.assertEqual(repuestos_item.get("nav_key"), "parts_inventory")
 
-    def test_parts_ventas_url_has_tipo_pts(self):
+    def test_parts_ventas_url_uses_pos_flow(self):
         ws = WorkspaceService.resolve(self.config, "/cl/es", "")
         docs_item = next((i for i in ws["nav"] if i["key"] == MOD_DOCUMENTOS), None)
         self.assertIsNotNone(docs_item)
-        self.assertIn("tipo=PTS", docs_item["url"])
+        self.assertTrue(docs_item["url"].endswith("/repuestos/pos/"))
+
+
+class SalesNavigationRegressionTests(TestCase):
+    """Cada rubro conserva su flujo comercial, sin caer en la UI de taller."""
+
+    def _sales_items(self, principal, extras=None):
+        config = _make_effective_config(principal, extras)
+        return [
+            item for item in WorkspaceService.resolve(config, "/cl/es", "")["nav"]
+            if item["nav_key"] in {"desarm_sales", "parts_sales"}
+        ]
+
+    def test_desarmaduria_sales_label_and_destination(self):
+        item = self._sales_items("DESARMADURIA")[0]
+        self.assertEqual(item["label"], "Ventas de desarme")
+        self.assertEqual(item["url"], "/cl/es/desarme/ventas/")
+
+    def test_parts_sales_label_and_destination(self):
+        item = self._sales_items("PARTS")[0]
+        self.assertEqual(item["label"], "Ventas de repuestos")
+        self.assertEqual(item["url"], "/cl/es/repuestos/pos/")
+
+    def test_mixed_desarme_and_parts_keeps_both_sales_accesses(self):
+        items = self._sales_items("DESARMADURIA", ["PARTS"])
+        self.assertEqual({item["nav_key"] for item in items}, {"desarm_sales", "parts_sales"})
+        self.assertEqual(
+            {item["url"] for item in items},
+            {"/cl/es/desarme/ventas/", "/cl/es/repuestos/pos/"},
+        )
+        self.assertEqual(
+            {item["label"] for item in items},
+            {"Ventas de desarme", "Ventas de repuestos"},
+        )
+
+    def test_workshop_sales_stays_on_document_flow(self):
+        config = _make_effective_config("WORKSHOP")
+        docs = [item for item in WorkspaceService.resolve(config, "/cl/es", "")["nav"]
+                if item["module_key"] == MOD_DOCUMENTOS]
+        self.assertTrue(docs)
+        self.assertTrue(any("documentos" in item["url"] for item in docs))
 
 
 # ---------------------------------------------------------------------------

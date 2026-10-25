@@ -178,9 +178,16 @@ class WorkspaceService:
                 key = nav_def.module_key
                 if key not in active:
                     continue
-                if key in ALWAYS_ON:
-                    continue
                 nav_key = nav_def.nav_key or key
+                # Documentos es un módulo común, pero los workspaces pueden
+                # ofrecer experiencias comerciales distintas (por ejemplo,
+                # ventas de desarme y POS de repuestos). En ese caso la
+                # definición lleva nav_key/path propios y debe conservarse;
+                # el resto de módulos ALWAYS_ON se muestra solo una vez.
+                if key in ALWAYS_ON and not (
+                    nav_def.path and nav_key not in seen_nav_keys
+                ):
+                    continue
                 if nav_key in seen_nav_keys:
                     continue
                 seen_nav_keys.add(nav_key)
