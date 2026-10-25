@@ -72,6 +72,7 @@
   const cart = new Map();
   let payment = "efectivo";
   let clientId = null;
+  const resultItems = new Map();
 
   function money(value) {
     return new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(value || 0);
@@ -148,17 +149,35 @@
       results.innerHTML = "";
       return;
     }
-    const res = await fetch(`buscar/?q=${encodeURIComponent(q)}`);
-    const data = await res.json();
-    results.innerHTML = "";
-    for (const item of data.results || []) {
+    try {
+      const res = await fetch(`buscar/?q=${encodeURIComponent(q)}`);
+      if (!res.ok) throw new Error("search_failed");
+      const data = await res.json();
+      resultItems.clear();
+      results.innerHTML = "";
+      for (const item of data.results || []) {
+        resultItems.set(String(item.id), item);
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "block w-full rounded border border-cyan-400/20 bg-black/50 p-3 text-left hover:bg-cyan-950/40";
-      btn.innerHTML = `<strong>${item.nombre}</strong><br><span class="text-xs text-gray-400">${item.part_number || item.codigo_oem || "Sin código"} · Stock ${item.stock} · ${item.ubicacion || "Sin ubicación"} ${item.medida ? "· " + item.medida : ""}</span>`;
-      btn.addEventListener("click", () => addItem(item));
+      btn.dataset.partId = String(item.id);
+      btn.className = "flex w-full cursor-pointer items-center justify-between gap-3 rounded border border-cyan-400/20 bg-black/50 p-3 text-left hover:border-cyan-300 hover:bg-cyan-950/40";
+      btn.innerHTML = `<span><strong>${item.nombre}</strong><br><span class="text-xs text-gray-400">${item.part_number || item.codigo_oem || "Sin código"} · Stock ${item.stock} · ${item.ubicacion || "Sin ubicación"} ${item.medida ? "· " + item.medida : ""}</span></span><span class="shrink-0 rounded bg-cyan-500 px-2 py-1 text-xs font-bold text-gray-950">Agregar</span>`;
       results.appendChild(btn);
+      }
+    } catch (_) {
+      results.innerHTML = '<p class="rounded border border-red-400/30 bg-red-950/30 p-3 text-sm text-red-200">No se pudo cargar la coincidencia. Intenta nuevamente.</p>';
     }
+  });
+
+  results.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-part-id]");
+    if (!button || !results.contains(button)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const item = resultItems.get(button.dataset.partId);
+    if (!item) return;
+    addItem(item);
+    status.textContent = `${item.nombre} agregado al carrito.`;
   });
 
   document.querySelectorAll(".pos-pay").forEach((btn) => {
