@@ -88,6 +88,13 @@
     return new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(value || 0);
   }
 
+  function stockLabel(stock) {
+    const available = Number(stock || 0);
+    if (available <= 0) return '<span class="rounded-full border border-red-400/50 bg-red-950/60 px-2 py-1 text-xs font-bold text-red-300">Agotado</span>';
+    if (available < 5) return `<span class="rounded-full border border-amber-400/50 bg-amber-950/60 px-2 py-1 text-xs font-bold text-amber-300">⚠ ${available} disponibles</span>`;
+    return `<span class="rounded-full border border-emerald-400/40 bg-emerald-950/50 px-2 py-1 text-xs font-bold text-emerald-300">✓ ${available} disponibles</span>`;
+  }
+
   function renderCart() {
     let total = 0;
     cartBox.innerHTML = "";
@@ -95,7 +102,8 @@
       total += item.cantidad * Number(item.precio_venta || 0);
       const row = document.createElement("div");
       row.className = "flex flex-wrap items-center justify-between gap-2 rounded bg-black/40 px-3 py-2";
-      row.innerHTML = `<span class="min-w-0 flex-1">${item.nombre} <span class="text-xs text-gray-500">${item.part_number || ""}</span></span>
+      const remaining = Math.max(0, Number(item.stock || 0) - item.cantidad);
+      row.innerHTML = `<span class="min-w-0 flex-1">${item.nombre} <span class="text-xs text-gray-500">${item.part_number || ""}</span><br><span class="text-[11px] text-cyan-300">Stock restante: ${remaining}</span></span>
         <span class="flex items-center gap-1">
           <button type="button" data-qty="dec" class="rounded bg-gray-700 px-2 py-1">−</button>
           <input type="number" min="1" max="${Math.max(1, item.stock || 1)}" value="${item.cantidad}" data-qty="input" class="w-14 rounded bg-black px-1 py-1 text-center text-white">
@@ -222,7 +230,10 @@
       btn.type = "button";
       btn.dataset.partId = String(item.id);
       btn.className = "flex w-full cursor-pointer items-center justify-between gap-3 rounded border border-cyan-400/20 bg-black/50 p-3 text-left hover:border-cyan-300 hover:bg-cyan-950/40";
-      btn.innerHTML = `<span><strong>${item.nombre}</strong><br><span class="text-xs text-gray-400">${item.part_number || item.codigo_oem || "Sin código"} · Stock ${item.stock} · ${item.ubicacion || "Sin ubicación"} ${item.medida ? "· " + item.medida : ""}</span></span><span class="shrink-0 rounded bg-cyan-500 px-2 py-1 text-xs font-bold text-gray-950">Agregar</span>`;
+      const available = Number(item.stock || 0);
+      btn.disabled = available <= 0;
+      btn.classList.toggle("opacity-50", available <= 0);
+      btn.innerHTML = `<span><strong>${item.nombre}</strong><br><span class="text-xs text-gray-400">${item.part_number || item.codigo_oem || "Sin código"} · ${item.ubicacion || "Sin ubicación"} ${item.medida ? "· " + item.medida : ""}</span></span><span class="flex shrink-0 flex-col items-end gap-1">${stockLabel(available)}<span class="rounded bg-cyan-500 px-2 py-1 text-xs font-bold text-gray-950">${available > 0 ? "Agregar" : "Sin stock"}</span></span>`;
       results.appendChild(btn);
       }
     } catch (_) {
