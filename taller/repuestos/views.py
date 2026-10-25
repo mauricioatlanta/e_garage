@@ -17,6 +17,7 @@ from taller.models.clientes import Cliente
 from taller.models.repuesto import Repuesto
 from taller.repuestos.pos_service import PartsPOSService
 from taller.services.empresa_service import get_empresa_safe
+from taller.templatetags.country_url import reverse_country_url
 from taller.utils.country_config import get_tax_name, get_tax_rate
 
 from .views_cbv import (
@@ -129,7 +130,7 @@ def pos_confirmar_venta(request):
         "total": str(documento.total),
         "tax_amount": str(documento.tax_amount or 0),
         "apply_vat": bool(documento.apply_vat),
-        "print_url": f"../documentos/ver/{documento.pk}/",
+        "print_url": reverse_country_url(request, "documentos:ver_documento", documento.pk),
     })
 
 

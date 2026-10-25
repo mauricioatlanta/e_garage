@@ -74,6 +74,8 @@ class PartsPOSTests(TestCase):
         linea = LineaRepuesto.objects.get(documento=documento)
         self.assertEqual(linea.origen_repuesto, ORIGEN_STOCK_BODEGA)
         self.assertEqual(linea.cantidad, 2)
+        self.assertTrue(data["print_url"].endswith(f"/documentos/ver/{documento.pk}/"))
+        self.assertNotIn("/repuestos/documentos/", data["print_url"])
 
     def test_pos_rolls_back_when_stock_is_insufficient(self):
         repuesto = RepuestoFactory(
