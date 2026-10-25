@@ -19,7 +19,13 @@ The resolved dict contract (guaranteed keys):
 """
 from __future__ import annotations
 
-from taller.constants.business_modules import ALWAYS_ON, MODULES_BY_RUBRO, NAV_ITEMS, PATH_HINTS
+from taller.constants.business_modules import (
+    ALWAYS_ON,
+    MOD_DOCUMENTOS,
+    MODULES_BY_RUBRO,
+    NAV_ITEMS,
+    PATH_HINTS,
+)
 from taller.constants.workspaces import TERMINOLOGY, WorkspaceDef, get_workspace_def
 
 
@@ -185,7 +191,9 @@ class WorkspaceService:
                 # definición lleva nav_key/path propios y debe conservarse;
                 # el resto de módulos ALWAYS_ON se muestra solo una vez.
                 if key in ALWAYS_ON and not (
-                    nav_def.path and nav_key not in seen_nav_keys
+                    key == MOD_DOCUMENTOS
+                    and nav_def.path
+                    and nav_key not in seen_nav_keys
                 ):
                     continue
                 if nav_key in seen_nav_keys:
@@ -197,8 +205,6 @@ class WorkspaceService:
         # Safety net: active modules not covered by any workspace nav definition.
         fallback_modules = active - seen_module_keys
         if ws.product_key == "RECYCLING":
-            from taller.constants.business_modules import MOD_DOCUMENTOS
-
             fallback_modules = fallback_modules - {MOD_DOCUMENTOS}
 
         for key in sorted(fallback_modules, key=lambda k: NAV_ITEMS[k]["order"]):

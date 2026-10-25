@@ -2060,6 +2060,12 @@ class MultiRubroNavGroupTests(TestCase):
         nav = self._nav("WORKSHOP", ["DESARMADURIA"])
         for mod in ALWAYS_ON:
             count = sum(1 for i in nav if i["key"] == mod)
+            if mod == MOD_DOCUMENTOS:
+                # El workspace de desarme aporta su historial de ventas
+                # separado; documentos de taller y ventas de desarme son
+                # accesos distintos aunque compartan módulo técnico.
+                self.assertEqual(count, 2)
+                continue
             self.assertLessEqual(count, 1,
                                  f"{mod} aparece {count} veces — ALWAYS_ON no debe duplicarse")
 
