@@ -97,7 +97,7 @@ PRODUCT_PROFILES = {
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",               "icon": "fas fa-home"},
             {"key": MOD_DESARME,       "label": "Vehículos de Desarme", "icon": "fas fa-car-crash"},
-            {"key": MOD_REPUESTOS,     "label": "Inventario",           "icon": "fas fa-boxes"},
+            {"key": MOD_REPUESTOS,     "label": "Inventario de desarme", "icon": "fas fa-boxes"},
             {"key": MOD_DOCUMENTOS,    "label": "Ventas",               "icon": "fas fa-shopping-cart"},
             {"key": MOD_CLIENTES,      "label": "Clientes",             "icon": "fas fa-users"},
             {"key": MOD_REPORTES,      "label": "Reportes",             "icon": "fas fa-chart-bar"},
@@ -107,7 +107,7 @@ PRODUCT_PROFILES = {
         "quick_access": [
             {"label": "Ingresar Vehículo", "icon": "fas fa-plus-circle",   "path": "desarme/vehiculos/crear/"},
             {"label": "Registrar Venta",   "icon": "fas fa-shopping-cart", "path": "documentos/form/"},
-            {"label": "Ver Inventario",    "icon": "fas fa-boxes",         "path": "repuestos/"},
+            {"label": "Ver Inventario de desarme", "icon": "fas fa-boxes", "path": "repuestos/"},
         ],
     },
 
@@ -119,7 +119,7 @@ PRODUCT_PROFILES = {
         "default_rubro": "PARTS",
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",        "icon": "fas fa-home"},
-            {"key": MOD_REPUESTOS,     "label": "Inventario",    "icon": "fas fa-boxes"},
+            {"key": MOD_REPUESTOS,     "label": "Inventario de repuestos", "icon": "fas fa-boxes"},
             {"key": MOD_DOCUMENTOS,    "label": "Ventas",        "icon": "fas fa-shopping-cart"},
             {"key": MOD_CLIENTES,      "label": "Clientes",      "icon": "fas fa-users"},
             {"key": MOD_REPORTES,      "label": "Reportes",      "icon": "fas fa-chart-bar"},
@@ -129,7 +129,7 @@ PRODUCT_PROFILES = {
         "quick_access": [
             {"label": "Nueva Venta",      "icon": "fas fa-shopping-cart", "path": "documentos/form/"},
             {"label": "Agregar Repuesto", "icon": "fas fa-plus",          "path": "repuestos/crear/"},
-            {"label": "Ver Inventario",   "icon": "fas fa-boxes",         "path": "repuestos/"},
+            {"label": "Ver Inventario de repuestos", "icon": "fas fa-boxes", "path": "repuestos/"},
         ],
     },
 
