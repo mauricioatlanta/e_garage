@@ -124,6 +124,8 @@ class WorkspaceService:
     @staticmethod
     def _url_for_nav_def(nav_def, url_prefix: str) -> str:
         if nav_def.path:
+            if nav_def.path.startswith("/"):
+                return nav_def.path
             return f"{url_prefix}/{nav_def.path}"
         return f"{url_prefix}/{NAV_ITEMS[nav_def.module_key]['path']}"
 
