@@ -315,6 +315,9 @@
       status.innerHTML = `Venta ${data.numero} creada. Total ${money(data.total)} · Impuesto ${money(data.tax_amount || 0)}. <a class="text-cyan-300" href="${data.print_url}">Ver documento</a>`;
       cart.clear();
       renderCart();
+      window.setTimeout(() => {
+        window.location.assign(data.sales_url || data.print_url);
+      }, 700);
     } catch (_) {
       status.textContent = "No se pudo conectar con el servidor. La venta no fue confirmada.";
     } finally {
