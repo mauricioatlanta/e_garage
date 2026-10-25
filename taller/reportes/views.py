@@ -177,10 +177,15 @@ def reportes_dashboard(request):
     active_rubros = {str(r or "").strip().upper() for r in active_rubros}
     parts_reports_mode = "PARTS" in active_rubros and "WORKSHOP" not in active_rubros
     tire_reports_mode = "TIRE" in active_rubros and "WORKSHOP" not in active_rubros
+    carwash_reports_mode = "DETAILING" in active_rubros and "WORKSHOP" not in active_rubros
     return render(
         request,
         "taller/reportes/reportes.html",
-        {"parts_reports_mode": parts_reports_mode, "tire_reports_mode": tire_reports_mode},
+        {
+            "parts_reports_mode": parts_reports_mode,
+            "tire_reports_mode": tire_reports_mode,
+            "carwash_reports_mode": carwash_reports_mode,
+        },
     )
 
 

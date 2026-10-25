@@ -220,8 +220,8 @@
     <div class="reportes-header">
       <span class="header-icon">📊</span>
       <div>
-        <h1>{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Centro de Reportes de Repuestos{% elif tire_reports_mode %}Centro de Reportes de Vulcanización{% else %}Centro de Reportes{% endif %}{% else %}Reports Center{% endif %}</h1>
-        <p>{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode or tire_reports_mode %}Ventas, servicios, inventario y rentabilidad en tiempo real{% else %}Análisis inteligente y visualización de datos{% endif %}{% else %}Smart analysis and real-time data visualization{% endif %}</p>
+        <h1>{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Centro de Reportes de Repuestos{% elif tire_reports_mode %}Centro de Reportes de Vulcanización{% elif carwash_reports_mode %}Centro de Reportes de Car Wash{% else %}Centro de Reportes{% endif %}{% else %}Reports Center{% endif %}</h1>
+        <p>{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode or tire_reports_mode %}Ventas, servicios, inventario y rentabilidad en tiempo real{% elif carwash_reports_mode %}Servicios, caja, clientes y recurrencia en tiempo real{% else %}Análisis inteligente y visualización de datos{% endif %}{% else %}Smart analysis and real-time data visualization{% endif %}</p>
       </div>
     </div>
 
@@ -262,7 +262,7 @@
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>{% endif %}
 
-        {% if not parts_reports_mode and not tire_reports_mode %}<a href="kilometraje/recordatorios/" class="reporte-card featured">
+        {% if not parts_reports_mode and not tire_reports_mode and not carwash_reports_mode %}<a href="kilometraje/recordatorios/" class="reporte-card featured">
           <div class="reporte-icon">🚨</div>
           <div class="reporte-text">
             <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Recordatorios{% else %}Maintenance Reminders{% endif %}</div>
@@ -282,14 +282,14 @@
       </h2>
       <div class="reportes-grid">
 
-        <a href="repuestos/" class="reporte-card">
+        {% if not carwash_reports_mode %}<a href="repuestos/" class="reporte-card">
           <div class="reporte-icon">🔩</div>
           <div class="reporte-text">
             <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Dashboard de Neumáticos{% else %}Dashboard Repuestos{% endif %}{% else %}Parts Dashboard{% endif %}</div>
             <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Medidas, marcas, ventas y stock crítico{% else %}Top ventas, márgenes, stock crítico{% endif %}{% else %}Top sales, margins, critical stock{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
-        </a>
+        </a>{% endif %}
 
         {% if request.user|is_owner %}
         <a href="dashboard-rentabilidad/" class="reporte-card">
@@ -310,7 +310,7 @@
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>
 
-        {% if not parts_reports_mode %}<a href="comparativo-precios/" class="reporte-card">
+        {% if not parts_reports_mode and not carwash_reports_mode %}<a href="comparativo-precios/" class="reporte-card">
           <div class="reporte-icon">💰</div>
           <div class="reporte-text">
             <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Comparativo Precios{% else %}Price Comparison{% endif %}</div>
@@ -343,8 +343,8 @@
         {% if not parts_reports_mode %}<a href="servicios/" class="reporte-card">
           <div class="reporte-icon">🛠️</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Servicios de Vulcanización{% else %}Servicios Realizados{% endif %}{% else %}Services Performed{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Montaje, balanceo, parches y rotación{% else %}Ingresos, frecuencia, tipos más solicitados{% endif %}{% else %}Revenue, frequency, most requested{% endif %}</div>
+            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Servicios de Vulcanización{% elif carwash_reports_mode %}Servicios de Car Wash{% else %}Servicios Realizados{% endif %}{% else %}Services Performed{% endif %}</div>
+            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Montaje, balanceo, parches y rotación{% elif carwash_reports_mode %}Lavados, pulidos y servicios más solicitados{% else %}Ingresos, frecuencia, tipos más solicitados{% endif %}{% else %}Revenue, frequency, most requested{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>{% endif %}
@@ -358,11 +358,11 @@
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>{% endif %}
 
-        <a href="{% if parts_reports_mode %}../clientes/{% else %}servicios/?enfoque=clientes{% endif %}" class="reporte-card">
+        <a href="{% if parts_reports_mode or carwash_reports_mode %}../clientes/{% else %}servicios/?enfoque=clientes{% endif %}" class="reporte-card">
           <div class="reporte-icon">👤</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Clientes y compradores{% else %}Clientes{% endif %}{% else %}Customers{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Compradores activos y recurrencia{% else %}Activos, nuevos, históricos, recurrencia{% endif %}{% else %}Active, new, historical, recurrence{% endif %}</div>
+            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Clientes y compradores{% elif carwash_reports_mode %}Clientes y recurrencia{% else %}Clientes{% endif %}{% else %}Customers{% endif %}</div>
+            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Compradores activos y recurrencia{% elif carwash_reports_mode %}Clientes nuevos, frecuentes e inactivos{% else %}Activos, nuevos, históricos, recurrencia{% endif %}{% else %}Active, new, historical, recurrence{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>
@@ -370,8 +370,8 @@
         <a href="{% if parts_reports_mode %}../documentos/?tipo=PTS{% else %}servicios/?enfoque=facturacion_total{% endif %}" class="reporte-card">
           <div class="reporte-icon">💸</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Ventas y facturación{% else %}Facturación{% endif %}{% else %}Billing{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Ingresos por periodo y venta{% else %}Ingresos por periodo, servicio y cliente{% endif %}{% else %}Revenue by period, service, customer{% endif %}</div>
+            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Ventas y facturación{% elif carwash_reports_mode %}Caja y facturación{% else %}Facturación{% endif %}{% else %}Billing{% endif %}</div>
+            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Ingresos por periodo y venta{% elif carwash_reports_mode %}Ingresos por lavado, servicio y cliente{% else %}Ingresos por periodo, servicio y cliente{% endif %}{% else %}Revenue by period, service, customer{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>
