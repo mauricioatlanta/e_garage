@@ -11,9 +11,11 @@ from taller.forms.configuracion_forms import ConfiguracionServiciosForm
 from taller.models.configuracion import ConfiguracionEmpresa
 from taller.servicios.models import ServicioBase
 from taller.utils.empresa import get_or_create_empresa
+from taller.auth.decorators_role import role_required
 
 
 @login_required
+@role_required("Owner", "Admin")
 def configurar_servicios(request):
     """
     Vista para configurar los rubros de la empresa y gestionar servicios disponibles.
@@ -23,8 +25,9 @@ def configurar_servicios(request):
     - Ver servicios disponibles según los rubros seleccionados
     - Ver servicios bloqueados (no relacionados con los rubros seleccionados)
     """
-    # Obtener la empresa asociada al usuario autenticado
-    empresa = get_user_empresa_safe(request.user)
+    # El middleware resuelve la empresa activa (incluido QA); el helper conserva
+    # compatibilidad para requests construidos fuera del stack normal.
+    empresa = getattr(request, "empresa", None) or get_or_create_empresa(request)
 
     # Obtener o crear la configuración de la empresa
     try:

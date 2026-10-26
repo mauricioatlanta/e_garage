@@ -13,8 +13,30 @@ from taller.models.lineas_documento import ORIGEN_DESARME, ORIGEN_STOCK_BODEGA
 from taller.models.lineas_documento import ORIGEN_COMPRA_TRABAJO
 from taller.models.pieza_desarme import ESTADO_DISPONIBLE, PiezaDesarme
 from taller.models.repuesto import Repuesto
-from taller.services.inventory_service import InventoryService
 from taller.services.empresa_service import get_empresa_safe
+from taller.services.inventory_intelligence import InventoryIntelligenceService
+from taller.services.inventory_service import InventoryService
+
+
+def _add_restock_messages(request, documento):
+    for alert in InventoryIntelligenceService.get_document_restock_alerts(documento):
+        repuesto = alert["repuesto"]
+        if alert["alert_state"] == "negative":
+            messages.warning(
+                request,
+                f"Incidencia: {repuesto.nombre} quedó con stock negativo ({alert['stock_actual']}).",
+            )
+        elif alert["alert_state"] == "out":
+            messages.warning(
+                request,
+                f"{repuesto.nombre} quedó agotado. Stock mínimo: {alert['stock_minimo']}.",
+            )
+        else:
+            messages.warning(
+                request,
+                f"Quedan {alert['stock_actual']} de {repuesto.nombre}. "
+                f"Stock mínimo: {alert['stock_minimo']}. Conviene reponer.",
+            )
 
 
 @login_required
@@ -115,6 +137,7 @@ def emitir_documento(request, documento_id):
             f"✅ Documento {documento.numero_documento} emitido exitosamente. "
             "Stock actualizado automáticamente.",
         )
+        _add_restock_messages(request, documento)
 
     return redirect("documentos:ver_documento", pk=documento.pk)
 

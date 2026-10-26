@@ -148,6 +148,7 @@ class WorkspaceService:
         items = []
         seen_nav_keys: set[str] = set()
         seen_module_keys: set[str] = set()
+        seen_accesses: set[tuple[str, str]] = set()
 
         def _make_item(nav_def, section: str, section_label: str) -> dict:
             key = nav_def.module_key
@@ -174,7 +175,9 @@ class WorkspaceService:
                 continue
             seen_nav_keys.add(nav_key)
             seen_module_keys.add(key)
-            items.append(_make_item(nav_def, "primary", ""))
+            item = _make_item(nav_def, "primary", "")
+            seen_accesses.add((key, item["url"]))
+            items.append(item)
 
         # Additional workspaces — secondary sections.
         # ALWAYS_ON items are already in primary; skip them to avoid duplication.
@@ -200,9 +203,14 @@ class WorkspaceService:
                     continue
                 if nav_key in seen_nav_keys:
                     continue
+                item = _make_item(nav_def, "secondary", brand_label)
+                access_identity = (key, item["url"])
+                if access_identity in seen_accesses:
+                    continue
                 seen_nav_keys.add(nav_key)
                 seen_module_keys.add(key)
-                items.append(_make_item(nav_def, "secondary", brand_label))
+                seen_accesses.add(access_identity)
+                items.append(item)
 
         # Safety net: active modules not covered by any workspace nav definition.
         fallback_modules = active - seen_module_keys

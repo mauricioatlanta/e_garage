@@ -37,14 +37,17 @@ class ReabastecimientoPanelView(LoginRequiredMixin, TenantViewMixin, ListView):
             target_coverage_days=InventoryIntelligenceService.DEFAULT_TARGET_COVERAGE_DAYS,
         )
         rows = panel["rows"]
-        if status_filter in {"critical", "warning", "stable", "idle"}:
-            rows = [row for row in rows if row["status"] == status_filter]
+        if status_filter in {"negative", "out", "low"}:
+            rows = [row for row in rows if row["alert_state"] == status_filter]
+        elif status_filter != "all":
+            rows = [row for row in rows if row["alert_state"]]
 
         context.update(
             {
                 "panel_rows": rows,
                 "panel_summary": panel["summary"],
                 "status_filter": status_filter,
+                "alert_count": sum(1 for row in panel["rows"] if row["alert_state"]),
                 "lookback_days": panel["lookback_days"],
                 "target_coverage_days": panel["target_coverage_days"],
                 "search_query": (self.request.GET.get("q") or "").strip(),

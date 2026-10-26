@@ -60,6 +60,7 @@ class InventoryIntelligenceService:
             Decimal("0.01"), rounding=ROUND_HALF_UP
         )
         stock_actual = int(repuesto.cantidad_stock or 0)
+        alert_enabled = repuesto.stock_minimo is not None
         stock_minimo = int(repuesto.stock_minimo or 0)
         dias_cobertura = cls.calculate_days_coverage(stock_actual, consumo_diario)
         sugerencia_compra = cls.calculate_purchase_suggestion(
@@ -72,7 +73,6 @@ class InventoryIntelligenceService:
         if sugerencia_compra > 0 and (
             stock_actual <= 0
             or (dias_cobertura is not None and dias_cobertura < cls.CRITICAL_COVERAGE_DAYS)
-            or (stock_minimo and stock_actual < stock_minimo)
         ):
             status = "critical"
         elif sugerencia_compra > 0:
@@ -82,6 +82,19 @@ class InventoryIntelligenceService:
         else:
             status = "idle"
 
+        if alert_enabled and stock_actual < 0:
+            alert_state = "negative"
+            alert_label = "Stock negativo"
+        elif alert_enabled and stock_actual == 0:
+            alert_state = "out"
+            alert_label = "Agotado"
+        elif alert_enabled and 0 < stock_actual <= stock_minimo:
+            alert_state = "low"
+            alert_label = "Stock bajo"
+        else:
+            alert_state = None
+            alert_label = ""
+
         return {
             "repuesto": repuesto,
             "consumo_total": total,
@@ -90,10 +103,36 @@ class InventoryIntelligenceService:
             "sugerencia_compra": sugerencia_compra,
             "stock_actual": stock_actual,
             "stock_minimo": stock_minimo,
+            "alert_enabled": alert_enabled,
+            "alert_state": alert_state,
+            "alert_label": alert_label,
             "ultimo_consumo": ultimo_consumo,
             "status": status,
             "target_coverage_days": target_days,
         }
+
+    @classmethod
+    def get_document_restock_alerts(cls, documento):
+        """Return current, company-scoped alerts for stock items in a document."""
+        repuesto_ids = list(
+            documento.lineas_repuesto.filter(
+                origen_repuesto=ORIGEN_STOCK_BODEGA,
+                repuesto_id__isnull=False,
+            ).values_list("repuesto_id", flat=True).distinct()
+        )
+        if not repuesto_ids:
+            return []
+        repuestos = Repuesto.objects.filter(
+            empresa=documento.empresa,
+            id__in=repuesto_ids,
+            stock_minimo__isnull=False,
+        ).order_by("nombre", "id")
+        alerts = []
+        for repuesto in repuestos:
+            snapshot = cls.build_repuesto_snapshot(repuesto)
+            if snapshot["alert_state"]:
+                alerts.append(snapshot)
+        return alerts
 
     @classmethod
     def _build_consumption_map(cls, empresa, start_date):
@@ -138,7 +177,9 @@ class InventoryIntelligenceService:
 
         window_days = max(int(lookback_days or cls.DEFAULT_LOOKBACK_DAYS), 1)
         target_days = int(target_coverage_days or cls.DEFAULT_TARGET_COVERAGE_DAYS)
-        start_date = timezone.localdate() - timedelta(days=window_days - 1)
+        # localdate() fails when a legacy/test timezone implementation returns
+        # a naive datetime. Consumption only needs the current calendar date.
+        start_date = timezone.now().date() - timedelta(days=window_days - 1)
         repuestos = queryset if queryset is not None else Repuesto.objects.filter(empresa=empresa)
         consumo_map = cls._build_consumption_map(empresa, start_date)
 

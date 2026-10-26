@@ -9,6 +9,13 @@ from taller.services.registration_service import RegistrationService
 from taller.services.registro_embudo_service import registrar_signup
 from taller.utils.country_config import get_country_config
 from taller.utils.plan_catalog import normalize_plan_code
+from taller.config.business_activities import (
+    ACTIVITY_GROUPS,
+    GROUP_CHOICES,
+    GROUP_TO_RUBROS,
+    VALID_GROUP_KEYS,
+    expand_activity_groups,
+)
 
 # ---------------------------------------------------------------------------
 # Grupos simplificados de rubros para el selector de signup.
@@ -24,121 +31,21 @@ from taller.utils.plan_catalog import normalize_plan_code
 # El límite de 2 grupos adicionales (máx 3 en total) pertenece ÚNICAMENTE
 # al formulario de signup. El modelo y el servicio no imponen ese límite.
 # ---------------------------------------------------------------------------
-SIGNUP_RUBRO_GROUPS = [
-    {
-        "key": "TALLER_MECANICO",
-        "label": "Taller Mecánico",
-        "label_en": "Auto Repair Shop",
-        "description": "Autos, motos, camiones — reparación y mantención",
-        "description_en": "Cars, motorcycles, trucks — repair and maintenance",
-        "icon": "🔧",
-        "rubros": ["WORKSHOP", "WORKSHOP_MOTO", "WORKSHOP_HEAVY"],
-    },
-    {
-        "key": "CASA_REPUESTOS",
-        "label": "Casa de Repuestos",
-        "label_en": "Auto Parts Store",
-        "description": "Venta de partes y repuestos automotrices",
-        "description_en": "Auto parts and accessories sales",
-        "icon": "📦",
-        "rubros": ["PARTS"],
-    },
-    {
-        "key": "DESARMADURIA",
-        "label": "Desarmaduría / Salvage",
-        "label_en": "Salvage Yard / Dismantler",
-        "description": "Desarme de vehículos, venta de piezas desmontadas",
-        "description_en": "Vehicle dismantling and used parts sales",
-        "icon": "🔩",
-        "rubros": ["DESARMADURIA"],
-    },
-    {
-        "key": "NEUMATICOS",
-        "label": "Neumáticos / Vulcanización",
-        "label_en": "Tires / Wheel Shop",
-        "description": "Venta e instalación de neumáticos y llantas",
-        "description_en": "Tire and wheel sales and installation",
-        "icon": "⭕",
-        "rubros": ["TIRE"],
-    },
-    {
-        "key": "CARROCERIA_DETAILING",
-        "label": "Carrocería / Pintura / Detailing",
-        "label_en": "Body Shop / Detailing",
-        "description": "Reparación de chapa, pintura, lavado y estética",
-        "description_en": "Bodywork, paint, wash and detailing",
-        "icon": "🎨",
-        "rubros": ["BODYSHOP", "DETAILING"],
-    },
-    {
-        "key": "RECICLAJE",
-        "label": "Reciclaje",
-        "label_en": "Recycling",
-        "description": "Compra y reventa de catalíticos y chatarra electrónica",
-        "description_en": "Catalytic converter and e-scrap buying and resale",
-        "icon": "♻️",
-        "rubros": ["RECYCLING"],
-    },
-    {
-        "key": "ESPECIALISTA",
-        "label": "Especialista",
-        "label_en": "Specialist",
-        "description": "Electricidad, escapes, suspensión, audio u otra especialidad",
-        "description_en": "Electrical, exhaust, suspension, audio or other specialty",
-        "icon": "⚡",
-        "rubros": ["ELECTRIC", "EXHAUST", "SUSPENSION_STEERING", "GLASS_AUDIO", "BRAKES"],
-    },
-    {
-        "key": "OTRO",
-        "label": "Otro / Mixto",
-        "label_en": "Other / Mixed",
-        "description": "Negocio no listado o con múltiples giros",
-        "description_en": "Unlisted business or multiple services",
-        "icon": "⊞",
-        "rubros": ["MIXED"],
-    },
-    {
-        "key": "GRUAS",
-        "label": "Grúas y asistencia vial",
-        "label_en": "Towing and roadside assistance",
-        "description": "Traslado, rescate y asistencia de vehículos",
-        "description_en": "Vehicle towing, recovery and roadside assistance",
-        "icon": "🚛",
-        "rubros": ["TOWING"],
-    },
-]
+# Compatibility exports: callers/tests historically import these names here.
+SIGNUP_RUBRO_GROUPS = [dict(group, rubros=list(group["rubros"])) for group in ACTIVITY_GROUPS]
+_GROUP_KEY_TO_RUBROS = GROUP_TO_RUBROS
+_SIGNUP_GROUP_CHOICES = list(GROUP_CHOICES)
+_VALID_GROUP_KEYS = VALID_GROUP_KEYS
 
-_GROUP_KEY_TO_RUBROS = {g["key"]: g["rubros"] for g in SIGNUP_RUBRO_GROUPS}
-_SIGNUP_GROUP_CHOICES = [(g["key"], g["label"]) for g in SIGNUP_RUBRO_GROUPS]
-_VALID_GROUP_KEYS = frozenset(_GROUP_KEY_TO_RUBROS)
 PUBLIC_RUBRO_ALIASES = {
-    "taller": "TALLER_MECANICO",
-    "talleres": "TALLER_MECANICO",
-    "workshop": "TALLER_MECANICO",
-    "desarmaduria": "DESARMADURIA",
-    "desarmadurias": "DESARMADURIA",
-    "salvage": "DESARMADURIA",
-    "repuestos": "CASA_REPUESTOS",
-    "repuesto": "CASA_REPUESTOS",
-    "parts": "CASA_REPUESTOS",
-    "casa_repuestos": "CASA_REPUESTOS",
-    "reciclaje": "RECICLAJE",
-    "recycling": "RECICLAJE",
-    "vulcanizacion": "NEUMATICOS",
-    "vulcanizaciones": "NEUMATICOS",
-    "neumaticos": "NEUMATICOS",
-    "neumatico": "NEUMATICOS",
-    "tire": "NEUMATICOS",
-    "tires": "NEUMATICOS",
-    "llantera": "NEUMATICOS",
-    "llantas": "NEUMATICOS",
-    "gomeria": "NEUMATICOS",
-    "carwash": "CARROCERIA_DETAILING",
-    "lavado": "CARROCERIA_DETAILING",
-    "gruas": "GRUAS",
-    "grua": "GRUAS",
-    "towing": "GRUAS",
-    "asistencia_vial": "GRUAS",
+    "taller": "TALLER_MECANICO", "talleres": "TALLER_MECANICO", "workshop": "TALLER_MECANICO",
+    "desarmaduria": "DESARMADURIA", "desarmadurias": "DESARMADURIA", "salvage": "DESARMADURIA",
+    "repuestos": "CASA_REPUESTOS", "repuesto": "CASA_REPUESTOS", "parts": "CASA_REPUESTOS", "casa_repuestos": "CASA_REPUESTOS",
+    "reciclaje": "RECICLAJE", "recycling": "RECICLAJE",
+    "vulcanizacion": "NEUMATICOS", "vulcanizaciones": "NEUMATICOS", "neumaticos": "NEUMATICOS", "neumatico": "NEUMATICOS",
+    "tire": "NEUMATICOS", "tires": "NEUMATICOS", "llantera": "NEUMATICOS", "llantas": "NEUMATICOS", "gomeria": "NEUMATICOS",
+    "carwash": "CARROCERIA_DETAILING", "lavado": "CARROCERIA_DETAILING",
+    "gruas": "GRUAS", "grua": "GRUAS", "towing": "GRUAS", "asistencia_vial": "GRUAS",
 }
 
 
@@ -171,11 +78,11 @@ class CustomSignupForm(SignupForm):
     first_name = forms.CharField(
         max_length=100,
         label="Nombre",
-        required=True,
+        required=False,  # ✅ Opcional
         widget=forms.TextInput(
-            attrs={"class": "input-futurista", "placeholder": "Tu nombre"}
+            attrs={"class": "input-futurista", "placeholder": "Nombre (opcional)"}
         ),
-        help_text="",
+        help_text="Ingresa tu nombre (opcional)",
     )
     last_name = forms.CharField(
         max_length=100,
@@ -197,12 +104,12 @@ class CustomSignupForm(SignupForm):
     )
     nombre_taller = forms.CharField(
         max_length=100,
-        label="Nombre del taller",
-        required=True,
+        label="Nombre de tu Taller (Opcional)",
+        required=False,  # ✅ FLUJO "LITE": Campo opcional
         widget=forms.TextInput(
-            attrs={"class": "input-futurista", "placeholder": "Ej: Taller San Miguel"}
+            attrs={"class": "input-futurista", "placeholder": "Ej: Taller San Miguel (Opcional)"}
         ),
-        help_text="",
+        help_text="Puedes dejarlo en blanco y configurarlo después en Settings",
     )
     # ✅ PAÍS: Selector visible para que el usuario elija su país en todos los signups
     COUNTRY_CHOICES = [("", "--- Seleccione país / Select country ---")] + \
@@ -257,11 +164,11 @@ class CustomSignupForm(SignupForm):
                 {"class": "input-futurista", "placeholder": "email@ejemplo.com"}
             )
 
-        # Campos mínimos del signup público.
+        # ✅ CAMPOS OPCIONALES: first_name, last_name, telefono ahora son opcionales
         if "first_name" in self.fields:
-            self.fields["first_name"].required = True
+            self.fields["first_name"].required = False  # ✅ Opcional
             self.fields["first_name"].widget.attrs.update(
-                {"class": "input-futurista", "placeholder": "Tu nombre"}
+                {"class": "input-futurista", "placeholder": "Nombre (opcional)"}
             )
             # Asegurar que el widget sea visible
             if hasattr(self.fields["first_name"].widget, "input_type"):
@@ -280,11 +187,11 @@ class CustomSignupForm(SignupForm):
         if "telefono" in self.fields:
             self.fields["telefono"].required = True  # ✅ OBLIGATORIO
 
-        # Configurar nombre_taller como dato mínimo de alta.
+        # Configurar nombre_taller como opcional
         if "nombre_taller" in self.fields:
-            self.fields["nombre_taller"].required = True
+            self.fields["nombre_taller"].required = False
             self.fields["nombre_taller"].widget.attrs.update(
-                {"class": "input-futurista", "placeholder": "Ej: Taller San Miguel"}
+                {"class": "input-futurista", "placeholder": "Ej: Taller San Miguel (Opcional)"}
             )
 
         # ✅ Username opcional - usar email como username si no se proporciona
@@ -325,13 +232,6 @@ class CustomSignupForm(SignupForm):
         if self.country_code and "country" in self.fields:
             self.fields["country"].initial = self.country_code
 
-        rubro_from_url = ""
-        if request:
-            rubro_from_url = (request.GET.get("rubro", "") or "").strip().upper()
-        normalized_rubro = normalize_public_rubro(rubro_from_url)
-        if normalized_rubro and "rubro_principal_signup" in self.fields:
-            self.fields["rubro_principal_signup"].initial = normalized_rubro
-
         # Obtener configuración del país y prefijo telefónico
         if self.country_code:
             country_config = get_country_config(self.country_code)
@@ -369,8 +269,8 @@ class CustomSignupForm(SignupForm):
             self.fields["country"].choices = ch
         if "first_name" in self.fields:
             self.fields["first_name"].label = "First name"
-            self.fields["first_name"].help_text = ""
-            self.fields["first_name"].widget.attrs["placeholder"] = "Your name"
+            self.fields["first_name"].help_text = "Optional"
+            self.fields["first_name"].widget.attrs["placeholder"] = "First name (optional)"
         if "last_name" in self.fields:
             self.fields["last_name"].label = "Last name"
             self.fields["last_name"].help_text = "Optional"
@@ -379,9 +279,13 @@ class CustomSignupForm(SignupForm):
             self.fields["telefono"].label = "Mobile (WhatsApp)"
             self.fields["telefono"].help_text = "Mobile number with country code (E.164 format)"
         if "nombre_taller" in self.fields:
-            self.fields["nombre_taller"].label = "Workshop name"
-            self.fields["nombre_taller"].help_text = ""
-            self.fields["nombre_taller"].widget.attrs["placeholder"] = "e.g. Main Street Auto"
+            self.fields["nombre_taller"].label = "Workshop name (optional)"
+            self.fields["nombre_taller"].help_text = (
+                "You can leave this blank and set it later in Settings"
+            )
+            self.fields["nombre_taller"].widget.attrs[
+                "placeholder"
+            ] = "e.g. Main Street Auto (optional)"
         if "password1" in self.fields:
             self.fields["password1"].label = "Password"
         if "password2" in self.fields:
@@ -417,7 +321,9 @@ class CustomSignupForm(SignupForm):
         return "Este número de contacto ya está vinculado a un taller registrado en eGarage."
 
     def clean_rubro_principal_signup(self):
-        group = normalize_public_rubro(self.cleaned_data.get("rubro_principal_signup") or "")
+        group = normalize_public_rubro(
+            self.cleaned_data.get("rubro_principal_signup") or ""
+        )
         if not group:
             raise forms.ValidationError(
                 "Please select your primary business type."
@@ -467,24 +373,7 @@ class CustomSignupForm(SignupForm):
         principal_group = self.cleaned_data.get("rubro_principal_signup") or ""
         adicionales = list(self.cleaned_data.get("rubros_adicionales") or [])
 
-        rubros: list = []
-
-        def _add(r: str) -> None:
-            if r not in rubros:
-                rubros.append(r)
-
-        # Primero: todos los rubros del grupo principal
-        for r in _GROUP_KEY_TO_RUBROS.get(principal_group, []):
-            _add(r)
-
-        # Luego: rubros de cada grupo adicional (excluyendo el principal)
-        for g in adicionales:
-            if g == principal_group:
-                continue
-            for r in _GROUP_KEY_TO_RUBROS.get(g, []):
-                _add(r)
-
-        return rubros
+        return expand_activity_groups(principal_group, adicionales)
 
     def clean_email(self):
         raw_email = (self.cleaned_data.get("email") or "").strip().lower()
@@ -703,12 +592,6 @@ class CustomSignupForm(SignupForm):
         )  # Valor por defecto si está vacío
         user.last_name = data.get("last_name", "").strip() or ""  # Opcional
         user.save()
-        try:
-            from taller.auth.password_policy import set_user_must_change_password
-
-            set_user_must_change_password(user, False)
-        except Exception:
-            pass
 
         # 3. ✅ Detectar país: 1) selección del usuario en el formulario, 2) ?from=xx, 3) URL, 4) CL por defecto
         from_param = request.GET.get("from", "").upper()

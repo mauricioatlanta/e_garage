@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Actividades de la empresa" %} - eGarage{% endblock %}
+
+{% block content %}
+<main class="max-w-4xl mx-auto px-4 py-8 text-white">
+  <div class="rounded-2xl border border-cyan-500/30 bg-slate-950/80 p-6 shadow-xl">
+    <h1 class="text-2xl font-bold text-cyan-300">{% trans "Actividades de la empresa" %}</h1>
+    <p class="mt-2 text-slate-300">
+      {% trans "La actividad principal define el entorno visual. Las adicionales habilitan sus herramientas sin borrar inventario ni historial." %}
+    </p>
+
+    <form method="post" class="mt-6 space-y-6">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div>
+        <label for="{{ form.actividad_principal.id_for_label }}" class="block font-semibold mb-2">{{ form.actividad_principal.label }}</label>
+        {{ form.actividad_principal }}
+        {% for error in form.actividad_principal.errors %}<p class="text-red-300 mt-1">{{ error }}</p>{% endfor %}
+      </div>
+      <fieldset>
+        <legend class="font-semibold mb-2">{{ form.actividades_adicionales.label }}</legend>
+        <p class="text-sm text-slate-400 mb-3">{% trans "Selecciona solamente las actividades que la empresa realiza actualmente." %}</p>
+        <div class="grid gap-3 sm:grid-cols-2">{{ form.actividades_adicionales }}</div>
+        {% for error in form.actividades_adicionales.errors %}<p class="text-red-300 mt-1">{{ error }}</p>{% endfor %}
+      </fieldset>
+      <div class="flex gap-3">
+        <button type="submit" class="rounded-lg bg-cyan-500 px-5 py-3 font-bold text-slate-950">{% trans "Guardar actividades" %}</button>
+        <a href="../" class="rounded-lg border border-slate-500 px-5 py-3">{% trans "Volver" %}</a>
+      </div>
+    </form>
+  </div>
+</main>
+{% endblock %}

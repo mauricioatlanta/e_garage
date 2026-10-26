@@ -13,6 +13,7 @@ from taller.views_ingreso import (
 centro_trabajo = ingreso_centro
 centro_trabajo_buscar = ingreso_buscar
 from taller.views_extra.company_settings_views import company_settings_view
+from taller.views_extra.configuracion_servicios_views import configurar_servicios
 from taller.views_extra.dashboard_empresa import (
     dashboard_centro_operaciones,
     dashboard_centro_operaciones_espacial,
@@ -135,6 +136,7 @@ urlpatterns = [
     # Puedes agregar aquí otras rutas globales si es necesario
     path("ajax/", include(("taller.ajax.urls", "ajax"), namespace="ajax")),
     # Company settings
+    path("settings/activities/", configurar_servicios, name="company_activities"),
     path("settings/", company_settings_view, name="company_settings"),
     # Centro de Ayuda
     path("help/", include(("taller.help.urls", "help"), namespace="help")),

@@ -2046,19 +2046,20 @@ class MultiRubroNavGroupTests(TestCase):
         self.assertGreater(len(sections), 0,
                            "Se esperan section_labels en nav multi-rubro WORKSHOP+DESARMADURIA")
 
-    def test_workshop_plus_desarmaduria_mod_repuestos_appears_twice(self):
+    def test_workshop_plus_desarmaduria_repuestos_destinations_are_unique(self):
         nav = self._nav("WORKSHOP", ["DESARMADURIA"])
         repuestos_items = [i for i in nav if i["key"] == MOD_REPUESTOS]
-        self.assertEqual(len(repuestos_items), 2,
-                         "MOD_REPUESTOS debe aparecer dos veces: taller_parts + desarm_parts")
+        self.assertEqual(len(repuestos_items), 3)
         nav_keys = {i.get("nav_key") for i in repuestos_items}
         self.assertIn("taller_parts", nav_keys)
         self.assertIn("desarm_parts", nav_keys)
+        self.assertIn("desarm_kiosko", nav_keys)
+        self.assertEqual(len({i["url"] for i in repuestos_items}), 3)
 
     def test_workshop_plus_desarmaduria_always_on_not_duplicated(self):
         from taller.constants.business_modules import ALWAYS_ON
         nav = self._nav("WORKSHOP", ["DESARMADURIA"])
-        for mod in ALWAYS_ON:
+        for mod in ALWAYS_ON - {MOD_DOCUMENTOS}:
             count = sum(1 for i in nav if i["key"] == mod)
             if mod == MOD_DOCUMENTOS:
                 # El workspace de desarme aporta su historial de ventas
@@ -2088,11 +2089,28 @@ class MultiRubroNavGroupTests(TestCase):
             f"Se esperan nav_keys de taller en sección secundaria. Obtenido: {secondary_nav_keys}",
         )
 
+    def test_desarmaduria_plus_expanded_workshop_has_sales_and_jobs_once(self):
+        nav = self._nav(
+            "DESARMADURIA",
+            ["WORKSHOP", "WORKSHOP_MOTO", "WORKSHOP_HEAVY"],
+        )
+        document_items = [item for item in nav if item["key"] == MOD_DOCUMENTOS]
+        self.assertEqual(len(document_items), 2)
+        self.assertEqual(
+            {item["nav_key"] for item in document_items},
+            {"desarm_sales", "taller_docs"},
+        )
+        self.assertTrue(any(item["url"].endswith("/desarme/ventas/") for item in document_items))
+        self.assertTrue(any(item["url"].endswith("/documentos/") for item in document_items))
+        self.assertEqual(
+            len([item for item in nav if item["nav_key"] == "taller_services"]),
+            1,
+        )
+
     def test_parts_plus_workshop_repuestos_appears_twice(self):
         nav = self._nav("PARTS", ["WORKSHOP"])
         repuestos_items = [i for i in nav if i["key"] == MOD_REPUESTOS]
-        self.assertGreaterEqual(len(repuestos_items), 2,
-                                "PARTS+WORKSHOP debe tener al menos 2 entradas MOD_REPUESTOS")
+        self.assertEqual(len(repuestos_items), 1,
+                         "El mismo destino de repuestos no debe repetirse")
         nav_keys = {i.get("nav_key") for i in repuestos_items}
         self.assertIn("parts_inventory", nav_keys)
-        self.assertIn("taller_parts", nav_keys)

@@ -53,7 +53,7 @@
                 color:{% if object.stock_minimo and object.cantidad_stock <= object.stock_minimo %}#f87171{% else %}#34d399{% endif %};">
         {{ object.cantidad_stock }}
       </p>
-      {% if object.stock_minimo %}
+      {% if object.stock_minimo is not None %}
       <p style="margin:4px 0 0; font-size:.75rem; color:#64748b;">mínimo {{ object.stock_minimo }}</p>
       {% endif %}
     </div>
