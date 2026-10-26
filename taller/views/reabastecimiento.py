@@ -4,6 +4,7 @@ from django.views.generic import ListView
 
 from core.views import TenantViewMixin
 from taller.models.repuesto import Repuesto
+from taller.services.empresa_service import get_empresa_safe
 from taller.services.inventory_intelligence import InventoryIntelligenceService
 
 
@@ -15,7 +16,10 @@ class ReabastecimientoPanelView(LoginRequiredMixin, TenantViewMixin, ListView):
     paginate_by = None
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        empresa = get_empresa_safe(self.request)
+        if not empresa:
+            return Repuesto.objects.none()
+        qs = Repuesto.objects.filter(empresa=empresa).select_related(*self.select_related_fields)
         q = (self.request.GET.get("q") or "").strip()
         if q:
             qs = qs.filter(
@@ -28,7 +32,7 @@ class ReabastecimientoPanelView(LoginRequiredMixin, TenantViewMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = get_empresa_safe(self.request)
         status_filter = (self.request.GET.get("status") or "").strip().lower()
         panel = InventoryIntelligenceService.build_panel(
             empresa=empresa,
