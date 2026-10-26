@@ -432,8 +432,29 @@ def detalle_suscriptor(request, empresa_id):
     Vista de detalle de un suscriptor específico
     """
     empresa = get_object_or_404(
-        Empresa.objects.select_related("user", "user__suscripcion"), id=empresa_id
+        Empresa.objects.select_related("user", "user__suscripcion", "config"), id=empresa_id
     )
+
+    # Mostrar el conjunto efectivo de rubros, no sólo el rubro principal.
+    # Esto es importante para suscriptores multi-rubro: ``rubros`` puede
+    # contener accesos adicionales (por ejemplo, desarme + repuestos).
+    rubros_activos = []
+    config = getattr(empresa, "config", None)
+    if config:
+        labels = dict(config.RUBRO_CHOICES)
+        codigos = (
+            config.get_effective_rubros()
+            if hasattr(config, "get_effective_rubros")
+            else [config.rubro_principal]
+        )
+        for codigo in codigos:
+            codigo = str(codigo or "").strip()
+            if codigo and codigo not in [item["codigo"] for item in rubros_activos]:
+                rubros_activos.append({
+                    "codigo": codigo,
+                    "nombre": labels.get(codigo, codigo.replace("_", " ").title()),
+                    "principal": codigo == config.rubro_principal,
+                })
 
     # Obtener suscripción si existe
     try:
@@ -446,6 +467,7 @@ def detalle_suscriptor(request, empresa_id):
         "suscripcion": suscripcion,
         "dias_restantes": empresa.dias_restantes,
         "config_pais": COUNTRY_SETTINGS.get(empresa.pais, COUNTRY_SETTINGS["CL"]),
+        "rubros_activos": rubros_activos,
     }
 
     return render(request, "admin/suscriptores/detalle_suscriptor.html", context)
