@@ -31,14 +31,18 @@
                     </span>
                 </div>
                 <div>
-                    <span class="text-gray-400">Rubro:</span>
-                    <span class="text-white font-medium ml-2">
-                        {% if empresa.config %}
-                            {{ empresa.config.get_rubro_principal_display }}
-                        {% else %}
-                            No configurado
-                        {% endif %}
-                    </span>
+                    <span class="text-gray-400 block mb-2">Rubros activos:</span>
+                    {% if rubros_activos %}
+                    <div class="flex flex-wrap gap-2 ml-0" aria-label="Rubros activos del suscriptor">
+                        {% for rubro in rubros_activos %}
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-full border {% if rubro.principal %}bg-cyan-900/70 border-cyan-500 text-cyan-200{% else %}bg-gray-700 border-gray-500 text-gray-200{% endif %}" title="{{ rubro.codigo }}">
+                            {% if rubro.principal %}<span aria-hidden="true">★</span>{% endif %}{{ rubro.nombre }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <span class="text-gray-400">No configurado</span>
+                    {% endif %}
                 </div>
                 <div>
                     <span class="text-gray-400">Email:</span>
@@ -560,4 +564,3 @@ document.getElementById('telefono-input').addEventListener('keypress', function(
 });
 </script>
 {% endblock %}
-
