@@ -1,8 +1,12 @@
+from types import SimpleNamespace
+
 import pytest
+from django.http import HttpResponse
 from django.test import Client, RequestFactory
 
 from taller.context_processors import company_country
 from taller.context_processors.business_modules import business_modules
+from taller.middleware.lang_policy import LanguagePolicyMiddleware
 from taller.tests.factories import ConfiguracionEmpresaFactory, EmpresaFactory, UserFactory
 
 
@@ -114,3 +118,39 @@ def test_context_processors_use_support_values_without_mutating_company():
     assert "repuestos" in modules_context["business_modules"]
     assert modules_context["product_profile"]["default_rubro"] == "TIRE"
     assert config.rubro_principal == "PARTS"
+
+
+@pytest.mark.django_db
+def test_superuser_switch_to_us_sets_english_cookie_session_and_us_en_url():
+    user = UserFactory(is_superuser=True, is_staff=True)
+    EmpresaFactory(user=user)
+    client = Client()
+    client.force_login(user)
+
+    response = client.post(
+        "/staff/support-environment/",
+        {"country": "us", "rubro": "TALLER"},
+        HTTP_REFERER="/cl/es/centro-operaciones/",
+    )
+
+    assert response.status_code == 302
+    assert response["Location"] == "/us/en/centro-operaciones/"
+    assert client.session["support_country"] == "us"
+    assert client.session["django_language"] == "en"
+    assert client.session["preferred_lang"] == "en"
+    assert response.cookies["django_language"].value == "en"
+
+
+def test_lang_policy_uses_support_country_for_superuser():
+    middleware = LanguagePolicyMiddleware(lambda request: HttpResponse(status=200))
+    request = SimpleNamespace(
+        user=SimpleNamespace(is_superuser=True),
+        session={"support_country": "US"},
+        empresa=SimpleNamespace(pais="CL"),
+        COOKIES={},
+        path="/cl/es/centro-operaciones/",
+    )
+
+    middleware(request)
+
+    assert request.LANGUAGE_CODE == "en"
