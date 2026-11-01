@@ -2,7 +2,9 @@ from types import SimpleNamespace
 
 import pytest
 from django.http import HttpResponse
+from django.template.loader import get_template
 from django.test import Client, RequestFactory
+from django.utils import translation
 
 from taller.context_processors import company_country
 from taller.context_processors.business_modules import business_modules
@@ -154,3 +156,38 @@ def test_lang_policy_uses_support_country_for_superuser():
     middleware(request)
 
     assert request.LANGUAGE_CODE == "en"
+
+
+@pytest.mark.django_db
+def test_support_bar_renders_english_when_en_active():
+    user = UserFactory(is_superuser=True, is_staff=True)
+    request = RequestFactory().get("/us/en/c/")
+    request.user = user
+    request.session = {}
+
+    template = get_template("components/support_switcher_bar.html")
+    with translation.override("en"):
+        html = template.render(
+            {"request": request, "user": user, "support_country": "us", "support_rubros": []}
+        )
+
+    assert "Support Mode" in html
+    assert "Apply" in html
+    assert "Modo Soporte" not in html
+
+
+@pytest.mark.django_db
+def test_support_bar_renders_spanish_when_es_active():
+    user = UserFactory(is_superuser=True, is_staff=True)
+    request = RequestFactory().get("/cl/es/c/")
+    request.user = user
+    request.session = {}
+
+    template = get_template("components/support_switcher_bar.html")
+    with translation.override("es"):
+        html = template.render(
+            {"request": request, "user": user, "support_country": "cl", "support_rubros": []}
+        )
+
+    assert "Modo Soporte" in html
+    assert "Aplicar" in html

@@ -833,3 +833,82 @@ msgstr "Parts sold today"
 
 msgid "Piezas inventariadas"
 msgstr "Parts in inventory"
+
+#: templates/components/support_switcher_bar.html
+msgid "Entorno de soporte"
+msgstr "Support environment"
+
+msgid "Modo Soporte"
+msgstr "Support Mode"
+
+msgid "País"
+msgstr "Country"
+
+msgid "Chile (CL)"
+msgstr "Chile (CL)"
+
+msgid "USA (US)"
+msgstr "USA (US)"
+
+msgid "Venezuela (VE)"
+msgstr "Venezuela (VE)"
+
+msgid "México (MX)"
+msgstr "Mexico (MX)"
+
+msgid "Brasil (BR)"
+msgstr "Brazil (BR)"
+
+msgid "Argentina (AR)"
+msgstr "Argentina (AR)"
+
+msgid "Colombia (CO)"
+msgstr "Colombia (CO)"
+
+msgid "Perú (PE)"
+msgstr "Peru (PE)"
+
+msgid "Ecuador (EC)"
+msgstr "Ecuador (EC)"
+
+msgid "Uruguay (UY)"
+msgstr "Uruguay (UY)"
+
+msgid "Rubros activos en soporte"
+msgstr "Active support categories"
+
+msgid "Rubros a activar"
+msgstr "Categories to enable"
+
+msgid "Taller mecánico"
+msgstr "Mechanical workshop"
+
+msgid "Desarmaduría"
+msgstr "Dismantling"
+
+msgid "Casa de repuestos"
+msgstr "Parts store"
+
+msgid "Vulcanización"
+msgstr "Tire vulcanization"
+
+msgid "Carwash"
+msgstr "Carwash"
+
+msgid "Grúas y asistencia vial"
+msgstr "Towing & roadside assistance"
+
+msgid "Aplicar"
+msgstr "Apply"
+
+msgid "Restablecer"
+msgstr "Reset"
+
+#: templates/base.html templates/taller/common/base.html
+msgid "Salir"
+msgstr "Logout"
+
+#: templates/taller/desarme/lista_piezas.html
+#: templates/taller/desarme/lista_vehiculos.html
+msgid "Ver kiosko"
+msgstr "View store"

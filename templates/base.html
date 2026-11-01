@@ -700,7 +700,7 @@
 
 <body class="min-h-screen flex flex-col{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %} eg-desarme-dashboard-compact{% endif %}">
 
-  {% include "components/support_switcher_bar.html" %}
+  {% if user.is_authenticated and user.is_superuser and "/accounts/" not in request.path %}{% include "components/support_switcher_bar.html" %}{% endif %}
 
   {% if qa_control_authorized %}
     {% include "qa_control/bar.html" %}
@@ -824,7 +824,7 @@
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
             <span class="nav-icon">🚪</span>
-            <span class="nav-text">{% if request.country == 'US' %}Logout{% else %}Salir{% endif %}</span>
+            <span class="nav-text">{% trans "Salir" %}</span>
           </button>
         </form>
       </div>
@@ -930,7 +930,7 @@
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
             <span class="nav-icon">🚪</span>
-            <span class="nav-text">{% if request.country == 'US' %}Logout{% else %}Salir{% endif %}</span>
+            <span class="nav-text">{% trans "Salir" %}</span>
           </button>
         </form>
       </div>
@@ -1141,10 +1141,10 @@
           }
           swRefreshing = true;
           console.log('Nueva version del Service Worker activa. Recargando...');
-          window.location.reload();
+          if (window.location.pathname.includes('/accounts/')) { console.log('SW reload bloqueado en auth'); return; } window.location.reload();
         });
 
-        navigator.serviceWorker.register('/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/service-worker.js', { scope: '/' })
+        navigator.serviceWorker.register('/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/service-worker.js', { scope: '/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/' })
           .then(function(registration) {
             console.log('✅ Service Worker registrado exitosamente:', registration.scope);
             
@@ -1166,7 +1166,7 @@
                   // Hay una nueva versión disponible
                   if (confirm('🎉 Nueva versión de eGarage disponible. ¿Deseas actualizar ahora?')) {
                     newWorker.postMessage({ type: 'SKIP_WAITING' });
-                    window.location.reload();
+                    if (window.location.pathname.includes('/accounts/')) { console.log('SW reload bloqueado en auth'); return; } window.location.reload();
                   }
                 }
               });

@@ -556,7 +556,7 @@
       {% csrf_token %}
       <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
         <span class="nav-icon">🚪</span>
-        <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Logout{% else %}Salir{% endif %}</span>
+        <span>{% trans "Salir" %}</span>
       </button>
     </form>
 

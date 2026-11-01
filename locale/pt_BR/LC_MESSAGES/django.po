@@ -8328,7 +8328,7 @@ msgstr ""
 #: .\taller\models\catalogo_repuestos.py:30 .\taller\models\ubicacion.py:32
 #: .\templates\taller\common\clientes\cliente_form_updated.html:198
 msgid "País"
-msgstr ""
+msgstr "País"
 
 #: .\deploy_atlantareciclajes\taller\models\models\ubicacion.py:45
 #: .\taller\models\ubicacion.py:47
@@ -12894,3 +12894,77 @@ msgstr "Valor do estoque"
 
 msgid "Servicios hoy"
 msgstr "Serviços hoje"
+
+#: templates/components/support_switcher_bar.html
+msgid "Entorno de soporte"
+msgstr "Ambiente de suporte"
+
+msgid "Modo Soporte"
+msgstr "Modo Suporte"
+
+msgid "Chile (CL)"
+msgstr "Chile (CL)"
+
+msgid "USA (US)"
+msgstr "EUA (US)"
+
+msgid "Venezuela (VE)"
+msgstr "Venezuela (VE)"
+
+msgid "México (MX)"
+msgstr "México (MX)"
+
+msgid "Brasil (BR)"
+msgstr "Brasil (BR)"
+
+msgid "Argentina (AR)"
+msgstr "Argentina (AR)"
+
+msgid "Colombia (CO)"
+msgstr "Colômbia (CO)"
+
+msgid "Perú (PE)"
+msgstr "Peru (PE)"
+
+msgid "Ecuador (EC)"
+msgstr "Equador (EC)"
+
+msgid "Uruguay (UY)"
+msgstr "Uruguai (UY)"
+
+msgid "Rubros activos en soporte"
+msgstr "Categorias ativas no suporte"
+
+msgid "Rubros a activar"
+msgstr "Categorias a ativar"
+
+msgid "Taller mecánico"
+msgstr "Oficina mecânica"
+
+msgid "Desarmaduría"
+msgstr "Desmontagem"
+
+msgid "Casa de repuestos"
+msgstr "Casa de peças"
+
+msgid "Vulcanización"
+msgstr "Vulcanização"
+
+msgid "Carwash"
+msgstr "Lavagem"
+
+msgid "Grúas y asistencia vial"
+msgstr "Guincho e assistência na estrada"
+
+msgid "Aplicar"
+msgstr "Aplicar"
+
+msgid "Restablecer"
+msgstr "Restaurar"
+
+#: templates/base.html templates/taller/common/base.html
+msgid "Salir"
+msgstr "Sair"
+
+msgid "Ver kiosko"
+msgstr "Ver quiosque"
