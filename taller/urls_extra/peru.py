@@ -10,7 +10,7 @@ from django.views.generic import RedirectView, TemplateView
 from taller.views.country_aware_auth import country_aware_login
 
 from taller.views_extra.bienvenida import bienvenida_pe
-from taller.views_extra.signup_redirects import signup_redirect
+from taller.views_extra.custom_signup import CustomSignupView
 from taller.views.landing_views import hub_peru
 
 app_name = "taller_peru"
@@ -42,10 +42,10 @@ urlpatterns = [
         lambda r: redirect("/pe/es/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="account_login_short",
     ),
-    # Signup Perú - redirect a signup universal con parámetro from=pe
+    # Signup Perú - CustomSignupView (igual que Chile), sin redirect que genera loop
     path(
         "accounts/signup/",
-        lambda r: signup_redirect(r, "pe"),
+        CustomSignupView.as_view(),
         name="account_signup",
     ),
     path(
