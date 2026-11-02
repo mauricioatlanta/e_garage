@@ -11,6 +11,19 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
   {% block extra_head %}{% endblock %}
+
+<style>
+/* Ocultar barra de soporte en login para evitar exposicion publica */
+body:not(.logged-in) .eg-support-switcher,
+body:not(.logged-in) [class*="support-switcher"],
+body:not(.logged-in) [class*="modo-soporte"],
+.login-container ~ [class*="support-switcher"],
+.login-page [class*="support-switcher"],
+.eg-support-switcher {
+    display: none !important;
+}
+</style>
+
 </head>
 <body>
 <div id="vanta-bg" style="position:fixed;width:100%;height:100%;top:0;left:0;z-index:0;background:#0a0a0a;background-image:linear-gradient(rgba(34,211,238,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.06) 1px, transparent 1px);background-size:24px 24px;"></div>

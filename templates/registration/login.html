@@ -1,1 +1,14 @@
+
+<style>
+/* Ocultar barra de soporte en login para evitar exposicion publica */
+body:not(.logged-in) .eg-support-switcher,
+body:not(.logged-in) [class*="support-switcher"],
+body:not(.logged-in) [class*="modo-soporte"],
+.login-container ~ [class*="support-switcher"],
+.login-page [class*="support-switcher"],
+.eg-support-switcher {
+    display: none !important;
+}
+</style>
+
 {% extends "account/login.html" %}
