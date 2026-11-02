@@ -26,6 +26,11 @@ from .funcionalidades_adicionales import (
 app_name = "analytics"
 
 urlpatterns = [
+    path("admin/api/country-ranking/", public_views.api_centro_control_america, name="api_country_ranking"),
+    path("admin/api/subscribers-by-country/", public_views.api_centro_control_america, name="api_subscribers_by_country"),
+
+    path("admin/api/global-kpis/", public_views.api_centro_control_america, name="api_centro_america_real"),
+
     # Analytics público de landings — separado del dashboard AI legacy
     path("public/", public_views.public_analytics_dashboard, name="public"),
     path("public/event/", public_analytics_event, name="public_analytics_event"),

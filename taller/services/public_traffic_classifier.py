@@ -129,3 +129,21 @@ def is_probable_non_human_request(request, user_agent: str | None = None) -> boo
         or is_scanner_path(path)
         or is_scanner_user_agent(ua)
     )
+
+
+def _clean_referrer(request) -> str:
+    from urllib.parse import urlparse
+    raw = (request.META.get("HTTP_REFERER") or "").strip()[:1000]
+    if not raw:
+        return ""
+    try:
+        parsed = urlparse(raw)
+        if not parsed.netloc:
+            return raw[:500]
+        return f"{parsed.scheme}://{parsed.netloc}{parsed.path}"[:500]
+    except:
+        return raw[:500]
+
+def _is_mobile(user_agent: str) -> bool:
+    ua = (user_agent or "").lower()
+    return any(t in ua for t in ("mobile","android","iphone","ipad","ipod",))
