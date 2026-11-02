@@ -424,3 +424,36 @@ class ServicioExterno(TenantScoped):
         if self.costo_taller > 0:
             return ((self.precio_cliente - self.costo_taller) / self.costo_taller) * 100
         return 0
+
+
+class CatalogoServicio(models.Model):
+    """Catálogo semilla de servicios sugeridos por (rubro, país).
+
+    `pais=None` representa el fallback internacional (DEFAULT): se usa cuando
+    no existe una entrada específica para el país del taller.
+    """
+
+    rubro = models.CharField(max_length=30, choices=RUBRO_CHOICES, db_index=True)
+    pais = models.CharField(max_length=2, null=True, blank=True, db_index=True)
+    nombre = models.CharField(max_length=160)
+    nombre_en = models.CharField(max_length=160, blank=True, default="")
+    nombre_pt = models.CharField(max_length=160, blank=True, default="")
+    orden = models.PositiveIntegerField(default=0)
+    activo = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["orden", "nombre"]
+        verbose_name = "Servicio de catálogo semilla"
+        verbose_name_plural = "Servicios de catálogo semilla"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["rubro", "pais", "nombre"],
+                name="uq_catalogo_servicio_rubro_pais_nombre",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["rubro", "pais", "activo"], name="idx_cat_serv_rubro_pais"),
+        ]
+
+    def __str__(self):
+        return f"{self.nombre} ({self.rubro}/{self.pais or 'DEFAULT'})"

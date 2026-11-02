@@ -54,7 +54,9 @@ def ver_documento_nuevo(request, documento_id):
 
     # Calcular totales
     subtotal_repuestos = sum(rep.subtotal for rep in repuestos)
-    subtotal_servicios = sum(serv.precio_unitario * serv.cantidad for serv in servicios)
+    subtotal_servicios = sum(
+        (serv.precio_unitario or Decimal("0")) * serv.cantidad for serv in servicios
+    )
     subtotal = subtotal_repuestos + subtotal_servicios
     iva = int(subtotal * Decimal("0.19"))
     total = subtotal + iva

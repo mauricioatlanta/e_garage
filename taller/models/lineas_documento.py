@@ -58,7 +58,8 @@ class LineaServicio(models.Model):
         max_length=255, help_text="Nombre del servicio (congelado al emitir documento)"
     )
     cantidad = models.PositiveIntegerField(default=1)
-    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    # Nullable: la mano de obra se ingresa manualmente por trabajo (sin precio predefinido).
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     from decimal import Decimal
 
     descuento = models.DecimalField(
@@ -142,7 +143,8 @@ class LineaServicio(models.Model):
     @property
     def subtotal(self):
         """Calcular subtotal con descuento"""
-        subtotal_bruto = self.cantidad * self.precio_unitario
+        precio = self.precio_unitario or Decimal("0")
+        subtotal_bruto = self.cantidad * precio
         descuento_valor = subtotal_bruto * (self.descuento / 100)
         return subtotal_bruto - descuento_valor
 
@@ -475,7 +477,8 @@ class LineaRepuesto(models.Model):
     @property
     def subtotal(self):
         """Calcular subtotal con descuento"""
-        subtotal_bruto = self.cantidad * self.precio_unitario
+        precio = self.precio_unitario or Decimal("0")
+        subtotal_bruto = self.cantidad * precio
         descuento_valor = subtotal_bruto * (self.descuento / 100)
         return subtotal_bruto - descuento_valor
 
