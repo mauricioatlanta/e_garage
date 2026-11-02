@@ -1,3 +1,4 @@
+from billing_countries import validate_signup_country
 from allauth.account.views import SignupView
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
@@ -54,6 +55,11 @@ class CustomSignupView(SignupView):
     template_name = "account/signup.html"
 
     def get(self, request, *args, **kwargs):
+        country_code = (kwargs.get("country") or request.GET.get("country") or "").strip().upper()
+        if country_code:
+            v = validate_signup_country(country_code)
+            if not v.get("allowed", False):
+                return redirect("/suscripcion-bloqueada/?country=" + country_code.lower())
         response = super().get(request, *args, **kwargs)
         if getattr(response, "status_code", None) == 200:
             record_signup_lifecycle_from_request(request, PublicAnalyticsEvent.EVENT_SIGNUP_VIEW)

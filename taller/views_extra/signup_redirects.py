@@ -1,34 +1,36 @@
 """
-Redirect universal para signup por país.
-
-Este módulo proporciona una función de redirect centralizada que redirige
-las rutas cortas de signup por país (/xx/accounts/signup/) a la ruta completa
-con país + idioma (/{pais}/{lang}/accounts/signup/).
+Redirect universal para signup por pais con validacion de cobertura eGarage.
 """
-
 from django.shortcuts import redirect
+from django.contrib import messages
+billing_module = None
+
+try:
+    from billing_countries import validate_signup_country
+    billing_module = validate_signup_country
+except ImportError:
+    pass
 
 
 def signup_redirect(request, country_code: str):
-    """
-    Redirige al signup country-aware con país + idioma en el path.
+    code = (country_code or "").strip().upper()
+    if billing_module:
+        validation = billing_module(code)
+        if not validation.get("allowed", False):
+            msg = validation.get(
+                "message",
+                "El servicio de suscripcion no esta disponible en tu region.",
+            )
+            try:
+                messages.warning(request, msg)
+            except Exception:
+                pass
+            return redirect("/suscripcion-bloqueada/?country=" + code.lower())
 
-    Args:
-        request: El objeto request de Django
-        country_code: Código del país (ej: "br", "co", "cl", "us")
-
-    Returns:
-        HttpResponseRedirect a /{country}/{lang}/accounts/signup/
-
-    Ejemplo:
-        >>> signup_redirect(request, "us")
-        # Redirige a: /us/en/accounts/signup/
-    """
-    # Normalizar código de país a minúsculas
-    country_code_lower = country_code.lower()
+    country_code_lower = code.lower()
     lang = "en" if country_code_lower == "us" else "es"
     base = f"/{country_code_lower}/{lang}/accounts/signup/"
-    # Preservar ?plan=, next=, etc.; no propagar country/from (país en path)
+
     params = request.GET.copy()
     params.pop("country", None)
     params.pop("from", None)

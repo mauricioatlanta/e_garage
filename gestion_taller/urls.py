@@ -426,37 +426,37 @@ urlpatterns = [
     # enlaces de onboarding/bienvenida (ej. /cl/signup/, /ar/signup/) resuelvan en todos los países
     path(
         "cl/signup/",
-        lambda r: redirect("/cl/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        lambda r: signup_redirect(r, "cl"),
         name="signup_redirect_cl",
     ),
     path(
         "ar/signup/",
-        lambda r: redirect("/ar/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        lambda r: signup_redirect(r, "ar"),
         name="signup_redirect_ar",
     ),
     path(
         "ec/signup/",
-        lambda r: redirect("/ec/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        lambda r: signup_redirect(r, "ec"),
         name="signup_redirect_ec",
     ),
     path(
         "co/signup/",
-        lambda r: redirect("/co/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        lambda r: signup_redirect(r, "co"),
         name="signup_redirect_co",
     ),
     path(
         "pe/signup/",
-        lambda r: redirect("/pe/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        lambda r: signup_redirect(r, "pe"),
         name="signup_redirect_pe",
     ),
     path(
         "ve/signup/",
-        lambda r: redirect("/ve/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        lambda r: signup_redirect(r, "ve"),
         name="signup_redirect_ve",
     ),
     path(
         "br/signup/",
-        lambda r: redirect("/br/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        lambda r: signup_redirect(r, "br"),
         name="signup_redirect_br",
     ),
     # Redirects amigables para login (siempre llevar a login canónico con idioma)
