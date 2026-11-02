@@ -1,0 +1,118 @@
+from django.utils import translation
+
+ALLOWED_BY_COUNTRY = {
+    "US": ("en", "es"),  # USA puede en/es
+    "CL": ("es",),  # Chile solo es
+    "MX": ("es",),  # México español
+    "CO": ("es",),  # Colombia español
+    "EC": ("es",),  # Ecuador español
+    "VE": ("es",),  # Venezuela español
+    "UY": ("es",),  # Uruguay español
+    "AR": ("es",),  # Argentina español
+    "PE": ("es",),  # Perú español
+    "BR": ("pt-br",),  # Brasil portugués
+}
+
+DEFAULT_BY_COUNTRY = {
+    "US": "en",
+    "CL": "es",
+    "MX": "es",
+    "CO": "es",
+    "EC": "es",
+    "VE": "es",
+    "UY": "es",
+    "AR": "es",
+    "PE": "es",
+    "BR": "pt-br",
+}
+
+# Django i18n usa esta clave por defecto
+DJANGO_LANGUAGE_SESSION_KEY = "django_language"  # Clave estándar de Django
+SESSION_KEY = "preferred_lang"  # clave alternativa si queremos
+
+
+class LanguagePolicyMiddleware:
+    """
+    Reglas:
+    - Si empresa.pais == CL: forzar 'es'
+    - Si empresa.pais == US:
+        - usar sesión/usuario si está entre los permitidos (en/es)
+        - si no, usar default 'en'
+    - Cualquier otro país: caer a LANGUAGE_CODE global
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        try:
+            # Detectar país desde empresa O desde request.country (URL)
+            pais = getattr(getattr(request, "empresa", None), "pais", None)
+
+            # Si no hay empresa (usuario no autenticado), usar request.country desde URL
+            if not pais:
+                pais = getattr(request, "country", None)
+
+            # Si aún no hay país, detectar desde URL directamente
+            if not pais:
+                segmentos = request.path.strip("/").split("/")
+                if segmentos:
+                    posible_pais = segmentos[0].upper()
+                    if posible_pais in DEFAULT_BY_COUNTRY:
+                        pais = posible_pais
+
+            # Asegurar que pais esté en mayúsculas
+            pais = pais.upper() if pais else None
+
+            # SOLUCIÓN SIMPLE: Solo para USA, respetar preferencia de sesión
+            if pais == "US":
+                # Signup público USA: idioma fijo por URL (no arrastrar cookie de /cl/ u otros).
+                path_norm = (request.path or "").rstrip("/") or "/"
+                if path_norm == "/us/signup":
+                    lang = "en"
+                    request.session[DJANGO_LANGUAGE_SESSION_KEY] = "en"
+                    request.eg_us_public_signup_lang = "en"
+                elif path_norm == "/us/es/signup":
+                    lang = "es"
+                    request.session[DJANGO_LANGUAGE_SESSION_KEY] = "es"
+                    request.eg_us_public_signup_lang = "es"
+                # PRIORIDAD 1: La URL explícita /us/en/... o /us/es/... manda sobre sesión/cookie.
+                # Así, al entrar desde el selector de país a /us/en/bienvenida/ se muestra siempre en inglés.
+                elif request.path.startswith("/us/en/"):
+                    lang = "en"
+                    request.session[DJANGO_LANGUAGE_SESSION_KEY] = "en"
+                elif request.path.startswith("/us/es/"):
+                    lang = "es"
+                    request.session[DJANGO_LANGUAGE_SESSION_KEY] = "es"
+                else:
+                    # Leer idioma de la sesión (LocaleMiddleware ya lo estableció)
+                    session_lang = request.session.get(DJANGO_LANGUAGE_SESSION_KEY)
+
+                    # Si hay idioma en sesión y es válido para USA, usarlo
+                    if session_lang in ALLOWED_BY_COUNTRY["US"]:
+                        lang = session_lang
+                    else:
+                        # Verificar si hay idioma en cookie (LocaleMiddleware lo puede leer)
+                        cookie_lang = request.COOKIES.get("django_language")
+                        if cookie_lang in ALLOWED_BY_COUNTRY["US"]:
+                            lang = cookie_lang
+                            # Guardar en sesión para consistencia
+                            request.session[DJANGO_LANGUAGE_SESSION_KEY] = lang
+                        else:
+                            lang = DEFAULT_BY_COUNTRY["US"]
+            else:
+                # Para otros países, usar default
+                lang = DEFAULT_BY_COUNTRY.get(pais, "es")
+
+            # Activar idioma
+            translation.activate(lang)
+            request.LANGUAGE_CODE = lang
+
+            response = self.get_response(request)
+            return response
+
+        except Exception as e:
+            print(f"[ERROR] LanguagePolicyMiddleware: {e}")
+            # En caso de error, continuar sin modificar idioma
+            response = self.get_response(request)
+            return response

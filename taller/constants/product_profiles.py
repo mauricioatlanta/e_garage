@@ -1,0 +1,226 @@
+from django.utils.translation import gettext_lazy as _
+"""
+Product profiles — groups rubros into named product experiences.
+
+Each profile defines:
+  - nav: ordered list of {key, label, icon} for the sidebar; labels/icons
+    override the generic defaults in business_modules.NAV_ITEMS.
+  - kpi_labels: ordered list of KPI titles for the dashboard header.
+  - quick_access: shortcut actions for the dashboard home.
+
+No database columns are touched; profiles are derived purely from
+ConfiguracionEmpresa.rubro_principal at request time.
+"""
+
+from taller.constants.business_modules import (
+    MOD_CLIENTES,
+    MOD_CONFIGURACION,
+    MOD_DESARME,
+    MOD_DOCUMENTOS,
+    MOD_FLOTA,
+    MOD_GRUAS,
+    MOD_INICIO,
+    MOD_RECICLAJE,
+    MOD_REPORTES,
+    MOD_REPUESTOS,
+    MOD_SERVICIOS,
+    MOD_VEHICULOS,
+)
+
+PRODUCT_TALLER         = "TALLER"
+PRODUCT_DESARMADURIA   = "DESARMADURIA"
+PRODUCT_CASA_REPUESTOS = "CASA_REPUESTOS"
+PRODUCT_TIRE           = "TIRE"
+PRODUCT_CARWASH        = "CARWASH"
+PRODUCT_RECYCLING      = "RECYCLING"
+PRODUCT_TOWING         = "TOWING"
+
+# Maps every rubro_principal value to a product family.
+RUBRO_TO_PRODUCT = {
+    "WORKSHOP":            PRODUCT_TALLER,
+    "WORKSHOP_MOTO":       PRODUCT_TALLER,
+    "WORKSHOP_HEAVY":      PRODUCT_TALLER,
+    "EXHAUST":             PRODUCT_TALLER,
+    "BODYSHOP":            PRODUCT_TALLER,
+    "ELECTRIC":            PRODUCT_TALLER,
+    "GLASS_AUDIO":         PRODUCT_TALLER,
+    "SUSPENSION_STEERING": PRODUCT_TALLER,
+    "BRAKES":              PRODUCT_TALLER,
+    "OBD_DIAGNOSTIC":      PRODUCT_TALLER,
+    "CLASSIC_CARS":        PRODUCT_TALLER,
+    "AUDIO_ENTERTAINMENT": PRODUCT_TALLER,
+    "GAS_CONVERSION":      PRODUCT_TALLER,
+    "BODY_GLASS":          PRODUCT_TALLER,
+    "TUNING":              PRODUCT_TALLER,
+    "FLEET":               PRODUCT_TALLER,
+    "FLEET_REPAIR":        PRODUCT_TALLER,
+    "DESARMADURIA":        PRODUCT_DESARMADURIA,
+    "MIXED":               PRODUCT_DESARMADURIA,
+    "PARTS":               PRODUCT_CASA_REPUESTOS,
+    "TIRE":                PRODUCT_TIRE,
+    "DETAILING":           PRODUCT_CARWASH,
+    "RECYCLING":           PRODUCT_RECYCLING,
+    "TOWING":              PRODUCT_TOWING,
+}
+
+PRODUCT_PROFILES = {
+    PRODUCT_TALLER: {
+        "name":          "eGarage Taller",
+        "tagline":       "Gestión integral de tu taller",
+        "icon":          "fas fa-wrench",
+        "color_class":   "cyan",
+        "default_rubro": "WORKSHOP",
+        "nav": [
+            {"key": MOD_INICIO,        "label": "Inicio",          "icon": "fas fa-home"},
+            {"key": MOD_DOCUMENTOS,    "label": "Trabajos",        "icon": "fas fa-file-invoice"},
+            {"key": MOD_VEHICULOS,     "label": "Vehículos",       "icon": "fas fa-car"},
+            {"key": MOD_CLIENTES,      "label": _("Clientes"),        "icon": "fas fa-users"},
+            {"key": MOD_SERVICIOS,     "label": "Servicios",       "icon": "fas fa-tools"},
+            {"key": MOD_REPUESTOS,     "label": "Repuestos",       "icon": "fas fa-cogs"},
+            {"key": MOD_FLOTA,         "label": "Flota",           "icon": "fas fa-truck"},
+            {"key": MOD_REPORTES,      "label": _("Reportes"),        "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"),   "icon": "fas fa-cog"},
+        ],
+        "kpi_labels": ["OT Abiertas", "OT Terminadas", "Vehículos en espera", "Ventas del día"],
+        "quick_access": [
+            {"label": "Nueva OT",        "icon": "fas fa-file-plus",  "path": "documentos/form/"},
+            {"label": "Nuevo Vehículo",  "icon": "fas fa-car",        "path": "vehiculos/crear/"},
+            {"label": "Nuevo Cliente",   "icon": "fas fa-user-plus",  "path": "clientes/crear/"},
+        ],
+    },
+
+    PRODUCT_DESARMADURIA: {
+        "name":          "eGarage Desarmaduría",
+        "tagline":       "Control total de tu desarmaduría",
+        "icon":          "fas fa-car-crash",
+        "color_class":   "orange",
+        "default_rubro": "DESARMADURIA",
+        "nav": [
+            {"key": MOD_INICIO,        "label": "Inicio",               "icon": "fas fa-home"},
+            {"key": MOD_DESARME,       "label": _("Vehículos de Desarme"), "icon": "fas fa-car-crash"},
+            {"key": MOD_REPUESTOS,     "label": _("Inventario de desarme"), "icon": "fas fa-boxes"},
+            {"key": MOD_DOCUMENTOS,    "label": _("Ventas"),               "icon": "fas fa-shopping-cart"},
+            {"key": MOD_CLIENTES,      "label": _("Clientes"),             "icon": "fas fa-users"},
+            {"key": MOD_REPORTES,      "label": _("Reportes"),             "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"),        "icon": "fas fa-cog"},
+        ],
+        "kpi_labels": ["Vehículos disponibles", "Valor inventario", "Piezas vendidas hoy", "Vehículos sin movimiento"],
+        "quick_access": [
+            {"label": "Ingresar Vehículo", "icon": "fas fa-plus-circle",   "path": "desarme/vehiculos/crear/"},
+            {"label": "Registrar Venta",   "icon": "fas fa-shopping-cart", "path": "documentos/form/"},
+            {"label": "Ver Inventario de desarme", "icon": "fas fa-boxes", "path": "repuestos/"},
+        ],
+    },
+
+    PRODUCT_CASA_REPUESTOS: {
+        "name":          "eGarage Repuestos",
+        "tagline":       "Tu casa de repuestos digitalizada",
+        "icon":          "fas fa-boxes",
+        "color_class":   "lime",
+        "default_rubro": "PARTS",
+        "nav": [
+            {"key": MOD_INICIO,        "label": "Inicio",        "icon": "fas fa-home"},
+            {"key": MOD_REPUESTOS,     "label": "Inventario de repuestos", "icon": "fas fa-boxes"},
+            {"key": MOD_DOCUMENTOS,    "label": _("Ventas"),        "icon": "fas fa-shopping-cart"},
+            {"key": MOD_CLIENTES,      "label": _("Clientes"),      "icon": "fas fa-users"},
+            {"key": MOD_REPORTES,      "label": _("Reportes"),      "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"), "icon": "fas fa-cog"},
+        ],
+        "kpi_labels": ["Ventas hoy", "Productos críticos", "Rotación", "Clientes frecuentes"],
+        "quick_access": [
+            {"label": "Nueva Venta",      "icon": "fas fa-shopping-cart", "path": "documentos/form/"},
+            {"label": "Agregar Repuesto", "icon": "fas fa-plus",          "path": "repuestos/crear/"},
+            {"label": "Ver Inventario de repuestos", "icon": "fas fa-boxes", "path": "repuestos/"},
+        ],
+    },
+
+    PRODUCT_TIRE: {
+        "name":          "eGarage Neumáticos & Vulcanización",
+        "tagline":       "Inventario, servicios y ventas rápidas para llanteras",
+        "icon":          "fas fa-circle-notch",
+        "color_class":   "amber",
+        "default_rubro": "TIRE",
+        "nav": [
+            {"key": MOD_INICIO,        "label": "Inicio",                    "icon": "fas fa-home"},
+            {"key": MOD_REPUESTOS,     "label": "Inventario de Neumáticos",  "icon": "fas fa-circle-notch"},
+            {"key": MOD_SERVICIOS,     "label": "Servicios Vulcanización",   "icon": "fas fa-tools"},
+            {"key": MOD_DOCUMENTOS,    "label": "Ventas de Mostrador",       "icon": "fas fa-cash-register"},
+            {"key": MOD_CLIENTES,      "label": _("Clientes"),                  "icon": "fas fa-users"},
+            {"key": MOD_VEHICULOS,     "label": "Vehículos",                 "icon": "fas fa-car"},
+            {"key": MOD_REPORTES,      "label": _("Reportes"),                  "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"),             "icon": "fas fa-cog"},
+        ],
+        "kpi_labels": ["Ventas hoy", "Neumáticos críticos", "Servicios hoy", "Ticket promedio"],
+        "quick_access": [
+            {"label": "POS Mostrador",          "icon": "fas fa-cash-register", "path": "repuestos/pos/"},
+            {"label": "Agregar Neumático",      "icon": "fas fa-plus",          "path": "repuestos/crear/"},
+            {"label": "Servicios Vulcanización", "icon": "fas fa-tools",        "path": "servicios/"},
+        ],
+    },
+
+    PRODUCT_RECYCLING: {
+        "name":          "eGarage Reciclaje",
+        "tagline":       "Compra y control de catalíticos, chatarra y metales",
+        "icon":          "fas fa-recycle",
+        "color_class":   "lime",
+        "default_rubro": "RECYCLING",
+        "nav": [
+            {"key": MOD_INICIO,        "label": "Inicio",        "icon": "fas fa-home"},
+            {"key": MOD_RECICLAJE,     "label": "Compras",       "icon": "fas fa-recycle"},
+            {"key": MOD_CLIENTES,      "label": _("Clientes"),      "icon": "fas fa-users"},
+            {"key": MOD_REPORTES,      "label": _("Reportes"),      "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"), "icon": "fas fa-cog"},
+        ],
+        "kpi_labels": ["Compras hoy", "Catalíticos en stock", "Margen del mes", "Chatarra bajo stock mínimo"],
+        "quick_access": [
+            {"label": "Nueva Compra",     "icon": "fas fa-recycle",       "path": "reciclaje/compras/nueva/"},
+            {"label": "Ver Stock",        "icon": "fas fa-boxes",         "path": "reciclaje/stock/"},
+            {"label": _("Reportes"),         "icon": "fas fa-chart-bar",     "path": "reciclaje/reportes/"},
+        ],
+    },
+
+    PRODUCT_CARWASH: {
+        "name":          "eGarage Carwash",
+        "tagline":       "Gestión simple para tu carwash",
+        "icon":          "fas fa-tint",
+        "color_class":   "blue",
+        "default_rubro": "DETAILING",
+        "nav": [
+            {"key": MOD_INICIO,        "label": "Inicio",        "icon": "fas fa-home"},
+            {"key": MOD_DOCUMENTOS,    "label": "Trabajos",       "icon": "fas fa-cash-register"},
+            {"key": MOD_CLIENTES,      "label": _("Clientes"),      "icon": "fas fa-users"},
+            {"key": MOD_SERVICIOS,     "label": "Servicios",     "icon": "fas fa-tint"},
+            {"key": MOD_REPORTES,      "label": _("Reportes"),      "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"), "icon": "fas fa-cog"},
+        ],
+        "kpi_labels": ["Servicios hoy", "Ingresos hoy", "Clientes hoy", "Servicios semana"],
+        "quick_access": [
+            {"label": "Registrar Servicio", "icon": "fas fa-tint",      "path": "documentos/form/"},
+            {"label": "Nuevo Cliente",      "icon": "fas fa-user-plus", "path": "clientes/crear/"},
+        ],
+    },
+
+    PRODUCT_TOWING: {
+        "name": "eGarage Grúas",
+        "tagline": "Despacho, traslado y cobranza de asistencia vial",
+        "icon": "fas fa-truck-pickup",
+        "color_class": "cyan",
+        "default_rubro": "TOWING",
+        "nav": [
+            {"key": MOD_INICIO, "label": "Inicio", "icon": "fas fa-home"},
+            {"key": MOD_GRUAS, "label": "Órdenes de traslado", "icon": "fas fa-truck-pickup"},
+            {"key": MOD_CLIENTES, "label": _("Clientes"), "icon": "fas fa-users"},
+            {"key": MOD_DOCUMENTOS, "label": "Documentos", "icon": "fas fa-file-invoice"},
+            {"key": MOD_REPORTES, "label": _("Reportes"), "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"), "icon": "fas fa-cog"},
+        ],
+        "kpi_labels": ["Órdenes hoy", "Pendientes de asignación", "Saldo por cobrar", "Margen registrado"],
+        "quick_access": [
+            {"label": "Nueva orden", "icon": "fas fa-plus", "path": "gruas/ordenes/nueva/"},
+            {"label": "Despacho", "icon": "fas fa-route", "path": "gruas/"},
+            {"label": "Conductores", "icon": "fas fa-id-card", "path": "gruas/conductores/"},
+        ],
+    },
+}
+
+DEFAULT_PRODUCT = PRODUCT_TALLER

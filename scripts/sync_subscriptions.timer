@@ -1,0 +1,14 @@
+[Unit]
+Description=Ejecutar sync_subscriptions diariamente a las 2:00 AM
+Requires=sync_subscriptions.service
+
+[Timer]
+# Ejecutar diariamente a las 2:00 AM
+OnCalendar=*-*-* 02:00:00
+# Si el sistema está apagado, ejecutar al arrancar (si pasaron menos de 12 horas desde la hora programada)
+Persistent=true
+# Ejecutar 1 minuto después de arrancar si se perdió la ejecución programada
+OnBootSec=1min
+
+[Install]
+WantedBy=timers.target

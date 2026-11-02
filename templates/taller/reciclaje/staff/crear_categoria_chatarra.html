@@ -1,0 +1,60 @@
+{% extends "layouts/base_egarage_panel.html" %}
+
+{% block page_title %}Nueva categoría de reciclaje{% endblock %}
+{% block page_subtitle %}Define familias propias para separar metales, papel, plásticos, baterías o cualquier material comprado{% endblock %}
+{% block page_icon %}🧭{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .rec-card { background: linear-gradient(135deg, rgba(0,0,0,0.76), rgba(7,30,38,0.84)); border: 1px solid rgba(0,255,255,0.32); border-radius: 10px; padding: 20px; max-width: 760px; }
+  .rec-input { background: rgba(10,14,20,0.9); border: 1px solid rgba(0,255,255,0.3); color: #e5e7eb; border-radius: 6px; padding: 0.55rem 0.7rem; width: 100%; }
+  .rec-field-label { color: #9ca3af; font-size: 0.85rem; display: block; margin: 0.85rem 0 0.25rem; }
+  .rec-actions { display:flex; gap:0.75rem; align-items:center; margin-top:1.1rem; flex-wrap:wrap; }
+  .rec-btn { background: #00fff7; color: #0f2027; font-weight: bold; border: none; border-radius: 8px; padding: 0.6rem 1.5rem; cursor: pointer; text-decoration:none; }
+  .rec-btn-secondary { background: transparent; color: #00fff7; border: 1px solid #00fff7; }
+  .rec-alert { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; }
+  .rec-suggestions { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.7rem; }
+  .rec-chip { border:1px solid rgba(0,255,255,0.3); color:#a7f3d0; border-radius:999px; padding:0.35rem 0.65rem; font-size:0.82rem; cursor:pointer; background:rgba(0,255,255,0.06); }
+</style>
+{% endblock %}
+
+{% block panel_content %}
+{% if messages %}
+  {% for message in messages %}<div class="rec-alert">{{ message }}</div>{% endfor %}
+{% endif %}
+
+<div class="rec-card">
+  <form method="post">
+    {% csrf_token %}
+    <label class="rec-field-label">Nombre de categoría</label>
+    <input type="text" name="nombre" class="rec-input" required placeholder="Metales ferrosos">
+
+    <label class="rec-field-label">Descripción operativa</label>
+    <textarea name="descripcion" class="rec-input" rows="4" placeholder="Materiales que se compran por kilo, con revisión visual en bodega."></textarea>
+
+    <div class="rec-suggestions" aria-label="Sugerencias rápidas">
+      <button type="button" class="rec-chip" data-name="Metales">Metales</button>
+      <button type="button" class="rec-chip" data-name="Papel y cartón">Papel y cartón</button>
+      <button type="button" class="rec-chip" data-name="Plásticos">Plásticos</button>
+      <button type="button" class="rec-chip" data-name="Baterías">Baterías</button>
+      <button type="button" class="rec-chip" data-name="Chatarra electrónica">Chatarra electrónica</button>
+      <button type="button" class="rec-chip" data-name="Chatarra industrial">Chatarra industrial</button>
+    </div>
+
+    <div class="rec-actions">
+      <button type="submit" class="rec-btn">Crear categoría</button>
+      <a href="../../" class="rec-btn rec-btn-secondary">Volver a stock</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.querySelectorAll("[data-name]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const input = document.querySelector('input[name="nombre"]');
+      if (input) input.value = btn.dataset.name || "";
+      input?.focus();
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,674 @@
+/**
+ * Estilos base para páginas de documentos (eGarage).
+ * Scope: .eg-document-page — evita !important y conflictos con Tailwind/Bootstrap/Select2.
+ */
+
+.eg-document-page {
+  --cyber-blue: #00ffff;
+  --cyber-green: #00ff88;
+  --cyber-purple: #8000ff;
+  --cyber-red: #ff0044;
+  --cyber-gold: #ffd700;
+  --cyber-orange: #ff8800;
+  --dark-bg: #0a0a0a;
+  --card-bg: rgba(16, 20, 24, 0.95);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+}
+
+/* Opcional: si se añade class="eg-document-page" al <body> en la base */
+body.eg-document-page {
+  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+  color: #fff;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* Layout & sections */
+.eg-document-page .cyber-container {
+  background: var(--card-bg);
+  border: 1px solid var(--cyber-blue);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 255, 255, 0.1);
+}
+
+.eg-document-page .form-section {
+  background: var(--card-bg);
+  border: 1px solid rgba(128, 0, 255, 0.3);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.eg-document-page .section-title {
+  color: var(--cyber-blue);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.eg-document-page .form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* Labels — alta especificidad sin !important */
+.eg-document-page .form-label,
+.eg-document-page .form-group label,
+.eg-document-page .form-check-label,
+.eg-document-page #document-form label,
+.eg-document-page #document-form .form-label {
+  color: #fff;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.eg-document-page .form-label {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Campos de formulario — un solo bloque por tipo */
+.eg-document-page .form-input,
+.eg-document-page .form-select,
+.eg-document-page .form-textarea,
+.eg-document-page .form-control,
+.eg-document-page input[type="text"],
+.eg-document-page input[type="date"],
+.eg-document-page input[type="number"],
+.eg-document-page input[type="email"],
+.eg-document-page input[type="tel"],
+.eg-document-page input[type="password"],
+.eg-document-page input[type="search"],
+.eg-document-page input[type="url"],
+.eg-document-page select,
+.eg-document-page textarea {
+  background: rgba(15, 15, 35, 0.98);
+  border: 2px solid var(--cyber-purple);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  width: 100%;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(128, 0, 255, 0.15);
+  min-height: 48px;
+  line-height: 1.4;
+}
+
+.eg-document-page form input,
+.eg-document-page form select,
+.eg-document-page form textarea,
+.eg-document-page #document-form input,
+.eg-document-page #document-form select,
+.eg-document-page #document-form textarea,
+.eg-document-page .table input,
+.eg-document-page .table select,
+.eg-document-page .table textarea,
+.eg-document-page .django-form input,
+.eg-document-page .django-form select,
+.eg-document-page .django-form textarea {
+  background: rgba(15, 15, 35, 0.98);
+  color: #fff;
+  border: 2px solid var(--cyber-purple);
+}
+
+/* Focus */
+.eg-document-page .form-input:focus,
+.eg-document-page .form-select:focus,
+.eg-document-page .form-textarea:focus,
+.eg-document-page .form-control:focus,
+.eg-document-page input:focus,
+.eg-document-page select:focus,
+.eg-document-page textarea:focus {
+  outline: none;
+  border-color: var(--cyber-green);
+  box-shadow: 0 0 25px rgba(0, 255, 136, 0.6);
+  background: rgba(0, 255, 136, 0.12);
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+/* Readonly / disabled */
+.eg-document-page .form-input[readonly],
+.eg-document-page .form-control[readonly],
+.eg-document-page input[readonly] {
+  background: rgba(30, 30, 50, 0.95);
+  border-color: var(--cyber-blue);
+  color: var(--cyber-blue);
+  cursor: not-allowed;
+}
+
+.eg-document-page .form-input:disabled,
+.eg-document-page .form-select:disabled,
+.eg-document-page .form-textarea:disabled,
+.eg-document-page .form-control:disabled,
+.eg-document-page input:disabled,
+.eg-document-page select:disabled,
+.eg-document-page textarea:disabled {
+  background: rgba(15, 15, 25, 0.95);
+  border-color: #444;
+  color: #888;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.eg-document-page .form-input::placeholder,
+.eg-document-page .form-control::placeholder,
+.eg-document-page input::placeholder,
+.eg-document-page textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+}
+
+/* Select options */
+.eg-document-page select option {
+  background: rgba(15, 15, 35, 0.98);
+  color: #fff;
+  padding: 12px 16px;
+  font-weight: 500;
+  border: none;
+}
+
+.eg-document-page select option:hover {
+  background: rgba(0, 255, 136, 0.2);
+}
+
+.eg-document-page select option:checked {
+  background: rgba(0, 255, 136, 0.3);
+  font-weight: bold;
+}
+
+/* Hover (no focus/disabled) */
+.eg-document-page .form-input:hover:not(:focus):not(:disabled),
+.eg-document-page .form-select:hover:not(:focus):not(:disabled),
+.eg-document-page .form-textarea:hover:not(:focus):not(:disabled),
+.eg-document-page .form-control:hover:not(:focus):not(:disabled),
+.eg-document-page input:hover:not(:focus):not(:disabled),
+.eg-document-page select:hover:not(:focus):not(:disabled),
+.eg-document-page textarea:hover:not(:focus):not(:disabled) {
+  border-color: var(--cyber-blue);
+  box-shadow: 0 4px 20px rgba(0, 255, 255, 0.15);
+}
+
+/* Select2 — solo dentro de .eg-document-page para no romper otros usos */
+.eg-document-page .select2-container .select2-selection--single,
+.eg-document-page .select2-container .select2-selection--multiple,
+.eg-document-page .select2-dropdown {
+  background: rgba(15, 15, 35, 0.98);
+  border: 2px solid var(--cyber-purple);
+  color: #fff;
+}
+
+.eg-document-page .select2-container .select2-selection--single .select2-selection__rendered,
+.eg-document-page .select2-container .select2-selection--multiple .select2-selection__choice {
+  color: #fff;
+}
+
+.eg-document-page .select2-results__option {
+  background: rgba(15, 15, 35, 0.98);
+  color: #fff;
+}
+
+.eg-document-page .select2-results__option--highlighted {
+  background: rgba(0, 255, 136, 0.3);
+  color: #fff;
+}
+
+/* Campo número (readonly) */
+.eg-document-page #id_numero {
+  background: rgba(30, 30, 50, 0.95);
+  border: 2px solid var(--cyber-blue);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: var(--cyber-blue);
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-align: center;
+  cursor: not-allowed;
+  box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+}
+
+/* Búsquedas AJAX */
+.eg-document-page #cliente-busqueda,
+.eg-document-page .rep-codigo,
+.eg-document-page .serv-search,
+.eg-document-page .otr-search {
+  background: rgba(20, 20, 40, 0.95);
+  border: 2px solid var(--cyber-purple);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #fff;
+  font-size: 1rem;
+  width: 100%;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1);
+}
+
+.eg-document-page #cliente-busqueda:focus,
+.eg-document-page .rep-codigo:focus,
+.eg-document-page .serv-search:focus,
+.eg-document-page .otr-search:focus {
+  outline: none;
+  border-color: var(--cyber-green);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+  background: rgba(0, 255, 136, 0.08);
+  transform: translateY(-1px);
+}
+
+.eg-document-page #cliente-info {
+  background: rgba(0, 255, 255, 0.08);
+  border: 2px solid var(--cyber-blue);
+  border-radius: 12px;
+  padding: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+}
+
+/* Campos por nombre — consolidados */
+.eg-document-page .rep-nombre,
+.eg-document-page .rep-precio-compra,
+.eg-document-page .rep-precio-venta,
+.eg-document-page .rep-cantidad,
+.eg-document-page .serv-precio,
+.eg-document-page .otr-precio,
+.eg-document-page .otr-precio-taller,
+.eg-document-page input[name*="empresa_externa"],
+.eg-document-page input[name*="descuento"],
+.eg-document-page input[name*="cantidad"],
+.eg-document-page input[name*="precio_unitario"],
+.eg-document-page input[name*="precio_cliente"],
+.eg-document-page input[name*="precio_taller"],
+.eg-document-page input[name="kilometraje"],
+.eg-document-page input[name="kilometraje_ingreso"],
+.eg-document-page input[name="fecha_emision"] {
+  background: rgba(20, 20, 40, 0.95);
+  border: 2px solid var(--cyber-purple);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #fff;
+  font-size: 1rem;
+  width: 100%;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1);
+}
+
+.eg-document-page input[name*="precio_compra"] {
+  background: rgba(30, 30, 50, 0.95);
+  border: 2px solid var(--cyber-blue);
+  color: var(--cyber-blue);
+  cursor: not-allowed;
+}
+
+.eg-document-page .rep-nombre,
+.eg-document-page .rep-precio-compra {
+  background: rgba(30, 30, 50, 0.95);
+  border-color: var(--cyber-blue);
+  color: var(--cyber-blue);
+  cursor: not-allowed;
+}
+
+.eg-document-page input[name*="empresa_externa"]:focus,
+.eg-document-page input[name*="descuento"]:focus,
+.eg-document-page input[name*="cantidad"]:focus,
+.eg-document-page input[name*="precio_unitario"]:focus,
+.eg-document-page input[name*="precio_cliente"]:focus,
+.eg-document-page input[name*="precio_taller"]:focus,
+.eg-document-page input[name="kilometraje"]:focus,
+.eg-document-page input[name="kilometraje_ingreso"]:focus,
+.eg-document-page input[name="fecha_emision"]:focus,
+.eg-document-page .rep-nombre:focus,
+.eg-document-page .rep-precio-venta:focus,
+.eg-document-page .rep-cantidad:focus,
+.eg-document-page .serv-precio:focus,
+.eg-document-page .otr-precio:focus,
+.eg-document-page .otr-precio-taller:focus {
+  outline: none;
+  border-color: var(--cyber-green);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+  background: rgba(0, 255, 136, 0.08);
+  transform: translateY(-1px);
+}
+
+.eg-document-page textarea[name="observaciones"] {
+  background: rgba(20, 20, 40, 0.95);
+  border: 2px solid var(--cyber-purple);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #fff;
+  font-size: 1rem;
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1);
+}
+
+.eg-document-page textarea[name="observaciones"]:focus {
+  outline: none;
+  border-color: var(--cyber-green);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+  background: rgba(0, 255, 136, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Checkboxes */
+.eg-document-page input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--cyber-green);
+  cursor: pointer;
+}
+
+.eg-document-page #id_exclude_vat {
+  accent-color: var(--cyber-orange);
+}
+
+.eg-document-page label[for="id_apply_vat"],
+.eg-document-page label[for="id_exclude_vat"] {
+  color: #b0b8c1;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.eg-document-page label[for="id_apply_vat"]:hover,
+.eg-document-page label[for="id_exclude_vat"]:hover {
+  color: var(--cyber-blue);
+  text-shadow: 0 0 8px var(--cyber-blue);
+}
+
+/* Dropdowns de resultados */
+.eg-document-page #cliente-resultados,
+.eg-document-page .serv-resultados,
+.eg-document-page .otr-resultados,
+.eg-document-page .repuesto-dropdown {
+  background: rgba(20, 20, 40, 0.98);
+  border: 2px solid var(--cyber-blue);
+  border-radius: 12px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3);
+}
+
+.eg-document-page .cliente-item,
+.eg-document-page .servicio-item,
+.eg-document-page .repuesto-suggestion {
+  background: transparent;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+.eg-document-page .cliente-item:hover,
+.eg-document-page .servicio-item:hover,
+.eg-document-page .repuesto-suggestion:hover {
+  background: rgba(0, 255, 255, 0.1);
+  border-color: var(--cyber-blue);
+}
+
+/* Subtotales / readonly */
+.eg-document-page .subtotal-field,
+.eg-document-page .rep-subtotal-view,
+.eg-document-page .serv-subtotal-view,
+.eg-document-page .otr-subtotal-view {
+  background: rgba(30, 30, 50, 0.95);
+  border: 2px solid var(--cyber-blue);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: var(--cyber-blue);
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  text-align: right;
+  cursor: not-allowed;
+  box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Selects por nombre */
+.eg-document-page select[name="tecnico_responsable"],
+.eg-document-page select[name="tipo"],
+.eg-document-page select[name="estado_pago"],
+.eg-document-page select[name="cliente"],
+.eg-document-page select[name="vehiculo"],
+.eg-document-page #id_cliente,
+.eg-document-page #id_vehiculo,
+.eg-document-page .form-select[name="cliente"],
+.eg-document-page .form-select[name="vehiculo"] {
+  background: rgba(20, 20, 40, 0.95);
+  border: 2px solid var(--cyber-purple);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #fff;
+  font-size: 1rem;
+  width: 100%;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1);
+  min-height: 48px;
+}
+
+.eg-document-page select[name="tecnico_responsable"]:focus,
+.eg-document-page select[name="tipo"]:focus,
+.eg-document-page select[name="estado_pago"]:focus,
+.eg-document-page select[name="cliente"]:focus,
+.eg-document-page select[name="vehiculo"]:focus,
+.eg-document-page #id_cliente:focus,
+.eg-document-page #id_vehiculo:focus {
+  outline: none;
+  border-color: var(--cyber-green);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+  background: rgba(0, 255, 136, 0.08);
+  transform: translateY(-1px);
+}
+
+.eg-document-page select[name="cliente"]:hover:not(:focus),
+.eg-document-page select[name="vehiculo"]:hover:not(:focus),
+.eg-document-page #id_cliente:hover:not(:focus),
+.eg-document-page #id_vehiculo:hover:not(:focus) {
+  border-color: var(--cyber-blue);
+  box-shadow: 0 4px 20px rgba(0, 255, 255, 0.15);
+}
+
+.eg-document-page select[name="estado_pago"] option[value="NO_PAGADO"] {
+  color: var(--cyber-orange);
+}
+
+.eg-document-page select[name="estado_pago"] option[value="PAGADO"] {
+  color: var(--cyber-green);
+}
+
+.eg-document-page select[name="estado_pago"] option[value="PARCIAL"] {
+  color: var(--cyber-blue);
+}
+
+/* Botones */
+.eg-document-page .btn-primary {
+  background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-green));
+  border: none;
+  border-radius: 25px;
+  padding: 12px 24px;
+  color: #000;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.eg-document-page .btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  color: #000;
+  text-decoration: none;
+}
+
+.eg-document-page .btn-secondary {
+  background: linear-gradient(45deg, var(--cyber-purple), var(--cyber-orange));
+  border: none;
+  border-radius: 25px;
+  padding: 12px 24px;
+  color: #fff;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.eg-document-page .btn-secondary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(128, 0, 255, 0.5);
+  color: #fff;
+  text-decoration: none;
+}
+
+.eg-document-page .btn-danger {
+  background: linear-gradient(45deg, var(--cyber-red), #ff6666);
+  border: none;
+  border-radius: 25px;
+  padding: 12px 24px;
+  color: #fff;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.eg-document-page .btn-danger:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 0, 68, 0.5);
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Header y mensajes */
+.eg-document-page .header-section {
+  background: var(--card-bg);
+  border: 1px solid rgba(0, 255, 255, 0.25);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.eg-document-page .header-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--cyber-blue);
+  margin: 0;
+  text-shadow: 0 0 12px rgba(0, 255, 255, 0.3);
+}
+
+.eg-document-page .header-subtitle {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.eg-document-page .header-info {
+  color: #64748b;
+  font-size: 0.8125rem;
+}
+
+.eg-document-page .form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.eg-document-page .error-message {
+  background: rgba(255, 0, 68, 0.1);
+  border: 1px solid var(--cyber-red);
+  border-radius: 8px;
+  padding: 1rem;
+  color: var(--cyber-red);
+  margin-bottom: 1rem;
+}
+
+.eg-document-page .success-message {
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid var(--cyber-green);
+  border-radius: 8px;
+  padding: 1rem;
+  color: var(--cyber-green);
+  margin-bottom: 1rem;
+}
+
+.eg-document-page .info-message {
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid var(--cyber-blue);
+  border-radius: 8px;
+  padding: 1rem;
+  color: var(--cyber-blue);
+  margin-bottom: 1rem;
+}
+
+.eg-document-page .grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.eg-document-page .grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+@keyframes eg-doc-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.eg-document-page .pulse-animation {
+  animation: eg-doc-pulse 2s infinite;
+}
+
+.eg-document-page .loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.eg-document-page .loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid var(--cyber-blue);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: eg-doc-spin 1s linear infinite;
+}
+
+@keyframes eg-doc-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

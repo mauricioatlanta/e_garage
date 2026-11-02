@@ -1,0 +1,158 @@
+from django.template.response import TemplateResponse
+from django.utils.http import url_has_allowed_host_and_scheme
+
+from .utils.templates import select_country_lang_template
+
+
+_COUNTRY_LANG = {"US": "en", "BR": "pt"}
+
+
+def _lang_for_country(country: str) -> str:
+    """Idioma canónico para un país. Chile, Perú, México, etc. → es."""
+    return _COUNTRY_LANG.get((country or "CL").upper(), "es")
+
+
+class CountryLangTemplateMixin:
+    """
+    Mixin para vistas que necesitan resolución automática de templates
+    basada en país e idioma del usuario.
+    """
+
+    base_template_name = None  # ej: "documentos/crear_documento.html"
+    response_class = TemplateResponse
+
+    def get_template_names(self):
+        """
+        Sobrescribe el método estándar de Django para resolución de templates
+        basada en país e idioma.
+        """
+        # Si hay template_name definido, usarlo como base_template_name
+        if hasattr(self, "template_name") and self.template_name:
+            base_template = self.template_name
+        elif self.base_template_name:
+            base_template = self.base_template_name
+        else:
+            # Usar el comportamiento estándar de Django
+            return super().get_template_names()
+
+        # Obtener datos de país e idioma
+        request = getattr(self, "request", None)
+        if not request:
+            # Fallback a template estándar si no hay request
+            return [f"taller/{base_template}"]
+
+        # Empresa de forma segura (OneToOne reverse puede lanzar ObjectDoesNotExist)
+        empresa = None
+        if hasattr(request, "user") and getattr(request.user, "is_authenticated", False):
+            try:
+                empresa = request.user.empresa
+            except Exception:
+                empresa = None
+
+        # Determinar país: prioridad URL path > request.country > empresa.pais > CL
+        path = (getattr(request, "path_info", "") or request.path or "").lower()
+        parts = [p for p in path.split("/") if p]
+        prefix = parts[0] if parts else ""
+        if prefix in {"us", "cl", "mx", "pe", "co", "ec", "ve", "br"}:
+            country = prefix.upper()
+        elif hasattr(request, "country") and request.country:
+            country = request.country
+        elif empresa and getattr(empresa, "pais", None):
+            country = empresa.pais
+        else:
+            country = "CL"
+
+        lang = _lang_for_country(country)
+
+        try:
+            template_name = select_country_lang_template(base_template, country, lang)
+            return [template_name]
+        except Exception:
+            return [
+                f"taller/common/{base_template}",
+                f"taller/{base_template}",
+            ]
+
+    def render_country_lang(self, request, context):
+        """
+        Renderiza usando template específico por país e idioma.
+
+        Resuelve automáticamente el template usando la jerarquía:
+        1. taller/{country}/{lang}/{base_template_name}
+        2. taller/{country}/{base_template_name}
+        3. taller/common/{lang}/{base_template_name}
+        4. taller/common/{base_template_name}
+        """
+        if not self.base_template_name:
+            raise ValueError("base_template_name debe estar definido en la vista")
+
+        # Empresa de forma segura (OneToOne reverse puede lanzar ObjectDoesNotExist)
+        empresa = None
+        if hasattr(request, "user") and getattr(request.user, "is_authenticated", False):
+            try:
+                empresa = request.user.empresa
+            except Exception:
+                empresa = None
+
+        # Determinar país: prioridad URL path > request.country > empresa.pais > CL
+        path = (getattr(request, "path_info", "") or request.path or "").lower()
+        parts = [
+            p for p in path.split("/") if p
+        ]  # "/us/documentos/form/" -> ["us","documentos","form"]
+
+        prefix = parts[0] if parts else ""
+        if prefix in {"us", "cl", "mx", "pe", "co", "ec", "ve", "br"}:
+            country = prefix.upper()
+        elif hasattr(request, "country") and request.country:
+            country = request.country
+        elif empresa and hasattr(empresa, "pais") and empresa.pais:
+            country = empresa.pais
+        else:
+            country = "CL"  # default
+
+        lang = _lang_for_country(country)
+
+        # Seleccionar template apropiado
+        try:
+            template_name = select_country_lang_template(self.base_template_name, country, lang)
+        except Exception:
+            # Fallback a template base si hay problemas
+            template_name = f"taller/common/{self.base_template_name}"
+
+        return self.response_class(request=request, template=template_name, context=context)
+
+
+def safe_next_url(url, allowed_hosts=None):
+    """
+    Valida si una URL es segura para redirección.
+
+    Esta función verifica que la URL:
+    - Tenga un esquema permitido (http, https)
+    - El host esté en la lista de hosts permitidos
+
+    Args:
+        url: URL a validar (str)
+        allowed_hosts: Lista de hosts permitidos (None usa ALLOWED_HOSTS de settings)
+
+    Returns:
+        str: La URL si es segura, None en caso contrario
+
+    Ejemplo:
+        >>> from taller.mixins import safe_next_url
+        >>> safe_next_url('/dashboard/')
+        '/dashboard/'
+        >>> safe_next_url('https://evil.com/')
+        None
+    """
+    if not url:
+        return None
+
+    # Si la URL es relativa (empieza con /), es segura
+    if url.startswith("/"):
+        return url
+
+    # Para URLs absolutas, validar con Django
+    if url_has_allowed_host_and_scheme(url, allowed_hosts=allowed_hosts):
+        return url
+
+    return None

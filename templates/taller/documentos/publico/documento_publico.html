@@ -1,0 +1,26 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>{{ document_label }} {{ documento.numero_documento|default:documento.id }}</title>
+  <link rel="stylesheet" href="/static/css/documentos/pdf_documento_profesional.css">
+  <style>
+    body { background: #020617; margin: 0; padding: 24px; }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+    .topnote {
+      max-width: 1100px; margin: 0 auto 16px auto; color: #cbd5e1;
+      border: 1px solid rgba(34,211,238,.18); background: rgba(15,23,42,.72);
+      border-radius: 16px; padding: 14px 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="topnote">
+    {{ document_label }} {{ documento.numero_documento|default:documento.id }}
+  </div>
+  <div class="wrap">
+    {% include "taller/documentos/pdf/documento_profesional_inner.html" %}
+  </div>
+</body>
+</html>

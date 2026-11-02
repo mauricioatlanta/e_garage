@@ -1,0 +1,215 @@
+{
+  "source": "working_copy.glb",
+  "object_count": 1,
+  "mesh_object_count": 1,
+  "totals": {
+    "vertices": 56956,
+    "edges": 171234,
+    "polygons": 114156,
+    "islands": 7
+  },
+  "materials": {},
+  "objects": [
+    {
+      "name": "mesh_node",
+      "vertices": 56956,
+      "edges": 171234,
+      "polygons": 114156,
+      "materials": [],
+      "connected_components": 7,
+      "components": [
+        {
+          "vertices": 30041,
+          "bounds_min": [
+            -0.951406,
+            -0.399427,
+            -0.22544
+          ],
+          "bounds_max": [
+            0.947442,
+            0.403217,
+            0.301287
+          ],
+          "dimensions": [
+            1.898848,
+            0.802644,
+            0.526727
+          ],
+          "center": [
+            -0.001982,
+            0.001895,
+            0.037924
+          ]
+        },
+        {
+          "vertices": 6845,
+          "bounds_min": [
+            0.396,
+            0.250385,
+            -0.308519
+          ],
+          "bounds_max": [
+            0.683316,
+            0.381511,
+            -0.023229
+          ],
+          "dimensions": [
+            0.287317,
+            0.131126,
+            0.28529
+          ],
+          "center": [
+            0.539658,
+            0.315948,
+            -0.165874
+          ]
+        },
+        {
+          "vertices": 6792,
+          "bounds_min": [
+            0.396054,
+            -0.377729,
+            -0.308507
+          ],
+          "bounds_max": [
+            0.683135,
+            -0.246248,
+            -0.023282
+          ],
+          "dimensions": [
+            0.28708,
+            0.131481,
+            0.285226
+          ],
+          "center": [
+            0.539594,
+            -0.311989,
+            -0.165895
+          ]
+        },
+        {
+          "vertices": 6453,
+          "bounds_min": [
+            -0.730958,
+            0.25347,
+            -0.308491
+          ],
+          "bounds_max": [
+            -0.443907,
+            0.381575,
+            -0.022947
+          ],
+          "dimensions": [
+            0.287051,
+            0.128105,
+            0.285543
+          ],
+          "center": [
+            -0.587433,
+            0.317523,
+            -0.165719
+          ]
+        },
+        {
+          "vertices": 6199,
+          "bounds_min": [
+            -0.730958,
+            -0.377754,
+            -0.308623
+          ],
+          "bounds_max": [
+            -0.442882,
+            -0.249022,
+            -0.023048
+          ],
+          "dimensions": [
+            0.288076,
+            0.128732,
+            0.285575
+          ],
+          "center": [
+            -0.58692,
+            -0.313388,
+            -0.165835
+          ]
+        },
+        {
+          "vertices": 330,
+          "bounds_min": [
+            -0.662258,
+            0.256631,
+            -0.198657
+          ],
+          "bounds_max": [
+            -0.511174,
+            0.263597,
+            -0.155996
+          ],
+          "dimensions": [
+            0.151084,
+            0.006966,
+            0.04266
+          ],
+          "center": [
+            -0.586716,
+            0.260114,
+            -0.177327
+          ]
+        },
+        {
+          "vertices": 296,
+          "bounds_min": [
+            -0.661655,
+            -0.259959,
+            -0.198546
+          ],
+          "bounds_max": [
+            -0.510788,
+            -0.253216,
+            -0.155658
+          ],
+          "dimensions": [
+            0.150867,
+            0.006743,
+            0.042888
+          ],
+          "center": [
+            -0.586222,
+            -0.256588,
+            -0.177102
+          ]
+        }
+      ],
+      "dimensions": [
+        1.898848,
+        0.802644,
+        0.60991
+      ],
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "bounds_min": [
+    -0.951406,
+    -0.399427,
+    -0.308623
+  ],
+  "bounds_max": [
+    0.947442,
+    0.403217,
+    0.301287
+  ],
+  "dimensions": [
+    1.898848,
+    0.802644,
+    0.60991
+  ],
+  "renders": {
+    "front": "/mnt/datos/projecto/e_garage_rubro_integracion/artifacts/meshy_sedan_diagnostic/renders/front.png",
+    "lateral": "/mnt/datos/projecto/e_garage_rubro_integracion/artifacts/meshy_sedan_diagnostic/renders/lateral.png",
+    "tres_cuartos": "/mnt/datos/projecto/e_garage_rubro_integracion/artifacts/meshy_sedan_diagnostic/renders/tres_cuartos.png"
+  }
+}

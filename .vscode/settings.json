@@ -1,0 +1,6 @@
+{
+  "twinny.chatModelName": "qwen2.5-coder:7b-instruct-q4_K_M",
+  "twinny.fimModelName": "qwen2.5-coder:7b-instruct-q4_K_M",
+  "twinny.ollamaApiUrl": "http://localhost:11434",
+  "twinny.debounceDelay": 1200
+}

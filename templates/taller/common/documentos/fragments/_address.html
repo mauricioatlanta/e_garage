@@ -1,0 +1,66 @@
+{# Fragmento para dirección por país #}
+{# Se incluye dinámicamente según ui_config.country_code #}
+{% load i18n %}
+
+{% if ui_config.country_code == 'CL' %}
+  {# Chile: Dirección con comuna y región #}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label class="form-label">{% trans "Address" %}</label>
+      <input type="text" name="direccion" class="form-control w-full" value="{{ form.direccion.value|default:'' }}">
+    </div>
+    <div>
+      <label class="form-label">{% trans "City" %}</label>
+      <input type="text" name="comuna" class="form-control w-full" value="{{ form.comuna.value|default:'' }}">
+    </div>
+    <div>
+      <label class="form-label">{% trans "Region" %}</label>
+      {% if form.region %}
+        {{ form.region }}
+      {% else %}
+        <select name="region" class="form-select w-full">
+          <option value="">{% trans "Select..." %}</option>
+          {% for region in ui_config.regions %}
+            <option value="{{ region.code }}">{{ region.name }}</option>
+          {% endfor %}
+        </select>
+      {% endif %}
+    </div>
+  </div>
+{% elif ui_config.country_code == 'US' %}
+  {# USA: Address con State y ZIP #}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="md:col-span-2">
+      <label class="form-label">{% trans "Street Address" %}</label>
+      <input type="text" name="direccion" class="form-control w-full" value="{{ form.direccion.value|default:'' }}">
+    </div>
+    <div>
+      <label class="form-label">{% trans "City" %}</label>
+      <input type="text" name="ciudad" class="form-control w-full" value="{{ form.ciudad.value|default:'' }}">
+    </div>
+    <div>
+      <label class="form-label">{% trans "State" %}</label>
+      {% if form.estado %}
+        {{ form.estado }}
+      {% else %}
+        <select name="estado" class="form-select w-full">
+          <option value="">{% trans "Select..." %}</option>
+          {% for state in ui_config.states %}
+            <option value="{{ state.code }}">{{ state.name }}</option>
+          {% endfor %}
+        </select>
+      {% endif %}
+    </div>
+    <div>
+      <label class="form-label">{% trans "ZIP Code" %}</label>
+      <input type="text" name="zip_code" inputmode="numeric" class="form-control w-full" value="{{ form.zip_code.value|default:'' }}">
+    </div>
+  </div>
+{% else %}
+  {# Fallback genérico #}
+  <div class="space-y-4">
+    <label class="form-label">{% trans "Address" %}</label>
+    <input type="text" name="direccion" class="form-control w-full" value="{{ form.direccion.value|default:'' }}">
+  </div>
+{% endif %}
+

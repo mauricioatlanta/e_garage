@@ -1,0 +1,118 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block title %}{{ workspace.brand.product_name }} — eGarage{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'taller/css/workspace_search.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block content %}
+
+{# Product header #}
+<div class="workspace-product-header">
+  <div class="workspace-product-heading">
+    <i class="{{ workspace.brand.icon }}" aria-hidden="true"></i>
+    <h2>
+      {{ workspace.brand.product_name }}
+    </h2>
+  </div>
+  <p>{{ workspace.brand.tagline }}</p>
+</div>
+
+{# KPI widget grid #}
+{% if dashboard_data.widgets %}
+<div class="workspace-kpi-grid">
+  {% for widget in dashboard_data.widgets %}
+    {% include "components/ui/kpi_card.html" with title=widget.title value=widget.value icon=widget.icon format=widget.format has_value=widget.has_value url=widget.url %}
+  {% endfor %}
+</div>
+{% endif %}
+
+{% include "components/workspace/briefing_panel.html" %}
+
+{% include "components/workspace/alerts_panel.html" %}
+
+{# Search + Live Feed #}
+<div class="workspace-action-grid" style="margin-bottom: 24px;">
+  {% include "components/workspace/search_panel.html" %}
+  {% include "components/workspace/live_feed.html" %}
+</div>
+
+{# Quick actions #}
+{% if workspace.quick_actions %}
+<div class="bg-[#111827] border border-[#1e293b] rounded-xl p-6 mb-6">
+  <h3 class="mb-4 font-semibold text-sm uppercase tracking-widest text-slate-400">{{ workspace.texts.quick_actions_label }}</h3>
+  <div style="display:flex; flex-wrap:wrap; gap:12px;">
+    {% for action in workspace.quick_actions %}
+    <a href="{{ action.url }}"
+       style="display:inline-flex; align-items:center; gap:8px; padding:10px 18px;
+              border-radius:10px; border:1px solid rgba(56,189,248,.25);
+              background:rgba(56,189,248,.07); color:#cbd5e1;
+              font-size:.88rem; font-weight:600; transition:.15s ease;
+              text-decoration:none;"
+       onmouseover="this.style.borderColor='rgba(56,189,248,.55)';this.style.color='#fff';"
+       onmouseout="this.style.borderColor='rgba(56,189,248,.25)';this.style.color='#cbd5e1';">
+      <i class="{{ action.icon }}" style="color:var(--eg-primary, #38bdf8);"></i>
+      {{ action.label }}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% include "components/workspace/activity_feed.html" %}
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+  window.workspaceSearchI18n = {
+    {% if workspace.product_key == "CASA_REPUESTOS" %}
+    vehicles:        "{% if request.LANGUAGE_CODE == 'en' %}Parts{% else %}Repuestos{% endif %}",
+    vehicleBadge:    "{% if request.LANGUAGE_CODE == 'en' %}Part{% else %}Repuesto{% endif %}",
+    untitledVehicle: "{% if request.LANGUAGE_CODE == 'en' %}No code{% else %}Sin código{% endif %}",
+    loadingBody:     "{{ workspace.texts.search_placeholder }}...",
+    hintBody:        "{{ workspace.texts.search_hint }}",
+    emptyBody:       "{% if request.LANGUAGE_CODE == 'en' %}Try another code, name or supplier.{% else %}Prueba con otro código, nombre o proveedor.{% endif %}",
+    {% elif workspace.product_key == "DESARMADURIA" %}
+    vehicles:        "{% if request.LANGUAGE_CODE == 'en' %}Dismantling vehicles{% else %}Vehículos de Desarme{% endif %}",
+    vehicleBadge:    "{% if request.LANGUAGE_CODE == 'en' %}Vehicle{% else %}Vehículo{% endif %}",
+    untitledVehicle: "{% if request.LANGUAGE_CODE == 'en' %}Vehicle without plate{% else %}Vehículo sin patente{% endif %}",
+    loadingBody:     "{{ workspace.texts.search_placeholder }}...",
+    hintBody:        "{{ workspace.texts.search_hint }}",
+    emptyBody:       "{% if request.LANGUAGE_CODE == 'en' %}Try another plate, make or part number.{% else %}Prueba con otra patente, marca o número de pieza.{% endif %}",
+    {% elif workspace.product_key == "CARWASH" %}
+    vehicles:        "{% if request.LANGUAGE_CODE == 'en' %}Vehicles{% else %}Vehículos{% endif %}",
+    vehicleBadge:    "{% if request.LANGUAGE_CODE == 'en' %}Vehicle{% else %}Vehículo{% endif %}",
+    untitledVehicle: "{% if request.LANGUAGE_CODE == 'en' %}Vehicle without plate{% else %}Vehículo sin patente{% endif %}",
+    loadingBody:     "{{ workspace.texts.search_placeholder }}...",
+    hintBody:        "{{ workspace.texts.search_hint }}",
+    emptyBody:       "{% if request.LANGUAGE_CODE == 'en' %}Try another name, plate or phone.{% else %}Prueba con otro nombre, patente o teléfono.{% endif %}",
+    {% else %}
+    vehicles:        "{% if request.LANGUAGE_CODE == 'en' %}Vehicles{% else %}Vehículos{% endif %}",
+    vehicleBadge:    "{% if request.LANGUAGE_CODE == 'en' %}Vehicle{% else %}Vehículo{% endif %}",
+    untitledVehicle: "{% if request.LANGUAGE_CODE == 'en' %}Vehicle without plate{% else %}Vehículo sin patente{% endif %}",
+    loadingBody:     "{{ workspace.texts.search_placeholder }}...",
+    hintBody:        "{{ workspace.texts.search_hint }}",
+    emptyBody:       "{% if request.LANGUAGE_CODE == 'en' %}Try another plate, VIN or customer detail.{% else %}Prueba con otra patente, VIN o dato del cliente.{% endif %}",
+    {% endif %}
+    customers:          "{% if request.LANGUAGE_CODE == 'en' %}Customers{% else %}Clientes{% endif %}",
+    loadingTitle:       "{% if request.LANGUAGE_CODE == 'en' %}Searching live{% else %}Buscando en vivo{% endif %}",
+    hintTitle:          "{% if request.LANGUAGE_CODE == 'en' %}Start typing{% else %}Comienza a escribir{% endif %}",
+    emptyTitle:         "{% if request.LANGUAGE_CODE == 'en' %}No matches found{% else %}Sin coincidencias{% endif %}",
+    errorTitle:         "{% if request.LANGUAGE_CODE == 'en' %}Search unavailable{% else %}Búsqueda no disponible{% endif %}",
+    errorBody:          "{% if request.LANGUAGE_CODE == 'en' %}The request could not be completed right now. Try again in a moment.{% else %}No se pudo completar la consulta ahora mismo. Intenta nuevamente en un momento.{% endif %}",
+    openLabel:          "{% if request.LANGUAGE_CODE == 'en' %}Open{% else %}Abrir{% endif %}",
+    customerBadge:      "{% if request.LANGUAGE_CODE == 'en' %}Customer{% else %}Cliente{% endif %}",
+    unassignedCustomer: "{% if request.LANGUAGE_CODE == 'en' %}No linked customer{% else %}Sin cliente asociado{% endif %}",
+    resultsLabel:       "{% if request.LANGUAGE_CODE == 'en' %}results{% else %}resultados{% endif %}"
+  };
+</script>
+<script src="{% static 'taller/js/workspace_search.js' %}?v={{ STATIC_VERSION }}-search-20260925b"></script>
+<script src="{% static 'taller/js/workspace_live_kpi.js' %}?v={{ STATIC_VERSION }}"></script>
+{% if briefing_url %}
+<script src="{% static 'taller/js/workspace_briefing.js' %}?v={{ STATIC_VERSION }}"></script>
+{% endif %}
+{% endblock %}

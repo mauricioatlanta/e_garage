@@ -1,0 +1,1665 @@
+import json
+
+from django import forms
+from django.contrib import admin
+from django.contrib.admin import AdminSite
+from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.db import models
+from django.utils.crypto import get_random_string
+from django.utils import timezone
+from django.utils.html import format_html
+
+from taller.models.catalogo import CatalogoModeloAuto
+from taller.models.clientes import Cliente
+from taller.models.color_cliente import ColorCliente
+from taller.models.comprobante_pago import ComprobantePago
+from taller.models.configuracion import ConfiguracionEmpresa
+from taller.models.pago import PagoPendiente
+from taller.models.documento import Documento
+from taller.models.empresa import Empresa
+from taller.models.movimiento_inventario import MovimientoInventario
+from taller.models.extras_vehiculo import CajaVehiculoEmpresa, MotorVehiculoEmpresa
+from taller.models.perfil_usuario import PerfilUsuario
+from taller.models.abandoned_lead import AbandonedLead
+from taller.models.interchange_pieza import InterchangePieza
+from taller.models.pieza_desarme import PiezaDesarme, PiezaDesarmeCompanyLabel
+from taller.models.reciclaje import (
+    CategoriaChatarra,
+    ProductoChatarra,
+    Catalitico,
+    PrecioMetal,
+    CompraReciclaje,
+    DetalleCompraCatalitico,
+    DetalleCompraChatarra,
+    VentaReciclaje,
+    DetalleVentaCatalitico,
+    DetalleVentaChatarra,
+)
+from taller.models.vehiculo_desarme import VehiculoDesarme
+from taller.models.vehiculo_desarme_event import VehiculoDesarmeEvent
+from taller.models.public_page_view import PublicPageView
+from taller.models.precio_suscripcion import PrecioSuscripcion
+from taller.models.subscription_change import SubscriptionChange
+from taller.models.suscripcion_transaccion import SuscripcionTransaccion
+from taller.models.tecnico import Tecnico
+from taller.services.plan_change_service import PlanLimitValidation
+from taller.services.suscripcion_transaccion_service import SuscripcionTransaccionService
+
+
+def generate_admin_temporary_password():
+    return f"Eg-{get_random_string(10)}-Aa1!"
+
+
+ADMIN_CLIENT_RUBRO_CHOICES = (
+    ("WORKSHOP", "Taller mecánico"),
+    ("DESARMADURIA", "Desarmaduría"),
+    ("TIRE", "Vulcanización"),
+    ("BODYSHOP", "Bodyshop"),
+    ("RECYCLING", "Recicladora"),
+)
+
+
+class AdminClienteCreationForm(UserCreationForm):
+    first_name = forms.CharField(required=False, label="Nombre")
+    last_name = forms.CharField(required=False, label="Apellido")
+    nombre_taller = forms.CharField(
+        required=False,
+        label="Nombre del negocio",
+        initial="Mi Taller",
+    )
+    telefono = forms.CharField(required=False, label="WhatsApp / Teléfono")
+    pais = forms.ChoiceField(choices=Empresa.PAIS_CHOICES, initial="CL", label="País")
+    rubro_principal = forms.ChoiceField(
+        choices=ADMIN_CLIENT_RUBRO_CHOICES,
+        initial="WORKSHOP",
+        label="Rubro principal",
+    )
+    plan = forms.ChoiceField(choices=Empresa.PLAN_CHOICES, initial="trial", label="Plan")
+    dias_prueba = forms.IntegerField(
+        min_value=0,
+        initial=14,
+        label="Días de prueba",
+        help_text="Para clientes creados manualmente desde WhatsApp.",
+    )
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ("username", "first_name", "last_name")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        temp_password = generate_admin_temporary_password()
+        for field_name in ("password1", "password2"):
+            self.fields[field_name].initial = temp_password
+            self.fields[field_name].widget = forms.TextInput(
+                attrs={
+                    "autocomplete": "new-password",
+                    "style": "font-family: monospace;",
+                }
+            )
+        self.fields["password1"].help_text = (
+            "Contraseña temporal autogenerada. Cópiala para enviarla por WhatsApp; "
+            "el cliente deberá cambiarla al primer inicio."
+        )
+        self.fields["username"].label = "Correo electrónico / usuario"
+        self.fields["username"].help_text = "Debe ser el correo del cliente. Se usará para iniciar sesión."
+
+    def clean_username(self):
+        username = super().clean_username().strip().lower()
+        email_field = forms.EmailField()
+        email_field.clean(username)
+        return username
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data.get("username", "")
+        user.first_name = self.cleaned_data.get("first_name", "")
+        user.last_name = self.cleaned_data.get("last_name", "")
+        if commit:
+            user.save()
+            self.save_related_records(user)
+        return user
+
+    def save_related_records(self, user):
+        dias_prueba = self.cleaned_data.get("dias_prueba") or 0
+        fecha_inicio = timezone.now()
+        fecha_fin = fecha_inicio + timezone.timedelta(days=dias_prueba) if dias_prueba else None
+        empresa, _ = Empresa.objects.get_or_create(
+            user=user,
+            defaults={
+                "nombre_taller": self.cleaned_data.get("nombre_taller") or "Mi Taller",
+                "email": self.cleaned_data.get("username", ""),
+                "telefono": self.cleaned_data.get("telefono", ""),
+                "pais": self.cleaned_data.get("pais") or "CL",
+                "plan": self.cleaned_data.get("plan") or "trial",
+                "dias_prueba": dias_prueba,
+                "suscripcion_activa": True,
+                "fecha_inicio": fecha_inicio,
+                "fecha_fin": fecha_fin,
+                "trial_started_at": fecha_inicio,
+                "trial_ends_at": fecha_fin,
+            },
+        )
+        PerfilUsuario.objects.update_or_create(
+            user=user,
+            defaults={
+                "pais": self.cleaned_data.get("pais") or "CL",
+                "must_change_password": True,
+            },
+        )
+        rubro_principal = self.cleaned_data.get("rubro_principal") or "WORKSHOP"
+        ConfiguracionEmpresa.objects.update_or_create(
+            empresa=empresa,
+            defaults={
+                "rubro_principal": rubro_principal,
+                "rubros": [rubro_principal],
+                "modules_configured_at": timezone.now(),
+            },
+        )
+
+
+class EmpresaUserInlineForm(forms.ModelForm):
+    rubro_principal = forms.ChoiceField(
+        choices=ConfiguracionEmpresa.RUBRO_CHOICES,
+        required=False,
+        label="Rubro principal",
+        help_text="Define el workspace operativo que verá el cliente al entrar.",
+    )
+    rubros = forms.MultipleChoiceField(
+        choices=ConfiguracionEmpresa.RUBRO_CHOICES,
+        required=False,
+        label="Rubros activos",
+        help_text="Mantén seleccionado el rubro principal; agrega otros solo si el negocio es mixto.",
+    )
+
+    class Meta:
+        model = Empresa
+        fields = (
+            "nombre_taller",
+            "empresa",
+            "email",
+            "telefono",
+            "pais",
+            "plan",
+            "dias_prueba",
+            "fecha_inicio",
+            "fecha_fin",
+            "suscripcion_activa",
+            "trial_started_at",
+            "trial_ends_at",
+            "trial_already_used",
+            "valor_mensual",
+            "moneda",
+            "rubro_principal",
+            "rubros",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        config = getattr(self.instance, "config", None) if self.instance and self.instance.pk else None
+        principal = getattr(config, "rubro_principal", "WORKSHOP") if config else "WORKSHOP"
+        rubros = list(getattr(config, "rubros", []) or [principal])
+        if principal not in rubros:
+            rubros.insert(0, principal)
+        self.fields["rubro_principal"].initial = principal
+        self.fields["rubros"].initial = rubros
+
+
+class PerfilUsuarioInline(admin.StackedInline):
+    model = PerfilUsuario
+    can_delete = False
+    extra = 0
+    fields = ("pais", "region", "ciudad", "state", "zipcode", "must_change_password")
+
+
+class EmpresaInline(admin.StackedInline):
+    model = Empresa
+    form = EmpresaUserInlineForm
+    can_delete = False
+    max_num = 1
+    verbose_name = "Empresa / Suscripción / Rubro"
+    verbose_name_plural = "Empresa / Suscripción / Rubro"
+    fields = (
+        "nombre_taller",
+        "empresa",
+        "email",
+        "telefono",
+        "pais",
+        "rubro_principal",
+        "rubros",
+        "plan",
+        "limite_usuarios_display",
+        "dias_prueba",
+        "fecha_inicio",
+        "fecha_fin",
+        "suscripcion_activa",
+        "trial_started_at",
+        "trial_ends_at",
+        "trial_already_used",
+        "valor_mensual",
+        "moneda",
+    )
+    readonly_fields = ("limite_usuarios_display",)
+
+    def get_extra(self, request, obj=None, **kwargs):
+        if obj and hasattr(obj, "empresa"):
+            return 0
+        return 1
+
+    @admin.display(description="Límite de usuarios")
+    def limite_usuarios_display(self, obj):
+        plan = (getattr(obj, "plan", "") or "trial").lower()
+        return PlanLimitValidation.LIMITES_PLANES.get(plan, 1)
+
+
+try:
+    admin.site.unregister(User)
+except admin.sites.NotRegistered:
+    pass
+
+
+@admin.register(User)
+class UserAdmin(DjangoUserAdmin):
+    add_form = AdminClienteCreationForm
+    add_fieldsets = (
+        (
+            "Acceso del cliente",
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "username",
+                    "password1",
+                    "password2",
+                    "first_name",
+                    "last_name",
+                ),
+            },
+        ),
+        (
+            "Configuración comercial inicial",
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "nombre_taller",
+                    "telefono",
+                    "pais",
+                    "rubro_principal",
+                    "plan",
+                    "dias_prueba",
+                ),
+            },
+        ),
+    )
+    inlines = (PerfilUsuarioInline, EmpresaInline)
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if not change and hasattr(form, "save_related_records"):
+            form.save_related_records(obj)
+
+    def save_formset(self, request, form, formset, change):
+        super().save_formset(request, form, formset, change)
+        if formset.model is not Empresa:
+            return
+
+        for inline_form in formset.forms:
+            if not getattr(inline_form, "cleaned_data", None):
+                continue
+            if inline_form.cleaned_data.get("DELETE"):
+                continue
+            empresa = inline_form.instance
+            if not getattr(empresa, "pk", None):
+                continue
+
+            rubro_principal = inline_form.cleaned_data.get("rubro_principal") or "WORKSHOP"
+            rubros = list(inline_form.cleaned_data.get("rubros") or [])
+            if rubro_principal not in rubros:
+                rubros.insert(0, rubro_principal)
+
+            config, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
+            config.rubro_principal = rubro_principal
+            config.rubros = rubros
+            config.save(update_fields=["rubro_principal", "rubros"])
+
+# ✅ Importar modelos de servicios de forma segura (puede fallar si no están disponibles)
+try:
+    from taller.servicios.models import (
+        CategoriaServicio,
+        CategoriaServicioName,
+        Servicio,
+        ServicioName,
+        SubcategoriaServicio,
+        SubcategoriaServicioName,
+    )
+
+    SERVICIOS_MODELS_AVAILABLE = True
+except ImportError as e:
+    # Los modelos de servicios no están disponibles
+    SERVICIOS_MODELS_AVAILABLE = False
+    # Crear clases dummy para evitar errores de referencia
+    CategoriaServicio = None
+    CategoriaServicioName = None
+    Servicio = None
+    ServicioName = None
+    SubcategoriaServicio = None
+    SubcategoriaServicioName = None
+    import logging
+
+    logger = logging.getLogger(__name__)
+    logger.warning(f"Modelos de servicios no disponibles: {e}")
+
+# Importar admins de catálogo I18N (se auto-registran con @admin.register)
+try:
+    from taller.admin.catalogo_admin import *  # noqa: F401, F403
+except ImportError:
+    pass  # Admin de catálogo no disponible aún
+
+# Importar admin de servicios externos (se auto-registra con @admin.register)
+try:
+    from taller.admin.servicios_externos_admin import *  # noqa: F401, F403
+except ImportError:
+    pass  # Admin de servicios externos no disponible aún
+
+# Importar admin de pagos manuales
+try:
+    from taller.admin_modules import pago_admin  # noqa: F401
+except ImportError:
+    pass
+
+
+class MyAdminSite(AdminSite):
+    site_header = "Panel de Administración de eGarage"
+    site_title = "eGarage Admin"
+    index_title = "Bienvenido al administrador"
+    login_template = "admin/login.html"  # Usar template del admin de Django
+    login_form = None  # Usar formulario por defecto del admin (NO allauth)
+
+    def has_permission(self, request):
+        return request.user.is_active and request.user.is_superuser
+
+    def login(self, request, extra_context=None):
+        """
+        Sobrescribir login para usar el login estándar de Django Admin
+        en lugar de allauth
+        """
+        from django.contrib.auth.views import LoginView
+        from django.contrib.auth.forms import AuthenticationForm
+        from django.views.decorators.csrf import csrf_protect
+        from django.views.decorators.cache import never_cache
+        from django.contrib.auth import login as auth_login
+        from django.urls import reverse
+        from django.shortcuts import redirect
+
+        if request.method == "GET" and self.has_permission(request):
+            # Ya está autenticado, redirigir al index
+            index_path = reverse("%s:index" % self.name, current_app=self.name)
+            return redirect(index_path)
+
+        # Usar el formulario de autenticación estándar de Django (NO allauth)
+        context = {
+            "title": "Iniciar sesión",
+            "app_path": request.get_full_path(),
+            "username": request.user.get_username(),
+            **(extra_context or {}),
+        }
+
+        @csrf_protect
+        @never_cache
+        def login_view(request):
+            if request.method == "POST":
+                form = AuthenticationForm(request, data=request.POST)
+                if form.is_valid():
+                    auth_login(request, form.get_user())
+                    return redirect(reverse("%s:index" % self.name, current_app=self.name))
+            else:
+                form = AuthenticationForm(request)
+
+            context["form"] = form
+            from django.template.response import TemplateResponse
+
+            return TemplateResponse(request, self.login_template, context)
+
+        return login_view(request)
+
+
+admin_site = MyAdminSite(name="myadmin")
+
+
+@admin.register(Empresa, site=admin_site)
+class EmpresaAdmin(admin.ModelAdmin):
+    list_display = (
+        "nombre_taller",
+        "user",
+        "estado_suscripcion_display",
+        "dias_restantes_display",
+        "fecha_fin",
+        "plan",
+    )
+    list_filter = ("suscripcion_activa", "plan", "fecha_fin")
+    search_fields = ("nombre_taller", "user__username", "user__email")
+    readonly_fields = (
+        "fecha_inicio",
+        "dias_restantes_display",
+        "estado_suscripcion_display",
+    )
+
+    fieldsets = (
+        (
+            "Información Básica",
+            {
+                "fields": (
+                    "user",
+                    "nombre_taller",
+                    "empresa",
+                    "email",
+                    "telefono",
+                    "direccion",
+                    "logo",
+                )
+            },
+        ),
+        (
+            "Suscripción",
+            {
+                "fields": (
+                    "plan",
+                    "suscripcion_activa",
+                    "fecha_inicio",
+                    "fecha_fin",
+                    "dias_prueba",
+                    "estado_suscripcion_display",
+                    "dias_restantes_display",
+                )
+            },
+        ),
+        ("Pagos", {"fields": ("ultimo_pago", "valor_mensual", "moneda")}),
+        (
+            "Notificaciones",
+            {
+                "fields": (
+                    "notificacion_5_dias",
+                    "notificacion_1_dia",
+                    "notificacion_vencido",
+                ),
+                "classes": ("collapse",),
+            },
+        ),
+    )
+
+    actions = ["extender_30_dias", "extender_60_dias", "marcar_como_pagado"]
+
+    @admin.display(description="Estado")
+    def estado_suscripcion_display(self, obj):
+        estado = obj.estado_suscripcion
+        colores = {
+            "activa": "green",
+            "advertencia": "orange",
+            "critico": "red",
+            "vencida": "gray",
+        }
+        color = colores.get(estado, "gray")
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}</span>',
+            color,
+            estado.upper(),
+        )
+
+    @admin.display(description="Días Restantes")
+    def dias_restantes_display(self, obj):
+        dias = obj.dias_restantes
+        if dias <= 0:
+            return format_html('<span style="color: red; font-weight: bold;">VENCIDO</span>')
+        elif dias <= 5:
+            return format_html(
+                '<span style="color: orange; font-weight: bold;">{} días</span>', dias
+            )
+        else:
+            return format_html('<span style="color: green;">{} días</span>', dias)
+
+    @admin.action(description="Extender 30 días")
+    def extender_30_dias(self, request, queryset):
+        for empresa in queryset:
+            empresa.extender_suscripcion(30)
+        count = queryset.count()
+        self.message_user(request, f"Se extendieron {count} suscripciones por 30 días.")
+
+    @admin.action(description="Extender 60 días")
+    def extender_60_dias(self, request, queryset):
+        for empresa in queryset:
+            empresa.extender_suscripcion(60)
+        count = queryset.count()
+        self.message_user(request, f"Se extendieron {count} suscripciones por 60 días.")
+
+    @admin.action(description="Marcar como pagado (30 días)")
+    def marcar_como_pagado(self, request, queryset):
+        for empresa in queryset:
+            empresa.marcar_pago_recibido()
+        count = queryset.count()
+        self.message_user(request, f"Se marcaron {count} empresas como pagadas.")
+
+    def has_add_permission(self, request):
+        """
+        Solo permitir crear empresas si no existe ya una para el usuario
+        """
+        if not request.user.is_superuser:
+            return False
+        return super().has_add_permission(request)
+
+
+@admin.register(PerfilUsuario, site=admin_site)
+class PerfilUsuarioAdmin(admin.ModelAdmin):
+    list_display = ("user", "pais", "must_change_password")
+    list_editable = ("must_change_password",)
+    search_fields = ("user__username", "user__email")
+    list_filter = ("pais", "must_change_password")
+
+    def has_add_permission(self, request):
+        """
+        BLOQUEAR la creación de nuevos perfiles de usuario
+        Mantener solo para visualización de datos existentes
+        """
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        """
+        Permitir editar el flag de cambio obligatorio a superusuarios.
+        """
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        """
+        Solo superusuarios pueden eliminar perfiles
+        """
+        return request.user.is_superuser
+
+
+@admin.register(AbandonedLead)
+class AbandonedLeadAdmin(admin.ModelAdmin):
+    list_display = ("fecha_creacion", "nombre", "email", "whatsapp_link", "rubro", "pais", "contactado")
+    list_filter = ("contactado", "pais", "rubro")
+    search_fields = ("nombre", "email", "whatsapp")
+    list_editable = ("contactado",)
+    readonly_fields = ("fecha_creacion", "updated_at", "whatsapp_link")
+
+    def whatsapp_link(self, obj):
+        if not obj.whatsapp_url:
+            return "-"
+        return format_html('<a href="{}" target="_blank" rel="noopener">WhatsApp</a>', obj.whatsapp_url)
+
+    whatsapp_link.short_description = "Contacto"
+
+
+@admin.register(Cliente, site=admin_site)
+class ClienteAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "apellido", "telefono", "empresa", "color_display")
+    list_filter = ("empresa", "color__country", "color")
+    search_fields = (
+        "nombre",
+        "apellido",
+        "telefono",
+        "email",
+        "empresa__nombre_taller",
+    )
+
+    fieldsets = (
+        (
+            "Información Personal",
+            {"fields": ("nombre", "apellido", "telefono", "email", "direccion")},
+        ),
+        ("Ubicación Chile", {"fields": ("region", "ciudad"), "classes": ("collapse",)}),
+        (
+            "Ubicación USA",
+            {
+                "fields": ("estado_usa", "ciudad_usa", "zipcode"),
+                "classes": ("collapse",),
+            },
+        ),
+        ("Identificación", {"fields": ("color", "tax_id")}),
+        ("Empresa", {"fields": ("empresa",)}),
+    )
+
+    @admin.display(
+        description="Color",
+        ordering="color__nombre",
+    )
+    def color_display(self, obj):
+        """Mostrar el color del cliente con preview visual"""
+        if obj.color:
+            return format_html(
+                '<div style="display: flex; align-items: center; gap: 8px;">'
+                '<div style="width: 20px; height: 20px; border-radius: 50%; background-color: {}; border: 2px solid #ccc;"></div>'
+                "<span>{}</span>"
+                "</div>",
+                obj.color.codigo_color,
+                obj.color.nombre,
+            )
+        return "Sin color"
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs.select_related(
+                "empresa", "color", "region", "ciudad", "estado_usa", "ciudad_usa"
+            )
+        return qs.filter(empresa__usuario_admin=request.user).select_related(
+            "empresa", "color", "region", "ciudad", "estado_usa", "ciudad_usa"
+        )
+
+
+@admin.register(ColorCliente, site=admin_site)
+class ColorClienteAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "country", "codigo_color_display", "activo", "orden")
+    list_filter = ("country", "activo")
+    search_fields = ("nombre", "codigo_color")
+    list_editable = ("activo", "orden")
+    ordering = ("country", "orden", "nombre")
+
+    fieldsets = (
+        ("Información Básica", {"fields": ("nombre", "country", "activo", "orden")}),
+        ("Color", {"fields": ("codigo_color",)}),
+    )
+
+    @admin.display(
+        description="Preview del Color",
+        ordering="codigo_color",
+    )
+    def codigo_color_display(self, obj):
+        """Mostrar el código de color con preview visual"""
+        return format_html(
+            '<div style="display: flex; align-items: center; gap: 8px;">'
+            '<div style="width: 30px; height: 30px; border-radius: 50%; background-color: {}; border: 2px solid #ccc;"></div>'
+            "<span>{}</span>"
+            "</div>",
+            obj.codigo_color,
+            obj.codigo_color,
+        )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).order_by("country", "orden", "nombre")
+
+
+@admin.register(Documento, site=admin_site)
+class DocumentoAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "tipo",
+        "numero",
+        "estado",
+        "fecha_emision",
+        "cliente",
+        "vehiculo",
+        "moneda",
+        "total",
+    )
+
+
+@admin.register(Tecnico, site=admin_site)
+class TecnicoAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "empresa")
+    list_filter = ("empresa",)
+    search_fields = ("nombre",)
+    list_editable = ()
+
+
+@admin.register(PiezaDesarme, site=admin_site)
+class PiezaDesarmeAdmin(admin.ModelAdmin):
+    list_display = (
+        "codigo",
+        "nombre",
+        "vehiculo_desarme",
+        "cantidad",
+        "estado_pieza",
+        "publicada",
+        "activo",
+        "empresa",
+    )
+    list_filter = ("empresa", "estado_pieza", "publicada", "activo")
+    search_fields = ("codigo", "nombre")
+    list_select_related = ("vehiculo_desarme", "empresa")
+    raw_id_fields = ("vehiculo_desarme", "repuesto", "part")
+    ordering = ("-created_at",)
+
+
+@admin.register(InterchangePieza, site=admin_site)
+class InterchangePiezaAdmin(admin.ModelAdmin):
+    list_display = (
+        "codigo_pieza",
+        "nombre_pieza",
+        "marca_origen",
+        "modelo_origen",
+        "marca_compatible",
+        "modelo_compatible",
+        "veces_confirmado",
+        "confirmado_por_vendedor",
+        "empresa",
+    )
+    list_filter = ("empresa", "marca_origen", "marca_compatible", "confirmado_por_vendedor")
+    search_fields = ("codigo_pieza", "nombre_pieza", "marca_origen", "modelo_origen",
+                     "marca_compatible", "modelo_compatible")
+    list_select_related = ("empresa",)
+    ordering = ("-created_at",)
+
+
+@admin.register(PiezaDesarmeCompanyLabel, site=admin_site)
+class PiezaDesarmeCompanyLabelAdmin(admin.ModelAdmin):
+    list_display = ("empresa", "pieza_desarme", "language", "label", "is_preferred", "updated_at")
+    list_filter = ("empresa", "language")
+    search_fields = (
+        "empresa__nombre_taller",
+        "pieza_desarme__codigo",
+        "pieza_desarme__nombre",
+        "label",
+    )
+    list_select_related = ("empresa", "pieza_desarme")
+    raw_id_fields = ("empresa", "pieza_desarme")
+    ordering = ("-updated_at",)
+
+
+@admin.register(CategoriaChatarra, site=admin_site)
+class CategoriaChatarraAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "empresa")
+    list_filter = ("empresa",)
+    search_fields = ("nombre",)
+
+
+@admin.register(ProductoChatarra, site=admin_site)
+class ProductoChatarraAdmin(admin.ModelAdmin):
+    list_display = (
+        "codigo",
+        "nombre",
+        "categoria",
+        "unidad_medida",
+        "cantidad_stock",
+        "precio_compra",
+        "precio_venta",
+        "activo",
+        "empresa",
+    )
+    list_filter = ("empresa", "categoria", "unidad_medida", "activo")
+    search_fields = ("codigo", "nombre")
+    list_select_related = ("categoria", "empresa")
+    ordering = ("-created_at",)
+
+
+@admin.register(Catalitico, site=admin_site)
+class CataliticoAdmin(admin.ModelAdmin):
+    list_display = (
+        "codigo",
+        "nombre",
+        "tipo_catalizador",
+        "estado",
+        "peso_kg",
+        "precio_venta",
+        "empresa",
+    )
+    list_filter = ("empresa", "tipo_catalizador", "estado", "activo")
+    search_fields = ("codigo", "nombre", "marca_vehiculo", "modelo_vehiculo")
+    list_select_related = ("empresa",)
+    ordering = ("-created_at",)
+
+
+@admin.register(PrecioMetal, site=admin_site)
+class PrecioMetalAdmin(admin.ModelAdmin):
+    list_display = ("empresa", "platino", "paladio", "rodio", "actualizado_en")
+    list_select_related = ("empresa",)
+
+
+class DetalleCompraCataliticoInline(admin.TabularInline):
+    model = DetalleCompraCatalitico
+    extra = 0
+
+
+class DetalleCompraChatarraInline(admin.TabularInline):
+    model = DetalleCompraChatarra
+    extra = 0
+
+
+@admin.register(CompraReciclaje, site=admin_site)
+class CompraReciclajeAdmin(admin.ModelAdmin):
+    list_display = ("id", "cliente", "empresa", "created_at")
+    list_filter = ("empresa",)
+    list_select_related = ("empresa", "cliente")
+    ordering = ("-created_at",)
+    inlines = [DetalleCompraCataliticoInline, DetalleCompraChatarraInline]
+
+
+class DetalleVentaCataliticoInline(admin.TabularInline):
+    model = DetalleVentaCatalitico
+    extra = 0
+
+
+class DetalleVentaChatarraInline(admin.TabularInline):
+    model = DetalleVentaChatarra
+    extra = 0
+
+
+@admin.register(VentaReciclaje, site=admin_site)
+class VentaReciclajeAdmin(admin.ModelAdmin):
+    list_display = ("id", "comprador", "empresa", "created_at")
+    list_filter = ("empresa",)
+    list_select_related = ("empresa", "comprador")
+    ordering = ("-created_at",)
+    inlines = [DetalleVentaCataliticoInline, DetalleVentaChatarraInline]
+
+
+# === ADMINISTRACIÓN DE SERVICIOS MULTILENGUAJE ===
+# ✅ Solo registrar si los modelos están disponibles
+
+if SERVICIOS_MODELS_AVAILABLE:
+
+    class CategoriaServicioNameInline(admin.TabularInline):
+        model = CategoriaServicioName
+        extra = 2
+        fields = ["language", "label", "aliases", "is_default"]
+
+    @admin.register(CategoriaServicio, site=admin_site)
+    class CategoriaServicioAdmin(admin.ModelAdmin):
+        list_display = ("id", "code", "country", "get_label_es", "get_label_en")
+        list_filter = ("country",)
+        search_fields = ("code", "names__label")
+        inlines = [CategoriaServicioNameInline]
+
+        @admin.display(description="Nombre (ES)")
+        def get_label_es(self, obj):
+            return obj.get_label("es")
+
+        @admin.display(description="Nombre (EN)")
+        def get_label_en(self, obj):
+            return obj.get_label("en")
+
+    class SubcategoriaServicioNameInline(admin.TabularInline):
+        model = SubcategoriaServicioName
+        extra = 2
+        fields = ["language", "label", "aliases", "is_default"]
+
+    @admin.register(SubcategoriaServicio, site=admin_site)
+    class SubcategoriaServicioAdmin(admin.ModelAdmin):
+        list_display = (
+            "id",
+            "code",
+            "country",
+            "categoria",
+            "get_label_es",
+            "get_label_en",
+        )
+        list_filter = ("country", "categoria")
+        search_fields = ("code", "names__label")
+        inlines = [SubcategoriaServicioNameInline]
+
+        @admin.display(description="Nombre (ES)")
+        def get_label_es(self, obj):
+            return obj.get_label("es")
+
+        @admin.display(description="Nombre (EN)")
+        def get_label_en(self, obj):
+            return obj.get_label("en")
+
+    class ServicioNameInline(admin.TabularInline):
+        model = ServicioName
+        extra = 2
+        fields = ["language", "label", "aliases", "is_default"]
+
+    @admin.register(Servicio, site=admin_site)
+    class ServicioAdmin(admin.ModelAdmin):
+        list_display = ("id", "nombre", "categoria", "subcategoria")
+        list_filter = ("categoria", "subcategoria")
+        search_fields = ("nombre",)
+        autocomplete_fields = ("categoria", "subcategoria")
+        ordering = ("nombre", "id")
+        list_editable = ()
+        inlines = [ServicioNameInline]
+
+
+@admin.register(ComprobantePago, site=admin_site)
+class ComprobantePagoAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "empresa",
+        "monto_display",
+        "estado_display",
+        "fecha_subida",
+        "plan_solicitado",
+    )
+    list_filter = ("estado", "metodo_pago", "plan_solicitado", "fecha_subida")
+    search_fields = ("empresa__nombre_taller", "numero_transaccion", "banco_origen")
+    readonly_fields = ("fecha_subida",)
+
+    fieldsets = (
+        (
+            "Información del Pago",
+            {
+                "fields": (
+                    "empresa",
+                    "monto",
+                    "moneda",
+                    "plan_solicitado",
+                    "metodo_pago",
+                )
+            },
+        ),
+        (
+            "Detalles de la Transacción",
+            {"fields": ("numero_transaccion", "comprobante", "descripcion")},
+        ),
+        (
+            "Estado y Revisión",
+            {"fields": ("estado", "fecha_procesado", "procesado_por", "notas_admin")},
+        ),
+        ("Sistema", {"fields": ("fecha_subida",), "classes": ("collapse",)}),
+    )
+
+    actions = ["aprobar_comprobantes", "rechazar_comprobantes"]
+
+    @admin.display(description="Monto")
+    def monto_display(self, obj):
+        return f"${obj.monto:,.0f} {obj.moneda}"
+
+    @admin.display(description="Estado")
+    def estado_display(self, obj):
+        colores = {"pendiente": "orange", "aprobado": "green", "rechazado": "red"}
+        color = colores.get(obj.estado, "gray")
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}</span>',
+            color,
+            obj.get_estado_display(),
+        )
+
+    def aprobar_comprobantes(self, request, queryset):
+        count = 0
+        for comprobante in queryset.filter(estado="pendiente"):
+            # Usar el método aprobar() que incluye:
+            # - Extensión de suscripción
+            # - Actualización de plan
+            # - Notificaciones automáticas (Email + WhatsApp)
+            comprobante.aprobar(procesado_por=request.user.username)
+            count += 1
+        self.message_user(
+            request, f"Se aprobaron {count} comprobantes. Notificaciones enviadas automáticamente."
+        )
+
+    def rechazar_comprobantes(self, request, queryset):
+        count = 0
+        for comprobante in queryset.filter(estado="pendiente"):
+            comprobante.estado = "rechazado"
+            comprobante.fecha_procesado = timezone.now()
+            comprobante.procesado_por = request.user.username
+            comprobante.notas_admin = "Rechazado desde admin"
+            comprobante.save()
+            count += 1
+        self.message_user(request, f"Se rechazaron {count} comprobantes.")
+
+    def save_model(self, request, obj, form, change):
+        previous_estado = None
+        if change and obj.pk:
+            previous = ComprobantePago.objects.filter(pk=obj.pk).first()
+            previous_estado = previous.estado if previous else None
+
+        super().save_model(request, obj, form, change)
+
+        if change and previous_estado != "aprobado" and obj.estado == "aprobado":
+            obj.aprobar(procesado_por=request.user.username)
+
+
+
+@admin.register(PagoPendiente, site=admin_site)
+class PagoPendienteAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "empresa",
+        "plan",
+        "monto",
+        "estado",
+        "fecha_subida",
+        "metodo_pago",
+    )
+
+    list_filter = ("estado", "plan", "metodo_pago", "fecha_subida")
+    search_fields = (
+        "empresa__nombre_taller",
+        "referencia",
+    )
+
+    readonly_fields = (
+        "fecha_subida",
+        "fecha_verificacion",
+    )
+
+    actions = (
+        "aprobar_seleccionados",
+        "rechazar_seleccionados",
+    )
+
+    @admin.action(description="Aprobar pagos seleccionados")
+    def aprobar_seleccionados(self, request, queryset):
+        count = 0
+        for pago in queryset.filter(estado="pendiente"):
+            pago.aprobar_pago(request.user)
+            count += 1
+
+        self.message_user(
+            request,
+            f"Se aprobaron {count} pagos pendientes."
+        )
+
+    @admin.action(description="Rechazar pagos seleccionados")
+    def rechazar_seleccionados(self, request, queryset):
+        count = 0
+        for pago in queryset.filter(estado="pendiente"):
+            pago.rechazar_pago(
+                request.user,
+                "Rechazado desde administración"
+            )
+            count += 1
+
+        self.message_user(
+            request,
+            f"Se rechazaron {count} pagos pendientes."
+        )
+
+
+@admin.register(SuscripcionTransaccion, site=admin_site)
+class SuscripcionTransaccionAdmin(admin.ModelAdmin):
+    list_display = (
+        "empresa",
+        "monto_display",
+        "metodo",
+        "estado_badge",
+        "created_at",
+        "subscription_applied_at",
+    )
+    list_filter = ("payment_method", "status", "created_at")
+    search_fields = ("empresa__nombre_taller", "id", "external_transaction_id", "reference", "uuid")
+    readonly_fields = (
+        "id",
+        "uuid",
+        "created_at",
+        "updated_at",
+        "processed_at",
+        "subscription_applied_at",
+        "payload_historico",
+    )
+    actions = ("aprobar_pagos_manuales",)
+    list_select_related = ("empresa",)
+
+    def monto_display(self, obj):
+        return obj.monto_formateado
+
+    monto_display.short_description = "Monto"
+    monto_display.admin_order_field = "amount"
+
+    def metodo(self, obj):
+        return obj.get_metodo_display()
+
+    metodo.short_description = "Método"
+    metodo.admin_order_field = "payment_method"
+
+    def estado_badge(self, obj):
+        colors = {
+            "approved": "#28a745",
+            "pending": "#ffc107",
+            "processing": "#0d6efd",
+            "rejected": "#dc3545",
+            "cancelled": "#6c757d",
+            "error": "#212529",
+        }
+        text_color = "#212529" if obj.status == "pending" else "#ffffff"
+        return format_html(
+            '<span style="background-color: {}; color: {}; padding: 3px 10px; border-radius: 10px; font-weight: bold; font-size: 11px;">{}</span>',
+            colors.get(obj.status, "#6c757d"),
+            text_color,
+            obj.get_estado_display(),
+        )
+
+    estado_badge.short_description = "Estado"
+    estado_badge.admin_order_field = "status"
+
+    def payload_historico(self, obj):
+        return format_html(
+            '<pre style="margin: 0; white-space: pre-wrap;">{}</pre>',
+            json.dumps(obj.gateway_payload or {}, indent=2, ensure_ascii=False),
+        )
+
+    payload_historico.short_description = "Payload histórico"
+
+    def aprobar_pagos_manuales(self, request, queryset):
+        pendientes = queryset.filter(status="pending")
+        count = 0
+        for tx in pendientes:
+            SuscripcionTransaccionService.finalizar_pago_exitoso(
+                tx,
+                processed_by=request.user.get_username(),
+            )
+            count += 1
+        self.message_user(request, f"Se han procesado {count} pagos exitosamente.")
+
+    aprobar_pagos_manuales.short_description = (
+        "Aprobar transferencias y enviar email de éxito"
+    )
+
+
+@admin.register(SubscriptionChange, site=admin_site)
+class SubscriptionChangeAdmin(admin.ModelAdmin):
+    list_display = (
+        "empresa",
+        "current_plan",
+        "requested_plan",
+        "change_type",
+        "status",
+        "prorated_amount",
+        "currency",
+        "scheduled_at",
+        "applied_at",
+        "created_at",
+    )
+    list_filter = ("status", "change_type", "current_plan", "requested_plan", "currency")
+    search_fields = ("empresa__nombre_taller", "empresa__user__email", "requested_by__email")
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+        "applied_at",
+        "cancelled_at",
+        "validation_snapshot",
+        "transaction",
+    )
+
+
+@admin.register(PrecioSuscripcion, site=admin_site)
+class PrecioSuscripcionAdmin(admin.ModelAdmin):
+    list_display = (
+        "nombre_plan",
+        "tipo_plan",
+        "pais_display",
+        "precio_formateado",
+        "activo",
+        "caracteristicas_preview",
+    )
+    list_filter = ("pais", "tipo_plan", "activo", "moneda")
+    search_fields = ("nombre_plan", "descripcion")
+    ordering = ("pais", "tipo_plan")
+
+    fieldsets = (
+        (
+            "Información Básica",
+            {
+                "fields": (
+                    "nombre_plan",
+                    "tipo_plan",
+                    "pais",
+                    "precio",
+                    "moneda",
+                    "activo",
+                )
+            },
+        ),
+        ("Descripción", {"fields": ("descripcion",)}),
+        (
+            "Características del Plan",
+            {
+                "fields": (
+                    "documentos_ilimitados",
+                    "usuarios_incluidos",
+                    "soporte_prioritario",
+                    "reportes_avanzados",
+                    "diagnostico_ia",
+                    "api_incluida",
+                    "multisucursal",
+                ),
+                "classes": ("wide",),
+            },
+        ),
+    )
+
+    @admin.display(description="País")
+    def pais_display(self, obj):
+        flag = "🇨🇱" if obj.pais == "CL" else "🇺🇸"
+        return f"{flag} {obj.get_pais_display()}"
+
+    @admin.display(description="Características")
+    def caracteristicas_preview(self, obj):
+        caracteristicas = obj.caracteristicas_list()
+        if len(caracteristicas) > 3:
+            return f"{', '.join(caracteristicas[:3])}... (+{len(caracteristicas)-3} más)"
+        return ", ".join(caracteristicas)
+
+    actions = ["duplicar_para_otro_pais"]
+
+    @admin.action(description="Duplicar para otro país")
+    def duplicar_para_otro_pais(self, request, queryset):
+        """Duplica precios para el otro país"""
+        for precio in queryset:
+            nuevo_pais = "US" if precio.pais == "CL" else "CL"
+            # Calcular precio convertido (aproximado)
+            if precio.pais == "CL" and nuevo_pais == "US":
+                nuevo_precio = precio.precio / 1000  # Conversión aproximada CLP a USD
+            else:
+                nuevo_precio = precio.precio * 1000  # Conversión aproximada USD a CLP
+
+            nueva_moneda = "USD" if nuevo_pais == "US" else "CLP"
+            nuevo_nombre = precio.nombre_plan.replace(
+                "Plan", "Monthly Plan" if nuevo_pais == "US" else "Plan"
+            )
+
+            PrecioSuscripcion.objects.get_or_create(
+                tipo_plan=precio.tipo_plan,
+                pais=nuevo_pais,
+                defaults={
+                    "precio": nuevo_precio,
+                    "moneda": nueva_moneda,
+                    "nombre_plan": nuevo_nombre,
+                    "descripcion": precio.descripcion,
+                    "documentos_ilimitados": precio.documentos_ilimitados,
+                    "usuarios_incluidos": precio.usuarios_incluidos,
+                    "soporte_prioritario": precio.soporte_prioritario,
+                    "reportes_avanzados": precio.reportes_avanzados,
+                    "diagnostico_ia": precio.diagnostico_ia,
+                    "api_incluida": precio.api_incluida,
+                    "multisucursal": precio.multisucursal,
+                },
+            )
+        self.message_user(request, f"Duplicados {len(queryset)} precios para el otro país.")
+
+
+@admin.register(CatalogoModeloAuto, site=admin_site)
+class CatalogoModeloAutoAdmin(admin.ModelAdmin):
+    """Administración del catálogo de marcas y modelos"""
+
+    list_display = ("marca", "modelo", "activo", "fecha_creacion")
+    list_filter = ("activo", "marca", "fecha_creacion")
+    search_fields = ("marca", "modelo")
+    list_editable = ("activo",)
+    list_per_page = 50
+    ordering = ("marca", "modelo")
+
+    # Agrupación por marca en el formulario
+    fieldsets = (
+        ("Información del Vehículo", {"fields": ("marca", "modelo")}),
+        ("Control", {"fields": ("activo",), "classes": ("collapse",)}),
+    )
+
+    # Filtros por sidebar
+    list_filter = ("activo", "fecha_creacion")
+
+    # Acciones personalizadas
+    actions = [
+        "activar_seleccionados",
+        "desactivar_seleccionados",
+        "estadisticas_marcas",
+    ]
+
+    @admin.action(description="Activar modelos seleccionados")
+    def activar_seleccionados(self, request, queryset):
+        count = queryset.update(activo=True)
+        self.message_user(request, f"{count} modelos activados.")
+
+    @admin.action(description="Desactivar modelos seleccionados")
+    def desactivar_seleccionados(self, request, queryset):
+        count = queryset.update(activo=False)
+        self.message_user(request, f"{count} modelos desactivados.")
+
+    @admin.action(description="Ver estadísticas de marcas")
+    def estadisticas_marcas(self, request, queryset):
+        from django.db.models import Count
+
+        stats = (
+            CatalogoModeloAuto.objects.values("marca")
+            .annotate(total=Count("id"), activos=Count("id", filter=models.Q(activo=True)))
+            .order_by("-total")[:10]
+        )
+
+        mensaje = "Top 10 marcas:\n" + "\n".join(
+            [f"• {s['marca']}: {s['activos']}/{s['total']}" for s in stats]
+        )
+        self.message_user(request, mensaje)
+
+
+@admin.register(ConfiguracionEmpresa, site=admin_site)
+class ConfigEmpresaAdmin(admin.ModelAdmin):
+    list_display = (
+        "empresa",
+        "nombre_publico",
+        "rubro_principal",
+        "moneda",
+        "tasa_impuesto",
+        "aplicar_impuesto_por_defecto",
+        "dividir_por_tecnico",
+    )
+    list_filter = (
+        "rubro_principal",
+        "moneda",
+        "aplicar_impuesto_por_defecto",
+        "dividir_por_tecnico",
+    )
+    search_fields = ("empresa__nombre", "nombre_publico")
+
+    fieldsets = (
+        (
+            "Información Básica",
+            {"fields": ("empresa", "nombre_publico", "tagline", "logo", "rubro_principal")},
+        ),
+        (
+            "Información de Contacto",
+            {"fields": ("direccion", "telefono", "email_contacto", "sitio_web")},
+        ),
+        (
+            "Configuración Financiera",
+            {"fields": ("moneda", "tasa_impuesto", "aplicar_impuesto_por_defecto")},
+        ),
+        ("Configuración Visual", {"fields": ("brand_color", "dividir_por_tecnico")}),
+        (
+            "Técnico por Defecto",
+            {"fields": ("tecnico_por_defecto",), "classes": ("collapse",)},
+        ),
+    )
+
+    def has_add_permission(self, request):
+        return request.user.is_staff
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_staff
+
+
+@admin.register(MotorVehiculoEmpresa, site=admin_site)
+class MotorVehiculoEmpresaAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "empresa", "modelo", "country")
+    list_filter = ("country", "empresa")
+    search_fields = ("nombre", "empresa__nombre_taller", "modelo__nombre")
+    raw_id_fields = ("empresa", "modelo")
+    list_select_related = ("empresa", "modelo", "modelo__marca")
+    ordering = ("empresa__nombre_taller", "modelo__nombre", "nombre")
+
+
+@admin.register(CajaVehiculoEmpresa, site=admin_site)
+class CajaVehiculoEmpresaAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "empresa", "modelo", "country")
+    list_filter = ("country", "empresa")
+    search_fields = ("nombre", "empresa__nombre_taller", "modelo__nombre")
+    raw_id_fields = ("empresa", "modelo")
+    list_select_related = ("empresa", "modelo", "modelo__marca")
+    ordering = ("empresa__nombre_taller", "modelo__nombre", "nombre")
+
+
+# Importar admin de memoria (se auto-registran con @admin.register)
+try:
+    from taller.admin_memoria import *  # noqa: F403, F401
+except ImportError:
+    pass  # Admin de memoria no disponible aún
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Dominios personalizados
+# Nota: el código de referencia vive en taller/admin/empresa_dominio.py, pero
+# no puede importarse desde allí porque taller/admin.py (este archivo) toma
+# precedencia sobre el directorio taller/admin/ como módulo Python.
+# ─────────────────────────────────────────────────────────────────────────────
+from taller.models.empresa_dominio import EmpresaDominio
+
+
+@admin.register(EmpresaDominio)
+class EmpresaDominioAdmin(admin.ModelAdmin):
+    list_display   = ("dominio", "empresa", "estado_badge", "ssl_emitido", "verificado_en", "creado_en")
+    list_filter    = ("estado", "ssl_emitido")
+    search_fields  = ("dominio", "empresa__nombre_taller", "empresa__user__email")
+    readonly_fields = (
+        "token_verificacion",
+        "verificado_en",
+        "ultimo_check_dns",
+        "intentos_verificacion",
+        "creado_en",
+        "actualizado_en",
+        "txt_record_name",
+        "txt_record_value",
+        "cname_target",
+    )
+    ordering = ("-creado_en",)
+    fieldsets = (
+        ("Dominio", {"fields": ("empresa", "dominio", "estado", "creado_por")}),
+        ("Instrucciones DNS", {
+            "fields": ("incluir_www", "txt_record_name", "txt_record_value", "cname_target"),
+            "classes": ("collapse",),
+        }),
+        ("Verificación", {
+            "fields": ("token_verificacion", "verificado_en", "ultimo_check_dns", "intentos_verificacion"),
+            "classes": ("collapse",),
+        }),
+        ("SSL", {
+            "fields": ("ssl_emitido", "ssl_cert_path", "ssl_key_path", "ssl_expira_en"),
+            "classes": ("collapse",),
+        }),
+        ("Auditoría", {"fields": ("creado_en", "actualizado_en"), "classes": ("collapse",)}),
+    )
+    actions = ("suspender_action", "reactivar_action")
+
+    @admin.display(description="Estado")
+    def estado_badge(self, obj):
+        colores = {
+            "PENDIENTE":     ("#f59e0b", "⏳"),
+            "VERIFICANDO":   ("#3b82f6", "🔍"),
+            "ACTIVO":        ("#10b981", "✅"),
+            "ERROR_DNS":     ("#ef4444", "❌"),
+            "SSL_PENDIENTE": ("#8b5cf6", "🔒"),
+            "SUSPENDIDO":    ("#6b7280", "⛔"),
+        }
+        color, icono = colores.get(obj.estado, ("#6b7280", "?"))
+        return format_html(
+            '<span style="color:{}; font-weight:600;">{} {}</span>',
+            color, icono, obj.get_estado_display(),
+        )
+
+    @admin.display(description="Registro TXT — Nombre")
+    def txt_record_name(self, obj):
+        return obj.get_txt_record_name() if obj.pk else "—"
+
+    @admin.display(description="Registro TXT — Valor")
+    def txt_record_value(self, obj):
+        return obj.get_txt_record_value() if obj.pk else "—"
+
+    @admin.display(description="Registros DNS (A / CNAME www)")
+    def cname_target(self, obj):
+        if not obj.pk:
+            return "—"
+        dns = obj.get_dns_instructions()
+        texto = f"A @ → {dns['apex']['value']}"
+        if dns["www"]["enabled"]:
+            texto += f" | CNAME www → {dns['www']['value']}"
+        return texto
+
+    @admin.action(description="Suspender dominios seleccionados")
+    def suspender_action(self, request, queryset):
+        from taller.services.domain_service import DomainService
+        count = 0
+        for ed in queryset.exclude(estado=EmpresaDominio.Estado.SUSPENDIDO):
+            DomainService.suspender(ed)
+            count += 1
+        self.message_user(request, f"{count} dominio(s) suspendido(s).")
+
+    @admin.action(description="Reactivar → PENDIENTE")
+    def reactivar_action(self, request, queryset):
+        from taller.services.domain_service import DomainService
+
+        count = 0
+        for ed in queryset.filter(estado=EmpresaDominio.Estado.SUSPENDIDO):
+            DomainService.reactivar(ed)
+            count += 1
+
+        self.message_user(request, f"{count} dominio(s) reactivado(s) a PENDIENTE.")
+
+
+# ---------------------------------------------------------------------------
+# MovimientoInventario — ledger append-only, solo lectura
+# ---------------------------------------------------------------------------
+
+@admin.register(MovimientoInventario)
+class MovimientoInventarioAdmin(admin.ModelAdmin):
+    list_display = (
+        "created_at",
+        "empresa",
+        "tipo",
+        "origen_stock",
+        "cantidad_delta",
+        "saldo_resultante",
+        "documento",
+    )
+    list_filter = ("tipo", "origen_stock", "empresa")
+    search_fields = (
+        "idempotency_key",
+        "documento__numero_documento",
+        "repuesto__nombre",
+        "repuesto__part_number",
+        "pieza_desarme__nombre",
+    )
+    readonly_fields = (
+        "empresa",
+        "tipo",
+        "origen_stock",
+        "repuesto",
+        "pieza_desarme",
+        "documento",
+        "linea_repuesto",
+        "cantidad_delta",
+        "saldo_resultante",
+        "costo_unitario",
+        "idempotency_key",
+        "event_version",
+        "created_by",
+        "created_at",
+        "notas",
+        "metadata",
+    )
+    actions = []
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+# ---------------------------------------------------------------------------
+# VehiculoDesarme — admin operacional (P2-DB)
+# ---------------------------------------------------------------------------
+
+@admin.register(VehiculoDesarme, site=admin_site)
+class VehiculoDesarmeAdmin(admin.ModelAdmin):
+    list_display = (
+        "__str__",
+        "empresa",
+        "estado_operativo",
+        "estado_desarme",
+        "fecha_ingreso_desarme",
+        "costo_adquisicion",
+    )
+    list_filter = ("empresa", "estado_operativo", "estado_desarme")
+    search_fields = ("patente", "vin", "marca_texto", "modelo_texto")
+    list_select_related = ("empresa", "marca", "modelo")
+    ordering = ("-fecha_ingreso_desarme", "-id")
+    readonly_fields = ("created_at", "updated_at")
+
+
+# ---------------------------------------------------------------------------
+# VehiculoDesarmeEvent — append-only, principalmente lectura
+# ---------------------------------------------------------------------------
+
+@admin.register(VehiculoDesarmeEvent, site=admin_site)
+class VehiculoDesarmeEventAdmin(admin.ModelAdmin):
+    list_display = (
+        "occurred_at",
+        "empresa",
+        "vehiculo",
+        "tipo",
+        "created_by",
+        "idempotency_key",
+    )
+    list_filter = ("empresa", "tipo")
+    search_fields = ("vehiculo__patente", "vehiculo__vin", "idempotency_key")
+    list_select_related = ("empresa", "vehiculo", "created_by")
+    ordering = ("-occurred_at",)
+    readonly_fields = (
+        "empresa",
+        "vehiculo",
+        "pieza",
+        "documento",
+        "tipo",
+        "metadata",
+        "idempotency_key",
+        "occurred_at",
+        "created_by",
+        "created_at",
+        "updated_at",
+    )
+    actions = []
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+# ---------------------------------------------------------------------------
+# PublicPageView — Analytics público disponible en Django Admin estándar
+# ---------------------------------------------------------------------------
+
+@admin.register(PublicPageView)
+class PublicPageViewDefaultAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "created_at",
+        "country",
+        "language",
+        "page_type",
+        "path",
+        "is_mobile",
+        "is_bot",
+    )
+
+    list_filter = (
+        "country",
+        "language",
+        "page_type",
+        "is_mobile",
+        "is_bot",
+        "created_at",
+    )
+
+    search_fields = (
+        "path",
+        "country",
+        "language",
+        "referrer",
+    )
+
+    ordering = (
+        "-created_at",
+    )
+
+    readonly_fields = (
+        "path",
+        "page_type",
+        "country",
+        "language",
+        "visitor_hash",
+        "referrer",
+        "user_agent",
+        "is_mobile",
+        "is_bot",
+        "created_at",
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

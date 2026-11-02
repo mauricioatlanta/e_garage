@@ -1,0 +1,175 @@
+# meta-contract.yaml
+# Canonical template for every eGarage integration contract.
+# ADR-000 defines the authoritative architecture behind this template.
+#
+# A contract is a named and versioned collection of Message Types that:
+#   - belong to the same business domain;
+#   - are governed by one publisher;
+#   - share lifecycle and ownership boundaries.
+#
+# Every file in contracts/registry/ must conform to this structure.
+# Each Message Type references its own JSON Schema payload.
+
+# ── META DESCRIPTION ──────────────────────────────────────────────────────────
+
+meta_description: >-
+  A contract is a named and versioned collection of Message Types that share
+  a common business domain and are governed by a single publisher.
+
+# ── CONTRACT IDENTITY ─────────────────────────────────────────────────────────
+# Globally unique contract identifier.
+# Format: {domain}.{contract-name}.v{major}
+# Examples:
+#   catalog.product-knowledge.v1
+#   inventory.stock.v1
+
+id: "{domain}.{contract-name}.v{major}"
+
+# Human-readable name used in documentation and tooling.
+display_name: ""
+
+# Contract category.
+# Allowed values:
+#   Truth | Capability | Behavioral | Session | Event | Infrastructure
+category: ""
+
+# ── OWNERSHIP ─────────────────────────────────────────────────────────────────
+# Bounded context that owns and versions this contract.
+owner: ""
+
+# Single subsystem responsible for publishing every Message Type in this contract.
+publisher: ""
+
+# Sole subsystem authorized to write the governed data.
+# Required (non-null) for Truth contracts.
+# Must be null for contracts that do not govern authoritative data.
+write_authority: null
+
+# ── MESSAGE TYPES ─────────────────────────────────────────────────────────────
+# A Message Type is an independently versioned message belonging to this contract.
+# Message Type IDs are globally unique across the eGarage platform.
+# Required format: {domain}.{entity}.{action}
+# Examples:
+#   catalog.product.changed
+#   catalog.product.snapshot
+#   catalog.product.tombstone
+#
+# Contracts with a single message still use the message_types[] array.
+# There is no shorthand for single-message contracts.
+
+message_types:
+  - # Globally unique identifier for this Message Type.
+    # Format: {domain}.{entity}.{action}
+    id: "{domain}.{entity}.{action}"
+
+    # Human-readable explanation of the message semantics.
+    description: ""
+
+    # Semantic version of this Message Type's payload and behavior.
+    # A breaking change in schema or semantics requires a MAJOR increment.
+    # This version is independent from the parent contract version.
+    version: "1.0.0"
+
+    # Path to the JSON Schema that validates this Message Type's payload.
+    # Path is relative to contracts/.
+    schema_ref: "schemas/{message-type-id}.schema.json"
+
+    # Semantic interaction pattern of this Message Type.
+    # Allowed values:
+    #   event            — publisher emits without prior consumer request
+    #   request-response — consumer requests; publisher responds
+    #   snapshot         — complete state of the domain at emission time
+    #   stream           — continuous flow; consumer subscribes
+    interaction: event
+
+    # Physical delivery mechanism.
+    # Allowed values:
+    #   queue   — message broker (Kafka topic, RabbitMQ, Django Q, etc.)
+    #   http    — REST or RPC endpoint
+    #   file    — filesystem or object storage
+    #   grpc    — gRPC channel
+    #   webhook — publisher calls a consumer-registered URL
+    #
+    # Changing transport is an implementation change, not a breaking semantic change.
+    # Changing interaction IS a breaking change.
+    transport: queue
+
+    # Expected publication or availability cadence.
+    # Allowed values:
+    #   realtime     — sub-second
+    #   near-realtime — seconds to minutes
+    #   batch        — scheduled intervals (hourly, daily)
+    #   static       — changes only on explicit configuration updates
+    #   on-demand    — only when requested by a consumer
+    frequency: near-realtime
+
+    # Binding guarantees for this specific Message Type.
+    # These are commitments from the publisher to all consumers.
+    # Changing any guarantee — in any direction — is a breaking change.
+    guarantees:
+      # Whether a consumer can safely process the same message more than once.
+      idempotent: null          # true | false
+
+      # Whether messages are guaranteed to arrive in publication order.
+      ordered: null             # true | false
+
+      # Data consistency visible to consumers at time of delivery.
+      consistency: null         # strong | eventual
+
+      # Whether the payload represents a delta or the complete current state.
+      completeness: null        # delta | full-snapshot
+
+      # Maximum acceptable age of the delivered data.
+      # Format: "5m", "1h", "24h". Use null when staleness does not apply.
+      max_staleness: null
+
+# ── CONSUMERS ─────────────────────────────────────────────────────────────────
+# Consumers declare exactly which Message Types they consume.
+# Declaring only the parent contract (without message_types) is not allowed.
+# Every message_type referenced here must exist in message_types[] above.
+# This list is exhaustive: unlisted subsystems are not authorized consumers.
+
+consumers:
+  - subsystem: "{consumer-subsystem}"
+    message_types:
+      - "{domain}.{entity}.{action}"
+
+# ── CONTRACT VERSIONING ───────────────────────────────────────────────────────
+# Semantic version of this contract definition.
+# This version describes the contract collection and its governance metadata.
+# It is independent from each message_types[].version.
+#
+# Increment MAJOR when:
+#   - a message_type is added, removed, or renamed
+#   - owner, publisher, or write_authority changes
+#   - a consumer is removed from the authorized list
+#
+# Increment MINOR when:
+#   - a new authorized consumer is added
+#   - documentation is clarified without semantic change
+version: "1.0.0"
+
+# Lifecycle status of this contract.
+# Allowed values:
+#   draft      — under design; must not be consumed in production
+#   stable     — approved; ready for production
+#   deprecated — replaced; consumers must migrate
+#
+# Rule: a contract cannot become stable while pending_decisions is non-empty.
+status: draft
+
+# Policy governing what triggers a major version bump.
+# Allowed values:
+#   semver-major         — follow the breaking change table in contracts/README.md
+#   negotiated-migration — publisher and all consumers agree on a migration plan
+breaking_change_policy: semver-major
+
+# Minimum contract version that consumers are expected to support.
+# Use null until a minimum is formally established.
+min_consumer_version: null
+
+# ── PENDING ARCHITECTURAL DECISIONS ───────────────────────────────────────────
+# ADR identifiers that must reach Accepted before this contract can become stable.
+# Format: ADR-NNN
+# An non-empty list blocks transition to stable.
+pending_decisions: []

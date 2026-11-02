@@ -1,0 +1,764 @@
+.workspace-shell {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0.5rem 0.75rem 1.5rem;
+    color: #e5eef9;
+    font-family: "Space Grotesk", "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+body.workspace-search-lock {
+    overflow: hidden;
+}
+
+.workspace-product-header {
+    margin-bottom: 28px;
+    min-width: 0;
+}
+
+.workspace-product-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    margin-bottom: 6px;
+}
+
+.workspace-product-heading i {
+    flex: 0 0 auto;
+    color: var(--eg-primary, #38bdf8);
+    font-size: 1.5rem;
+}
+
+.workspace-product-heading h2 {
+    min-width: 0;
+    margin: 0;
+    color: #f8fbff;
+    font-size: 1.4rem;
+    font-weight: 800;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+
+.workspace-product-header p {
+    max-width: 48rem;
+    margin: 0;
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.workspace-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.workspace-kpi-grid > * {
+    min-width: 0;
+}
+
+.workspace-kpi-grid p,
+.workspace-kpi-grid h3 {
+    overflow-wrap: anywhere;
+}
+
+.workspace-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+}
+
+.workspace-header-copy {
+    min-width: 0;
+}
+
+.workspace-meta {
+    margin: 0 0 0.1rem;
+    color: #8ca0b8;
+    font-size: 0.69rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.workspace-title {
+    margin: 0;
+    color: #f8fbff;
+    font-size: 0.94rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.workspace-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.workspace-keyhint-mini {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: #6f8898;
+    cursor: default;
+}
+
+.workspace-keyhint-mini i {
+    font-size: 0.8rem;
+}
+
+.workspace-keyhint-label {
+    font-size: 0.625rem;
+    line-height: 1;
+    color: #6f8898;
+    letter-spacing: 0.02em;
+}
+
+/* ─── Action grid (search card + CDM card) ──────────────────────────────── */
+.workspace-action-grid {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr;
+    gap: 10px;
+    margin: 10px 0 14px;
+}
+
+/*
+ * Keep the search usable on compact desktop/laptop widths.
+ * With the persistent sidebar, two columns make customer names unnecessarily
+ * cramped. Stack search + live feed until there is enough horizontal room.
+ */
+@media (max-width: 1359px) {
+    .workspace-action-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.workspace-search-card {
+    background: #0f2330;
+    border: 0.5px solid rgba(93, 202, 165, 0.35);
+    border-radius: 12px;
+    padding: 14px;
+}
+
+.wsc-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #9fe1cb;
+    margin-bottom: 10px;
+}
+
+.wsc-header i { color: #5dcaa5; font-size: 16px; }
+
+.wsc-hint { margin: 10px 0 0; font-size: 10px; color: #46606f; }
+
+/* ─── CDM card (violet) ─────────────────────────────────────────────────── */
+.workspace-cdm-card {
+    --cdm-violet: #7f77dd;
+    --cdm-violet-text: #cecbf6;
+    --cdm-violet-dim: #8a83c9;
+    background: #150f2e;
+    border: 0.5px solid rgba(127, 119, 221, 0.4);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--cdm-violet-text);
+    transition: border-color 140ms ease;
+}
+
+.workspace-cdm-card:hover {
+    border-color: rgba(127, 119, 221, 0.7);
+    text-decoration: none;
+}
+
+.cdm-card-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    margin-bottom: 8px;
+}
+
+.cdm-card-header i { font-size: 15px; }
+
+.cdm-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cdm-violet);
+    display: inline-block;
+}
+
+.cdm-card-metric {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    margin: 2px 0;
+}
+
+.cdm-card-metric span:first-child {
+    font-size: 26px;
+    font-weight: 500;
+    color: #eeedfe;
+}
+
+.cdm-metric-label { font-size: 11px; color: var(--cdm-violet); }
+
+.cdm-sparkline {
+    width: 100%;
+    height: 20px;
+    margin: 4px 0 8px;
+    color: var(--cdm-violet);
+}
+
+.cdm-card-footer {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: auto;
+    font-size: 10px;
+    color: var(--cdm-violet-dim);
+}
+
+.cdm-card-footer i { margin-left: auto; }
+
+.cdm-pulse {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--cdm-violet);
+    display: inline-block;
+    animation: cdm-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes cdm-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+}
+
+.workspace-search-panel {
+    position: relative;
+}
+
+.workspace-search-field-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0 0 0.4rem;
+}
+
+.workspace-search-label {
+    display: block;
+    margin: 0;
+    color: #7f93aa;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.workspace-search-close {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.35rem;
+    height: 2.35rem;
+    flex: 0 0 auto;
+    border: 1px solid rgba(140, 160, 184, 0.18);
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.04);
+    color: #adc0d5;
+}
+
+.workspace-search-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-height: 4.5rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid rgba(140, 160, 184, 0.2);
+    border-radius: 1rem;
+    background: rgba(9, 14, 24, 0.92);
+    transition: border-color 140ms ease, background 140ms ease;
+}
+
+.workspace-search-panel.is-open .workspace-search-input-wrap,
+.workspace-search-input-wrap:focus-within {
+    border-color: rgba(125, 211, 252, 0.45);
+    background: rgba(10, 16, 28, 0.98);
+}
+
+.workspace-search-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    flex: 0 0 auto;
+    color: #6fb7e8;
+}
+
+.workspace-search-icon svg {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.workspace-search-input {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #f8fbff;
+    font-size: clamp(1.2rem, 2.8vw, 1.6rem);
+    font-weight: 560;
+    line-height: 1.15;
+}
+
+.workspace-search-input::placeholder {
+    color: #5f7288;
+}
+
+.workspace-search-shortcut {
+    flex: 0 0 auto;
+    width: 2.2rem;
+    height: 2.2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(140, 160, 184, 0.18);
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    color: #8ca0b8;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.workspace-search-dropdown {
+    position: absolute;
+    top: calc(100% + 0.45rem);
+    left: 0;
+    right: 0;
+    z-index: 30;
+    overflow: hidden;
+    max-height: min(72vh, 38rem);
+    overflow-y: auto;
+    border: 1px solid rgba(140, 160, 184, 0.18);
+    border-radius: 0.95rem;
+    background: rgba(7, 11, 19, 0.98);
+    box-shadow: 0 16px 40px rgba(2, 8, 23, 0.35);
+}
+
+.workspace-search-content {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.55rem;
+}
+
+.workspace-search-state {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.9rem;
+    border: 1px solid rgba(140, 160, 184, 0.12);
+    border-radius: 0.8rem;
+    background: rgba(15, 23, 42, 0.5);
+}
+
+.workspace-search-state-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #f8fbff;
+    font-size: 0.94rem;
+    font-weight: 600;
+}
+
+.workspace-search-state-copy {
+    margin: 0;
+    color: #8ca0b8;
+    font-size: 0.84rem;
+    line-height: 1.45;
+}
+
+.workspace-spinner {
+    width: 0.9rem;
+    height: 0.9rem;
+    border: 2px solid rgba(125, 211, 252, 0.22);
+    border-top-color: #7dd3fc;
+    border-radius: 999px;
+    animation: workspace-spin 900ms linear infinite;
+}
+
+@keyframes workspace-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.workspace-search-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0 0.15rem 0.25rem;
+    color: #73869c;
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.workspace-search-section {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.workspace-search-section + .workspace-search-section {
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(140, 160, 184, 0.08);
+}
+
+.workspace-search-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0 0.15rem;
+}
+
+.workspace-search-section-title {
+    color: #b7c6d9;
+    font-size: 0.8rem;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.workspace-search-section-count {
+    color: #73869c;
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.workspace-result-grid {
+    display: grid;
+    gap: 0.4rem;
+}
+
+.workspace-result-card {
+    display: grid;
+    gap: 0.28rem;
+    width: 100%;
+    padding: 0.8rem 0.85rem;
+    border: 1px solid rgba(140, 160, 184, 0.1);
+    border-radius: 0.85rem;
+    background: rgba(15, 23, 42, 0.56);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 120ms ease, background 120ms ease;
+}
+
+.workspace-result-card:hover,
+.workspace-result-card:focus-visible,
+.workspace-result-card.is-active {
+    border-color: rgba(125, 211, 252, 0.28);
+    background: rgba(16, 27, 49, 0.86);
+    outline: none;
+}
+
+.workspace-result-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.workspace-result-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.35rem;
+    padding: 0 0.45rem;
+    border-radius: 0.45rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.workspace-result-badge.type-vehiculo {
+    background: rgba(56, 189, 248, 0.11);
+    color: #9ad7ff;
+}
+
+.workspace-result-badge.type-cliente {
+    background: rgba(96, 165, 250, 0.11);
+    color: #bed5ff;
+}
+
+.workspace-result-aux {
+    color: #73869c;
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.workspace-result-title {
+    color: #f8fbff;
+    font-size: 0.95rem;
+    font-weight: 620;
+    line-height: 1.25;
+}
+
+.workspace-result-subtitle {
+    color: #adc0d5;
+    font-size: 0.83rem;
+    line-height: 1.35;
+}
+
+.workspace-result-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    color: #73869c;
+    font-size: 0.76rem;
+    line-height: 1.3;
+}
+
+.workspace-result-open {
+    color: #9ad7ff;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.workspace-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+@media (max-width: 720px) {
+    .workspace-product-header {
+        margin-bottom: 18px;
+    }
+
+    .workspace-product-heading {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .workspace-product-heading i {
+        margin-top: 0.1rem;
+        font-size: 1.15rem;
+    }
+
+    .workspace-product-heading h2 {
+        font-size: 1.18rem;
+    }
+
+    .workspace-product-header p {
+        font-size: 0.84rem;
+    }
+
+    .workspace-kpi-grid,
+    .eg-content > .grid.grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.85rem !important;
+        margin-bottom: 1.35rem;
+    }
+
+    .workspace-kpi-grid > a > div,
+    .workspace-kpi-grid > div,
+    .eg-content > .grid.grid-cols-4 > a > div,
+    .eg-content > .grid.grid-cols-4 > div {
+        min-height: 8rem;
+        padding: 1rem !important;
+    }
+
+    .workspace-kpi-grid h3,
+    .eg-content > .grid.grid-cols-4 h3 {
+        font-size: 1.45rem;
+        line-height: 1.15;
+    }
+
+    .workspace-kpi-grid p,
+    .eg-content > .grid.grid-cols-4 p {
+        max-width: calc(100% - 1.6rem);
+        font-size: 0.84rem;
+        line-height: 1.25;
+        overflow-wrap: normal;
+        word-break: normal;
+    }
+
+    .workspace-shell {
+        padding: 0.85rem 0.7rem 1.4rem;
+    }
+
+    .workspace-header {
+        align-items: flex-start;
+        flex-direction: column;
+        margin-bottom: 0.65rem;
+    }
+
+    .workspace-search-input-wrap {
+        min-height: 4rem;
+        padding: 0.65rem 0.75rem;
+    }
+
+    .workspace-search-card:not(.is-mobile-active) .workspace-search-input-wrap {
+        gap: 0.55rem;
+    }
+
+    .workspace-search-card:not(.is-mobile-active) .workspace-search-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .workspace-search-card:not(.is-mobile-active) .workspace-search-input {
+        font-size: 1rem;
+    }
+
+    .workspace-search-card:not(.is-mobile-active) .workspace-search-shortcut {
+        display: none;
+    }
+
+    .workspace-search-card.is-mobile-active {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        min-height: 100dvh;
+        padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+        border: 0;
+        border-radius: 0;
+        background: #07111a;
+        overflow: hidden;
+    }
+
+    .workspace-search-card.is-mobile-active .wsc-header {
+        margin-bottom: 0.8rem;
+    }
+
+    .workspace-search-card.is-mobile-active .workspace-search-panel {
+        display: flex;
+        flex: 1 1 auto;
+        min-height: 0;
+        flex-direction: column;
+    }
+
+    .workspace-search-card.is-mobile-active .workspace-search-close {
+        display: inline-flex;
+    }
+
+    .workspace-search-card.is-mobile-active .workspace-search-input-wrap {
+        flex: 0 0 auto;
+        min-height: 3.7rem;
+        border-radius: 0.9rem;
+    }
+
+    .workspace-search-card.is-mobile-active .workspace-search-input {
+        font-size: 1.05rem;
+    }
+
+    .workspace-search-card.is-mobile-active .workspace-search-shortcut {
+        display: none;
+    }
+
+    .workspace-search-card.is-mobile-active .workspace-search-dropdown {
+        position: static;
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+        margin-top: 0.75rem;
+        border-radius: 0.9rem;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .workspace-search-card.is-mobile-active .workspace-search-content {
+        gap: 0.65rem;
+        padding: 0.7rem;
+    }
+
+    .workspace-search-card.is-mobile-active .wsc-hint {
+        display: none;
+    }
+
+    .workspace-search-dropdown {
+        max-height: min(68vh, 30rem);
+    }
+
+    .workspace-result-card {
+        min-height: 5.25rem;
+        padding: 0.95rem;
+        border-radius: 0.95rem;
+    }
+
+    .workspace-result-title {
+        font-size: 1rem;
+    }
+
+    .workspace-result-subtitle,
+    .workspace-result-meta {
+        font-size: 0.86rem;
+    }
+}
+
+@media (max-width: 520px) {
+    .workspace-action-grid {
+        gap: 0.75rem;
+        margin-top: 0.75rem;
+    }
+
+    .workspace-result-topline,
+    .workspace-result-meta {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .workspace-header-actions {
+        display: none;
+    }
+
+    .workspace-search-summary {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+}
+
+/*
+ * Mobile fullscreen search:
+ * .eg-content uses backdrop-filter, which creates the containing block for
+ * position: fixed in Chromium. Disable that effect only while mobile search
+ * owns the viewport.
+ */
+@media (max-width: 720px) {
+    body.workspace-search-lock .eg-content {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .workspace-keyhint-mini,
+    .workspace-search-shortcut {
+        display: none;
+    }
+
+    .workspace-search-input {
+        flex: 1 1 auto;
+    }
+}

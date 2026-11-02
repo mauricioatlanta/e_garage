@@ -1,0 +1,83 @@
+{
+  "glb_bytes": 1868560,
+  "objects_total": 146,
+  "mesh_objects": 146,
+  "vertices": 53445,
+  "triangles": 41436,
+  "materials": 12,
+  "material_names": [
+    "MAT_BODY_NEUTRAL",
+    "MAT_COOLING",
+    "MAT_DARK_METAL",
+    "MAT_ENGINE",
+    "MAT_GLASS_NEUTRAL",
+    "MAT_HEADLAMP",
+    "MAT_INTERIOR",
+    "MAT_INTERIOR_ACCENT",
+    "MAT_METAL",
+    "MAT_TAILLAMP",
+    "MAT_TIRE",
+    "MAT_TRIM_NEUTRAL"
+  ],
+  "component_ids": [
+    "body.bumper.front",
+    "body.bumper.rear",
+    "body.door.front.left",
+    "body.door.front.right",
+    "body.door.rear.left",
+    "body.door.rear.right",
+    "body.hood",
+    "body.mirror.left",
+    "body.mirror.right",
+    "body.roof_panel",
+    "body.shell",
+    "body.trunk_lid",
+    "cooling.fan",
+    "cooling.radiator",
+    "cooling.water_pump",
+    "engine.assembly",
+    "glass.door.front.left",
+    "glass.door.front.right",
+    "glass.door.rear.left",
+    "glass.door.rear.right",
+    "glass.windshield.front",
+    "glass.windshield.rear",
+    "interior.dashboard",
+    "interior.seat.front.left",
+    "interior.seat.front.right",
+    "interior.seat.rear",
+    "interior.steering_wheel",
+    "light.headlamp.left",
+    "light.headlamp.right",
+    "light.tail.left",
+    "light.tail.right",
+    "wheel.front.left",
+    "wheel.front.right",
+    "wheel.rear.left",
+    "wheel.rear.right"
+  ],
+  "required_component_ids": 33,
+  "missing_required": [],
+  "negative_scale_objects": [],
+  "zero_area_polygons": 0,
+  "zero_area_by_object": {},
+  "bounds_meters": {
+    "min": [
+      -2.31,
+      -1.09,
+      0.06
+    ],
+    "max": [
+      2.37,
+      1.09,
+      1.525
+    ],
+    "dimensions": [
+      4.68,
+      2.18,
+      1.465
+    ]
+  },
+  "axis_convention": "X forward, Y driver-left, Z up",
+  "reimport_status": "PASS"
+}

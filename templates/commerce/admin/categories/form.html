@@ -1,0 +1,54 @@
+{% extends "commerce/admin/base_admin.html" %}
+
+{% block page_title %}{{ action }} Categoría{% endblock %}
+{% block page_subtitle %}
+  {% if category %}Editando: {{ category.name }}{% else %}Nueva categoría para el catálogo{% endif %}
+{% endblock %}
+
+{% block main_actions %}
+<a href="{% url 'commerce:admin_category_list' %}" class="ca-btn ca-btn-ghost">← Volver</a>
+{% endblock %}
+
+{% block ca_content %}
+<div class="max-w-2xl">
+  <form method="post" enctype="multipart/form-data" class="space-y-5">
+    {% csrf_token %}
+
+    {% for field in form %}
+    <div>
+      <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">
+        {{ field.label }}{% if field.field.required %} <span class="text-red-400">*</span>{% endif %}
+      </label>
+      {{ field }}
+      {% if field.help_text %}
+      <p class="text-xs text-gray-600 mt-1">{{ field.help_text }}</p>
+      {% endif %}
+      {% for error in field.errors %}
+      <p class="text-xs text-red-400 mt-1">{{ error }}</p>
+      {% endfor %}
+    </div>
+    {% endfor %}
+
+    <div class="flex gap-3 pt-2">
+      <button type="submit" class="ca-btn ca-btn-primary px-6 py-2 text-sm">
+        {% if category %}Guardar cambios{% else %}Crear categoría{% endif %}
+      </button>
+      <a href="{% url 'commerce:admin_category_list' %}" class="ca-btn ca-btn-ghost px-6 py-2 text-sm">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block ca_extra_js %}
+<script>
+const nameInput = document.querySelector('input[name="name"]');
+const slugInput = document.querySelector('input[name="slug"]');
+if (nameInput && slugInput && !slugInput.value) {
+  nameInput.addEventListener('input', () => {
+    slugInput.value = nameInput.value.toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "commerce/base.html" %}
+
+{% block title %}Redirigiendo al pago — {{ brand.brand_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto px-4 py-24 text-center">
+
+  <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-6"
+       style="background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);">
+    <svg class="w-8 h-8 animate-spin" style="color: var(--color-primary);"
+         fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+    </svg>
+  </div>
+
+  <h1 class="text-xl font-semibold text-gray-900 mb-2">Redirigiendo al pago...</h1>
+  <p class="text-gray-500 text-sm mb-8">
+    Serás dirigido a la pasarela de pago en un momento.
+  </p>
+
+  {# El formulario se auto-envía. El token_ws nunca se muestra como texto visible. #}
+  <form id="payment-redirect-form" method="post" action="{{ redirect_url }}">
+    <input type="hidden" name="token_ws" value="{{ gateway_token }}">
+    <button type="submit"
+            class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl
+                   font-medium text-sm">
+      Continuar al pago →
+    </button>
+  </form>
+
+  <p class="mt-6 text-xs text-gray-400">
+    Pedido {{ order.order_number }} · ${{ order.total|floatformat:0 }}
+  </p>
+
+</div>
+
+<script>
+  (function () {
+    var form = document.getElementById('payment-redirect-form');
+    if (form) { form.submit(); }
+  }());
+</script>
+{% endblock %}

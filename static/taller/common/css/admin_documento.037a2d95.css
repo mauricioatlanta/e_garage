@@ -1,0 +1,210 @@
+/* === TEMA POR DOCUMENTO === */
+.presupuesto-theme { --primary-color: #3498db; }
+.orden-theme       { --primary-color: #f39c12; }
+.factura-theme     { --primary-color: #27ae60; }
+
+/* === CONTENEDORES === */
+fieldset.module {
+    border: 2px solid var(--primary-color, #2980b9);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+
+fieldset.module h2 {
+    background-color: var(--primary-color, #2980b9);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+/* === FORMULARIO GENERAL (DOS CAMPOS POR FILA) === */
+fieldset.module .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+fieldset.module .form-row > div {
+    flex: 1 1 48%;
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+}
+
+fieldset.module .form-row label {
+    font-weight: bold;
+    margin-bottom: 4px;
+    text-align: left;
+}
+
+fieldset.module .form-row input,
+fieldset.module .form-row select,
+fieldset.module .form-row textarea {
+    padding: 7px 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    width: 100% !important;
+}
+
+/* === CAMPOS NUMÉRICOS === */
+fieldset.module .form-row input[type="number"] {
+    max-width: 200px;
+}
+
+/* === CAMPOS DE TOTALES A LA DERECHA === */
+fieldset.module.totales-inline {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+fieldset.module.totales-inline .form-row {
+    flex-direction: row;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+fieldset.module.totales-inline .form-row > div {
+    flex: 0 0 auto;
+    min-width: 160px;
+}
+
+fieldset.module.totales-inline input[name*="total"],
+fieldset.module.totales-inline input[name*="iva"] {
+    text-align: right;
+    font-weight: bold;
+}
+
+/* === INLINE TABULAR === */
+.inline-group .tabular {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.inline-group .tabular th {
+    background-color: var(--primary-color, #2980b9);
+    color: white;
+    font-size: 14px;
+    padding: 8px;
+}
+
+.inline-group .tabular td {
+    padding: 6px;
+    vertical-align: middle;
+}
+
+.inline-group .tabular td input,
+.inline-group .tabular td select {
+    width: 100%;
+    padding: 4px 6px;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+/* === INPUTS INLINE === */
+.inline-related input[type="text"],
+.inline-related input[type="number"],
+.inline-related select {
+    width: 100% !important;
+    min-width: 100px;
+    max-width: 100%;
+}
+
+/* === BOTÓN ELIMINAR === */
+.inline-deletelink {
+    color: red;
+    font-size: 16px;
+}
+
+/* === BOTÓN AGREGAR FILA === */
+.inline-group .add-row {
+    margin-top: 10px;
+}
+
+.inline-group .add-row a {
+    display: inline-block;
+    background-color: var(--primary-color, #2980b9);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.inline-group .add-row a:hover {
+    background-color: #1a5276;
+}
+
+/* === BOTONES GENERALES === */
+.button {
+    font-size: 15px;
+    padding: 10px 16px;
+    border-radius: 6px;
+    margin: 5px;
+}
+
+input.default, .submit-row input {
+    background-color: var(--primary-color, #2980b9) !important;
+    color: white;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+input.default:hover {
+    background-color: #1a5276 !important;
+}
+
+/* === MODO OSCURO === */
+body.dark-theme {
+    background-color: #1e1e1e;
+    color: #eee;
+}
+
+body.dark-theme fieldset.module {
+    background-color: #2c2c2c;
+    border-color: #444;
+}
+
+body.dark-theme input,
+body.dark-theme select,
+body.dark-theme textarea {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+body.dark-theme .inline-group .tabular th {
+    background-color: #444;
+    color: #fff;
+}
+
+body.dark-theme .submit-row input.default {
+    background-color: #444 !important;
+    color: #fff;
+}
+
+/* === RESPONSIVE === */
+@media screen and (max-width: 768px) {
+    fieldset.module .form-row {
+        flex-direction: column;
+    }
+
+    fieldset.module .form-row > div {
+        width: 100%;
+    }
+
+    .inline-group .tabular td input,
+    .inline-group .tabular td select {
+        width: 100%;
+    }
+}

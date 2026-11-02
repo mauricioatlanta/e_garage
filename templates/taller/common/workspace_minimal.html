@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Workspace - eGarage</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white min-h-screen p-6">
+  <div class="max-w-6xl mx-auto space-y-8">
+    <header class="flex flex-wrap items-center justify-between gap-4 border-b border-cyan-500/40 pb-4">
+      <div class="flex items-center gap-4 flex-wrap">
+        {% if company_logo_url %}
+        <a href="{{ workspace_base_url|default:'/us/en' }}/" class="flex-shrink-0">
+          <img src="{{ company_logo_url }}" alt="{{ company_name|default:'Logo' }}" class="h-12 w-auto max-w-[200px] object-contain object-left" />
+        </a>
+        {% endif %}
+        <div>
+          <h1 class="text-2xl font-bold text-cyan-300">Workshop Workspace</h1>
+          <p class="text-slate-400 mt-1">Central place to receive vehicles and daily operations.</p>
+        </div>
+      </div>
+      <a href="{{ workspace_base_url|default:'/us/en' }}/" class="text-cyan-400 hover:text-cyan-300 text-sm whitespace-nowrap">← Back to dashboard</a>
+    </header>
+
+    {% with base=workspace_base_url|default:"/us/en" %}
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <a href="{% if vehiculos_url %}{{ vehiculos_url }}{% else %}{{ base }}/vehiculos/{% endif %}" class="block p-5 rounded-xl bg-slate-900/80 border border-cyan-500/30 hover:border-cyan-400 transition-all cursor-pointer no-underline">
+        <h2 class="text-lg font-semibold text-cyan-200 mb-2">🚗 Vehicles</h2>
+        <p class="text-sm text-slate-400 mb-3">Review and manage vehicles in your workshop.</p>
+        <span class="text-cyan-400 text-sm">Go to vehicles →</span>
+      </a>
+      <a href="{% if documentos_url %}{{ documentos_url }}{% else %}{{ base }}/documentos/{% endif %}" class="block p-5 rounded-xl bg-slate-900/80 border border-cyan-500/30 hover:border-cyan-400 transition-all cursor-pointer no-underline">
+        <h2 class="text-lg font-semibold text-cyan-200 mb-2">📄 Documents</h2>
+        <p class="text-sm text-slate-400 mb-3">Budgets, work orders and invoices.</p>
+        <span class="text-cyan-400 text-sm">Go to documents →</span>
+      </a>
+      <a href="{% if desarme_url %}{{ desarme_url }}{% else %}{{ base }}/desarme/{% endif %}" class="block p-5 rounded-xl bg-slate-900/80 border border-cyan-500/30 hover:border-cyan-400 transition-all cursor-pointer no-underline">
+        <h2 class="text-lg font-semibold text-cyan-200 mb-2">🧩 Disassembly</h2>
+        <p class="text-sm text-slate-400 mb-3">Vehicles and parts in the disassembly module.</p>
+        <span class="text-cyan-400 text-sm">Go to disassembly →</span>
+      </a>
+    </section>
+    {% endwith %}
+  </div>
+</body>
+</html>

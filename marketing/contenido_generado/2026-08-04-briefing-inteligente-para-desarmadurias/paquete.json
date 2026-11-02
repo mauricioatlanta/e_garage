@@ -1,0 +1,96 @@
+{
+  "feature": "Briefing inteligente para desarmadurías",
+  "descripcion": "Panel que analiza indicadores del negocio y entrega alertas, resumen y recomendaciones",
+  "fecha": "2026-08-04",
+  "idioma": "es",
+  "publico_objetivo": "Dueños de talleres mecánicos y casas de repuestos en Latinoamérica",
+  "pais": "CL",
+  "propuesta_valor": "Briefing inteligente para desarmadurías — gestión más inteligente para tu taller",
+  "redes": {
+    "facebook": {
+      "texto": "¡Nuevo en eGarage! 🚗\n\nBriefing inteligente para desarmadurías\n\nPanel que analiza indicadores del negocio y entrega alertas, resumen y recomendaciones\n\nDiseñado para dueños de talleres mecánicos y casas de repuestos en latinoamérica. Sin complicaciones, desde el primer día.\n\nConoce más en egarage.cl"
+    },
+    "instagram": {
+      "texto": "⚡ Briefing inteligente para desarmadurías\nPanel que analiza indicadores del negocio y entrega alertas, resumen y recomendaciones\nTu taller, más inteligente.\n👉 egarage.cl"
+    },
+    "tiktok": {
+      "gancho": "¿Tu taller todavía trabaja sin briefing inteligente para desarmadurías?",
+      "guion": "Escucha esto. Briefing inteligente para desarmadurías ya está disponible en eGarage. Panel que analiza indicadores del negocio y entrega alertas, resumen y recomendaciones Entra a egarage.cl y empieza gratis hoy.",
+      "texto_pantalla": [
+        "BRIEFING INTELIGENTE PARA DESARMADURÍAS",
+        "Disponible en eGarage",
+        "egarage.cl"
+      ],
+      "escenas": [
+        "escena 1: pantalla del dashboard mostrando Briefing inteligente para desarmadurías",
+        "escena 2: dueño del taller revisando la información en su celular",
+        "escena 3: logo de eGarage con URL egarage.cl"
+      ],
+      "cta": "Empieza gratis en egarage.cl"
+    },
+    "reel": {
+      "escenas": [
+        {
+          "tiempo": "0-5s",
+          "texto": "BRIEFING INTELIGENTE PARA DESARMADURÍAS",
+          "visual": "Pantalla del dashboard mostrando Briefing inteligente para desarmadurías"
+        },
+        {
+          "tiempo": "5-12s",
+          "texto": "Panel que analiza indicadores del negocio y entrega alertas,",
+          "visual": "Animación de los datos en pantalla"
+        },
+        {
+          "tiempo": "12-20s",
+          "texto": "Tu taller, más inteligente",
+          "visual": "Dueño satisfecho revisando el celular"
+        },
+        {
+          "tiempo": "20-27s",
+          "texto": "egarage.cl",
+          "visual": "Logo eGarage con URL en primer plano"
+        }
+      ]
+    },
+    "historias": [
+      {
+        "pantalla": 1,
+        "texto": "⚡ Nuevo en eGarage",
+        "cta": false
+      },
+      {
+        "pantalla": 2,
+        "texto": "Briefing inteligente para desarmadurías",
+        "cta": false
+      },
+      {
+        "pantalla": 3,
+        "texto": "Panel que analiza indicadores del negocio y entrega alertas, resumen y recomenda",
+        "cta": false
+      },
+      {
+        "pantalla": 4,
+        "texto": "Disponible ahora para tu taller",
+        "cta": false
+      },
+      {
+        "pantalla": 5,
+        "texto": "Pruébalo gratis en egarage.cl",
+        "cta": true
+      }
+    ]
+  },
+  "hashtags": [
+    "eGarage",
+    "TallerMecanico",
+    "GestionTaller",
+    "SoftwareTaller",
+    "Repuestos",
+    "AutoLatam",
+    "TallerInteligente"
+  ],
+  "proveedor": "anthropic",
+  "fallback_used": true,
+  "modelo": "",
+  "formato_version": "1.0"
+}

@@ -1,0 +1,33 @@
+{% load i18n %}
+<div class="desarme-subnav mb-4">
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a class="nav-link {% if active_subnav == 'vehiculos' %}active{% endif %}" 
+               href="{% url 'taller:desarme_lista_vehiculos' %}">
+                <i class="bi bi-car-front me-1"></i>
+                {% trans "Vehículos" %}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_subnav == 'repuestos' %}active{% endif %}" 
+               href="{% url 'taller:desarme_lista_repuestos' %}">
+                <i class="bi bi-tools me-1"></i>
+                {% trans "Repuestos" %}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_subnav == 'ingreso' %}active{% endif %}" 
+               href="{% url 'taller:desarme_ingreso_vehiculo' %}">
+                <i class="bi bi-plus-circle me-1"></i>
+                {% trans "Ingresar Vehículo" %}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_subnav == 'historial' %}active{% endif %}" 
+               href="{% url 'taller:desarme_historial' %}">
+                <i class="bi bi-clock-history me-1"></i>
+                {% trans "Historial" %}
+            </a>
+        </li>
+    </ul>
+</div>

@@ -1,0 +1,629 @@
+{% load money %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ documento.tipo_documento }} #{{ documento.numero_documento }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0.8cm 0.75cm 0.95cm 0.75cm;
+            @bottom-center {
+                content: "Página " counter(page) " de " counter(pages) " | Generado el {{ fecha_generacion|date:'d/m/Y H:i' }}";
+                font-size: 7pt;
+                color: #94a3b8;
+                font-family: 'Arial', sans-serif;
+            }
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-size: 9pt;
+            line-height: 1.28;
+            color: #e5edf8;
+            background: #071426;
+        }
+        .header,
+        .documento-header,
+        .info-box,
+        .tabla-items,
+        .observaciones,
+        .totales,
+        .firma-seccion {
+            page-break-inside: avoid;
+        }
+        
+        /* ========== HEADER PROFESIONAL ========== */
+        .header {
+            border: 1px solid #1e3a5f;
+            border-left: 4px solid #38bdf8;
+            margin-bottom: 14px;
+            display: table;
+            width: 100%;
+            background: #0c1b2f;
+            padding: 12px 14px;
+        }
+        .header-left {
+            display: table-cell;
+            vertical-align: top;
+            width: 30%;
+        }
+        .header-right {
+            display: table-cell;
+            vertical-align: top;
+            width: 70%;
+            text-align: right;
+        }
+        .logo-container {
+            margin-bottom: 10px;
+        }
+        .logo {
+            max-height: 48px;
+            max-width: 140px;
+        }
+        .empresa-nombre {
+            font-size: 15pt;
+            font-weight: 800;
+            color: #f8fafc;
+            letter-spacing: 0;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+        .empresa-datos {
+            font-size: 8pt;
+            color: #b6c3d1;
+            line-height: 1.35;
+        }
+        .empresa-datos strong {
+            color: #dbeafe;
+        }
+        
+        /* ========== DOCUMENTO HEADER ========== */
+        .documento-header {
+            background: #0f2742;
+            color: #f8fafc;
+            padding: 13px 16px;
+            margin-bottom: 14px;
+            display: table;
+            width: 100%;
+            border: 1px solid #1e3a5f;
+        }
+        .documento-left {
+            display: table-cell;
+            vertical-align: middle;
+            width: 60%;
+        }
+        .documento-right {
+            display: table-cell;
+            vertical-align: middle;
+            width: 40%;
+            text-align: right;
+        }
+        .documento-titulo {
+            font-size: 18pt;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+        }
+        .documento-numero {
+            font-size: 12pt;
+            font-weight: 600;
+            color: #bae6fd;
+            letter-spacing: 0;
+        }
+        .documento-fecha {
+            font-size: 9pt;
+            color: #cbd5e1;
+            margin-top: 5px;
+        }
+        
+        /* ========== INFO BOXES ========== */
+        .info-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 14px;
+        }
+        .info-row {
+            display: table-row;
+        }
+        .info-cell {
+            display: table-cell;
+            width: 50%;
+            vertical-align: top;
+            padding: 0 8px;
+        }
+        .info-box {
+            border: 1px solid #1e3a5f;
+            padding: 10px 12px;
+            background: #0c1b2f;
+            height: 100%;
+        }
+        .info-titulo {
+            font-weight: 700;
+            color: #7dd3fc;
+            font-size: 9pt;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #1e3a5f;
+            padding-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .info-campo {
+            margin-bottom: 4px;
+            font-size: 8.6pt;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #94a3b8;
+            display: inline-block;
+            min-width: 72px;
+        }
+        .info-value {
+            color: #f1f5f9;
+        }
+        
+        /* ========== TABLAS ========== */
+        .subtitulo {
+            font-size: 10pt;
+            font-weight: 700;
+            color: #7dd3fc;
+            margin: 12px 0 6px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            border-bottom: 1px solid #1e3a5f;
+            padding-bottom: 4px;
+        }
+        .tabla-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            border: 1px solid #1e3a5f;
+            overflow: hidden;
+        }
+        .tabla-items thead {
+            background: #132f4f;
+            color: #f8fafc;
+        }
+        .tabla-items th {
+            padding: 7px 8px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-right: 1px solid #1e3a5f;
+        }
+        .tabla-items th:last-child {
+            border-right: none;
+        }
+        .tabla-items td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #1e3a5f;
+            border-right: 1px solid #1e3a5f;
+            font-size: 8.6pt;
+            color: #e5edf8;
+        }
+        .tabla-items td:last-child {
+            border-right: none;
+        }
+        .tabla-items tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .tabla-items tbody tr:nth-child(even) {
+            background: #0f2138;
+        }
+        .tabla-items tbody tr:nth-child(odd) {
+            background: #0b1a2d;
+        }
+        .texto-derecha {
+            text-align: right;
+        }
+        .texto-centro {
+            text-align: center;
+        }
+        
+        /* ========== TOTALES ========== */
+        .totales {
+            background: #0f2742;
+            border: 1px solid #38bdf8;
+            padding: 10px 12px;
+            margin-top: 10px;
+            float: right;
+            width: 260px;
+        }
+        .total-fila {
+            display: table;
+            width: 100%;
+            margin-bottom: 6px;
+        }
+        .total-label {
+            display: table-cell;
+            font-weight: 600;
+            color: #cbd5e1;
+            font-size: 8.6pt;
+        }
+        .total-valor {
+            display: table-cell;
+            text-align: right;
+            font-weight: 700;
+            width: 96px;
+            color: #f8fafc;
+            font-size: 8.8pt;
+        }
+        .total-final {
+            border-top: 1px solid #38bdf8;
+            padding-top: 7px;
+            margin-top: 8px;
+        }
+        .total-final .total-label {
+            font-size: 10.5pt;
+            color: #f8fafc;
+            font-weight: 900;
+        }
+        .total-final .total-valor {
+            font-size: 12pt;
+            color: #7dd3fc;
+            font-weight: 900;
+        }
+        
+        /* ========== SERVICIOS EXTERNOS ========== */
+        .servicio-externo {
+            background: #102943 !important;
+        }
+        
+        /* ========== OBSERVACIONES ========== */
+        .observaciones {
+            margin-top: 10px;
+            clear: both;
+        }
+        .observaciones-box {
+            border: 1px solid #1e3a5f;
+            padding: 9px 10px;
+            background: #0c1b2f;
+            min-height: 36px;
+            font-size: 8.6pt;
+            color: #e5edf8;
+        }
+        
+        /* ========== FIRMAS ========== */
+        .firma-seccion {
+            margin-top: 18px;
+            clear: both;
+        }
+        .firma-grid {
+            display: table;
+            width: 100%;
+            margin-top: 12px;
+        }
+        .firma-cell {
+            display: table-cell;
+            width: 50%;
+            text-align: center;
+            vertical-align: bottom;
+            padding: 8px 12px;
+        }
+        .firma-linea {
+            border-top: 1px solid #7dd3fc;
+            margin-bottom: 6px;
+            height: 26px;
+        }
+        .firma-texto {
+            font-size: 8.4pt;
+            color: #cbd5e1;
+        }
+        .firma-texto strong {
+            color: #f8fafc;
+            font-weight: 700;
+        }
+        
+        /* ========== FOOTER ========== */
+        .footer {
+            margin-top: 16px;
+            text-align: center;
+            border-top: 1px solid #1e3a5f;
+            padding-top: 8px;
+            font-size: 7.8pt;
+            color: #94a3b8;
+        }
+        .footer-credits {
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid #1e3a5f;
+            font-size: 7pt;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <!-- ========== HEADER CON EMPRESA ========== -->
+    <div class="header">
+        <div class="header-left">
+            {% if empresa_logo_url or config_logo_url %}
+            <div class="logo-container">
+                <img src="{% if config_logo_url %}{{ config_logo_url }}{% else %}{{ empresa_logo_url }}{% endif %}" alt="Logo" class="logo">
+            </div>
+            {% endif %}
+        </div>
+        <div class="header-right">
+            <div class="empresa-nombre">{{ company_name|default:empresa.nombre_taller|default:empresa.empresa|default:"Mi Empresa" }}</div>
+            <div class="empresa-datos">
+                {% if company_address %}
+                    <strong>{{ company_address }}</strong><br>
+                {% elif config_empresa.direccion %}
+                    <strong>{{ config_empresa.direccion }}</strong><br>
+                {% elif empresa.direccion %}
+                    <strong>{{ empresa.direccion }}</strong><br>
+                {% endif %}
+                {% if company_phone %}
+                    Tel: {{ company_phone }}
+                {% elif config_empresa.telefono %}
+                    Tel: {{ config_empresa.telefono }}
+                {% elif empresa.telefono %}
+                    Tel: {{ empresa.telefono }}
+                {% endif %}
+                {% if company_email %}
+                    | {{ company_email }}
+                {% elif config_empresa.email_contacto %}
+                    | {{ config_empresa.email_contacto }}
+                {% elif empresa.email %}
+                    | {{ empresa.email }}
+                {% endif %}
+                {% if empresa.rut %}
+                    <br>RUT: {{ empresa.rut }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== DOCUMENTO HEADER ========== -->
+    <div class="documento-header">
+        <div class="documento-left">
+            <div class="documento-titulo">
+                {% if documento.tipo == 'FAC' %}FACTURA{% elif documento.tipo == 'PRES' %}PRESUPUESTO{% elif documento.tipo == 'OT' %}ORDEN DE TRABAJO{% else %}{{ documento.get_tipo_display|upper|default:documento.tipo|upper }}{% endif %}
+            </div>
+            <div class="documento-numero"># {{ documento.numero_documento|default:documento.numero|default:documento.id }}</div>
+        </div>
+        <div class="documento-right">
+            <div class="documento-fecha">{% if documento.fecha_emision %}{{ documento.fecha_emision|date:"d \d\e F \d\e Y" }}{% else %}Fecha no especificada{% endif %}</div>
+        </div>
+    </div>
+
+    <!-- ========== DATOS DEL CLIENTE Y VEHÍCULO ========== -->
+    <div class="info-grid">
+        <div class="info-row">
+            <div class="info-cell">
+                <div class="info-box">
+                    <div class="info-titulo">Datos del Cliente</div>
+                    <div class="info-campo">
+                        <span class="info-label">Nombre:</span>
+                        <span class="info-value">{{ documento.cliente.nombre|default:"" }} {{ documento.cliente.apellido|default:"" }}</span>
+                    </div>
+                    {% if documento.cliente.rut %}
+                    <div class="info-campo">
+                        <span class="info-label">RUT:</span>
+                        <span class="info-value">{{ documento.cliente.rut }}</span>
+                    </div>
+                    {% endif %}
+                    {% if documento.cliente.telefono %}
+                    <div class="info-campo">
+                        <span class="info-label">Teléfono:</span>
+                        <span class="info-value">{{ documento.cliente.telefono }}</span>
+                    </div>
+                    {% endif %}
+                    {% if documento.cliente.email %}
+                    <div class="info-campo">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">{{ documento.cliente.email }}</span>
+                    </div>
+                    {% endif %}
+                    {% if documento.cliente.direccion %}
+                    <div class="info-campo">
+                        <span class="info-label">Dirección:</span>
+                        <span class="info-value">{{ documento.cliente.direccion }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="info-cell">
+                {% if documento.vehiculo %}
+                <div class="info-box">
+                    <div class="info-titulo">Datos del Vehículo</div>
+                    {% if documento.vehiculo.marca %}
+                    <div class="info-campo">
+                        <span class="info-label">Marca:</span>
+                        <span class="info-value">{{ documento.vehiculo.marca }}</span>
+                    </div>
+                    {% endif %}
+                    {% if documento.vehiculo.modelo %}
+                    <div class="info-campo">
+                        <span class="info-label">Modelo:</span>
+                        <span class="info-value">{{ documento.vehiculo.modelo }}</span>
+                    </div>
+                    {% endif %}
+                    {% if documento.vehiculo.patente %}
+                    <div class="info-campo">
+                        <span class="info-label">Patente:</span>
+                        <span class="info-value">{{ documento.vehiculo.patente }}</span>
+                    </div>
+                    {% endif %}
+                    {% if documento.vehiculo.anio %}
+                    <div class="info-campo">
+                        <span class="info-label">Año:</span>
+                        <span class="info-value">{{ documento.vehiculo.anio }}</span>
+                    </div>
+                    {% endif %}
+                    {% if documento.kilometraje %}
+                    <div class="info-campo">
+                        <span class="info-label">Kilometraje:</span>
+                        <span class="info-value">{{ documento.kilometraje|floatformat:0 }} km</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== REPUESTOS ========== -->
+    {% if repuestos %}
+    <div class="subtitulo">Repuestos</div>
+    <table class="tabla-items">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th class="texto-centro">Cantidad</th>
+                <th class="texto-derecha">Precio Unit.</th>
+                <th class="texto-derecha">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for repuesto in repuestos %}
+            <tr>
+                <td>{{ repuesto.codigo|default:"-" }}</td>
+                <td>{{ repuesto.nombre|default:"" }}</td>
+                <td class="texto-centro">{{ repuesto.cantidad|default:1 }}</td>
+                <td class="texto-derecha">{{ repuesto.precio_unitario|money_clp|default:"$0" }}</td>
+                <td class="texto-derecha">{{ repuesto.subtotal|money_clp|default:"$0" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- ========== SERVICIOS ========== -->
+    {% if servicios %}
+    <div class="subtitulo">Servicios</div>
+    <table class="tabla-items">
+        <thead>
+            <tr>
+                <th>Descripción del Servicio</th>
+                <th class="texto-centro">Cantidad</th>
+                <th class="texto-derecha">Precio Unit.</th>
+                <th class="texto-derecha">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servicio in servicios %}
+            <tr>
+                <td>{{ servicio.nombre|default:"" }}</td>
+                <td class="texto-centro">{{ servicio.cantidad|default:1 }}</td>
+                <td class="texto-derecha">{{ servicio.precio_unitario|money_clp|default:"$0" }}</td>
+                <td class="texto-derecha">{{ servicio.subtotal|money_clp|default:"$0" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- ========== SERVICIO EXTERNO ========== -->
+    {% if otros_servicios %}
+    <div class="subtitulo">Servicio externo</div>
+    <table class="tabla-items">
+        <thead>
+            <tr>
+                <th>Servicio</th>
+                <th class="texto-derecha">Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servicio in otros_servicios %}
+            <tr class="servicio-externo">
+                <td>{{ servicio.nombre|default:"" }}</td>
+                <td class="texto-derecha">{{ servicio.precio_cliente|money_clp|default:"$0" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- ========== OBSERVACIONES ========== -->
+    {% if documento.observaciones %}
+    <div class="observaciones">
+        <div class="subtitulo">Observaciones</div>
+        <div class="observaciones-box">
+            {{ documento.observaciones|linebreaks }}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ========== TOTALES ========== -->
+    {% if documento.tipo == 'FAC' or documento.tipo == 'OT' or documento.tipo == 'PRES' %}
+    <div class="totales">
+        {% if total_repuestos %}
+        <div class="total-fila">
+            <div class="total-label">Total Repuestos:</div>
+            <div class="total-valor">{{ total_repuestos|money_clp }}</div>
+        </div>
+        {% endif %}
+        {% if total_servicios %}
+        <div class="total-fila">
+            <div class="total-label">Total Servicios:</div>
+            <div class="total-valor">{{ total_servicios|money_clp }}</div>
+        </div>
+        {% endif %}
+        {% if total_otros_servicios %}
+        <div class="total-fila">
+            <div class="total-label">Total Servicio externo:</div>
+            <div class="total-valor">{{ total_otros_servicios|money_clp }}</div>
+        </div>
+        {% endif %}
+        {% if subtotal %}
+        <div class="total-fila">
+            <div class="total-label">Subtotal:</div>
+            <div class="total-valor">{{ subtotal|money_clp }}</div>
+        </div>
+        {% endif %}
+        {% if iva %}
+        <div class="total-fila">
+            <div class="total-label">IVA (19%):</div>
+            <div class="total-valor">{{ iva|money_clp }}</div>
+        </div>
+        {% endif %}
+        {% if total %}
+        <div class="total-fila total-final">
+            <div class="total-label">TOTAL:</div>
+            <div class="total-valor">{{ total|money_clp }}</div>
+        </div>
+        {% endif %}
+    </div>
+    <div style="clear: both;"></div>
+    {% endif %}
+
+    <!-- ========== FIRMAS ========== -->
+    {% if documento.tipo != 'FAC' %}
+    <div class="firma-seccion">
+        <div class="firma-grid">
+            <div class="firma-cell">
+                <div class="firma-linea"></div>
+                <div class="firma-texto">
+                    <strong>Firma del Cliente</strong><br>
+                    {{ documento.cliente.nombre|default:"" }} {{ documento.cliente.apellido|default:"" }}
+                </div>
+            </div>
+            <div class="firma-cell">
+                <div class="firma-linea"></div>
+                <div class="firma-texto">
+                    <strong>Firma Autorizada</strong><br>
+                    {{ company_name|default:empresa.nombre_taller|default:empresa.empresa|default:"Mi Empresa" }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ========== FOOTER ========== -->
+    <div class="footer">
+        <div class="footer-credits">
+            Documento generado el {{ fecha_generacion|date:"d/m/Y H:i" }}
+        </div>
+    </div>
+</body>
+</html>

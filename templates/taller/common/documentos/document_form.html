@@ -1,0 +1,1684 @@
+{% extends "taller/documentos/base/base_documento.html" %}
+{% load i18n %}
+{% load static %}
+{% load country_url %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/documentos/document_form_prototype.css' %}?v=20260603c">
+{% endblock extra_css %}
+
+{% block documento_title %}
+{% if es_edicion %}Editar documento{% else %}Crear documento{% endif %}
+{% endblock documento_title %}
+
+{% block content %}
+{% with active_country=empresa.pais|default:'CL' %}
+{% with current_country=country_code|default:active_country|default:'CL' %}
+<form
+  method="post"
+  id="document-form"
+  class="document-prototype-form"
+  enctype="multipart/form-data"
+  action="{% if es_edicion and documento %}{% country_url 'documentos:documento_editar' documento.pk %}{% else %}{% country_url 'documentos:documento_crear' %}{% endif %}"
+  data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
+  data-form-mode="{{ document_form_bootstrap.mode|default:'clean' }}"
+  data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"
+  data-has-server-line-items="{% if has_server_line_items %}1{% else %}0{% endif %}"
+  data-country-code="{{ current_country }}"
+  data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
+  data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
+  data-url-vehiculos-by-cli="{% country_url 'documentos:api_vehiculos_por_cliente' %}"
+  data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
+  data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
+  data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
+  data-url-repuesto-create-page="{% country_url 'repuestos:crear_repuesto' %}"
+  data-url-service-search="{% country_url 'servicios:buscar_servicios_api' %}"
+  data-url-service-create="{% country_url 'servicios:crear_servicio' %}"
+  data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}"
+>
+  {% csrf_token %}
+
+  <div class="doc-hidden-support" aria-hidden="true">
+    <input type="hidden" name="numero" value="{{ form.numero.value|default_if_none:'' }}">
+    {% if form.kilometraje %}{{ form.kilometraje.as_hidden }}{% endif %}
+    {% if form.millas %}{{ form.millas.as_hidden }}{% endif %}
+    {% if form.metodo_pago %}{{ form.metodo_pago.as_hidden }}{% endif %}
+    {% if form.ult4 %}{{ form.ult4.as_hidden }}{% endif %}
+    {% if form.monto_pagado %}{{ form.monto_pagado.as_hidden }}{% endif %}
+    {% if form.saldo_pendiente %}{{ form.saldo_pendiente.as_hidden }}{% endif %}
+    {% if form.fecha_pago %}{{ form.fecha_pago.as_hidden }}{% endif %}
+    {% if form.nota_pago %}{{ form.nota_pago.as_hidden }}{% endif %}
+    {% if form.descuento %}{{ form.descuento.as_hidden }}{% endif %}
+    {% if form.pagado %}<div class="doc-hidden-control">{{ form.pagado }}</div>{% endif %}
+    {% if form.apply_vat %}<div class="doc-hidden-control">{{ form.apply_vat }}</div>{% endif %}
+  </div>
+
+  <div id="doc-shell" class="doc-prototype-shell">
+    {% if messages %}
+      <div class="doc-feedback-stack">
+        {% for message in messages %}
+          {% with msg_text=message|stringformat:"s" %}
+          {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesion exitosamente" not in msg_text and "Ha cerrado sesion" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
+            <div class="doc-feedback {% if message.tags == 'success' %}doc-feedback--success{% elif message.tags == 'error' %}doc-feedback--error{% else %}doc-feedback--info{% endif %}">
+              <span class="doc-feedback__text">{{ message }}</span>
+            </div>
+          {% endif %}
+          {% endwith %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if form.errors %}
+      <div class="doc-feedback doc-feedback--error">
+        <strong>Errores de validación</strong>
+        <ul class="doc-error-list">
+          {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <section class="doc-header-card">
+      <div class="doc-header-card__title">
+        <span class="doc-header-card__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M7 3.75h7.5L20.25 9.5v8.75A2.25 2.25 0 0 1 18 20.5H7A2.25 2.25 0 0 1 4.75 18.25V6A2.25 2.25 0 0 1 7 3.75Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M14.5 3.75V9.5h5.75" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M8 12h8M8 15.5h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M8.25 19a2.75 2.75 0 1 0 0-5.5 2.75 2.75 0 0 0 0 5.5Z" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M8.25 12v3.5M6.5 17.25H10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <div>
+          <h1 data-i18n="{% if es_edicion %}editar_documento{% else %}crear_documento{% endif %}">{% if es_edicion %}EDITAR {{ ui_config.document_noun|default:"DOCUMENTO"|upper }}{% else %}CREAR {{ ui_config.document_noun|default:"DOCUMENTO"|upper }}{% endif %}</h1>
+          <span id="draft-indicator" class="doc-draft-indicator hidden" role="status" aria-live="polite" data-i18n="borrador_guardado">Borrador guardado</span>
+        </div>
+        <div class="doc-lang-toggle" id="doc-lang-toggle" role="group" aria-label="Idioma / Language">
+          <button type="button" class="doc-lang-btn doc-lang-btn--active" data-lang="es">ES</button>
+          <button type="button" class="doc-lang-btn" data-lang="en">EN</button>
+        </div>
+      </div>
+
+      <div class="doc-top-grid">
+        <div class="doc-field-card doc-field-card--number">
+          <label data-i18n="doc_numero">{{ ui_config.document_noun|default:"Documento" }} N°</label>
+          <span id="id_numero" class="doc-field-display" data-placeholder="Se generará automáticamente">
+            {% if es_edicion %}
+              {{ documento.numero|default:form.numero.value|default:"-" }}
+            {% else %}
+              -
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="doc-field-card">
+          <label for="id_fecha_emision" data-i18n="fecha">Fecha</label>
+          {{ form.fecha_emision }}
+        </div>
+
+        <div class="doc-field-card">
+          <label for="id_tipo" data-i18n="tipo_doc">Tipo de documento</label>
+          {{ form.tipo }}
+        </div>
+
+        {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
+        <div class="doc-field-card">
+          <label id="tecnico-label" for="id_tecnico_responsable" data-label-default="{{ current_label }}" data-label-pts="Vendedor" data-i18n="mecanico_responsable">{{ current_label }}</label>
+          {{ form.tecnico_responsable }}
+        </div>
+        {% endwith %}
+
+        <div class="doc-field-card">
+          <label for="id_payment_status" data-i18n="estado_pago">Estado de pago</label>
+          <div id="payment-status-badge" class="doc-payment-shell doc-console-payment doc-console-payment-pending">
+            {{ form.payment_status }}
+          </div>
+        </div>
+
+        {% if ui_config.show_services or ui_config.show_otros_servicios %}
+          <div class="doc-field-card">
+            <label for="doc_mode" data-i18n="operacion">Operación</label>
+            <select id="doc_mode" name="doc_mode">
+              <option value="services" data-i18n="op_servicios">Servicios</option>
+              <option value="parts" data-i18n="op_solo_repuestos">Solo venta de repuestos</option>
+            </select>
+          </div>
+        {% else %}
+          <input type="hidden" id="doc_mode" name="doc_mode" value="parts">
+        {% endif %}
+      </div>
+
+      <div class="doc-entity-grid">
+        <section class="doc-panel doc-panel--entity">
+          <div class="doc-panel__heading">
+            <h2 data-i18n="cliente">CLIENTE</h2>
+            <a
+              id="btn-nuevo-cliente"
+              href="{% country_url 'clientes:crear_cliente' %}?return_to={{ request.get_full_path|urlencode }}&select_field=cliente"
+              data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
+              onclick="if (window.openClienteModal) { event.preventDefault(); window.openClienteModal(); return false; }"
+              class="doc-action-btn doc-action-btn--cyan-alt"
+            >
+              <span aria-hidden="true">+</span>
+              <span data-i18n="nuevo">Nuevo</span>
+            </a>
+          </div>
+
+          <div class="doc-client-controls">
+            <div class="doc-search-wrap">
+              <label for="cliente-busqueda" class="sr-only">Buscar cliente</label>
+              <input
+                type="text"
+                id="cliente-busqueda"
+                placeholder="Buscar cliente..."
+                value="{{ cliente_preselect_nombre|default_if_none:'' }}"
+                autocomplete="off"
+                oninput="window.EG?.cliente?.handleClienteInput?.(this.value)"
+                onfocus="window.EG?.cliente?.handleClienteFocus?.(this.value)"
+                onkeydown="return window.EG?.cliente?.handleClienteKeydown?.(event)"
+              >
+              <span class="doc-search-wrap__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <circle cx="11" cy="11" r="6.75" stroke="currentColor" stroke-width="1.7"/>
+                  <path d="m16.25 16.25 3.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <div id="cliente-resultados" class="doc-results-dropdown hidden"></div>
+            </div>
+
+            <div class="doc-select-wrap">
+              <label for="id_cliente" class="sr-only">Cliente</label>
+              <select id="id_cliente" name="cliente">
+                <option value="">Seleccionar cliente...</option>
+                {% if cliente_preselect_id %}
+                  <option value="{{ cliente_preselect_id }}" selected>{{ cliente_preselect_nombre|default:cliente_preselect_id }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+
+          <div id="cliente-info" class="doc-entity-info{% if not cliente_preselect_id %} hidden{% endif %}">
+            <div class="doc-entity-info__name" id="cliente-nombre">{{ cliente_preselect_nombre|default_if_none:'' }}</div>
+            <div class="doc-entity-info__detail" id="cliente-telefono">{% if cliente_preselect_telefono %}Tel: {{ cliente_preselect_telefono }}{% endif %}</div>
+            <div class="doc-entity-info__detail" id="cliente-email">{% if cliente_preselect_email %}Email: {{ cliente_preselect_email }}{% endif %}</div>
+            <div class="doc-entity-info__meta" id="cliente-ultima-visita"></div>
+          </div>
+
+          <div id="cliente-empty" class="doc-entity-empty">
+            <span class="doc-entity-empty__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M5.5 19.25c1.65-3.4 4.1-5.1 6.5-5.1s4.85 1.7 6.5 5.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <div>
+              <strong data-i18n="cliente_empty_title">Sin cliente seleccionado</strong>
+              <p data-i18n="cliente_empty_hint">Seleccione un cliente para ver información</p>
+            </div>
+          </div>
+        </section>
+
+        {% if ui_config.show_vehicle %}
+        <section class="doc-panel doc-panel--entity" id="vehicle-section">
+          <div class="doc-panel__heading">
+            <h2 data-i18n="vehiculo">VEHÍCULO</h2>
+            <a
+              id="btn-nuevo-vehiculo"
+              href="{% country_url 'vehiculos:crear_vehiculo' %}?return_to={{ request.get_full_path|urlencode }}&select_field=vehiculo&cliente_id="
+              data-url-crear-vehiculo="{% country_url 'vehiculos:crear_vehiculo' %}"
+              onclick="if (window.openVehiculoModal) { event.preventDefault(); window.openVehiculoModal(); return false; }"
+              class="doc-action-btn doc-action-btn--cyan-alt"
+            >
+              <span aria-hidden="true">+</span>
+              <span data-i18n="nuevo_vehiculo">Nuevo vehículo</span>
+            </a>
+          </div>
+
+          <div class="doc-vehicle-controls">
+            <div class="doc-select-wrap">
+              <label for="id_vehiculo" class="sr-only">Vehículo</label>
+              <select id="id_vehiculo" name="vehiculo">
+                <option value="">Seleccionar vehículo...</option>
+                {% if vehiculo_preselect_id %}
+                  <option value="{{ vehiculo_preselect_id }}" selected>{{ vehiculo_preselect_id }}</option>
+                {% endif %}
+              </select>
+            </div>
+
+            {% if 'kilometraje_ingreso' in form.fields %}
+            <div id="miles-section" class="doc-inline-field">
+              <label for="id_kilometraje_ingreso" data-i18n="km_label">Kilometraje</label>
+              {{ form.kilometraje_ingreso }}
+            </div>
+            {% endif %}
+          </div>
+
+          {% if form.kilometraje_ingreso.errors %}
+            <p class="doc-inline-error">{{ form.kilometraje_ingreso.errors.0 }}</p>
+          {% endif %}
+
+          <div id="vehiculo-info" class="doc-entity-info hidden">
+            <div class="doc-entity-info__name" id="vehiculo-marca-modelo"></div>
+            <div class="doc-entity-info__detail" id="vehiculo-ano-vin"></div>
+            <div class="doc-entity-info__detail" id="vehiculo-mileage"></div>
+            <div class="doc-entity-info__meta" id="vehiculo-ultima-entrada"></div>
+          </div>
+
+          <div id="vehiculo-empty" class="doc-entity-empty">
+            <span class="doc-entity-empty__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M7 8.25 8.4 5.9A2.5 2.5 0 0 1 10.55 4.75h2.9A2.5 2.5 0 0 1 15.6 5.9L17 8.25" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M4.75 9.5h14.5v6.25A1.75 1.75 0 0 1 17.5 17.5h-11A1.75 1.75 0 0 1 4.75 15.75V9.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <circle cx="8" cy="13.75" r="1" fill="currentColor"/>
+                <circle cx="16" cy="13.75" r="1" fill="currentColor"/>
+              </svg>
+            </span>
+            <div>
+              <strong data-i18n="vehiculo_empty_title">Sin vehículo seleccionado</strong>
+              <p data-i18n="vehiculo_empty_hint">Seleccione un vehículo para ver información</p>
+            </div>
+          </div>
+
+          {% if not es_edicion %}
+          <!-- Inspección de Ingreso: aparece sólo con vehículo seleccionado -->
+          <div id="seccion-inspeccion" style="display:none;margin-top:10px;border-top:1px solid rgba(6,182,212,.2);padding-top:10px">
+            <div style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none" onclick="toggleInspeccion()">
+              <span style="font-size:13px">🔍</span>
+              <span style="font-size:12px;font-weight:700;letter-spacing:.05em;color:#67e8f9">INSPECCIÓN DE INGRESO</span>
+              <span id="inspeccion-chevron" style="margin-left:auto;font-size:11px;color:#94a3b8;transition:transform .2s">▼</span>
+            </div>
+
+            <div id="inspeccion-body" style="display:none;padding-top:10px">
+              <input type="hidden" name="inspeccion_activa" value="0" id="id_inspeccion_activa">
+
+              <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer">
+                <input type="checkbox" id="chk-inspeccion" onchange="activarInspeccion(this.checked)"
+                       style="width:16px;height:16px;accent-color:#06b6d4">
+                <span style="font-size:12px;color:#cbd5e1">Registrar inspección al crear el documento</span>
+              </label>
+
+              <div id="inspeccion-campos" style="display:none">
+
+                <!-- Nivel de combustible -->
+                <div style="margin-bottom:10px">
+                  <label style="display:block;font-size:11px;color:#94a3b8;margin-bottom:4px">Nivel de combustible</label>
+                  <div style="display:flex;align-items:center;gap:4px">
+                    <span style="font-size:11px;color:#64748b">E</span>
+                    <div style="display:flex;gap:3px;flex:1" id="fuel-btns">
+                      {% for val, label in insp_combustible_choices %}
+                      <button type="button" onclick="setFuel('{{ val }}')" data-fuel="{{ val }}"
+                              class="insp-fuel-btn"
+                              style="flex:1;padding:4px 2px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;
+                                     {% if val == 'medio' %}background:#0e7490;color:#fff;border:2px solid #06b6d4
+                                     {% else %}background:#1e293b;color:#64748b;border:2px solid #334155{% endif %}">
+                        {{ label }}
+                      </button>
+                      {% endfor %}
+                    </div>
+                    <span style="font-size:11px;color:#64748b">F</span>
+                  </div>
+                  <input type="hidden" name="insp_combustible" id="id_insp_combustible" value="medio">
+                </div>
+
+                <!-- Daños preexistentes — Inspector SVG -->
+                <div style="margin-bottom:10px">
+                  <div style="border:1px solid rgba(6,182,212,.25);border-radius:10px;overflow:hidden;background:rgba(0,0,0,.35)">
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid rgba(6,182,212,.2)">
+                      <span style="font-size:10px;font-weight:700;color:#67e8f9;letter-spacing:.08em">DAÑOS EN CARROCERÍA</span>
+                      <span id="di-badge" style="font-size:9px;font-family:monospace;color:#06b6d4;border:1px solid rgba(6,182,212,.4);border-radius:4px;padding:1px 6px">0 marcados</span>
+                    </div>
+                    <div style="display:flex;border-bottom:1px solid rgba(6,182,212,.2)" id="di-tabs">
+                      <button type="button" class="di-tab di-on" data-view="f" onclick="diSwitchView('f')" style="flex:1;padding:6px 0;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Frontal</button>
+                      <button type="button" class="di-tab" data-view="t" onclick="diSwitchView('t')" style="flex:1;padding:6px 0;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Trasera</button>
+                      <button type="button" class="di-tab" data-view="li" onclick="diSwitchView('li')" style="flex:1;padding:6px 0;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Lat. Izq</button>
+                      <button type="button" class="di-tab" data-view="ld" onclick="diSwitchView('ld')" style="flex:1;padding:6px 0;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Lat. Der</button>
+                      <button type="button" class="di-tab" data-view="i" onclick="diSwitchView('i')" style="flex:1;padding:6px 0;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Interior</button>
+                    </div>
+                    <div style="background:#040c18">
+                      <div id="di-pf">
+                        <svg viewBox="0 0 400 228" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto">
+                          <rect width="400" height="228" fill="#040c18"/>
+                          <line x1="0" y1="57" x2="400" y2="57" stroke="#0b1e30" stroke-width=".5"/><line x1="0" y1="114" x2="400" y2="114" stroke="#0b1e30" stroke-width=".5"/><line x1="0" y1="171" x2="400" y2="171" stroke="#0b1e30" stroke-width=".5"/><line x1="200" y1="0" x2="200" y2="228" stroke="#0b1e30" stroke-width=".5"/>
+                          <path d="M 64,215 L 66,138 C 66,95 105,54 150,42 L 200,36 L 250,42 C 295,54 334,95 334,138 L 336,215 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1.5"/>
+                          <path d="M 154,45 L 246,45 C 298,55 312,85 315,95 L 85,95 Z" fill="#060f1e" stroke="#162e48" stroke-width="1"/>
+                          <path d="M 200,40 L 175,95 M 200,40 L 225,95" stroke="#0c1c2e" stroke-width="1"/>
+                          <path d="M 85,95 L 315,95 L 340,145 L 60,145 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1.2"/>
+                          <path d="M 140,95 L 155,145 M 260,95 L 245,145 M 200,95 L 200,145" stroke="#162e48" stroke-width="1" fill="none"/>
+                          <path d="M 60,115 L 140,122 L 138,138 L 62,132 Z" fill="#091424" stroke="#00c8e0" stroke-width="1"/><path d="M 65,118 L 135,124" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M 340,115 L 260,122 L 262,138 L 338,132 Z" fill="#091424" stroke="#00c8e0" stroke-width="1"/><path d="M 335,118 L 265,124" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M 152,124 L 248,124 L 265,175 L 135,175 Z" fill="#050c14" stroke="#1e4a6e" stroke-width="1.5"/>
+                          <path d="M 155,135 H 245 M 145,148 H 255 M 140,162 H 260 M 175,124 L 160,175 M 200,124 L 200,175 M 225,124 L 240,175" stroke="#152b44" stroke-width="0.8"/>
+                          <polygon points="194,142 200,135 206,142 200,149" fill="none" stroke="#00c8e0" stroke-width="1.5"/>
+                          <path d="M 46,92 Q 36,92 36,100 Q 36,108 48,106 L 68,101 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1"/><line x1="38" y1="99" x2="52" y2="101" stroke="#00c8e0" stroke-width="1.5"/>
+                          <path d="M 354,92 Q 364,92 364,100 Q 364,108 352,106 L 332,101 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1"/><line x1="362" y1="99" x2="348" y2="101" stroke="#00c8e0" stroke-width="1.5"/>
+                          <path d="M 60,145 L 45,145 L 42,192 C 45,210 52,215 62,215 L 62,145 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1"/>
+                          <path d="M 340,145 L 355,145 L 358,192 C 355,210 348,215 338,215 L 338,145 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1"/>
+                          <path d="M 62,175 L 135,175 L 125,215 L 62,215 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+                          <path d="M 338,175 L 265,175 L 275,215 L 338,215 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+                          <rect x="72" y="185" width="40" height="15" rx="3" fill="#040a12" stroke="#1a3a5c"/><circle cx="92" cy="192" r="3" fill="#00c8e0" opacity="0.7"/>
+                          <rect x="288" y="185" width="40" height="15" rx="3" fill="#040a12" stroke="#1a3a5c"/><circle cx="308" cy="192" r="3" fill="#00c8e0" opacity="0.7"/>
+                          <path d="M 50,215 L 350,215 C 365,215 365,223 350,223 L 50,223 C 35,223 35,215 50,215 Z" fill="#050e1a" stroke="#1e4a6e" stroke-width="1"/>
+                          <path class="di-zone" data-p="Parabrisas" onclick="diCy(this)" d="M 154,45 L 246,45 C 298,55 312,85 315,95 L 85,95 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Capot" onclick="diCy(this)" d="M 85,95 L 315,95 L 340,145 L 60,145 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Faro izquierdo" onclick="diCy(this)" d="M 60,115 L 140,122 L 138,138 L 62,132 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Faro derecho" onclick="diCy(this)" d="M 340,115 L 260,122 L 262,138 L 338,132 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Parrilla" onclick="diCy(this)" d="M 152,124 L 248,124 L 265,175 L 135,175 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Guardabarro izq." onclick="diCy(this)" d="M 60,145 L 42,145 L 42,192 C 45,215 62,215 62,215 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Guardabarro der." onclick="diCy(this)" d="M 340,145 L 358,145 L 358,192 C 355,215 338,215 338,215 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Espejo izq." onclick="diCy(this)" d="M 36,92 Q 36,110 55,105 L 68,100 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Espejo der." onclick="diCy(this)" d="M 364,92 Q 364,110 345,105 L 332,100 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Parachoque del." onclick="diCy(this)" d="M 50,175 L 350,175 L 365,223 L 35,223 Z" fill="transparent" stroke="none"/>
+                          <text x="200" y="72" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">parabrisas</text>
+                          <text x="200" y="112" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">capot</text>
+                          <text x="100" y="132" text-anchor="middle" font-size="7" fill="#00c8e0" pointer-events="none">faro izq</text>
+                          <text x="300" y="132" text-anchor="middle" font-size="7" fill="#00c8e0" pointer-events="none">faro der</text>
+                          <text x="200" y="162" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">parrilla</text>
+                          <text x="200" y="202" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">parachoque del.</text>
+                        </svg>
+                      </div>
+                      <div id="di-pt" style="display:none">
+                        <svg viewBox="0 0 400 228" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto">
+                          <rect width="400" height="228" fill="#040c18"/>
+                          <line x1="0" y1="57" x2="400" y2="57" stroke="#0b1e30" stroke-width=".5"/><line x1="0" y1="114" x2="400" y2="114" stroke="#0b1e30" stroke-width=".5"/><line x1="0" y1="171" x2="400" y2="171" stroke="#0b1e30" stroke-width=".5"/><line x1="200" y1="0" x2="200" y2="228" stroke="#0b1e30" stroke-width=".5"/>
+                          <path d="M 64,215 L 66,138 C 66,95 105,54 150,42 L 200,36 L 250,42 C 295,54 334,95 334,138 L 336,215 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1.5"/>
+                          <path d="M 132,47 L 268,47 C 298,56 310,82 308,95 L 92,95 C 90,82 102,56 132,47 Z" fill="#060f1e" stroke="#162e48" stroke-width="1"/>
+                          <path d="M 200,47 L 198,95 M 166,48 L 160,95 M 234,48 L 240,95" stroke="#0c1c2e" stroke-width="1"/>
+                          <path d="M 92,95 L 308,95 L 326,155 L 74,155 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1.2"/>
+                          <path d="M 148,95 L 143,155 M 252,95 L 257,155 M 200,95 L 200,155" stroke="#162e48" stroke-width="1" fill="none"/>
+                          <path d="M 63,108 L 128,116 L 124,142 L 65,136 Z" fill="#1a0404" stroke="#ef4444" stroke-width="1.2"/><path d="M 71,113 L 120,119 M 71,121 L 118,127 M 71,129 L 116,134" stroke="#ef444455" stroke-width="1"/>
+                          <path d="M 337,108 L 272,116 L 276,142 L 335,136 Z" fill="#1a0404" stroke="#ef4444" stroke-width="1.2"/><path d="M 329,113 L 280,119 M 329,121 L 282,127 M 329,129 L 284,134" stroke="#ef444455" stroke-width="1"/>
+                          <path d="M 66,155 L 45,155 L 42,192 C 45,210 52,215 64,215 L 66,155 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1"/>
+                          <path d="M 334,155 L 355,155 L 358,192 C 355,210 348,215 336,215 L 334,155 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1"/>
+                          <path d="M 66,175 L 128,175 L 118,215 L 66,215 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+                          <path d="M 334,175 L 272,175 L 282,215 L 334,215 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+                          <path d="M 128,175 L 272,175 L 282,215 L 118,215 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+                          <path d="M 50,215 L 350,215 C 365,215 365,223 350,223 L 50,223 C 35,223 35,215 50,215 Z" fill="#050e1a" stroke="#1e4a6e" stroke-width="1"/>
+                          <rect x="166" y="183" width="68" height="20" rx="3" fill="#040a12" stroke="#1a3a5c"/><rect x="170" y="186" width="60" height="14" rx="1" fill="#0a1828" stroke="#2a5a79" stroke-width=".5"/>
+                          <ellipse cx="148" cy="219" rx="6" ry="3" fill="#050c18" stroke="#1a3a5c"/><ellipse cx="252" cy="219" rx="6" ry="3" fill="#050c18" stroke="#1a3a5c"/>
+                          <path class="di-zone" data-p="Luneta" onclick="diCy(this)" d="M 132,47 L 268,47 C 298,56 310,82 308,95 L 92,95 C 90,82 102,56 132,47 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Maletero" onclick="diCy(this)" d="M 92,95 L 308,95 L 326,155 L 74,155 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Faro tras. izq." onclick="diCy(this)" d="M 63,108 L 128,116 L 124,142 L 65,136 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Faro tras. der." onclick="diCy(this)" d="M 337,108 L 272,116 L 276,142 L 335,136 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Guard. tras. izq." onclick="diCy(this)" d="M 64,155 L 42,155 L 42,215 L 64,215 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Guard. tras. der." onclick="diCy(this)" d="M 336,155 L 358,155 L 358,215 L 336,215 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Parachoque tras." onclick="diCy(this)" d="M 50,175 L 350,175 L 360,223 L 40,223 Z" fill="transparent" stroke="none"/>
+                          <text x="200" y="72" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">luneta</text>
+                          <text x="200" y="128" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">maletero</text>
+                          <text x="94" y="130" text-anchor="middle" font-size="7" fill="#ef4444" pointer-events="none">faro tras. izq</text>
+                          <text x="306" y="130" text-anchor="middle" font-size="7" fill="#ef4444" pointer-events="none">faro tras. der</text>
+                          <text x="200" y="202" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">parachoque tras.</text>
+                        </svg>
+                      </div>
+                      <div id="di-pl" style="display:none">
+                        <div id="di-lat-label" style="text-align:center;font-size:9px;padding:3px;border-bottom:1px solid #1a3a5c;color:#00c8e0;letter-spacing:2px;font-family:monospace">◈ LADO IZQUIERDO</div>
+                        <svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto">
+                          <rect width="520" height="220" fill="#040c18"/>
+                          <line x1="0" y1="55" x2="520" y2="55" stroke="#0b1e30" stroke-width=".5"/><line x1="0" y1="110" x2="520" y2="110" stroke="#0b1e30" stroke-width=".5"/><line x1="0" y1="165" x2="520" y2="165" stroke="#0b1e30" stroke-width=".5"/><line x1="260" y1="0" x2="260" y2="220" stroke="#0b1e30" stroke-width=".5"/>
+                          <path d="M 15,160 L 18,140 C 18,118 42,108 75,108 L 125,108 C 150,75 185,52 245,48 L 355,48 C 420,48 452,78 472,108 L 502,108 C 518,112 518,132 505,142 L 502,165 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1.8"/>
+                          <path d="M 152,103 L 154,70 C 180,60 215,53 255,53 L 255,103 Z" fill="#060f1e" stroke="#162e48" stroke-width="1"/>
+                          <path d="M 260,53 L 345,53 C 380,55 405,75 422,103 Z" fill="#060f1e" stroke="#162e48" stroke-width="1"/>
+                          <line x1="257" y1="53" x2="257" y2="103" stroke="#1a3a5c" stroke-width="2.5"/><line x1="152" y1="72" x2="152" y2="103" stroke="#1a3a5c" stroke-width="1.5"/><line x1="365" y1="58" x2="385" y2="103" stroke="#1a3a5c" stroke-width="1.5"/>
+                          <path d="M 75,108 C 130,108 170,113 220,116 L 472,116" stroke="#1e4a6e" stroke-width="1" fill="none"/>
+                          <path d="M 115,148 L 435,148" stroke="#11253a" stroke-width="2" fill="none"/>
+                          <path d="M 504,115 L 480,115 C 470,115 462,120 458,126 L 458,134 L 503,134 Z" fill="#2d0808" stroke="#ef4444" stroke-width="1"/>
+                          <path d="M 15,115 L 38,117 C 48,117 54,122 58,128 L 16,134 Z" fill="#0c223c" stroke="#00c8e0" stroke-width="1"/>
+                          <circle cx="95" cy="165" r="32" fill="#050d18" stroke="#1e4a6e" stroke-width="3"/><circle cx="95" cy="165" r="24" fill="#0c1e36" stroke="#00c8e0" stroke-width="1"/>
+                          <path d="M 95,133 L 95,197 M 63,165 L 127,165 M 72,142 L 118,188 M 72,188 L 118,142" stroke="#1e4a6e" stroke-width="1.5"/><circle cx="95" cy="165" r="6" fill="#040c18" stroke="#1e4a6e"/>
+                          <circle cx="435" cy="165" r="32" fill="#050d18" stroke="#1e4a6e" stroke-width="3"/><circle cx="435" cy="165" r="24" fill="#0c1e36" stroke="#00c8e0" stroke-width="1"/>
+                          <path d="M 435,133 L 435,197 M 403,165 L 467,165 M 412,142 L 458,188 M 412,188 L 458,142" stroke="#1e4a6e" stroke-width="1.5"/><circle cx="435" cy="165" r="6" fill="#040c18" stroke="#1e4a6e"/>
+                          <path class="di-zone di-lat" data-p="Techo / Ventanas lat." onclick="diCyLat(this)" d="M 145,70 L 355,48 C 420,48 435,75 440,103 L 135,103 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone di-lat" data-p="Capó / Frente lat." onclick="diCyLat(this)" d="M 15,108 L 135,108 L 135,145 L 15,145 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone di-lat" data-p="Fender delantero lat." onclick="diCyLat(this)" d="M 15,145 L 135,145 L 135,195 L 45,195 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone di-lat" data-p="Puerta delantera" onclick="diCyLat(this)" d="M 135,103 L 257,103 L 257,165 L 135,165 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone di-lat" data-p="Puerta trasera lat." onclick="diCyLat(this)" d="M 257,103 L 385,103 L 385,165 L 257,165 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone di-lat" data-p="Fender trasero lat." onclick="diCyLat(this)" d="M 385,103 L 460,103 L 460,195 L 385,195 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone di-lat" data-p="Baúl / Zona tras. lat." onclick="diCyLat(this)" d="M 460,103 L 515,103 L 515,165 L 460,165 Z" fill="transparent" stroke="none"/>
+                          <circle class="di-zone di-lat" data-p="Llanta delantera lat." onclick="diCyLat(this)" cx="95" cy="165" r="32" fill="transparent" stroke="none"/>
+                          <circle class="di-zone di-lat" data-p="Llanta trasera lat." onclick="diCyLat(this)" cx="435" cy="165" r="32" fill="transparent" stroke="none"/>
+                          <path class="di-zone di-lat" data-p="Espejo lateral" onclick="diCyLat(this)" d="M 125,85 L 150,85 L 150,103 L 125,103 Z" fill="transparent" stroke="none"/>
+                          <text x="260" y="80" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">techo / ventanas</text>
+                          <text x="75" y="132" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">frente</text>
+                          <text x="195" y="136" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">puerta del.</text>
+                          <text x="320" y="136" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">puerta tras.</text>
+                          <text x="490" y="132" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">baúl</text>
+                        </svg>
+                      </div>
+                      <div id="di-pi" style="display:none">
+                        <svg viewBox="0 0 480 210" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto">
+                          <rect width="480" height="210" fill="#040c18"/>
+                          <line x1="0" y1="52.5" x2="480" y2="52.5" stroke="#0b1e30" stroke-width=".5"/><line x1="0" y1="105" x2="480" y2="105" stroke="#0b1e30" stroke-width=".5"/><line x1="0" y1="157.5" x2="480" y2="157.5" stroke="#0b1e30" stroke-width=".5"/><line x1="240" y1="0" x2="240" y2="210" stroke="#0b1e30" stroke-width=".5"/>
+                          <path d="M 58,18 Q 58,10 68,10 L 412,10 Q 422,10 424,22 L 438,96 Q 442,110 438,124 L 424,188 Q 422,198 412,198 L 68,198 Q 58,198 58,188 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1.5"/>
+                          <path d="M 66,10 L 414,10 L 420,54 Q 378,64 240,66 Q 102,64 60,54 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+                          <path d="M 70,11 L 410,11 L 416,50 Q 378,58 240,60 Q 102,58 64,50 Z" fill="#060f1e" stroke="#162e48" stroke-width=".5"/>
+                          <circle cx="116" cy="74" r="22" fill="none" stroke="#1e4a6e" stroke-width="2"/><circle cx="116" cy="74" r="9" fill="#0c1e36" stroke="#1a3a5c"/>
+                          <line x1="116" y1="54" x2="116" y2="65" stroke="#1e4a6e" stroke-width="1.5"/><line x1="94" y1="74" x2="107" y2="74" stroke="#1e4a6e" stroke-width="1.5"/><line x1="125" y1="74" x2="138" y2="74" stroke="#1e4a6e" stroke-width="1.5"/><line x1="116" y1="83" x2="116" y2="96" stroke="#1e4a6e" stroke-width="1.5"/>
+                          <rect x="194" y="24" width="92" height="34" rx="4" fill="#050c14" stroke="#1a3a5c"/><rect x="198" y="27" width="84" height="26" rx="2" fill="#040a10" stroke="#1a3a5c" stroke-width=".4"/>
+                          <rect x="296" y="28" width="72" height="26" rx="3" fill="#060e1c" stroke="#1a3a5c"/><circle cx="310" cy="41" r="7" fill="#050c18" stroke="#1a3a5c"/><circle cx="352" cy="41" r="7" fill="#050c18" stroke="#1a3a5c"/>
+                          <path d="M 208,9 L 272,9 L 276,20 L 204,20 Z" fill="#060e1c" stroke="#1a3a5c" stroke-width=".5"/>
+                          <rect x="196" y="80" width="48" height="52" rx="6" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/><circle cx="220" cy="100" r="8" fill="#060e1c" stroke="#1a3a5c"/>
+                          <rect x="60" y="52" width="14" height="108" rx="4" fill="#0c1e36" stroke="#1e4a6e"/><rect x="406" y="52" width="14" height="108" rx="4" fill="#0c1e36" stroke="#1e4a6e"/>
+                          <path d="M 74,78 L 176,78 L 176,126 Q 176,134 165,134 L 86,134 Q 74,134 74,126 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/><rect x="90" y="72" width="72" height="14" rx="6" fill="#0a1828" stroke="#162e48"/>
+                          <path d="M 250,78 L 406,78 L 406,126 Q 406,134 394,134 L 262,134 Q 250,134 250,126 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/><rect x="278" y="72" width="100" height="14" rx="6" fill="#0a1828" stroke="#162e48"/>
+                          <path d="M 74,148 L 406,148 L 406,192 Q 406,200 394,200 L 86,200 Q 74,200 74,192 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+                          <rect x="88" y="142" width="64" height="14" rx="6" fill="#0a1828" stroke="#162e48"/><rect x="172" y="142" width="64" height="14" rx="6" fill="#0a1828" stroke="#162e48"/><rect x="256" y="142" width="64" height="14" rx="6" fill="#0a1828" stroke="#162e48"/>
+                          <path class="di-zone" data-p="Espejo retrovisor" onclick="diCy(this)" d="M 204,8 L 276,8 L 280,22 L 200,22 Z" fill="transparent" stroke="none"/>
+                          <rect class="di-zone" data-p="Tablero" onclick="diCy(this)" x="58" y="10" width="386" height="60" fill="transparent" stroke="none"/>
+                          <rect class="di-zone" data-p="Radio / pantalla" onclick="diCy(this)" x="190" y="20" width="100" height="42" rx="4" fill="transparent" stroke="none"/>
+                          <rect class="di-zone" data-p="Climatizador" onclick="diCy(this)" x="292" y="24" width="80" height="34" rx="3" fill="transparent" stroke="none"/>
+                          <circle class="di-zone" data-p="Volante" onclick="diCy(this)" cx="116" cy="74" r="24" fill="transparent" stroke="none"/>
+                          <rect class="di-zone" data-p="Consola central" onclick="diCy(this)" x="192" y="76" width="56" height="60" rx="6" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Asiento conductor" onclick="diCy(this)" d="M 74,70 L 176,70 L 176,136 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Asiento pasajero" onclick="diCy(this)" d="M 250,70 L 406,70 L 406,136 Z" fill="transparent" stroke="none"/>
+                          <path class="di-zone" data-p="Asiento trasero" onclick="diCy(this)" d="M 74,140 L 406,140 L 406,202 L 74,202 Z" fill="transparent" stroke="none"/>
+                          <rect class="di-zone" data-p="Panel puerta izq." onclick="diCy(this)" x="58" y="48" width="18" height="116" rx="4" fill="transparent" stroke="none"/>
+                          <rect class="di-zone" data-p="Panel puerta der." onclick="diCy(this)" x="404" y="48" width="18" height="116" rx="4" fill="transparent" stroke="none"/>
+                          <text x="240" y="18" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">retrovisor</text>
+                          <text x="240" y="44" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">radio / pantalla</text>
+                          <text x="330" y="44" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">climatiz.</text>
+                          <text x="116" y="78" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">volante</text>
+                          <text x="118" y="110" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">asiento cond.</text>
+                          <text x="326" y="110" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">asiento pas.</text>
+                          <text x="240" y="176" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">asiento trasero</text>
+                        </svg>
+                      </div>
+                    </div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;padding:8px 12px;border-top:1px solid rgba(6,182,212,.15);font-size:12px;color:#4a7a99">
+                      <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#f59e0b;margin-right:4px;vertical-align:middle"></span>Rayón</span>
+                      <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#f97316;margin-right:4px;vertical-align:middle"></span>Golpe</span>
+                      <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#ef4444;margin-right:4px;vertical-align:middle"></span>Roto</span>
+                      <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#a855f7;margin-right:4px;vertical-align:middle"></span>Falta pieza</span>
+                      <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#6b7280;margin-right:4px;vertical-align:middle"></span>Sucio</span>
+                    </div>
+                    <div id="di-list" style="padding:0 12px 8px">
+                      <p style="font-size:10px;color:#475569;text-align:center;padding:8px 0;margin:0">Toca una zona del vehículo para registrar daño.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Fotos de inspección -->
+                <div style="margin-bottom:10px">
+                  <label style="display:block;cursor:pointer">
+                    <div style="border:2px dashed #0e7490;border-radius:6px;padding:10px;text-align:center"
+                         onmouseover="this.style.borderColor='#06b6d4'" onmouseout="this.style.borderColor='#0e7490'">
+                      <span style="font-size:18px">📷</span>
+                      <p style="margin:2px 0 0;font-size:11px;color:#67e8f9">Fotos de inspección</p>
+                    </div>
+                    <input type="file" name="insp_fotos" accept="image/*" multiple capture="environment"
+                           style="display:none" onchange="inspeccionPreviews(this)" id="id_insp_fotos">
+                  </label>
+                  <div id="insp-fotos-preview" style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:6px"></div>
+                </div>
+
+                <!-- Observaciones inspección -->
+                <div style="margin-bottom:10px">
+                  <textarea name="insp_observaciones" rows="2" placeholder="Observaciones generales..."
+                            style="width:100%;background:#1e293b;border:1px solid #334155;border-radius:5px;padding:6px 8px;color:#f1f5f9;font-size:12px;resize:none"></textarea>
+                </div>
+
+                <!-- Firma cliente -->
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:10px">
+                  <input type="checkbox" name="insp_firma_cliente" value="1"
+                         style="width:14px;height:14px;accent-color:#06b6d4">
+                  <span style="font-size:11px;color:#cbd5e1">Cliente confirmó la inspección</span>
+                </label>
+
+                <!-- Enviar reporte al cliente -->
+                <div style="border-top:1px solid rgba(6,182,212,.15);padding-top:10px">
+                  <p style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#67e8f9;margin:0 0 8px">Enviar reporte al cliente</p>
+
+                  <!-- WhatsApp: button → JS abre wa.me con window.open (evita draft dialog) -->
+                  <div id="di-wa-wrap" style="margin-bottom:8px">
+                    <button type="button" id="di-btn-wa"
+                       style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px;background:#16a34a;color:#fff;font-size:11px;font-weight:700;border-radius:6px;border:none;cursor:pointer;transition:background .15s"
+                       onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'">
+                      <svg style="width:14px;height:14px;flex-shrink:0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                      </svg>
+                      Enviar por WhatsApp
+                    </button>
+                    <p id="di-wa-notel" style="display:none;font-size:10px;color:#475569;margin:4px 0 0">Sin teléfono registrado — no disponible</p>
+                  </div>
+
+                  <!-- Email: envío inmediato via fetch (no requiere guardar el OT) -->
+                  <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px">
+                    <input type="email" id="di-insp-email"
+                           placeholder="correo@cliente.com"
+                           style="flex:1;padding:6px 8px;background:#1e293b;border:1px solid #334155;border-radius:5px;color:#f1f5f9;font-size:11px">
+                    <button type="button" id="di-btn-email"
+                            style="padding:6px 10px;background:#1d4ed8;color:#fff;font-size:11px;font-weight:700;border-radius:5px;border:none;cursor:pointer;white-space:nowrap">
+                      ✉ Enviar ahora
+                    </button>
+                  </div>
+                  <p id="di-email-status" style="font-size:10px;margin:0;display:none"></p>
+                </div>
+
+              </div><!-- /inspeccion-campos -->
+            </div><!-- /inspeccion-body -->
+          </div>
+          {% endif %}
+
+        </section>
+        {% endif %}
+      </div>
+    </section>
+
+    <div class="doc-main-grid">
+      <div class="doc-main-column">
+        {% if ui_config.show_repuestos %}
+        <section class="doc-panel doc-panel--section">
+          <div class="doc-section-head">
+            <div>
+              <h2 data-i18n="repuestos">REPUESTOS</h2>
+            </div>
+            <div class="doc-section-actions">
+              <button type="button" id="add-repuesto" class="doc-action-btn doc-action-btn--cyan">
+                <span aria-hidden="true">+</span><span data-i18n="agregar">AGREGAR</span>
+              </button>
+              <a href="{% country_url 'repuestos:crear_repuesto' %}?return_to={{ request.get_full_path|urlencode }}&select_field=repuesto"
+                 class="doc-action-btn doc-action-btn--cyan-alt">
+                <span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="doc-table-head doc-table-head--parts">
+            <span data-i18n="codigo">Código</span>
+            <span data-i18n="rep_nombre">Repuesto / Nombre</span>
+            <span data-i18n="cant">Cant.</span>
+            <span data-i18n="precio_unit">Precio unit.</span>
+            <span data-i18n="total">Total</span>
+            <span data-i18n="acciones">Acciones</span>
+          </div>
+
+          <div id="repuestos-container" class="doc-lines-container doc-lines-container--parts">
+            <div class="doc-empty-state">
+              <span class="doc-empty-state__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M8 4.75 4.75 6.5v11L12 21l7.25-3.5v-11L16 4.75M8 4.75 12 7l4-2.25M8 4.75V9.5L12 12l4-2.5V4.75M12 12v9" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <strong data-i18n="rep_empty_title">Aún no agregas repuestos</strong>
+              <p data-i18n="rep_empty_hint">Haz clic en AGREGAR para añadir la primera línea</p>
+            </div>
+          </div>
+        </section>
+        {% endif %}
+
+        {% if ui_config.show_services %}
+        <section class="doc-panel doc-panel--section">
+          <div class="doc-section-head">
+            <h2 data-i18n="servicios">SERVICIOS</h2>
+            <div class="doc-section-actions">
+              <button type="button" id="add-servicio" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span data-i18n="agregar">AGREGAR</span></button>
+              <a href="{% country_url 'servicios:crear_servicio' %}?return_to={{ request.get_full_path|urlencode }}&select_field=servicio" class="doc-action-btn doc-action-btn--cyan-alt"><span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span></a>
+            </div>
+          </div>
+
+          <div class="doc-table-head doc-table-head--services">
+            <span data-i18n="srv_nombre">Servicio / Nombre</span>
+            <span data-i18n="precio_unit">Precio unit.</span>
+            <span data-i18n="total">Total</span>
+            <span data-i18n="acciones">Acciones</span>
+          </div>
+
+          <div id="servicios-container" class="doc-lines-container doc-lines-container--services">
+            <div id="servicios-empty-hint" class="doc-empty-state">
+              <span class="doc-empty-state__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M14.75 3.75a2 2 0 0 1 2.83 2.83L10 14.16l-3.5.67.67-3.5 7.58-7.58Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                  <path d="m13.5 5 2.5 2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                  <path d="M5 18.5h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </span>
+              <strong data-i18n="srv_empty_title">Aún no agregas servicios</strong>
+              <p data-i18n="srv_empty_hint">Haz clic en AGREGAR para añadir el primer servicio</p>
+            </div>
+          </div>
+        </section>
+        {% endif %}
+
+        {% if ui_config.show_otros_servicios %}
+        <section class="doc-panel doc-panel--section">
+          <div class="doc-section-head">
+            <h2 data-i18n="otros_servicios">OTROS SERVICIOS / TERCEROS</h2>
+            <div class="doc-section-actions">
+              <button type="button" id="add-otro" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span data-i18n="agregar">AGREGAR</span></button>
+              <a href="{% country_url 'servicios:crear_otro_servicio' %}?return_to={{ request.get_full_path|urlencode }}" class="doc-action-btn doc-action-btn--cyan-alt"><span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span></a>
+            </div>
+          </div>
+
+          <div class="doc-table-head doc-table-head--others">
+            <span data-i18n="srv_nombre">Servicio / Nombre</span>
+            <span data-i18n="empresa_externa">Empresa externa</span>
+            <span aria-hidden="true"></span>
+            <span data-i18n="precio_cliente">Precio cliente</span>
+            <span aria-hidden="true"></span>
+          </div>
+
+          <div id="otros-container" class="doc-lines-container doc-lines-container--others">
+            <div id="otros-empty-hint" class="doc-empty-state hidden" style="display:none !important;"></div>
+          </div>
+        </section>
+        {% endif %}
+
+      </div>
+
+      <aside class="doc-side-column">
+        <section class="doc-panel doc-panel--totals">
+          <div class="doc-panel__heading doc-panel__heading--totals">
+            <span class="doc-panel__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M7 3.75h7.5L20.25 9.5v8.75A2.25 2.25 0 0 1 18 20.5H7A2.25 2.25 0 0 1 4.75 18.25V6A2.25 2.25 0 0 1 7 3.75Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M14.5 3.75V9.5h5.75" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M8 12h8M8 15.5h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <h2 data-i18n="totales">TOTALES</h2>
+          </div>
+
+          <div class="doc-totals-list">
+            <div class="doc-total-row">
+              <span data-i18n="subtotal_rep">Subtotal repuestos</span>
+              <span id="t_repuestos">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
+            </div>
+
+            {% if ui_config.show_services %}
+            <div class="doc-total-row">
+              <span data-i18n="subtotal_srv">Subtotal servicios</span>
+              <span id="t_servicios">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
+            </div>
+            {% endif %}
+
+            {% if ui_config.show_otros_servicios %}
+            <div class="doc-total-row">
+              <span data-i18n="subtotal_otros">Subtotal otros servicios</span>
+              <span id="t_otros">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
+            </div>
+            {% endif %}
+
+            <div class="doc-total-row">
+              <span data-i18n="subtotal_neto">Subtotal neto</span>
+              <span id="t_subtotal_neto">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
+            </div>
+
+            {% for tax_line in ui_config.tax_lines %}
+            <div class="doc-total-row doc-total-row--tax">
+              <label class="doc-tax-toggle" for="include_{{ tax_line.id }}">
+                <input
+                  type="checkbox"
+                  id="include_{{ tax_line.id }}"
+                  checked
+                  class="tax-checkbox"
+                  data-tax-id="{{ tax_line.id }}"
+                  data-tax-rate="{{ tax_line.rate }}"
+                >
+                <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
+              </label>
+              <span id="t_{{ tax_line.id }}">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="doc-grand-total">
+            <span data-i18n="total_pagar">TOTAL A PAGAR</span>
+            <strong id="t_total">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</strong>
+          </div>
+        </section>
+
+        <section class="doc-panel doc-panel--notes">
+          <div class="doc-panel__heading">
+            <h2 data-i18n="notas">NOTAS</h2>
+          </div>
+          {{ form.observaciones }}
+
+          <!-- Adjuntar evidencias: hasta 4 fotos + 1 video -->
+          <div class="doc-media-upload" id="doc-media-upload">
+            <div class="doc-media-upload__label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span data-i18n="adjuntar_evidencias">Adjuntar evidencias</span>
+              <small class="doc-media-upload__hint" data-i18n="evidencias_hint">hasta 4 fotos · 1 video</small>
+            </div>
+
+            <!-- Zona de drop para fotos -->
+            <div class="doc-media-slots">
+              <div class="doc-media-slot" id="foto-slot-0" data-slot="0" data-type="foto">
+                <input type="file" name="evidencia_foto" accept="image/*" class="doc-media-input" id="evidencia-foto-0" multiple style="display:none">
+                <label for="evidencia-foto-0" class="doc-media-slot__inner" title="Agregar foto">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <span class="doc-media-slot__count" id="foto-count">0/4</span>
+                </label>
+              </div>
+              <div class="doc-media-previews" id="fotos-preview"></div>
+            </div>
+
+            <!-- Zona de video -->
+            <div class="doc-media-slots" style="margin-top:8px">
+              <div class="doc-media-slot doc-media-slot--video" id="video-slot" data-type="video">
+                <input type="file" name="evidencia_video" accept="video/*" class="doc-media-input" id="evidencia-video" style="display:none">
+                <label for="evidencia-video" class="doc-media-slot__inner" title="Agregar video">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                  <span id="video-label" data-i18n="agregar_video">Video</span>
+                </label>
+              </div>
+              <div id="video-preview"></div>
+            </div>
+          </div>
+        </section>
+
+        <div class="doc-form-actions">
+          <a href="{% country_url 'documentos:lista_documentos' %}" id="btn-cancelar-doc" class="doc-action-btn doc-action-btn--ghost doc-action-btn--wide" data-i18n="cancelar">CANCELAR</a>
+          <button type="button" id="save-draft-btn" class="doc-action-btn doc-action-btn--cyan doc-action-btn--wide" data-i18n="guardar_borrador">GUARDAR BORRADOR</button>
+          <button type="submit" class="doc-action-btn doc-action-btn--success doc-action-btn--wide">
+            {% if es_edicion %}
+              <span data-i18n="guardar_cambios">Guardar cambios</span>
+            {% else %}
+              <span data-i18n="guardar_continuar">GUARDAR Y CONTINUAR</span>
+            {% endif %}
+          </button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <input type="hidden" name="repuestos_json" id="id_repuestos_json" value="{{ repuestos_json|default:"[]" }}">
+  <input type="hidden" name="servicios_json" id="id_servicios_json">
+  <input type="hidden" name="otros_json" id="id_otros_json">
+</form>
+
+<!-- Modal: cambios sin guardar / unsaved changes -->
+<div id="modal-unsaved" style="display:none;position:fixed;inset:0;z-index:60;align-items:center;justify-content:center">
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.65)" id="modal-unsaved-overlay"></div>
+  <div style="position:relative;z-index:1;background:#0d1b2e;border:1px solid rgba(95,126,163,0.35);border-radius:14px;padding:28px 28px 22px;max-width:380px;width:calc(100% - 32px);box-shadow:0 28px 80px rgba(1,8,18,0.6)">
+    <h3 id="modal-unsaved-title" style="margin:0 0 10px;font-size:16px;font-weight:800;color:#f4f9ff">¿Salir sin guardar?</h3>
+    <p id="modal-unsaved-body" style="margin:0 0 22px;font-size:13px;color:#95abc2;line-height:1.5">Tienes cambios sin guardar. Si sales ahora se perderán.</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button type="button" id="modal-unsaved-stay" style="padding:8px 16px;border-radius:6px;border:1.5px solid #4a5a72;background:#1e2a3a;color:#cbd5e1;font-size:12px;font-weight:700;cursor:pointer">Quedarme</button>
+      <button type="button" id="modal-unsaved-leave" style="padding:8px 16px;border-radius:6px;border:none;background:#dc2626;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Salir</button>
+    </div>
+  </div>
+</div>
+
+
+{{ clientes_prefetch|json_script:"prefetchClientes" }}
+{{ vehiculos_prefetch|json_script:"prefetchVehiculos" }}
+{{ repuestos_prefetch|json_script:"prefetchRepuestos" }}
+{{ servicios_prefetch|json_script:"prefetchServicios" }}
+{{ otros_servicios_prefetch|json_script:"prefetchOtrosServicios" }}
+{{ ui_config.tax_lines|json_script:"uiConfigTaxLines" }}
+{{ document_form_bootstrap|json_script:"documentFormBootstrap" }}
+{% if has_server_line_items %}
+<script>
+if (window.DESARME_PREFILL) {
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            var form = document.getElementById('document-form');
+            if (form) delete form.dataset.egLineItemsHydrated;
+            if (window.EG && window.EG.lineItemsBootstrap) {
+                window.EG.lineItemsBootstrap.hydrateLineItems();
+            }
+        }, 500);
+    });
+}
+</script>
+{% endif %}
+{% endwith %}
+{% endwith %}
+{% endblock content %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+(function() {
+  var T = {
+    es: {
+      crear_documento: 'CREAR {{ ui_config.document_noun|default:"DOCUMENTO"|upper }}', editar_documento: 'EDITAR {{ ui_config.document_noun|default:"DOCUMENTO"|upper }}',
+      borrador_guardado: 'Borrador guardado',
+      doc_numero: '{{ ui_config.document_noun|default:"Documento" }} N°', fecha: 'Fecha', tipo_doc: 'Tipo de documento',
+      estado_pago: 'Estado de pago', operacion: 'Operación',
+      op_servicios: 'Servicios', op_solo_repuestos: 'Solo venta de repuestos',
+      tipo_opts: { OT: 'Orden de Trabajo', PRES: 'Presupuesto', FAC: 'Comprobante', PTS: 'Venta Repuestos' },
+      pay_opts: { pending: 'Pendiente', paid: 'Pagado', partial: 'Parcial', canceled: 'Anulado' },
+      cliente: 'CLIENTE', vehiculo: 'VEHÍCULO',
+      repuestos: 'REPUESTOS', servicios: 'SERVICIOS',
+      otros_servicios: 'OTROS SERVICIOS / TERCEROS', totales: 'TOTALES', notas: 'NOTAS',
+      agregar: 'AGREGAR', nuevo: 'Nuevo',
+      nuevo_vehiculo: 'Nuevo vehículo',
+      cancelar: 'CANCELAR', guardar_borrador: 'GUARDAR BORRADOR',
+      guardar_continuar: 'GUARDAR Y CONTINUAR', guardar_cambios: 'Guardar cambios',
+      codigo: 'Código', rep_nombre: 'Repuesto / Nombre', cant: 'Cant.',
+      precio_unit: 'Precio unit.', total: 'Total', acciones: 'Acciones',
+      srv_nombre: 'Servicio / Nombre', empresa_externa: 'Empresa externa',
+      precio_cliente: 'Precio cliente',
+      subtotal_rep: 'Subtotal repuestos', subtotal_srv: 'Subtotal servicios',
+      subtotal_otros: 'Subtotal otros servicios', subtotal_neto: 'Subtotal neto',
+      total_pagar: 'TOTAL A PAGAR',
+      rep_empty_title: 'Aún no agregas repuestos',
+      rep_empty_hint: 'Haz clic en AGREGAR para añadir la primera línea',
+      srv_empty_title: 'Aún no agregas servicios',
+      srv_empty_hint: 'Haz clic en AGREGAR para añadir el primer servicio',
+      cliente_empty_title: 'Sin cliente seleccionado',
+      cliente_empty_hint: 'Seleccione un cliente para ver información',
+      vehiculo_empty_title: 'Sin vehículo seleccionado',
+      vehiculo_empty_hint: 'Seleccione un vehículo para ver información',
+      km_label: 'Kilometraje', mecanico_responsable: 'Mecánico responsable',
+      notas_ph: 'Escribe una nota (opcional)...',
+      buscar_cliente_ph: 'Buscar cliente...', sel_vehiculo_ph: 'Seleccionar vehículo...',
+      adjuntar_evidencias: 'Adjuntar evidencias',
+      evidencias_hint: 'hasta 4 fotos · 1 video',
+      agregar_video: 'Video',
+    },
+    en: {
+      crear_documento: 'CREATE {{ ui_config.document_noun_en|default:"DOCUMENT"|upper }}', editar_documento: 'EDIT {{ ui_config.document_noun_en|default:"DOCUMENT"|upper }}',
+      borrador_guardado: 'Draft saved',
+      doc_numero: '{{ ui_config.document_noun_en|default:"Document" }} No.', fecha: 'Date', tipo_doc: 'Document type',
+      estado_pago: 'Payment status', operacion: 'Operation',
+      op_servicios: 'Services', op_solo_repuestos: 'Parts only',
+      tipo_opts: { OT: 'Work Order', PRES: 'Estimate', FAC: 'Invoice', PTS: 'Parts Sale' },
+      pay_opts: { pending: 'Pending', paid: 'Paid', partial: 'Partial', canceled: 'Canceled' },
+      cliente: 'CLIENT', vehiculo: 'VEHICLE',
+      repuestos: 'PARTS', servicios: 'SERVICES',
+      otros_servicios: 'OTHER SERVICES / THIRD PARTIES', totales: 'TOTALS', notas: 'NOTES',
+      agregar: 'ADD', nuevo: 'New',
+      nuevo_vehiculo: 'New vehicle',
+      cancelar: 'CANCEL', guardar_borrador: 'SAVE DRAFT',
+      guardar_continuar: 'SAVE AND CONTINUE', guardar_cambios: 'Save changes',
+      codigo: 'Code', rep_nombre: 'Part / Name', cant: 'Qty.',
+      precio_unit: 'Unit price', total: 'Total', acciones: 'Actions',
+      srv_nombre: 'Service / Name', empresa_externa: 'External company',
+      precio_cliente: 'Client price',
+      subtotal_rep: 'Parts subtotal', subtotal_srv: 'Services subtotal',
+      subtotal_otros: 'Other services subtotal', subtotal_neto: 'Net subtotal',
+      total_pagar: 'TOTAL DUE',
+      rep_empty_title: 'No parts added yet',
+      rep_empty_hint: 'Click ADD to add the first line',
+      srv_empty_title: 'No services added yet',
+      srv_empty_hint: 'Click ADD to add the first service',
+      cliente_empty_title: 'No client selected',
+      cliente_empty_hint: 'Select a client to view info',
+      vehiculo_empty_title: 'No vehicle selected',
+      vehiculo_empty_hint: 'Select a vehicle to view info',
+      km_label: 'Mileage', mecanico_responsable: 'Lead mechanic',
+      notas_ph: 'Write a note (optional)...',
+      buscar_cliente_ph: 'Search client...', sel_vehiculo_ph: 'Select vehicle...',
+      adjuntar_evidencias: 'Attach evidence',
+      evidencias_hint: 'up to 4 photos · 1 video',
+      agregar_video: 'Video',
+    }
+  };
+
+  function applyLang(lang) {
+    var t = T[lang] || T.es;
+    window.EG_LANG = lang;
+    try { localStorage.setItem('eg_doc_lang', lang); } catch(e) {}
+
+    // Toggle button states
+    document.querySelectorAll('#doc-lang-toggle .doc-lang-btn').forEach(function(btn) {
+      var active = btn.dataset.lang === lang;
+      btn.classList.toggle('doc-lang-btn--active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+
+    // Translate all data-i18n elements
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) el.textContent = t[key];
+    });
+
+    // Translate option text (select options with data-i18n)
+    document.querySelectorAll('option[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) el.text = t[key];
+    });
+
+    // Update placeholders
+    var cBusq = document.getElementById('cliente-busqueda');
+    if (cBusq) cBusq.placeholder = t.buscar_cliente_ph || '';
+    var vSel = document.getElementById('id_vehiculo');
+    if (vSel && vSel.options[0] && vSel.options[0].value === '') {
+      vSel.options[0].text = t.sel_vehiculo_ph || '';
+    }
+    var notesEl = document.getElementById('id_observaciones');
+    if (notesEl) notesEl.placeholder = t.notas_ph || '';
+
+    // Translate id_tipo options (rendered by Django, no data-i18n)
+    var tipoSel = document.getElementById('id_tipo');
+    if (tipoSel && t.tipo_opts) {
+      Array.prototype.forEach.call(tipoSel.options, function(opt) {
+        if (t.tipo_opts[opt.value]) opt.text = t.tipo_opts[opt.value];
+      });
+    }
+
+    // Translate id_payment_status options
+    var paySel = document.getElementById('id_payment_status');
+    if (paySel && t.pay_opts) {
+      Array.prototype.forEach.call(paySel.options, function(opt) {
+        if (t.pay_opts[opt.value]) opt.text = t.pay_opts[opt.value];
+      });
+    }
+  }
+
+  window.EG_setLang = applyLang;
+
+  // Idioma derivado del país del suscriptor (servidor siempre gana sobre localStorage)
+  var SERVER_LANG = (function() {
+    var c = '{{ country_code|default:"CL" }}'.toUpperCase();
+    if (c === 'US') return 'en';
+    if (c === 'BR') return 'pt';
+    return 'es';
+  })();
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Wire up lang toggle buttons
+    document.querySelectorAll('#doc-lang-toggle .doc-lang-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() { applyLang(btn.dataset.lang); });
+    });
+    // Usar idioma del servidor; sobrescribir lo que haya en localStorage
+    try { localStorage.setItem('eg_doc_lang', SERVER_LANG); } catch(e) {}
+    applyLang(SERVER_LANG);
+
+    // Unsaved-changes modal — replaces native browser beforeunload dialog
+    var UNSAVED_COPY = {
+      es: { title: '¿Salir sin guardar?', body: 'Tienes cambios sin guardar. Si sales ahora se perderán.', stay: 'Quedarme', leave: 'Salir de todas formas' },
+      en: { title: 'Leave without saving?', body: 'You have unsaved changes. If you leave now they will be lost.', stay: 'Stay', leave: 'Leave anyway' }
+    };
+
+    function updateUnsavedModal(lang) {
+      var c = UNSAVED_COPY[lang] || UNSAVED_COPY.es;
+      var t = document.getElementById('modal-unsaved-title');
+      var b = document.getElementById('modal-unsaved-body');
+      var s = document.getElementById('modal-unsaved-stay');
+      var l = document.getElementById('modal-unsaved-leave');
+      if (t) t.textContent = c.title;
+      if (b) b.textContent = c.body;
+      if (s) s.textContent = c.stay;
+      if (l) l.textContent = c.leave;
+    }
+
+    // Keep modal text in sync when language toggles
+    var origApplyLang = window.EG_setLang;
+    window.EG_setLang = function(lang) { origApplyLang(lang); updateUnsavedModal(lang); };
+
+    // Init modal text with current language
+    updateUnsavedModal(saved);
+
+    var modal = document.getElementById('modal-unsaved');
+    var leaveUrl = null;
+
+    function showUnsavedModal(href) {
+      leaveUrl = href;
+      if (modal) modal.style.display = 'flex';
+    }
+    function hideUnsavedModal() {
+      if (modal) modal.style.display = 'none';
+      leaveUrl = null;
+    }
+
+    function isFormDirty() {
+      return window.EG && window.EG.borrador && typeof window.EG.borrador.isDirty === 'function'
+        ? window.EG.borrador.isDirty()
+        : false;
+    }
+
+    var cancelBtn = document.getElementById('btn-cancelar-doc');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', function(e) {
+        if (!isFormDirty()) return;
+        e.preventDefault();
+        showUnsavedModal(cancelBtn.href);
+      });
+    }
+
+    var stayBtn = document.getElementById('modal-unsaved-stay');
+    var leaveBtn = document.getElementById('modal-unsaved-leave');
+    var overlay = document.getElementById('modal-unsaved-overlay');
+    if (stayBtn) stayBtn.addEventListener('click', hideUnsavedModal);
+    if (overlay) overlay.addEventListener('click', hideUnsavedModal);
+    if (leaveBtn) leaveBtn.addEventListener('click', function() {
+      if (leaveUrl) window.location.href = leaveUrl;
+    });
+  });
+})();
+</script>
+<script src="{% static 'js/marketplace_tooltip_fixed.js' %}"></script>
+<script>
+window.__PRESELECT_CLIENTE_ID__ = "{{ cliente_preselect_id|default:''|escapejs }}";
+window.__PRESELECT_VEHICULO_ID__ = "{{ vehiculo_preselect_id|default:''|escapejs }}";
+window.egEncodeDocumentFormNext = function() {
+    return encodeURIComponent(window.location.pathname + (window.location.search || ''));
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    var notes = document.getElementById('id_observaciones');
+    if (notes) {
+        notes.setAttribute('rows', '4');
+        notes.setAttribute('placeholder', notes.getAttribute('placeholder') || 'Escribe una nota (opcional)...');
+    }
+
+    var kmInput = document.getElementById('id_kilometraje_ingreso');
+    if (kmInput) {
+        if (!kmInput.getAttribute('placeholder')) {
+            kmInput.setAttribute('placeholder', 'km');
+        }
+        // type="number" inputs reject locale-formatted values (e.g. "50,000" in en-US).
+        // Only apply visual formatting for text inputs.
+        if (kmInput.type !== 'number') {
+            kmInput.addEventListener('blur', function() {
+                var raw = String(this.value || '').replace(/[^0-9]/g, '');
+                if (!raw) return;
+                var num = parseInt(raw, 10);
+                if (!isNaN(num)) {
+                    var country = (window.EG && EG.cfg && EG.cfg.country) || 'CL';
+                    var locales = { CL:'es-CL', MX:'es-MX', AR:'es-AR', PE:'es-PE', US:'en-US' };
+                    var locale = locales[country] || 'es-CL';
+                    this.value = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(num);
+                }
+            });
+            kmInput.addEventListener('focus', function() {
+                var raw = String(this.value || '').replace(/[^0-9]/g, '');
+                this.value = raw;
+            });
+        }
+    }
+
+    function buildContextualCreateUrl(baseUrl, params) {
+        var url = new URL(baseUrl, window.location.origin);
+        Object.entries(params || {}).forEach(function(entry) {
+            var key = entry[0];
+            var value = entry[1];
+            if (value === undefined || value === null || value === '') {
+                return;
+            }
+            url.searchParams.set(key, value);
+        });
+        return url.toString();
+    }
+
+    function getDocumentReturnTo() {
+        return window.location.pathname + (window.location.search || '');
+    }
+
+    function getSelectedClienteId() {
+        var clienteSelect = document.getElementById('id_cliente');
+        if (!clienteSelect) {
+            return '';
+        }
+        if (window.jQuery && jQuery(clienteSelect).hasClass('select2-hidden-accessible')) {
+            return jQuery(clienteSelect).val() || '';
+        }
+        return clienteSelect.value || '';
+    }
+
+    window.openClienteModal = function openClienteModal() {
+        var trigger = document.getElementById('btn-nuevo-cliente');
+        var baseUrl = trigger && trigger.dataset ? trigger.dataset.urlCrearCliente : '';
+        if (!baseUrl) {
+            return;
+        }
+        window.location.href = buildContextualCreateUrl(baseUrl, {
+            return_to: getDocumentReturnTo(),
+            select_field: 'cliente'
+        });
+    };
+
+    window.openVehiculoModal = function openVehiculoModal() {
+        var trigger = document.getElementById('btn-nuevo-vehiculo');
+        var baseUrl = trigger && trigger.dataset ? trigger.dataset.urlCrearVehiculo : '';
+        if (!baseUrl) {
+            return;
+        }
+        window.location.href = buildContextualCreateUrl(baseUrl, {
+            return_to: getDocumentReturnTo(),
+            select_field: 'vehiculo',
+            cliente_id: getSelectedClienteId()
+        });
+    };
+
+    var draftButton = document.getElementById('save-draft-btn');
+    if (draftButton) {
+        draftButton.addEventListener('click', function() {
+            if (window.serializeRows) {
+                window.serializeRows();
+            }
+            if (window.EG && window.EG.borrador && typeof window.EG.borrador.saveDocumentDraftNow === 'function') {
+                window.EG.borrador.saveDocumentDraftNow();
+            }
+        });
+    }
+});
+</script>
+<script>
+window.FORCE_NEW_DOCUMENT = {% if es_edicion %}false{% else %}true{% endif %};
+window.DESARME_PREFILL = window.DESARME_PREFILL || {% if has_server_line_items %}true{% else %}false{% endif %};
+</script>
+<script src="{% static 'js/document-form/index.js' %}?v=3.2.7"></script>
+<style>
+/* --- Módulo de carga de evidencias en notas --- */
+.doc-media-upload {
+  margin-top: 14px;
+  border-top: 1px solid rgba(95,126,163,0.2);
+  padding-top: 14px;
+}
+.doc-media-upload__label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #5f7ea3;
+  margin-bottom: 10px;
+}
+.doc-media-upload__label svg { flex-shrink: 0; }
+.doc-media-upload__hint {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #3a4d63;
+  margin-left: auto;
+}
+.doc-media-slots { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+.doc-media-slot {
+  width: 60px;
+  height: 60px;
+  border: 1.5px dashed rgba(95,126,163,0.35);
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: border-color .2s;
+}
+.doc-media-slot:hover { border-color: #06b6d4; }
+.doc-media-slot--video { border-color: rgba(139,92,246,0.4); }
+.doc-media-slot--video:hover { border-color: #8b5cf6; }
+.doc-media-slot__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  gap: 3px;
+  color: #5f7ea3;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.doc-media-slot__inner:hover { color: #06b6d4; }
+.doc-media-slot--video .doc-media-slot__inner:hover { color: #8b5cf6; }
+.doc-media-slot__count { font-size: 9px; color: #3a4d63; }
+.doc-media-previews, #video-preview { display: flex; gap: 6px; flex-wrap: wrap; }
+.doc-media-thumb {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid rgba(95,126,163,0.25);
+  flex-shrink: 0;
+}
+.doc-media-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.doc-media-thumb__remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(220,38,38,0.85);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+}
+.doc-media-thumb--video {
+  width: 90px;
+  background: #0d1b2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: #8b5cf6;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px;
+  text-align: center;
+}
+</style>
+<script>
+(function() {
+  var MAX_FOTOS = 4;
+  var fotoFiles = [];
+  var videoFile = null;
+
+  var fotoInput = document.getElementById('evidencia-foto-0');
+  var videoInput = document.getElementById('evidencia-video');
+  var fotosPreview = document.getElementById('fotos-preview');
+  var videoPreview = document.getElementById('video-preview');
+  var fotoCount = document.getElementById('foto-count');
+
+  if (!fotoInput || !videoInput) return;
+
+  function refreshFotoCount() {
+    if (fotoCount) fotoCount.textContent = fotoFiles.length + '/' + MAX_FOTOS;
+  }
+
+  function renderFotoPreviews() {
+    fotosPreview.innerHTML = '';
+    fotoFiles.forEach(function(f, idx) {
+      var thumb = document.createElement('div');
+      thumb.className = 'doc-media-thumb';
+      var img = document.createElement('img');
+      img.src = URL.createObjectURL(f);
+      img.alt = f.name;
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'doc-media-thumb__remove';
+      btn.title = 'Eliminar';
+      btn.textContent = '×';
+      btn.addEventListener('click', function() {
+        fotoFiles.splice(idx, 1);
+        syncFotoInput();
+        renderFotoPreviews();
+        refreshFotoCount();
+      });
+      thumb.appendChild(img);
+      thumb.appendChild(btn);
+      fotosPreview.appendChild(thumb);
+    });
+    refreshFotoCount();
+  }
+
+  function syncFotoInput() {
+    var dt = new DataTransfer();
+    fotoFiles.forEach(function(f) { dt.items.add(f); });
+    fotoInput.files = dt.files;
+  }
+
+  fotoInput.addEventListener('change', function() {
+    var remaining = MAX_FOTOS - fotoFiles.length;
+    if (remaining <= 0) return;
+    Array.from(fotoInput.files).slice(0, remaining).forEach(function(f) {
+      if (f.type.startsWith('image/')) fotoFiles.push(f);
+    });
+    syncFotoInput();
+    renderFotoPreviews();
+  });
+
+  function renderVideoPreview() {
+    videoPreview.innerHTML = '';
+    if (!videoFile) return;
+    var thumb = document.createElement('div');
+    thumb.className = 'doc-media-thumb doc-media-thumb--video';
+    var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('width', '20'); icon.setAttribute('height', '20');
+    icon.setAttribute('viewBox', '0 0 24 24'); icon.setAttribute('fill', 'none');
+    icon.setAttribute('stroke', 'currentColor'); icon.setAttribute('stroke-width', '1.5');
+    icon.innerHTML = '<polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>';
+    var name = document.createElement('span');
+    name.textContent = videoFile.name.length > 12 ? videoFile.name.substring(0, 12) + '…' : videoFile.name;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'doc-media-thumb__remove';
+    btn.title = 'Eliminar';
+    btn.textContent = '×';
+    btn.addEventListener('click', function() {
+      videoFile = null;
+      videoInput.value = '';
+      renderVideoPreview();
+    });
+    thumb.appendChild(icon);
+    thumb.appendChild(name);
+    thumb.appendChild(btn);
+    videoPreview.appendChild(thumb);
+  }
+
+  videoInput.addEventListener('change', function() {
+    if (videoInput.files.length) {
+      videoFile = videoInput.files[0];
+    }
+    renderVideoPreview();
+  });
+})();
+</script>
+
+<script>
+// ── Inspección de Ingreso ──────────────────────────────────────
+(function() {
+  var seccion = document.getElementById('seccion-inspeccion');
+  if (!seccion) return;
+
+  // Mostrar la sección sólo cuando hay vehículo seleccionado
+  var vehiculoSel = document.getElementById('id_vehiculo');
+  function checkVehiculo() {
+    if (!vehiculoSel) return;
+    seccion.style.display = vehiculoSel.value ? '' : 'none';
+    if (!vehiculoSel.value) {
+      var chk = document.getElementById('chk-inspeccion');
+      if (chk && chk.checked) { chk.checked = false; activarInspeccion(false); }
+    }
+  }
+  if (vehiculoSel) { vehiculoSel.addEventListener('change', checkVehiculo); checkVehiculo(); }
+
+  var inspDanoCont = 0;
+  var inspFotos = [];
+
+  window.toggleInspeccion = function() {
+    var body = document.getElementById('inspeccion-body');
+    var chev = document.getElementById('inspeccion-chevron');
+    var open = body.style.display !== 'none';
+    body.style.display = open ? 'none' : '';
+    chev.style.transform = open ? '' : 'rotate(180deg)';
+  };
+
+  window.activarInspeccion = function(on) {
+    document.getElementById('id_inspeccion_activa').value = on ? '1' : '0';
+    document.getElementById('inspeccion-campos').style.display = on ? '' : 'none';
+  };
+
+  window.setFuel = function(val) {
+    document.getElementById('id_insp_combustible').value = val;
+    document.querySelectorAll('.insp-fuel-btn').forEach(function(btn) {
+      var sel = btn.dataset.fuel === val;
+      btn.style.background = sel ? '#0e7490' : '#1e293b';
+      btn.style.color = sel ? '#fff' : '#64748b';
+      btn.style.borderColor = sel ? '#06b6d4' : '#334155';
+    });
+  };
+
+  // ===== INSPECTOR DE DAÑOS EMBEBIDO (prefijo di) =====
+  (function() {
+    var DI_TIPOS = ['none','rayon','golpe','rotura','faltante','mancha'];
+    var DI_LABEL = { none:'—', rayon:'Rayón', golpe:'Golpe', rotura:'Roto', faltante:'Falta pieza', mancha:'Sucio' };
+    var DI_COLOR = { none:'transparent', rayon:'#f59e0b', golpe:'#f97316', rotura:'#ef4444', faltante:'#a855f7', mancha:'#6b7280' };
+    var DI_DATA = {};
+    var diLatSide = 'izq';
+    var diView = 'f';
+    var DI_FRONTAL = { 'Parabrisas':'vidrio_del','Capot':'capo','Faro izquierdo':'faro_di','Faro derecho':'faro_dd','Parrilla':'parrilla','Guardabarro izq.':'guardabarro_di','Guardabarro der.':'guardabarro_dd','Espejo izq.':'espejo_i','Espejo der.':'espejo_d','Parachoque del.':'parachoque_del' };
+    var DI_TRASERA = { 'Luneta':'vidrio_tra','Maletero':'maletero','Faro tras. izq.':'faro_ti','Faro tras. der.':'faro_td','Guard. tras. izq.':'guardabarro_ti','Guard. tras. der.':'guardabarro_td','Parachoque tras.':'parachoque_tra' };
+    var DI_LAT = { 'Techo / Ventanas lat.':{izq:'techo',der:'techo'},'Capó / Frente lat.':{izq:'capo',der:'capo'},'Fender delantero lat.':{izq:'guardabarro_di',der:'guardabarro_dd'},'Puerta delantera':{izq:'puerta_di',der:'puerta_dd'},'Puerta trasera lat.':{izq:'puerta_ti',der:'puerta_td'},'Fender trasero lat.':{izq:'guardabarro_ti',der:'guardabarro_td'},'Baúl / Zona tras. lat.':{izq:'maletero',der:'maletero'},'Llanta delantera lat.':{izq:'llanta_di',der:'llanta_dd'},'Llanta trasera lat.':{izq:'llanta_ti',der:'llanta_td'},'Espejo lateral':{izq:'espejo_i',der:'espejo_d'} };
+    var DI_INT = { 'Espejo retrovisor':{zona:'interior',d:'Espejo retrovisor'},'Tablero':{zona:'interior',d:'Tablero'},'Radio / pantalla':{zona:'interior',d:'Radio/pantalla'},'Climatizador':{zona:'interior',d:'Climatizador'},'Volante':{zona:'interior',d:'Volante'},'Consola central':{zona:'interior',d:'Consola central'},'Asiento conductor':{zona:'interior',d:'Asiento conductor'},'Asiento pasajero':{zona:'interior',d:'Asiento pasajero'},'Asiento trasero':{zona:'interior',d:'Asiento trasero'},'Panel puerta izq.':{zona:'puerta_di',d:'Panel interior'},'Panel puerta der.':{zona:'puerta_dd',d:'Panel interior'} };
+    var DI_ZLABELS = { 'vidrio_del':'Parabrisas','vidrio_tra':'Luneta trasera','capo':'Capó','faro_di':'Faro del. izq.','faro_dd':'Faro del. der.','faro_ti':'Faro tras. izq.','faro_td':'Faro tras. der.','parrilla':'Parrilla','guardabarro_di':'Guard. del. izq.','guardabarro_dd':'Guard. del. der.','guardabarro_ti':'Guard. tras. izq.','guardabarro_td':'Guard. tras. der.','espejo_i':'Espejo izq.','espejo_d':'Espejo der.','parachoque_del':'Parachoque del.','parachoque_tra':'Parachoque tras.','techo':'Techo','maletero':'Maletero','puerta_di':'Puerta del. izq.','puerta_dd':'Puerta del. der.','puerta_ti':'Puerta tras. izq.','puerta_td':'Puerta tras. der.','llanta_di':'Llanta del. izq.','llanta_dd':'Llanta del. der.','llanta_ti':'Llanta tras. izq.','llanta_td':'Llanta tras. der.','interior':'Interior' };
+
+    function diLbl(k) { return k.indexOf('::')!==-1?'Interior – '+k.split('::')[1]:(DI_ZLABELS[k]||k); }
+    function diEH(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+    function diEJ(s) { return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+
+    function diVis(el, tipo) {
+      var c=DI_COLOR[tipo]||'transparent';
+      if(tipo==='none'){el.setAttribute('fill','transparent');el.setAttribute('stroke','none');el.setAttribute('stroke-width','0');}
+      else{el.setAttribute('fill',c+'33');el.setAttribute('stroke',c);el.setAttribute('stroke-width','2.5');}
+    }
+
+    function diCycle(zk, def) {
+      var cur=DI_DATA[zk]?DI_DATA[zk].tipo:'none';
+      var nxt=DI_TIPOS[(DI_TIPOS.indexOf(cur)+1)%DI_TIPOS.length];
+      if(nxt==='none'){delete DI_DATA[zk];}
+      else if(!DI_DATA[zk]){DI_DATA[zk]={tipo:nxt,desc:def||''};}
+      else{DI_DATA[zk].tipo=nxt;}
+      diRender();diUpdateBadge();diAllVis();
+    }
+
+    window.diCy = function(el) {
+      var p=el.getAttribute('data-p'),zk,def='';
+      if(diView==='f'){zk=DI_FRONTAL[p];}
+      else if(diView==='t'){zk=DI_TRASERA[p];}
+      else if(diView==='i'){var im=DI_INT[p];if(im){zk=im.zona+'::'+im.d;def=im.d;}}
+      if(zk) diCycle(zk,def);
+    };
+    window.diCyLat = function(el) {
+      var p=el.getAttribute('data-p'),e=DI_LAT[p];
+      if(e) diCycle(e[diLatSide],'');
+    };
+
+    function diRefLat() {
+      document.querySelectorAll('.di-lat').forEach(function(el){
+        var e=DI_LAT[el.getAttribute('data-p')],zk=e?e[diLatSide]:null;
+        diVis(el,zk&&DI_DATA[zk]?DI_DATA[zk].tipo:'none');
+      });
+    }
+    function diAllVis() {
+      document.querySelectorAll('#di-pf .di-zone').forEach(function(el){var zk=DI_FRONTAL[el.getAttribute('data-p')];diVis(el,zk&&DI_DATA[zk]?DI_DATA[zk].tipo:'none');});
+      document.querySelectorAll('#di-pt .di-zone').forEach(function(el){var zk=DI_TRASERA[el.getAttribute('data-p')];diVis(el,zk&&DI_DATA[zk]?DI_DATA[zk].tipo:'none');});
+      diRefLat();
+      document.querySelectorAll('#di-pi .di-zone').forEach(function(el){var im=DI_INT[el.getAttribute('data-p')];if(!im)return;var zk=im.zona+'::'+im.d;diVis(el,DI_DATA[zk]?DI_DATA[zk].tipo:'none');});
+    }
+    function diUpdateBadge() {
+      var n=Object.keys(DI_DATA).length,b=document.getElementById('di-badge');
+      if(b)b.textContent=n+' marcado'+(n!==1?'s':'');
+    }
+    function diRender() {
+      var cont=document.getElementById('di-list');if(!cont)return;
+      var keys=Object.keys(DI_DATA);
+      if(!keys.length){cont.innerHTML='<p style="font-size:12px;color:#475569;text-align:center;padding:8px 0;margin:0">Toca una zona del vehículo para registrar daño.</p>';return;}
+      cont.innerHTML='<div style="border-top:1px solid rgba(6,182,212,.1)">'+keys.map(function(k){
+        var d=DI_DATA[k],c=DI_COLOR[d.tipo];
+        return '<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(6,182,212,.07)">'+
+          '<span style="width:9px;height:9px;border-radius:50%;background:'+c+';flex-shrink:0"></span>'+
+          '<span style="font-size:12px;color:#94a3b8;flex-shrink:0;width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+diEH(diLbl(k))+'</span>'+
+          '<span style="font-size:12px;font-weight:700;color:'+c+';flex-shrink:0;width:70px">'+DI_LABEL[d.tipo]+'</span>'+
+          '<input type="text" style="flex:1;min-width:0;background:#1e293b;border:1px solid #334155;border-radius:4px;padding:3px 6px;font-size:12px;color:#f1f5f9" placeholder="Descripción…" value="'+diEH(d.desc)+'" oninput="window._diData[\''+diEJ(k)+'\'].desc=this.value">'+
+          '<button type="button" onclick="window._diRemove(\''+diEJ(k)+'\')" style="color:#475569;font-size:14px;background:none;border:none;cursor:pointer;flex-shrink:0">×</button>'+
+          '</div>';
+      }).join('')+'</div>';
+    }
+    window._diData = DI_DATA;
+    window._diRemove = function(k){delete DI_DATA[k];diUpdateBadge();diRender();diAllVis();};
+
+    window.diSwitchView = function(v) {
+      diView=v;
+      document.querySelectorAll('.di-tab').forEach(function(t){t.classList.toggle('di-on',t.getAttribute('data-view')===v);});
+      document.querySelectorAll('#di-pf,#di-pt,#di-pl,#di-pi').forEach(function(p){p.style.display='none';});
+      var panels={f:'di-pf',t:'di-pt',li:'di-pl',ld:'di-pl',i:'di-pi'};
+      var panel=document.getElementById(panels[v]);if(panel)panel.style.display='block';
+      if(v==='li'||v==='ld'){
+        diLatSide=v==='li'?'izq':'der';
+        var lbl=document.getElementById('di-lat-label');
+        if(lbl)lbl.textContent='◈ LADO '+(diLatSide==='izq'?'IZQUIERDO':'DERECHO');
+        diRefLat();
+      }
+    };
+
+    // Inject insp_zona_N / insp_tipo_dano_N / insp_descripcion_N before submit
+    var theForm = document.querySelector('form[data-doc-form]') || document.querySelector('form[method="post"]');
+    if (theForm) {
+      theForm.addEventListener('submit', function() {
+        document.querySelectorAll('.di-h').forEach(function(e){e.remove();});
+        if(document.getElementById('id_inspeccion_activa')?.value !== '1') return;
+        var i=0;
+        Object.keys(DI_DATA).forEach(function(k){
+          var d=DI_DATA[k],zona,desc;
+          if(k.indexOf('::')!==-1){zona='interior';desc=d.desc||k.split('::')[1];}
+          else{zona=k;desc=d.desc||'';}
+          [['insp_zona_'+i,zona],['insp_tipo_dano_'+i,d.tipo],['insp_descripcion_'+i,desc]].forEach(function(pair){
+            var inp=document.createElement('input');inp.type='hidden';inp.name=pair[0];inp.value=pair[1];inp.className='di-h';theForm.appendChild(inp);
+          });
+          i++;
+        });
+      }, true);
+    }
+
+    // Inject tab CSS once
+    var s=document.createElement('style');
+    s.textContent='.di-tab{color:rgba(100,160,200,.5);border-bottom:2px solid transparent;background:transparent;border-left:none;border-right:none;border-top:none;cursor:pointer;transition:color .15s,border-color .15s}.di-tab.di-on{color:#06b6d4;border-bottom-color:#06b6d4}.di-zone{cursor:pointer;transition:fill .15s,stroke .15s}';
+    document.head.appendChild(s);
+
+    // ── WhatsApp + Email (acceso a DI_DATA/DI_ZLABELS en este scope) ──
+    (function() {
+      var PAIS = "{{ empresa.pais|default:'CL'|escapejs }}";
+      var EMPRESA_NOMBRE = "{{ empresa.nombre_taller|escapejs }}";
+      var DIAL = {'CL':'56','US':'1','MX':'52','AR':'54','UY':'598','BR':'55','PE':'51','VE':'58'};
+      var URL_ENVIAR_PREVIO = "{% country_url 'documentos:enviar_reporte_previo' %}";
+      var CSRF = (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
+
+      function normalizeTel(raw) {
+        raw = (raw || '').replace(/[^\d]/g, '');
+        if (!raw) return '';
+        var code = DIAL[PAIS] || '56';
+        if (raw.startsWith(code)) return raw;
+        return code + raw.replace(/^0+/, '');
+      }
+
+      function getCurrentTel() {
+        var telEl = document.getElementById('cliente-telefono');
+        return normalizeTel((telEl ? telEl.textContent.replace(/^Tel:\s*/, '') : '').trim());
+      }
+
+      function buildWaMsg() {
+        var vehiculoEl = document.getElementById('vehiculo-nombre');
+        var vehiculo = vehiculoEl ? vehiculoEl.textContent.trim() : 'vehículo';
+        var now = new Date();
+        var fecha = now.toLocaleDateString('es-CL') + ' ' + now.toLocaleTimeString('es-CL', {hour:'2-digit',minute:'2-digit'});
+        var selComb = document.getElementById('id_insp_combustible');
+        var comb = selComb ? (selComb.options[selComb.selectedIndex] || {}).text || '' : '';
+        var kmEl = document.querySelector('[name="kilometraje_ingreso"]');
+        var km = kmEl ? kmEl.value : '';
+
+        var msg = '*Inspección de Ingreso – ' + EMPRESA_NOMBRE + '*\n';
+        msg += 'Vehículo: ' + vehiculo + '\n';
+        msg += 'Fecha: ' + fecha + '\n';
+        if (km) msg += 'Kilometraje: ' + parseInt(km).toLocaleString('es-CL') + ' km\n';
+        if (comb) msg += 'Combustible: ' + comb + '\n';
+        msg += '\nDaños preexistentes:\n';
+
+        var keys = Object.keys(DI_DATA);
+        if (keys.length === 0) {
+          msg += '  Sin daños registrados\n';
+        } else {
+          keys.forEach(function(k) {
+            var d = DI_DATA[k];
+            var zonaKey = k.indexOf('::') !== -1 ? k.split('::')[1] : k;
+            msg += '  • ' + (DI_ZLABELS[zonaKey] || zonaKey) + ' → ' + (DI_LABEL[d.tipo] || d.tipo);
+            if (d.desc) msg += ': ' + d.desc;
+            msg += '\n';
+          });
+        }
+        var obsEl = document.querySelector('[name="insp_observaciones"]');
+        var obs = obsEl ? obsEl.value : '';
+        if (obs) msg += '\nObservaciones:\n' + obs + '\n';
+        msg += '\nEste reporte fue generado al momento de la recepción del vehículo.';
+        return msg;
+      }
+
+      // WhatsApp
+      var btnWa = document.getElementById('di-btn-wa');
+      var noTel = document.getElementById('di-wa-notel');
+      if (btnWa) {
+        btnWa.addEventListener('click', function() {
+          var tel = getCurrentTel();
+          if (!tel) return;
+          window.open('https://wa.me/' + tel + '?text=' + encodeURIComponent(buildWaMsg()), '_blank', 'noopener,noreferrer');
+        });
+      }
+
+      // Email
+      var btnEmail = document.getElementById('di-btn-email');
+      if (btnEmail) {
+        btnEmail.addEventListener('click', function() {
+          var emailEl = document.getElementById('di-insp-email');
+          var statusEl = document.getElementById('di-email-status');
+          var email = (emailEl ? emailEl.value : '').trim();
+          if (!email) { if (emailEl) emailEl.focus(); return; }
+
+          var vehiculoEl = document.getElementById('vehiculo-nombre');
+          var vehiculo = vehiculoEl ? vehiculoEl.textContent.trim() : '';
+          var selComb = document.getElementById('id_insp_combustible');
+          var comb = selComb ? (selComb.options[selComb.selectedIndex] || {}).text || '' : '';
+          var kmEl = document.querySelector('[name="kilometraje_ingreso"]');
+          var km = kmEl ? kmEl.value : '';
+
+          var danos = Object.keys(DI_DATA).map(function(k) {
+            var d = DI_DATA[k];
+            var zonaKey = k.indexOf('::') !== -1 ? k.split('::')[1] : k;
+            return {zona: DI_ZLABELS[zonaKey] || zonaKey, tipo: DI_LABEL[d.tipo] || d.tipo, desc: d.desc || ''};
+          });
+
+          var body = 'csrfmiddlewaretoken=' + encodeURIComponent(CSRF) +
+            '&email=' + encodeURIComponent(email) +
+            '&vehiculo=' + encodeURIComponent(vehiculo) +
+            '&km=' + encodeURIComponent(km) +
+            '&combustible=' + encodeURIComponent(comb) +
+            '&danos=' + encodeURIComponent(JSON.stringify(danos));
+
+          this.disabled = true;
+          this.textContent = 'Enviando…';
+          if (statusEl) { statusEl.style.display = 'none'; statusEl.textContent = ''; }
+
+          var self = this;
+          fetch(URL_ENVIAR_PREVIO, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': CSRF},
+            body: body
+          })
+          .then(function(r) { return r.json(); })
+          .then(function(r) {
+            if (statusEl) {
+              statusEl.style.display = '';
+              statusEl.style.color = r.ok ? '#4ade80' : '#f87171';
+              statusEl.textContent = r.ok ? '✓ Correo enviado a ' + email : '✗ ' + (r.error || 'Error desconocido');
+            }
+          })
+          .catch(function() {
+            if (statusEl) { statusEl.style.display = ''; statusEl.style.color = '#f87171'; statusEl.textContent = '✗ Error de red'; }
+          })
+          .finally(function() { self.disabled = false; self.textContent = '✉ Enviar ahora'; });
+        });
+      }
+
+      // Pre-fill email y visibilidad WA al cambiar cliente
+      function syncClienteInfo() {
+        var tel = getCurrentTel();
+        if (btnWa) btnWa.style.display = tel ? '' : 'none';
+        if (noTel) noTel.style.display = tel ? 'none' : '';
+        var emailEl = document.getElementById('di-insp-email');
+        if (emailEl && !emailEl.value) {
+          var clienteEmailEl = document.getElementById('cliente-email');
+          var rawEmail = clienteEmailEl ? clienteEmailEl.textContent.replace(/^Email:\s*/, '').trim() : '';
+          if (rawEmail) emailEl.value = rawEmail;
+        }
+      }
+
+      var mut = new MutationObserver(syncClienteInfo);
+      ['cliente-telefono', 'cliente-email'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) mut.observe(el, {childList:true, subtree:true, characterData:true});
+      });
+      syncClienteInfo();
+    }());
+  })();
+
+  window.inspeccionPreviews = function(input) {
+    var cont = document.getElementById('insp-fotos-preview');
+    cont.innerHTML = '';
+    var files = Array.from(input.files).slice(0, 6);
+    files.forEach(function(f) {
+      var div = document.createElement('div');
+      div.style.cssText = 'position:relative;border-radius:6px;overflow:hidden;background:#1e293b;aspect-ratio:1';
+      var img = document.createElement('img');
+      img.src = URL.createObjectURL(f);
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover';
+      div.appendChild(img);
+      cont.appendChild(div);
+    });
+  };
+
+})();
+</script>
+{% endblock extra_js %}

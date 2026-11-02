@@ -1,0 +1,596 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load custom_filters %}
+{% load i18n %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-8 px-4 md:px-8">
+
+  <!-- Encabezado -->
+  <div class="mb-8">
+    <div class="flex items-center gap-3 mb-1">
+      <div class="w-1 h-8 bg-cyan-500 rounded-full"></div>
+      <h1 class="text-2xl font-bold text-cyan-200" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;">
+        Análisis de Servicios
+      </h1>
+    </div>
+    <p class="text-gray-400 text-sm ml-4 pl-4 border-l border-gray-700">Inteligencia de servicios y facturación</p>
+  </div>
+
+  <!-- Botones de navegación -->
+  <div class="flex flex-wrap gap-2 mb-8">
+    <button class="enfoque-btn active" data-enfoque="facturacion_total">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" /></svg>
+      Facturación Total
+    </button>
+    <button class="enfoque-btn" data-enfoque="ventas">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+      Top Servicios
+    </button>
+    <button class="enfoque-btn" data-enfoque="facturacion">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+      Mayor Facturación
+    </button>
+    <button class="enfoque-btn" data-enfoque="historico">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" /></svg>
+      Histórico Mensual
+    </button>
+    <button class="enfoque-btn" data-enfoque="nunca">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+      Nunca Vendidos
+    </button>
+    <button class="enfoque-btn" data-enfoque="vehiculos">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l1 1h12l1-1z" /></svg>
+      Vehículos Atendidos
+    </button>
+    <button class="enfoque-btn" data-enfoque="clientes">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0" /></svg>
+      Análisis de Clientes
+    </button>
+    <button class="enfoque-btn" data-enfoque="agenda">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+      Agenda y Turnos
+    </button>
+    <button class="enfoque-btn" data-enfoque="periodo">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" /></svg>
+      Servicios por Período
+    </button>
+  </div>
+
+  <!-- Panel: Facturación Total -->
+  <div id="panel-facturacion_total" class="enfoque-panel">
+    <div class="panel-card">
+      <h2 class="panel-title">Análisis de Facturación Total</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div class="resumen-card border-l-4 border-cyan-600/60">
+          <p class="resumen-label">Ingresos Totales</p>
+          <p class="resumen-value text-cyan-300">${{ facturacion_total|floatformat:0|intcomma }}</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">Facturación por Período</h3>
+          <ul class="divide-y divide-gray-700/50">
+            {% for f in facturacion_periodo %}
+            <li class="py-2 flex justify-between text-sm">
+              <span class="text-gray-400">{{ f.mes }}</span>
+              <span class="text-green-300 font-semibold">${{ f.total|floatformat:0|intcomma }}</span>
+            </li>
+            {% empty %}
+            <li class="py-4 text-center text-gray-500 text-sm">No hay datos disponibles.</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">Facturación por Servicio</h3>
+          <ul class="divide-y divide-gray-700/50">
+            {% for f in facturacion_servicio %}
+            <li class="py-2 flex justify-between text-sm">
+              <span class="text-gray-400 truncate mr-2">{{ f.nombre|truncatechars:22 }}</span>
+              <span class="text-green-300 font-semibold whitespace-nowrap">${{ f.total|floatformat:0|intcomma }}</span>
+            </li>
+            {% empty %}
+            <li class="py-4 text-center text-gray-500 text-sm">No hay datos disponibles.</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">Facturación por Cliente</h3>
+          <ul class="divide-y divide-gray-700/50">
+            {% for f in facturacion_cliente %}
+            <li class="py-2 flex justify-between text-sm">
+              <span class="text-gray-400 truncate mr-2">{{ f.cliente|truncatechars:22 }}</span>
+              <span class="text-green-300 font-semibold whitespace-nowrap">${{ f.total|floatformat:0|intcomma }}</span>
+            </li>
+            {% empty %}
+            <li class="py-4 text-center text-gray-500 text-sm">No hay datos disponibles.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel: Top Servicios -->
+  <div id="panel-ventas" class="enfoque-panel" style="display:none;">
+    <div class="panel-card">
+      <h2 class="panel-title">Top 10 Servicios Más Solicitados</h2>
+      <div class="overflow-x-auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Servicio</th>
+              <th class="text-center">Veces Realizado</th>
+              <th class="text-right">Total Facturado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in top_servicios %}
+            <tr>
+              <td>{{ s.nombre }}</td>
+              <td class="text-center font-semibold text-white">{{ s.cantidad }}</td>
+              <td class="text-right text-green-300 font-semibold">${{ s.total|floatformat:0|intcomma }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center text-gray-500 py-6">No hay datos disponibles.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel: Mayor Facturación -->
+  <div id="panel-facturacion" class="enfoque-panel" style="display:none;">
+    <div class="panel-card">
+      <h2 class="panel-title">Servicios con Mayor Facturación</h2>
+      <div class="overflow-x-auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Servicio</th>
+              <th class="text-right">Total Facturado</th>
+              <th class="text-center">Veces Realizado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in top_facturacion %}
+            <tr>
+              <td>{{ s.nombre }}</td>
+              <td class="text-right text-green-300 font-semibold">${{ s.total|floatformat:0|intcomma }}</td>
+              <td class="text-center text-gray-300">{{ s.cantidad }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center text-gray-500 py-6">No hay datos disponibles.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel: Histórico Mensual -->
+  <div id="panel-historico" class="enfoque-panel" style="display:none;">
+    <div class="panel-card">
+      <h2 class="panel-title">Histórico de Servicios Mensuales</h2>
+      <div style="position: relative; height: 380px;" class="mt-4">
+        <canvas id="serviciosMensualesChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel: Nunca Vendidos -->
+  <div id="panel-nunca" class="enfoque-panel" style="display:none;">
+    <div class="panel-card">
+      <h2 class="panel-title">Servicios Nunca Realizados</h2>
+      <ul class="mt-4 divide-y divide-gray-700/50">
+        {% for s in nunca_vendidos %}
+          <li class="py-2 text-sm text-gray-300">{{ s.nombre }}</li>
+        {% empty %}
+          <li class="py-6 text-center text-gray-500">Todos los servicios han sido realizados al menos una vez.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Panel: Vehículos Atendidos -->
+  <div id="panel-vehiculos" class="enfoque-panel" style="display:none;">
+    <div class="panel-card">
+      <h2 class="panel-title">Ranking de Vehículos Atendidos</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">Modelos más frecuentes</h3>
+          <ul class="divide-y divide-gray-700/50">
+            {% for m in ranking_modelos %}
+            <li class="py-2 flex justify-between text-sm">
+              <span class="text-gray-300">{{ m.modelo }}</span>
+              <span class="inline-block bg-cyan-900/40 text-cyan-300 border border-cyan-700/40 rounded px-2 py-0.5 text-xs font-semibold">{{ m.cantidad }}</span>
+            </li>
+            {% empty %}
+            <li class="py-4 text-center text-gray-500 text-sm">No hay datos.</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">Marcas más frecuentes</h3>
+          <ul class="divide-y divide-gray-700/50">
+            {% for m in ranking_marcas %}
+            <li class="py-2 flex justify-between text-sm">
+              <span class="text-gray-300">{{ m.marca }}</span>
+              <span class="inline-block bg-cyan-900/40 text-cyan-300 border border-cyan-700/40 rounded px-2 py-0.5 text-xs font-semibold">{{ m.cantidad }}</span>
+            </li>
+            {% empty %}
+            <li class="py-4 text-center text-gray-500 text-sm">No hay datos.</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">Años más frecuentes</h3>
+          <ul class="divide-y divide-gray-700/50">
+            {% for a in ranking_anios %}
+            <li class="py-2 flex justify-between text-sm">
+              <span class="text-gray-300">{{ a.anio }}</span>
+              <span class="inline-block bg-cyan-900/40 text-cyan-300 border border-cyan-700/40 rounded px-2 py-0.5 text-xs font-semibold">{{ a.cantidad }}</span>
+            </li>
+            {% empty %}
+            <li class="py-4 text-center text-gray-500 text-sm">No hay datos.</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">Clientes frecuentes</h3>
+          <ul class="divide-y divide-gray-700/50">
+            {% for c in ranking_clientes %}
+            <li class="py-2 flex justify-between text-sm">
+              <span class="text-gray-300">{{ c.cliente }}</span>
+              <span class="inline-block bg-cyan-900/40 text-cyan-300 border border-cyan-700/40 rounded px-2 py-0.5 text-xs font-semibold">{{ c.cantidad }}</span>
+            </li>
+            {% empty %}
+            <li class="py-4 text-center text-gray-500 text-sm">No hay datos.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel: Análisis de Clientes -->
+  <div id="panel-clientes" class="enfoque-panel" style="display:none;">
+    <div class="panel-card">
+      <h2 class="panel-title">Análisis de Clientes</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">Clientes más activos</h3>
+          <ul class="divide-y divide-gray-700/50">
+            {% for c in clientes_activos %}
+            <li class="py-2 flex justify-between text-sm">
+              <span class="text-gray-300">{{ c.nombre }}</span>
+              <span class="inline-block bg-green-900/40 text-green-300 border border-green-700/40 rounded px-2 py-0.5 text-xs font-semibold">{{ c.cantidad }}</span>
+            </li>
+            {% empty %}
+            <li class="py-4 text-center text-gray-500 text-sm">No hay datos.</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">Clientes nuevos (últimos 3 meses)</h3>
+          <ul class="divide-y divide-gray-700/50">
+            {% for c in clientes_nuevos %}
+            <li class="py-2 flex justify-between text-sm">
+              <span class="text-gray-300">{{ c.nombre }}</span>
+              <span class="text-cyan-400 text-xs">{{ c.fecha_primer_servicio|date:'d/m/Y' }}</span>
+            </li>
+            {% empty %}
+            <li class="py-4 text-center text-gray-500 text-sm">No hay datos.</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">Clientes históricos</h3>
+          <ul class="divide-y divide-gray-700/50">
+            {% for c in clientes_historicos %}
+            <li class="py-2 flex justify-between text-sm">
+              <span class="text-gray-300">{{ c.nombre }}</span>
+              <span class="inline-block bg-green-900/40 text-green-300 border border-green-700/40 rounded px-2 py-0.5 text-xs font-semibold">{{ c.cantidad }}</span>
+            </li>
+            {% empty %}
+            <li class="py-4 text-center text-gray-500 text-sm">No hay datos.</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-300 mb-3 uppercase tracking-wider">Con mayor recurrencia</h3>
+          <ul class="divide-y divide-gray-700/50">
+            {% for c in clientes_recurrentes %}
+            <li class="py-2 flex justify-between text-sm">
+              <span class="text-gray-300">{{ c.nombre }}</span>
+              <span class="inline-block bg-green-900/40 text-green-300 border border-green-700/40 rounded px-2 py-0.5 text-xs font-semibold">{{ c.cantidad }}</span>
+            </li>
+            {% empty %}
+            <li class="py-4 text-center text-gray-500 text-sm">No hay datos.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel: Agenda y Turnos -->
+  <div id="panel-agenda" class="enfoque-panel" style="display:none;">
+    <div class="panel-card">
+      <h2 class="panel-title">Agenda y Próximos Turnos</h2>
+      <div class="overflow-x-auto mt-4">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Cliente</th>
+              <th>Vehículo</th>
+              <th>Tipo de Documento</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in turnos_proximos %}
+            <tr>
+              <td class="text-cyan-300 font-mono text-sm">{{ t.fecha|date:'d/m/Y' }}</td>
+              <td>{{ t.cliente }}</td>
+              <td>{{ t.vehiculo }}</td>
+              <td>{{ t.tipo_documento }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-gray-500 py-6">No hay turnos agendados.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="text-xs text-gray-600 mt-3 text-center">Solo se muestran los próximos 20 turnos agendados.</p>
+    </div>
+  </div>
+
+  <!-- Panel: Servicios por Período -->
+  <div id="panel-periodo" class="enfoque-panel" style="display:none;">
+    <div class="panel-card">
+      <h2 class="panel-title">Servicios por Período</h2>
+      <form method="get" class="flex flex-wrap gap-4 mb-6 items-end">
+        <div>
+          <label for="fecha_desde" class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Fecha desde</label>
+          <input type="date" id="fecha_desde" name="fecha_desde"
+                 value="{{ fecha_desde|date:'Y-m-d' }}"
+                 class="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-cyan-600">
+        </div>
+        <div>
+          <label for="fecha_hasta" class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Fecha hasta</label>
+          <input type="date" id="fecha_hasta" name="fecha_hasta"
+                 value="{{ fecha_hasta|date:'Y-m-d' }}"
+                 class="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-cyan-600">
+        </div>
+        <div>
+          <button type="submit" class="enfoque-btn active">Filtrar</button>
+        </div>
+      </form>
+
+      <div class="resumen-card border-l-4 border-green-600/60 mb-6 inline-block">
+        <p class="resumen-label">Total generado en el período</p>
+        <p class="resumen-value text-green-300">${{ total_periodo_servicios|floatformat:0|intcomma }}</p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Documento</th>
+              <th>Fecha</th>
+              <th>Cliente</th>
+              <th>Técnico</th>
+              <th class="text-right">Total Servicios</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in documentos_periodo %}
+            <tr>
+              <td class="text-cyan-300 font-mono text-sm">{{ doc.numero|default:doc.id }}</td>
+              <td class="text-gray-400">{{ doc.fecha_emision|date:"d/m/Y" }}</td>
+              <td>
+                {% if doc.cliente %}{{ doc.cliente.nombre }} {{ doc.cliente.apellido }}
+                {% else %}<span class="text-gray-600">Sin cliente</span>{% endif %}
+              </td>
+              <td>
+                {% if doc.tecnico_responsable %}{{ doc.tecnico_responsable.nombre }}
+                {% else %}<span class="text-gray-600">—</span>{% endif %}
+              </td>
+              <td class="text-right text-green-300 font-semibold">${{ doc.total_servicios|floatformat:0|intcomma }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-gray-500 py-6">No se encontraron servicios en el período seleccionado.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+  .enfoque-btn {
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid #334155;
+    border-radius: 0.5rem;
+    padding: 0.45rem 1.1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .enfoque-btn:hover {
+    background: rgba(6, 182, 212, 0.08);
+    border-color: #0891b2;
+    color: #e2e8f0;
+  }
+  .enfoque-btn.active {
+    background: rgba(6, 182, 212, 0.15);
+    border-color: #06b6d4;
+    color: #67e8f9;
+    font-weight: 600;
+  }
+
+  .panel-card {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+  }
+  .panel-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(71, 85, 105, 0.4);
+  }
+
+  .data-table {
+    width: 100%;
+    font-size: 0.875rem;
+    border-collapse: collapse;
+  }
+  .data-table th {
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #64748b;
+    border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+  }
+  .data-table td {
+    padding: 0.6rem 0.75rem;
+    color: #cbd5e1;
+    border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+  }
+  .data-table tbody tr:hover td {
+    background: rgba(6, 182, 212, 0.04);
+  }
+  .data-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .resumen-card {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(71, 85, 105, 0.4);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+  }
+  .resumen-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 0.4rem;
+  }
+  .resumen-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    line-height: 1.2;
+  }
+</style>
+
+<script>
+  document.querySelectorAll('.enfoque-btn[data-enfoque]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.enfoque-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      document.querySelectorAll('.enfoque-panel').forEach(p => p.style.display = 'none');
+      const panel = document.getElementById('panel-' + this.dataset.enfoque);
+      if (panel) panel.style.display = '';
+      if (this.dataset.enfoque === 'historico') {
+        setTimeout(renderChart, 100);
+      }
+    });
+  });
+
+  function getEnfoqueFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('enfoque') || 'facturacion_total';
+  }
+  const enfoqueInicial = getEnfoqueFromURL();
+  const btnInicial = document.querySelector('.enfoque-btn[data-enfoque="' + enfoqueInicial + '"]');
+  if (btnInicial) btnInicial.click();
+
+  function renderChart() {
+    const historico = {{ historico_servicios|safe }};
+    const ctx = document.getElementById('serviciosMensualesChart').getContext('2d');
+    if (window.serviciosChart) window.serviciosChart.destroy();
+    window.serviciosChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: historico.labels,
+        datasets: [{
+          label: 'Facturación de Servicios',
+          data: historico.data,
+          borderColor: '#06b6d4',
+          backgroundColor: 'rgba(6, 182, 212, 0.08)',
+          borderWidth: 2,
+          pointBackgroundColor: '#06b6d4',
+          pointBorderColor: '#0f172a',
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          tension: 0.3,
+          fill: true,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            labels: { color: '#94a3b8', font: { size: 13 } }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            titleColor: '#94a3b8',
+            bodyColor: '#e2e8f0',
+            borderColor: '#334155',
+            borderWidth: 1,
+            cornerRadius: 6,
+            callbacks: {
+              label: function(context) {
+                return ' $' + context.parsed.y.toLocaleString();
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(51, 65, 85, 0.5)' },
+            ticks: { color: '#64748b', font: { size: 12 } },
+            border: { color: '#1e293b' }
+          },
+          y: {
+            grid: { color: 'rgba(51, 65, 85, 0.5)' },
+            beginAtZero: true,
+            ticks: {
+              color: '#64748b',
+              font: { size: 12 },
+              callback: function(value) { return '$' + value.toLocaleString(); }
+            },
+            border: { color: '#1e293b' }
+          }
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

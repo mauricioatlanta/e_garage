@@ -1,0 +1,28 @@
+﻿LIMPIEZA DE ARCHIVOS ESTATICOS - eGarage
+========================================
+Fecha: 10/06/2025 14:31:45
+Modo: DRY RUN
+
+ESTADISTICAS:
+- Archivos analizados: 151
+- Archivos borrados: 7
+- Archivos reorganizados: 144
+
+ARCHIVOS BORRADOS:
+- img\logo-glow.241d56d2.png (Duplicado por hash (mantener: egarage_intro\logo-glow.241d56d2.png))
+- img\TallerPro_logo.eda79c86.png (Duplicado por hash (mantener: images\egarage_default_logo.eda79c86.png))
+- js\particles.json (Duplicado por hash (mantener: js\fondo_interactivo.d41d8cd9.js))
+- videos\egarage_intro_6s.mp4 (Duplicado por hash (mantener: egarage_intro\egarage_intro_6s.mp4))
+- videos\fondo_futurista.mp4 (Duplicado por hash (mantener: js\fondo_interactivo.d41d8cd9.js))
+- videos\particles_background.webm (Duplicado por hash (mantener: egarage_intro\particles_background.webm))
+- js\vendor\jquery.min.c0338651.js (Duplicado por hash (mantener: vendor\jquery\dist\jquery.min.c0338651.js))
+
+ESTRUCTURA FINAL:
+- taller/common/css/ (archivos CSS compartidos)
+- taller/common/js/ (archivos JS compartidos)
+- taller/common/img/ (imagenes compartidas)
+- taller/common/fonts/ (fuentes compartidas)
+- taller/common/media/ (videos/audio compartidos)
+- taller/cl/ (archivos especificos de Chile)
+- taller/us/ (archivos especificos de USA)
+- vendor/ (librerias de terceros)

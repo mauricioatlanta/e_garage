@@ -1,0 +1,165 @@
+from django.http import Http404, HttpResponsePermanentRedirect
+from django.shortcuts import render
+from django.middleware.csrf import get_token
+
+from commerce.views.catalog import catalog_home
+from taller.country.engine import URL_SLUG_TO_VERTICAL, get_hub_landing_urls, get_landing_context
+from taller.country.hub import COUNTRY_HUB
+from taller.services.public_analytics import track_public_page
+from taller.models.public_page_view import PublicPageView
+from taller.services.public_attribution import attach_public_analytics_cookies
+from taller.services.country_localization import get_whatsapp_cta_context
+
+
+def landing_home(request):
+    if getattr(request, "is_custom_domain", False):
+        config = getattr(request.empresa, "config", None)
+        if config and config.rubro_principal == "RECYCLING":
+            company_settings = getattr(request.empresa.user, "company_settings", None)
+            logo_url = company_settings.logo.url if company_settings and company_settings.logo else None
+            return render(request, "taller/reciclaje/bienvenida_atlanta.html", {
+                "empresa": request.empresa,
+                "logo_url": logo_url,
+            })
+        return catalog_home(request)
+
+    track_public_page(
+        request,
+        page_type=PublicPageView.PAGE_HOME,
+    )
+    get_token(request)
+    whatsapp_cta = get_whatsapp_cta_context("cl")
+    whatsapp_cta["secondary_label"] = "Hablar con un asesor"
+    response = render(
+        request,
+        "public/gateway.html",
+        {"whatsapp_cta": whatsapp_cta},
+    )
+    return attach_public_analytics_cookies(request, response)
+
+
+_HUB_CANONICAL_PATH = {
+    "us_en": "/us/en/",
+    "us_es": "/us/es/",
+}
+
+_HUB_HREFLANG = {
+    "us_en": (("en-US", "/us/en/"), ("es-US", "/us/es/")),
+    "us_es": (("en-US", "/us/en/"), ("es-US", "/us/es/")),
+}
+
+
+def render_country_hub(request, country_key):
+    track_public_page(
+        request,
+        page_type=PublicPageView.PAGE_WELCOME,
+        country=country_key,
+        language=COUNTRY_HUB[country_key].get("language", ""),
+    )
+    ctx = dict(COUNTRY_HUB[country_key])
+    ctx["landing_urls"] = get_hub_landing_urls(country_key)
+    ctx["canonical_path"] = _HUB_CANONICAL_PATH.get(
+        country_key, f"/{COUNTRY_HUB[country_key]['country_code']}/"
+    )
+    ctx["hreflang_alternates"] = _HUB_HREFLANG.get(country_key, ())
+    ctx["whatsapp_cta"] = get_whatsapp_cta_context(country_key)
+    get_token(request)
+    response = render(request, "public/hub_country.html", ctx)
+    return attach_public_analytics_cookies(request, response)
+
+
+def hub_chile(request):
+    return render_country_hub(request, "cl")
+
+
+def hub_argentina(request):
+    return render_country_hub(request, "ar")
+
+
+def hub_peru(request):
+    return render_country_hub(request, "pe")
+
+
+def hub_mexico(request):
+    return render_country_hub(request, "mx")
+
+
+def hub_ecuador(request):
+    return render_country_hub(request, "ec")
+
+
+def hub_venezuela(request):
+    return render_country_hub(request, "ve")
+
+
+def hub_brasil(request):
+    return render_country_hub(request, "br")
+
+
+def hub_usa_en(request):
+    return render_country_hub(request, "us_en")
+
+
+def hub_usa_es(request):
+    return render_country_hub(request, "us_es")
+
+
+def landing_vertical(request, country_key: str, url_slug: str):
+    """
+    Unified country-aware landing view.
+    URL: /<country_key>/<url_slug>/   e.g. /cl/talleres/ or /ar/gomeria/
+    For US: /us/en/<slug>/ and /us/es/<slug>/ are routed here with country_key=us_en/us_es.
+    """
+    vertical_key = URL_SLUG_TO_VERTICAL.get(url_slug)
+    if not vertical_key or country_key not in COUNTRY_HUB:
+        raise Http404
+
+    track_public_page(
+        request,
+        page_type=PublicPageView.PAGE_LANDING,
+        country=country_key,
+        language=COUNTRY_HUB[country_key].get("language", ""),
+    )
+
+    ctx = get_landing_context(country_key, vertical_key)
+    ctx["whatsapp_cta"] = get_whatsapp_cta_context(country_key, vertical_key)
+    get_token(request)
+    if ctx.get("canonical_path") == "/cl/desarmadurias/" and vertical_key == "salvage":
+        # Kept for the dedicated scroll/trial funnel script on this route.
+        pass
+    response = render(request, "public/landing_vertical.html", ctx)
+    return attach_public_analytics_cookies(request, response)
+
+
+# ── Legacy country-agnostic routes — 301 to Chile equivalents ───────────────
+
+def landing_talleres(request):
+    return HttpResponsePermanentRedirect("/cl/talleres/")
+
+
+def landing_desarmadurias(request):
+    return HttpResponsePermanentRedirect("/cl/desarmadurias/")
+
+
+def landing_repuestos(request):
+    return HttpResponsePermanentRedirect("/cl/repuestos/")
+
+
+def landing_carwash(request):
+    return HttpResponsePermanentRedirect("/cl/lavado/")
+
+
+def landing_vulcanizacion(request):
+    return HttpResponsePermanentRedirect("/cl/vulcanizaciones/")
+
+
+def landing_workshop(request):
+    return HttpResponsePermanentRedirect("/cl/talleres/")
+
+
+def landing_salvage(request):
+    return HttpResponsePermanentRedirect("/cl/desarmadurias/")
+
+
+def landing_parts(request):
+    return HttpResponsePermanentRedirect("/cl/repuestos/")

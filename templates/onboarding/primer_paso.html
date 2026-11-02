@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eGarage — Primer paso</title>
+  <link rel="icon" type="image/png" href="{% static 'images/egarage_icon_192x192.png' %}">
+  <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Exo 2', 'Inter', sans-serif; }
+    .font-orbitron { font-family: 'Orbitron', monospace; }
+
+    {% if color == "lime" %}
+    .accent { color: #a3e635; }
+    .accent-bg { background-color: rgb(163 230 53 / 0.12); border-color: rgb(163 230 53 / 0.3); }
+    .cta-btn { background: #65a30d; color: #f0fdf4; }
+    .cta-btn:hover { background: #84cc16; }
+    .glow-h1 { text-shadow: 0 0 20px rgba(163, 230, 53, 0.6); }
+    .step-dot { background: rgb(163 230 53 / 0.15); border-color: rgb(163 230 53 / 0.4); color: #a3e635; }
+    {% elif color == "fuchsia" %}
+    .accent { color: #e879f9; }
+    .accent-bg { background-color: rgb(232 121 249 / 0.1); border-color: rgb(232 121 249 / 0.3); }
+    .cta-btn { background: #a21caf; color: #fdf4ff; }
+    .cta-btn:hover { background: #c026d3; }
+    .glow-h1 { text-shadow: 0 0 20px rgba(217, 70, 239, 0.6); }
+    .step-dot { background: rgb(232 121 249 / 0.12); border-color: rgb(232 121 249 / 0.35); color: #e879f9; }
+    {% else %}
+    .accent { color: #22d3ee; }
+    .accent-bg { background-color: rgb(34 211 238 / 0.1); border-color: rgb(34 211 238 / 0.3); }
+    .cta-btn { background: #0891b2; color: #ecfeff; }
+    .cta-btn:hover { background: #06b6d4; }
+    .glow-h1 { text-shadow: 0 0 20px rgba(0, 245, 255, 0.6); }
+    .step-dot { background: rgb(34 211 238 / 0.1); border-color: rgb(34 211 238 / 0.3); color: #22d3ee; }
+    {% endif %}
+
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeInUp 0.5s ease-out forwards; }
+    .fade-in-2 { animation: fadeInUp 0.5s ease-out 0.1s forwards; opacity: 0; }
+    .fade-in-3 { animation: fadeInUp 0.5s ease-out 0.2s forwards; opacity: 0; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col" style="background: linear-gradient(135deg, #060e1e 0%, #0f1e38 50%, #080e20 100%); color: #f8fafc;">
+
+  <!-- Nav mínima -->
+  <nav class="px-6 py-4 flex items-center justify-between border-b border-slate-800/60">
+    <a href="/" class="flex items-center gap-2">
+      <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage" class="h-7 w-auto">
+      <span class="font-orbitron text-slate-400 text-xs hidden sm:block">eGarage</span>
+    </a>
+    <a href="{{ dashboard_url }}" class="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+      Ir al Dashboard →
+    </a>
+  </nav>
+
+  <!-- Contenido central -->
+  <main class="flex-1 flex items-center justify-center px-6 py-16">
+    <div class="max-w-lg w-full text-center">
+
+      <!-- Emoji de rubro -->
+      <div class="text-5xl mb-6 fade-in">{{ emoji }}</div>
+
+      <!-- Perfecto -->
+      <p class="text-slate-400 text-lg mb-2 fade-in">Perfecto.</p>
+
+      <!-- Título principal -->
+      <h1 class="font-orbitron text-3xl sm:text-4xl font-black text-white mb-4 leading-tight glow-h1 fade-in">
+        {{ titulo }}
+      </h1>
+
+      <!-- Frase -->
+      <p class="text-xl text-slate-200 mb-10 fade-in-2">{{ frase }}</p>
+
+      <!-- CTA principal -->
+      <a href="{{ cta_url }}"
+         class="cta-btn inline-block px-10 py-4 rounded-xl font-bold text-lg font-orbitron transition-all shadow-lg mb-8 fade-in-2">
+        {{ cta_texto }}
+      </a>
+
+      <!-- Checklist de 3 pasos -->
+      <div class="accent-bg border rounded-2xl p-6 text-left space-y-4 fade-in-3">
+        {% for paso in pasos %}
+        <div class="flex items-center gap-4">
+          <div class="step-dot w-8 h-8 rounded-full border flex items-center justify-center font-orbitron font-bold text-sm shrink-0">
+            {{ forloop.counter }}
+          </div>
+          <span class="text-slate-200 text-sm">{{ paso }}</span>
+        </div>
+        {% endfor %}
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer mínimo -->
+  <footer class="px-6 py-4 text-center">
+    <p class="text-slate-600 text-xs">eGarage · Si tienes dudas, escríbenos a support@egarage.cl</p>
+  </footer>
+
+</body>
+</html>

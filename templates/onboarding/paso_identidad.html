@@ -1,0 +1,81 @@
+{% extends "onboarding/base.html" %}
+{% load i18n %}
+
+{% block step_content %}
+<h3 class="h4 mb-4">{% trans "Paso 1: Identidad de tu Empresa" %}</h3>
+<p class="text-muted mb-4">{% trans "Configura la información básica de tu negocio automotriz" %}</p>
+
+<form id="paso1Form">
+    {% csrf_token %}
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="id_nombre_taller" class="form-label onb-label">{% trans "Nombre del Negocio" %}</label>
+                <input type="text" class="form-control onb-control" id="id_nombre_taller" name="nombre_taller"
+                       value="{{ empresa.nombre_taller }}" required>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="id_lema" class="form-label onb-label">{% trans "Lema" %}</label>
+                <input type="text" class="form-control onb-control" id="id_lema" name="lema"
+                       value="{{ form.lema.value|default:'' }}">
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="id_direccion" class="form-label onb-label">{% trans "Dirección" %}</label>
+        <input type="text" class="form-control onb-control" id="id_direccion" name="direccion"
+               value="{{ empresa.direccion }}" required>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="id_telefono" class="form-label onb-label">{% trans "Teléfono" %}</label>
+                <input type="tel" class="form-control onb-control" id="id_telefono" name="telefono"
+                       value="{{ empresa.telefono }}" required>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="id_email" class="form-label onb-label">{% trans "Email de Contacto" %}</label>
+                <input type="email" class="form-control onb-control" id="id_email" name="email"
+                       value="{{ empresa.email }}" required>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="id_logo" class="form-label onb-label">{% trans "Logo" %}</label>
+                <input type="file" class="form-control onb-control" id="id_logo" name="logo" accept="image/*">
+                {% if empresa.logo %}
+                <div class="mt-2">
+                    <img src="{{ empresa.logo.url }}" alt="{% trans 'Logo actual' %}" style="max-height: 50px;">
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Selector de tipo de negocio -->
+    <div class="mb-4 mt-2">
+        <label for="id_rubro_principal" class="onb-label">{% trans "¿Qué tipo de negocio tienes?" %}</label>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1rem;">
+            {% trans "Selecciona el rubro que mejor describe tu operación. Esto personaliza el menú y el dashboard de eGarage." %}
+        </p>
+
+        <select class="form-control onb-control" id="id_rubro_principal" name="rubro_principal" required>
+            {% for value, label in rubro_choices %}
+            <option value="{{ value }}" {% if value == rubro_actual %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</form>
+{% endblock %}

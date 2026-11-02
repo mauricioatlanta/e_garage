@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Tienda{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/egarage_icon_192x192.png' %}">
+  {% block extra_css %}{% endblock %}
+  <style>
+    :root {
+      --tienda-bg: #0f172a;
+      --tienda-card: #1e293b;
+      --tienda-border: rgba(34,211,238,.15);
+      --tienda-accent: #22d3ee;
+    }
+    body { background: var(--tienda-bg); color: #e2e8f0; min-height: 100vh; }
+    .card-pieza {
+      background: var(--tienda-card);
+      border: 1px solid var(--tienda-border);
+      border-radius: 12px;
+      transition: border-color .2s, transform .2s;
+    }
+    .card-pieza:hover {
+      border-color: var(--tienda-accent);
+      transform: translateY(-2px);
+    }
+    .badge-condicion {
+      font-size: .7rem;
+      padding: .2rem .55rem;
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .badge-NUEVO     { background: #d1fae5; color: #065f46; }
+    .badge-EXCELENTE { background: #dbeafe; color: #1e40af; }
+    .badge-BUENA     { background: #fef3c7; color: #92400e; }
+    .badge-REGULAR   { background: #fce7f3; color: #9d174d; }
+    .btn-wa {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: #25d366; color: #fff;
+      padding: .5rem 1rem; border-radius: 8px;
+      font-weight: 600; font-size: .85rem;
+      text-decoration: none;
+      transition: background .2s;
+    }
+    .btn-wa:hover { background: #1ebe5d; }
+    .sin-imagen {
+      background: #0f172a;
+      display: flex; align-items: center; justify-content: center;
+      color: #334155; font-size: 2.5rem;
+    }
+    .precio { font-size: 1.35rem; font-weight: 700; color: #22d3ee; }
+  </style>
+</head>
+<body>
+  {% block content %}{% endblock %}
+
+  <footer class="mt-16 py-8 border-t border-slate-800 text-center">
+    <a href="https://egarage.cl" target="_blank" rel="noopener" class="inline-flex items-center gap-2 opacity-50 hover:opacity-80 transition-opacity">
+      <img src="{% static 'images/egarage_default_logo.svg' %}" alt="eGarage" class="h-5 w-auto">
+      <span class="text-xs text-slate-400">Tienda creada con eGarage</span>
+    </a>
+  </footer>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

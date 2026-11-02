@@ -1,0 +1,80 @@
+{% extends "commerce/admin/base_admin.html" %}
+
+{% block page_title %}Categorías{% endblock %}
+{% block page_subtitle %}Árbol de categorías del catálogo{% endblock %}
+
+{% block main_actions %}
+<a href="{% url 'commerce:admin_category_create' %}" class="ca-btn ca-btn-primary">+ Nueva categoría</a>
+{% endblock %}
+
+{% block page_stats %}
+<div class="flex gap-4 mt-3 pt-3 border-t border-white/5">
+  <span class="text-xs text-gray-400">Total: <strong class="text-cyan-300">{{ stats.total }}</strong></span>
+  <span class="text-xs text-gray-400">Activas: <strong class="text-green-400">{{ stats.active }}</strong></span>
+  <span class="text-xs text-gray-400">Inactivas: <strong class="text-gray-500">{{ stats.inactive }}</strong></span>
+</div>
+{% endblock %}
+
+{% block ca_content %}
+{% if not roots %}
+<div class="text-center py-16 text-gray-500">
+  <p class="text-4xl mb-3">🗂</p>
+  <p class="text-lg font-medium text-gray-400 mb-2">Sin categorías aún</p>
+  <p class="text-sm mb-6">Crea tu primera categoría para organizar el catálogo.</p>
+  <a href="{% url 'commerce:admin_category_create' %}" class="ca-btn ca-btn-primary">+ Crear primera categoría</a>
+</div>
+{% else %}
+<div id="category-tree" class="space-y-2">
+  {% for cat in roots %}
+  {% include "commerce/admin/categories/_tree_node.html" with category=cat depth=0 %}
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block ca_extra_js %}
+<script>
+const CSRF = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+
+function toggleActive(pk, btn) {
+  fetch(`/commerce/admin/categories/${pk}/toggle/`, {
+    method: 'POST',
+    headers: {'X-CSRFToken': CSRF, 'Content-Type': 'application/json'},
+  })
+  .then(r => r.json())
+  .then(data => {
+    const badge = btn.closest('.ca-tree-node').querySelector('.status-badge');
+    if (data.is_active) {
+      badge.className = 'status-badge ca-badge-active';
+      badge.textContent = 'Activa';
+      btn.textContent = 'Desactivar';
+    } else {
+      badge.className = 'status-badge ca-badge-inactive';
+      badge.textContent = 'Inactiva';
+      btn.textContent = 'Activar';
+    }
+  });
+}
+
+function confirmDelete(pk) {
+  if (!confirm('¿Eliminar esta categoría? Los productos que la usen quedarán sin categoría.')) return;
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = `/commerce/admin/categories/${pk}/eliminar/`;
+  const csrf = document.createElement('input');
+  csrf.type = 'hidden'; csrf.name = 'csrfmiddlewaretoken'; csrf.value = CSRF;
+  form.appendChild(csrf);
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function toggleChildren(pk) {
+  const children = document.getElementById(`children-${pk}`);
+  const arrow = document.getElementById(`arrow-${pk}`);
+  if (children) {
+    const hidden = children.classList.toggle('hidden');
+    arrow.textContent = hidden ? '▶' : '▼';
+  }
+}
+</script>
+{% endblock %}

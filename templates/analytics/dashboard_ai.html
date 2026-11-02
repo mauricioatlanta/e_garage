@@ -1,0 +1,603 @@
+{% load static %}
+{% load simple_i18n %}
+<!DOCTYPE html>
+<html lang="{% if is_usa %}en{% else %}es{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if is_usa %}AI Analytics Dashboard{% else %}Dashboard AI Analytics{% endif %} - {{ user.empresa.nombre }}</title>
+
+    <!-- Dashboard UI assets -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-glow: #2563eb;
+            --secondary-glow: #0f766e;
+            --accent-glow: #059669;
+            --danger-glow: #dc2626;
+            --bg-dark: #f6f8fb;
+            --bg-panel: #ffffff;
+            --text-primary: #18212f;
+            --text-secondary: #64748b;
+            --glass-bg: #ffffff;
+            --glass-border: #e2e8f0;
+            --panel-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 22px 24px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: var(--panel-shadow);
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .country-badge {
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid #bfdbfe;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 22px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--panel-shadow);
+        }
+
+        .metric-card::before {
+            display: none;
+        }
+
+        .metric-card:hover::before {
+            display: none;
+        }
+
+        @keyframes cardScan {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12);
+            border-color: var(--primary-glow);
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .metric-icon {
+            font-size: 1.5rem;
+            margin-right: 12px;
+            color: var(--primary-glow);
+        }
+
+        .metric-title {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0;
+            font-weight: 700;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .metric-growth {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .growth-positive {
+            color: var(--accent-glow);
+        }
+
+        .growth-negative {
+            color: var(--danger-glow);
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .chart-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 25px;
+            position: relative;
+            box-shadow: var(--panel-shadow);
+        }
+
+        .chart-title {
+            font-size: 1rem;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .ai-insights-section {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--panel-shadow);
+        }
+
+        .insights-title {
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            font-weight: 800;
+        }
+
+        .insights-title::before {
+            content: '🤖';
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+
+        .insight-item {
+            background: #f8fafc;
+            border-left: 3px solid var(--accent-glow);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .insight-item:hover {
+            background: #ecfdf5;
+            transform: translateX(5px);
+        }
+
+        .insight-type {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--accent-glow);
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .insight-title-text {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .insight-description {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .insight-confidence {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .real-time-section {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            min-width: 200px;
+            z-index: 1000;
+            box-shadow: var(--panel-shadow);
+        }
+
+        .real-time-title {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .real-time-metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .pulse-indicator {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-glow);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 255, 136, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
+            }
+        }
+
+        .loading-skeleton {
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0.1) 25%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0.1) 75%
+            );
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+            height: 20px;
+        }
+
+        @keyframes loading {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .header-title {
+                font-size: 1.8rem;
+            }
+
+            .real-time-section {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">
+                {% if is_usa %}AI Analytics{% else %}Analytics IA{% endif %}
+            </h1>
+            <div class="country-badge">
+                <i class="fas fa-flag"></i>
+                {% if is_usa %}United States{% else %}Chile{% endif %}
+            </div>
+        </div>
+
+        <!-- Real-time Metrics Panel -->
+        <div class="real-time-section">
+            <div class="real-time-title">
+                {% if is_usa %}Live Metrics{% else %}Métricas en Vivo{% endif %}
+                <span class="pulse-indicator"></span>
+            </div>
+            <div id="realTimeMetrics">
+                <div class="loading-skeleton"></div>
+                <div class="loading-skeleton" style="margin-top: 5px;"></div>
+                <div class="loading-skeleton" style="margin-top: 5px;"></div>
+            </div>
+        </div>
+
+        <!-- Key Metrics Grid -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="metric-icon fas fa-chart-line"></i>
+                    <span class="metric-title">{% if is_usa %}Total Revenue{% else %}Ingresos Totales{% endif %}</span>
+                </div>
+                <div class="metric-value">{{ analytics.revenue.total }}</div>
+                <div class="metric-growth {% if analytics.revenue.growth >= 0 %}growth-positive{% else %}growth-negative{% endif %}">
+                    <i class="fas fa-arrow-{% if analytics.revenue.growth >= 0 %}up{% else %}down{% endif %}"></i>
+                    {{ analytics.revenue.growth }}%
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="metric-icon fas fa-file-invoice"></i>
+                    <span class="metric-title">{% if is_usa %}Documents{% else %}Documentos{% endif %}</span>
+                </div>
+                <div class="metric-value">{{ analytics.operations.documentos_total }}</div>
+                <div class="metric-growth">
+                    <i class="fas fa-clock"></i>
+                    {% if is_usa %}Last 30 days{% else %}Últimos 30 días{% endif %}
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="metric-icon fas fa-car"></i>
+                    <span class="metric-title">{% if is_usa %}Active Vehicles{% else %}Vehículos Activos{% endif %}</span>
+                </div>
+                <div class="metric-value">{{ analytics.operations.vehiculos_activos }}</div>
+                <div class="metric-growth growth-positive">
+                    <i class="fas fa-users"></i>
+                    {{ analytics.operations.clientes_activos }} {% if is_usa %}clients{% else %}clientes{% endif %}
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="metric-icon fas fa-cogs"></i>
+                    <span class="metric-title">{% if is_usa %}Efficiency{% else %}Eficiencia{% endif %}</span>
+                </div>
+                <div class="metric-value">{{ analytics.operations.efficiency }}%</div>
+                <div class="metric-growth {% if analytics.operations.efficiency >= 80 %}growth-positive{% else %}growth-negative{% endif %}">
+                    <i class="fas fa-target"></i>
+                    {% if is_usa %}Operational{% else %}Operacional{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3 class="chart-title">{% if is_usa %}Revenue Timeline{% else %}Línea de Tiempo de Ingresos{% endif %}</h3>
+                <canvas id="revenueChart" height="300"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="chart-title">{% if is_usa %}Vehicle Distribution{% else %}Distribución de Vehículos{% endif %}</h3>
+                <canvas id="vehicleChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- AI Insights Section -->
+        <div class="ai-insights-section">
+            <h2 class="insights-title">{% if is_usa %}AI Insights{% else %}Insights de IA{% endif %}</h2>
+            <div id="aiInsights">
+                {% for insight in analytics.ai_insights %}
+                <div class="insight-item">
+                    <div class="insight-type">{{ insight.type }}</div>
+                    <div class="insight-title-text">{{ insight.title }}</div>
+                    <div class="insight-description">{{ insight.description }}</div>
+                    <span class="insight-confidence">{{ insight.confidence|floatformat:0 }}% {% if is_usa %}confidence{% else %}confianza{% endif %}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Configuración global
+        const isUSA = {{ is_usa|yesno:"true,false" }};
+        const currency = '{{ analytics.config.moneda }}';
+        const symbol = '{{ analytics.config.simbolo }}';
+
+        // Función para actualizar métricas en tiempo real
+        function updateRealTimeMetrics() {
+            fetch('/analytics/real-time/')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('realTimeMetrics');
+                    container.innerHTML = `
+                        <div class="real-time-metric">
+                            <span>${isUSA ? 'Today' : 'Hoy'}:</span>
+                            <span>${symbol}${data.today_revenue.toLocaleString()}</span>
+                        </div>
+                        <div class="real-time-metric">
+                            <span>${isUSA ? 'Documents' : 'Docs'}:</span>
+                            <span>${data.today_documents}</span>
+                        </div>
+                        <div class="real-time-metric">
+                            <span>${isUSA ? 'Active' : 'Activos'}:</span>
+                            <span>${data.active_services}</span>
+                        </div>
+                    `;
+                })
+                .catch(error => console.error('Error updating metrics:', error));
+        }
+
+        // Gráfica de ingresos
+        function createRevenueChart() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+
+            fetch('/analytics/revenue-api/')
+                .then(response => response.json())
+                .then(data => {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.revenue_timeline.map(item => new Date(item.date).toLocaleDateString()),
+                            datasets: [{
+                                label: isUSA ? 'Revenue' : 'Ingresos',
+                                data: data.revenue_timeline.map(item => item.revenue),
+                                borderColor: '#2563eb',
+                                backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: '#475569'
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        color: '#64748b'
+                                    },
+                                    grid: {
+                                        color: '#e2e8f0'
+                                    }
+                                },
+                                y: {
+                                    ticks: {
+                                        color: '#64748b',
+                                        callback: function(value) {
+                                            return symbol + value.toLocaleString();
+                                        }
+                                    },
+                                    grid: {
+                                        color: '#e2e8f0'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+        }
+
+        // Gráfica de vehículos
+        function createVehicleChart() {
+            const ctx = document.getElementById('vehicleChart').getContext('2d');
+
+            fetch('/analytics/vehicle-api/')
+                .then(response => response.json())
+                .then(data => {
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.distribution.map(item => item.marca__nombre),
+                            datasets: [{
+                                data: data.distribution.map(item => item.count),
+                                backgroundColor: [
+                                    '#2563eb', '#0f766e', '#059669', '#f59e0b',
+                                    '#7c3aed', '#dc2626', '#0891b2', '#65a30d'
+                                ],
+                                borderWidth: 2,
+                                borderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: '#475569',
+                                        padding: 20
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+        }
+
+        // Cargar insights adicionales
+        function loadAIInsights() {
+            fetch('/analytics/ai-insights/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    type: 'predictive',
+                    timeframe: 30
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const container = document.getElementById('aiInsights');
+                    data.insights.forEach(insight => {
+                        const insightElement = document.createElement('div');
+                        insightElement.className = 'insight-item';
+                        insightElement.innerHTML = `
+                            <div class="insight-type">${insight.type}</div>
+                            <div class="insight-title-text">${insight.title}</div>
+                            <div class="insight-description">${insight.description}</div>
+                            <span class="insight-confidence">${Math.round(insight.confidence * 100)}% ${isUSA ? 'confidence' : 'confianza'}</span>
+                        `;
+                        container.appendChild(insightElement);
+                    });
+                }
+            });
+        }
+
+        // Inicializar dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            createRevenueChart();
+            createVehicleChart();
+            updateRealTimeMetrics();
+            loadAIInsights();
+
+            // Actualizar métricas cada 30 segundos
+            setInterval(updateRealTimeMetrics, 30000);
+        });
+    </script>
+</body>
+</html>

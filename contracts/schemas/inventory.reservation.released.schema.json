@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "egarage/contracts/schemas/inventory.reservation.released.schema.json",
+  "title": "inventory.reservation.released — Payload Schema",
+  "description": "Emitted by erp.inventory when a reservation is manually released before its TTL. Triggers: explicit order cancellation by the buyer, cancellation by an operator, or a payment failure that warrants immediate release rather than waiting for TTL. The released units are returned to aggregate_available. erp.inventory also emits a corresponding inventory.stock.updated message.",
+  "type": "object",
+  "required": ["reservation_id", "order_id", "product_id", "location_id", "quantity", "release_reason", "occurred_at"],
+  "additionalProperties": false,
+  "properties": {
+
+    "reservation_id": {
+      "type": "string",
+      "description": "Identifier of the reservation being released."
+    },
+
+    "order_id": {
+      "type": "string",
+      "description": "Identifier of the Commerce order associated with this reservation."
+    },
+
+    "product_id": {
+      "type": "string",
+      "description": "Stable product identifier from ERP Core."
+    },
+
+    "location_id": {
+      "type": "string",
+      "description": "Location from which the units are released back to available."
+    },
+
+    "quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of units returned to aggregate_available."
+    },
+
+    "release_reason": {
+      "type": "string",
+      "enum": ["buyer_cancelled", "operator_cancelled", "payment_failed"],
+      "description": "Machine-readable reason for the manual release. buyer_cancelled: the buyer explicitly cancelled the order. operator_cancelled: a warehouse or support operator cancelled the reservation. payment_failed: the payment processor returned a definitive failure, warranting immediate release."
+    },
+
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the release was committed in ERP Core."
+    }
+  }
+}

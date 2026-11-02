@@ -1,0 +1,452 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n %}
+{% load humanize %}
+{% load custom_filters %}
+{% load country_url %}
+{% load role_tags %}
+
+{% block page_title %}{% trans "Desarme" %} – {% trans "Repuestos" %}{% endblock %}
+{% block page_subtitle %}{% trans "Repuestos extraídas de vehículos de desarme" %}{% endblock %}
+{% block page_icon %}📦{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .piece-card {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(0, 255, 255, 0.25);
+    border-radius: 10px;
+    padding: 12px;
+    transition: all 0.3s ease;
+  }
+  .piece-card:hover {
+    border-color: rgba(0, 255, 255, 0.5);
+  }
+  .piece-card.en-carrito {
+    border-color: rgba(52, 211, 153, 0.7);
+    background: rgba(52, 211, 153, 0.08);
+  }
+  /* Estado de la ficha */
+  .piece-card { position: relative; overflow: hidden; }
+  .piece-card.estado-VENDIDA {
+    background: rgba(60, 30, 30, 0.55);
+    border-color: rgba(185, 28, 28, 0.5);
+    box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.15);
+  }
+  .piece-card.estado-VENDIDA::after {
+    content: "✓ VENDIDA";
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: rgba(252, 165, 165, 0.7);
+    letter-spacing: .12em;
+    pointer-events: none;
+    background: rgba(185, 28, 28, 0.25);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 4px;
+    padding: 1px 6px;
+  }
+  .piece-card.estado-SCRAP {
+    background: rgba(30, 30, 30, 0.65);
+    border-color: rgba(107, 114, 128, 0.45);
+    box-shadow: inset 0 0 0 1px rgba(107, 114, 128, 0.1);
+    opacity: 0.6;
+  }
+  .piece-card.estado-DANADA {
+    background: rgba(60, 8, 8, 0.4);
+    border-color: rgba(239, 68, 68, 0.5);
+  }
+  .piece-card.estado-RESERVADA {
+    background: rgba(60, 44, 4, 0.4);
+    border-color: rgba(234, 179, 8, 0.55);
+  }
+  .piece-card.estado-FALTANTE {
+    background: rgba(25, 15, 40, 0.5);
+    border-color: rgba(139, 92, 246, 0.35);
+    opacity: 0.55;
+  }
+  .btn-carrito {
+    background: rgba(52, 211, 153, 0.15);
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: #6ee7b7;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .btn-carrito:hover { background: rgba(52, 211, 153, 0.3); }
+  .btn-carrito.activo {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+  }
+  .pieces-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+  }
+  .interactive-btn {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(0, 128, 255, 0.15));
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: #67e8f9;
+    font-size: 12px;
+  }
+  .interactive-btn:hover { color: #a5f3fc; }
+  .desarme-search {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 255, 255, 0.25);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 1rem;
+  }
+  .desarme-search input, .desarme-search select {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: #e0e7ff;
+  }
+  .desarme-search input { max-width: 240px; }
+  .desarme-search input:focus, .desarme-search select:focus {
+    outline: none;
+    border-color: rgba(0, 255, 255, 0.6);
+  }
+  .badge-estado { font-size: 11px; padding: 2px 8px; border-radius: 9999px; font-weight: 500; }
+  .badge-DISPONIBLE { background: rgba(34, 197, 94, 0.3); color: #86efac; }
+  .badge-RESERVADA { background: rgba(234, 179, 8, 0.3); color: #fde047; }
+  .badge-VENDIDA { background: rgba(59, 130, 246, 0.3); color: #93c5fd; }
+  .badge-DANADA { background: rgba(239, 68, 68, 0.3); color: #fca5a5; }
+  .badge-SCRAP { background: rgba(107, 114, 128, 0.4); color: #d1d5db; }
+  .vehiculo-origen {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+  .vehiculo-origen a { color: #67e8f9; }
+  .desarme-live-status {
+    color: #94a3b8;
+    font-size: 12px;
+    min-height: 18px;
+  }
+  .piece-card.is-live-hidden {
+    display: none;
+  }
+  #desarme-pieces-results.is-loading {
+    opacity: 0.55;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+</style>
+{% endblock %}
+
+{% block page_stats %}
+<div class="desarme-nav-module flex flex-wrap gap-2 mt-4">
+  <a href="{% country_url 'desarme:index' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">{% trans "Dashboard" %}</a>
+  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🚗 {% trans "Vehículos" %}</a>
+  <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">📦 {% trans "Repuestos" %}</a>
+  <a href="{% country_url 'desarme:lista_interchange' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🔄 {% if "/en/" in request.path or LANGUAGE_CODE == "en" and "/es/" not in request.path %}Interchange{% else %}Cruce de piezas{% endif %}</a>
+  <a href="{% country_url 'desarme:lista_ventas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🧾 {% trans "Ventas" %}</a>
+  <a href="{% country_url 'desarme:reportes' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📊 {% trans "Reportes" %}</a>
+  {% if empresa.slug %}<a href="{% url 'tienda:tienda_storefront_slug' slug=empresa.slug %}" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-emerald-500/20 border border-emerald-400/50 text-emerald-200 hover:bg-emerald-500/30">🛒 {% trans "Ver kiosko" %}</a>{% endif %}
+</div>
+{% if select_field == 'pieza_desarme' and return_to %}
+<div style="margin-top:12px;padding:10px 16px;border-radius:10px;background:rgba(243,154,19,0.12);border:1px solid rgba(243,154,19,0.4);color:#fcd34d;font-size:13px;display:flex;align-items:center;gap:10px;">
+  <span>📄</span>
+  <span>{% trans "Selecciona una pieza para agregarla al documento" %} — <a href="{{ return_to }}" style="color:#67e8f9;text-decoration:underline;">{% trans "Volver sin seleccionar" %}</a></span>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block main_actions %}
+{% if request.user|is_admin_or_owner %}
+<a href="{% country_url 'desarme:crear_pieza' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold">
+  ➕ {% trans "Nueva repuesto" %}
+</a>
+<a href="{% country_url 'desarme:crear_pieza_suelta' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600/80 hover:bg-indigo-500 text-white text-sm font-semibold">
+  📦 {% trans "Pieza suelta" %}
+</a>
+{% endif %}
+<a href="{% country_url 'desarme:lista_vehiculos' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-600/80 hover:bg-cyan-500 text-white text-sm font-semibold">
+  🚗 {% trans "Vehículos" %}
+</a>
+<a href="{% country_url 'desarme:index' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600/80 hover:bg-purple-500 text-white text-sm font-semibold">
+  📊 {% trans "Dashboard" %}
+</a>
+{% if empresa.slug %}<a href="{% url 'tienda:tienda_storefront_slug' slug=empresa.slug %}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600/80 hover:bg-emerald-500 text-white text-sm font-semibold border border-emerald-400/40">🛒 {% trans "Ver kiosko" %}</a>{% endif %}
+{% endblock %}
+
+{% block search_bar %}
+<div class="desarme-search">
+  <form method="get" action="" class="flex flex-wrap items-center gap-3" id="desarme-pieces-filter-form" data-live-search-form>
+    <input type="search" name="q" value="{{ q }}" placeholder="{% trans 'Código, nombre, marca o modelo...' %}" aria-label="{% trans 'Buscar' %}" id="desarme-live-search" autocomplete="off">
+    <select name="estado" class="text-sm">
+      <option value="">{% trans "Estado" %}</option>
+      {% for value, label in estado_pieza_choices %}
+      <option value="{{ value }}" {% if estado_filtro == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <select name="vehiculo" class="text-sm min-w-[160px]">
+      <option value="">{% trans "Todos los vehículos" %}</option>
+      {% for vid, label in vehiculos_choices %}
+      <option value="{{ vid }}" {% if vehiculo_filtro == vid or vehiculo_filtro == vid|stringformat:"s" %}selected{% endif %}>
+        {{ label }}
+      </option>
+      {% endfor %}
+    </select>
+    <select name="condicion" class="text-sm">
+      <option value="">{% trans "Toda condición" %}</option>
+      {% for value, label in condicion_choices %}
+      <option value="{{ value }}" {% if condicion_filtro == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+
+    <input type="text" name="zona" value="{{ zona_filtro }}" placeholder="{% trans 'Zona...' %}">
+
+    <select name="proveedor" class="text-sm min-w-[160px]">
+      <option value="">{% trans "Todo proveedor" %}</option>
+      {% for id, nombre in proveedores_choices %}
+      <option value="{{ id }}" {% if proveedor_filtro == id|stringformat:"s" %}selected{% endif %}>{{ nombre }}</option>
+      {% endfor %}
+    </select>
+
+    <input type="date" name="fecha_desde" value="{{ fecha_desde_filtro }}" title="{% trans 'Extraído desde' %}">
+    <input type="date" name="fecha_hasta" value="{{ fecha_hasta_filtro }}" title="{% trans 'Extraído hasta' %}">
+
+    <input type="number" name="costo_min" value="{{ costo_min_filtro }}" placeholder="{% trans 'Costo mín.' %}" style="width: 100px;">
+    <input type="number" name="costo_max" value="{{ costo_max_filtro }}" placeholder="{% trans 'Costo máx.' %}" style="width: 100px;">
+
+    <button type="submit" class="interactive-btn px-4 py-2">{% trans "Filtrar" %}</button>
+    {% if q or estado_filtro or vehiculo_filtro or condicion_filtro or zona_filtro or fecha_desde_filtro or fecha_hasta_filtro or costo_min_filtro or costo_max_filtro or proveedor_filtro %}
+    <a href="{% country_url 'desarme:lista_piezas' %}" class="text-gray-400 hover:text-cyan-300 text-sm">{% trans "Limpiar" %}</a>
+    {% endif %}
+  </form>
+  <div class="desarme-live-status mt-2" id="desarme-live-status" aria-live="polite"></div>
+  <a href="{% country_url 'desarme:piezas_reporte_pdf' %}?{{ querystring }}" target="_blank"
+     class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 inline-flex items-center gap-1.5 mt-2">
+    📄 {% trans "Generar PDF" %}
+  </a>
+</div>
+{% endblock %}
+
+{% block panel_content %}
+<div id="desarme-pieces-results">
+  {% include "taller/desarme/partials/_lista_piezas_results.html" %}
+</div>
+
+{# ── Centro de venta flotante ── #}
+<div id="carrito-flotante" style="display:none;position:fixed;bottom:24px;right:24px;z-index:999;width:min(460px,calc(100vw - 24px));">
+  <div style="background:#0f172a;border:1px solid rgba(0,255,255,0.3);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);overflow:hidden;">
+    <div style="background:rgba(0,255,255,0.08);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,255,255,0.15);">
+      <span style="color:#67e8f9;font-weight:600;">🧾 Venta activa <span id="carrito-count" style="background:rgba(0,255,255,0.2);border-radius:9999px;padding:1px 8px;">0</span></span>
+      <button type="button" onclick="limpiarCarrito()" style="color:#94a3b8;font-size:11px;background:none;border:none;cursor:pointer;">✕ Limpiar</button>
+    </div>
+    <div id="carrito-body" style="max-height:260px;overflow-y:auto;padding:8px 16px;"></div>
+    <div style="padding:12px 16px;border-top:1px solid rgba(0,255,255,0.15);">
+      <form method="post" action="{% country_url 'desarme:crear_venta_operaciones' %}" id="form-carrito">
+        {% csrf_token %}
+        <input type="hidden" name="selected_data" id="selected-data-input" value="[]">
+        <input type="hidden" name="crear_cliente_rapido" id="crear-cliente-rapido-input" value="0">
+        <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:10px;">
+          <select name="cliente" id="venta-cliente-existente" style="width:100%;background:#020617;border:1px solid rgba(0,255,255,0.3);border-radius:10px;padding:8px 10px;color:#e2e8f0;">
+            <option value="">Cliente existente...</option>
+            {% for cliente in clientes_venta_choices %}
+            <option value="{{ cliente.id }}">{{ cliente }}</option>
+            {% endfor %}
+          </select>
+          <input name="cliente_nombre" id="venta-cliente-rapido" type="text" placeholder="Cliente rápido (si no existe)" style="width:100%;background:#020617;border:1px solid rgba(0,255,255,0.3);border-radius:10px;padding:8px 10px;color:#e2e8f0;">
+          <textarea name="observaciones" rows="2" placeholder="Observaciones de la venta" style="width:100%;background:#020617;border:1px solid rgba(0,255,255,0.3);border-radius:10px;padding:8px 10px;color:#e2e8f0;resize:vertical;"></textarea>
+        </div>
+        <div id="carrito-inputs"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;color:#cbd5e1;font-size:13px;">
+          <span>Total</span>
+          <strong id="carrito-total" style="color:#67e8f9;">$0</strong>
+        </div>
+        <button type="submit" onclick="return prepararVentaOperaciones()" style="width:100%;padding:10px;border-radius:8px;background:linear-gradient(135deg,#0891b2,#2563eb);color:white;font-weight:700;font-size:13px;border:none;cursor:pointer;">
+          🧾 Crear venta PTS
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_extra_js %}
+<script>
+{% if select_field == 'pieza_desarme' and return_to %}
+var EG_RETURN_TO = '{{ return_to|escapejs }}';
+function seleccionarPieza(pk, codigo, nombre, precio, costo) {
+  var sep = EG_RETURN_TO.indexOf('?') >= 0 ? '&' : '?';
+  window.location.href = EG_RETURN_TO + sep
+    + 'pieza_desarme_id=' + pk
+    + '&created_repuesto_codigo=' + encodeURIComponent(codigo)
+    + '&created_repuesto_nombre=' + encodeURIComponent(nombre)
+    + '&created_repuesto_precio_venta=' + (precio || 0)
+    + '&created_repuesto_costo_linea=' + (costo || 0);
+}
+{% endif %}
+var carrito = {};
+function syncCarritoCards() {
+  Object.keys(carrito).forEach(function(id) {
+    var card = document.getElementById('card-' + id);
+    var btn = document.getElementById('btn-' + id);
+    if (card) card.classList.add('en-carrito');
+    if (btn) {
+      btn.classList.add('activo');
+      btn.textContent = '✕ Quitar';
+    }
+  });
+}
+function initDesarmeRealtimeSearch() {
+  var form = document.querySelector('[data-live-search-form]');
+  var input = document.getElementById('desarme-live-search');
+  var results = document.getElementById('desarme-pieces-results');
+  var status = document.getElementById('desarme-live-status');
+  if (!form || !input || !results || !window.fetch) return;
+
+  var debounceTimer = null;
+  var controller = null;
+
+  function buildParams(includePartial) {
+    var params = new URLSearchParams(new FormData(form));
+    params.delete('page');
+    if (includePartial) params.set('partial', '1');
+    return params;
+  }
+
+  function refreshResults() {
+    var params = buildParams(true);
+    var url = window.location.pathname + '?' + params.toString();
+    if (controller) controller.abort();
+    controller = new AbortController();
+    results.classList.add('is-loading');
+    if (status) status.textContent = 'Buscando...';
+
+    fetch(url, {
+      headers: {'X-Requested-With': 'XMLHttpRequest'},
+      signal: controller.signal
+    })
+    .then(function(response) {
+      if (!response.ok) throw new Error('No se pudo actualizar la búsqueda.');
+      return response.text();
+    })
+    .then(function(html) {
+      results.innerHTML = html;
+      syncCarritoCards();
+
+      var cleanParams = buildParams(false);
+      var cleanQuery = cleanParams.toString();
+      window.history.replaceState({}, '', cleanQuery ? window.location.pathname + '?' + cleanQuery : window.location.pathname);
+      if (status) {
+        var count = results.querySelectorAll('.piece-card').length;
+        status.textContent = input.value.trim()
+          ? count + ' resultado' + (count === 1 ? '' : 's')
+          : '';
+      }
+    })
+    .catch(function(error) {
+      if (error.name !== 'AbortError' && status) {
+        status.textContent = 'No se pudo actualizar la búsqueda en tiempo real.';
+      }
+    })
+    .finally(function() {
+      results.classList.remove('is-loading');
+    });
+  }
+
+  input.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(refreshResults, 300);
+  });
+  input.addEventListener('search', refreshResults);
+}
+document.addEventListener('DOMContentLoaded', initDesarmeRealtimeSearch);
+function toggleCarrito(id, codigo, nombre, precio, stock) {
+  if (carrito[id]) {
+    quitarDelCarrito(id);
+  } else {
+    carrito[id] = {id:id, codigo:codigo, nombre:nombre, precio:Number(precio || 0), cantidad:1, stock:Number(stock || 0)};
+    var card = document.getElementById('card-'+id);
+    var btn = document.getElementById('btn-'+id);
+    if (card) card.classList.add('en-carrito');
+    if (btn) { btn.classList.add('activo'); btn.textContent = '✕ Quitar'; }
+    actualizarUI();
+  }
+}
+function quitarDelCarrito(id) {
+  delete carrito[id];
+  var card = document.getElementById('card-'+id);
+  var btn = document.getElementById('btn-'+id);
+  if (card) card.classList.remove('en-carrito');
+  if (btn) { btn.classList.remove('activo'); btn.textContent = '🛒 Agregar'; }
+  actualizarUI();
+}
+function limpiarCarrito() {
+  Object.keys(carrito).forEach(function(id){ quitarDelCarrito(parseInt(id)); });
+}
+function setCarritoCantidad(id, value) {
+  if (!carrito[id]) return;
+  var qty = parseInt(value, 10);
+  if (isNaN(qty) || qty < 1) qty = 1;
+  if (carrito[id].stock > 0 && qty > carrito[id].stock) qty = carrito[id].stock;
+  carrito[id].cantidad = qty;
+  actualizarUI();
+}
+function setCarritoPrecio(id, value) {
+  if (!carrito[id]) return;
+  var price = Number(value);
+  if (isNaN(price) || price < 0) price = 0;
+  carrito[id].precio = price;
+  actualizarUI();
+}
+function formatCLP(value) {
+  try {
+    return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(Number(value || 0));
+  } catch (e) {
+    return '$' + Number(value || 0).toLocaleString('es-CL');
+  }
+}
+function actualizarUI() {
+  var items = Object.values(carrito);
+  document.getElementById('carrito-flotante').style.display = items.length===0 ? 'none' : 'block';
+  document.getElementById('carrito-count').textContent = items.length;
+  document.getElementById('carrito-body').innerHTML = items.map(function(i){
+    return '<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:12px;">'
+      + '<div style="display:flex;justify-content:space-between;gap:8px;">'
+      + '<div style="min-width:0;"><span style="color:#67e8f9;font-family:monospace;">'+i.codigo+'</span><p style="color:#e2e8f0;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+i.nombre+'</p></div>'
+      + '<button type="button" onclick="quitarDelCarrito('+i.id+')" style="color:#f87171;background:none;border:none;cursor:pointer;font-size:16px;">✕</button></div>'
+      + '<div style="display:grid;grid-template-columns:80px 1fr 86px;gap:6px;margin-top:6px;align-items:center;">'
+      + '<input type="number" min="1" max="'+i.stock+'" value="'+i.cantidad+'" onchange="setCarritoCantidad('+i.id+', this.value)" style="background:#020617;border:1px solid rgba(148,163,184,.25);border-radius:8px;color:#e2e8f0;padding:5px 7px;">'
+      + '<input type="number" min="0" step="1" value="'+i.precio+'" onchange="setCarritoPrecio('+i.id+', this.value)" style="background:#020617;border:1px solid rgba(148,163,184,.25);border-radius:8px;color:#e2e8f0;padding:5px 7px;">'
+      + '<strong style="text-align:right;color:#86efac;">'+formatCLP(i.cantidad * i.precio)+'</strong></div></div>';
+  }).join('');
+  var total = items.reduce(function(acc, item){ return acc + item.cantidad * item.precio; }, 0);
+  document.getElementById('carrito-total').textContent = formatCLP(total);
+  document.getElementById('selected-data-input').value = JSON.stringify(items.map(function(i){
+    return {id:i.id, cantidad:i.cantidad, precio_venta:i.precio};
+  }));
+}
+function prepararVentaOperaciones() {
+  var items = Object.values(carrito);
+  if (!items.length) {
+    alert('Selecciona al menos un repuesto.');
+    return false;
+  }
+  var cliente = document.getElementById('venta-cliente-existente');
+  var rapido = document.getElementById('venta-cliente-rapido');
+  if ((!cliente || !cliente.value) && (!rapido || !rapido.value.trim())) {
+    alert('Selecciona un cliente existente o ingresa un cliente rápido.');
+    return false;
+  }
+  document.getElementById('crear-cliente-rapido-input').value = rapido && rapido.value.trim() ? 'on' : '0';
+  actualizarUI();
+  return true;
+}
+</script>
+{% endblock %}

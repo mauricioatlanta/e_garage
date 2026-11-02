@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load country_url %}
+
+{% block title %}Technicians — eGarage{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+
+  <!-- Header -->
+  <div class="bg-black/60 backdrop-blur border border-cyan-400/30 rounded-lg p-6 mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-white font-mono">👨‍🔧 Technicians</h1>
+      <p class="text-gray-400 text-sm mt-1">{{ empresa.nombre }}</p>
+    </div>
+    <a href="{% country_url 'tecnicos:nuevo' %}" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-5 rounded-lg transition-colors text-sm">
+      ➕ New
+    </a>
+  </div>
+
+  <!-- Messages -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mb-4 px-4 py-3 rounded border {% if message.tags == 'success' %}bg-green-900/40 border-green-500/40 text-green-300{% else %}bg-red-900/40 border-red-500/40 text-red-300{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- List -->
+  {% if tecnicos %}
+    <div class="space-y-3">
+      {% for tecnico in tecnicos %}
+        <div class="bg-black/60 backdrop-blur border {% if tecnico.activo %}border-cyan-400/30{% else %}border-gray-600/30{% endif %} rounded-lg px-5 py-4 flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <span class="text-xl">{% if tecnico.activo %}🟢{% else %}🔴{% endif %}</span>
+            <div>
+              <div class="text-white font-semibold">{{ tecnico.nombre }}</div>
+              <div class="text-gray-400 text-xs mt-0.5">
+                {{ tecnico.get_rol_display }}
+                {% if not tecnico.activo %}&nbsp;· <span class="text-gray-500">Inactive</span>{% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="{% country_url 'tecnicos:editar' tecnico.id %}" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold py-1.5 px-3 rounded transition-colors">
+              Edit
+            </a>
+            <form method="post" action="{% country_url 'tecnicos:toggle' tecnico.id %}">
+              {% csrf_token %}
+              <button type="submit" class="{% if tecnico.activo %}bg-yellow-700 hover:bg-yellow-600{% else %}bg-green-800 hover:bg-green-700{% endif %} text-white text-xs font-semibold py-1.5 px-3 rounded transition-colors">
+                {% if tecnico.activo %}Deactivate{% else %}Activate{% endif %}
+              </button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="bg-black/60 backdrop-blur border border-gray-600/30 rounded-lg p-10 text-center">
+      <div class="text-gray-500 text-lg mb-3">👥 No technicians registered yet</div>
+      <a href="{% country_url 'tecnicos:nuevo' %}" class="inline-block bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+        Add first technician
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

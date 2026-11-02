@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "egarage/contracts/schemas/identity.profile.v1.schema.json",
+  "title": "Identity Profile Contract — Payload Schema (SUPERSEDED)",
+  "description": "SUPERSEDED. This monolithic schema was replaced when identity.profile.v1 was migrated to meta-contract v2. Use: identity.profile.resolved.schema.json. Kept for historical reference only.",
+  "type": "object",
+  "required": ["identity_id", "linkage_status", "created_at"],
+  "additionalProperties": false,
+  "properties": {
+    "identity_id": {
+      "type": "string",
+      "description": "Canonical, stable identifier owned by the identity subsystem. Not the same as buyer_id or cliente_id. Never reused."
+    },
+    "email": {
+      "type": ["string", "null"],
+      "format": "email",
+      "description": "Primary linkage key used to match a Buyer to a Cliente. Null for anonymous or guest identities. Pending ADR-006: whether email is the only valid linkage key."
+    },
+    "buyer_id": {
+      "type": ["string", "null"],
+      "description": "Reference to the Buyer record in commerce.engine. Null if this identity was initiated from the ERP side."
+    },
+    "cliente_id": {
+      "type": ["string", "null"],
+      "description": "Reference to the Cliente record in erp.core. Null if this identity was initiated from the Commerce side."
+    },
+    "linkage_status": {
+      "type": "string",
+      "enum": ["unlinked", "linked", "guest"],
+      "description": "unlinked: identity exists in one system only, no verified match. linked: Buyer and Cliente have been verified as the same person. guest: no persistent identity record; session is ephemeral."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "linked_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Timestamp of when buyer_id and cliente_id were linked. Null if linkage_status is not 'linked'."
+    }
+  },
+  "if": {
+    "properties": { "linkage_status": { "const": "linked" } },
+    "required": ["linkage_status"]
+  },
+  "then": {
+    "required": ["buyer_id", "cliente_id", "linked_at"],
+    "properties": {
+      "buyer_id": { "type": "string" },
+      "cliente_id": { "type": "string" },
+      "linked_at": { "type": "string", "format": "date-time" }
+    }
+  }
+}

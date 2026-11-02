@@ -1,0 +1,59 @@
+{% comment %}
+  Nav: desktop = barra horizontal de enlaces. Móvil = hamburguesa + drawer lateral.
+  Enlaces: Convertidores Catalíticos, Flexibles, Resonadores, Silenciadores, etc.
+{% endcomment %}
+<nav class="nav-bar-sticky" aria-label="Navegación principal">
+  <div class="nav-space nav-bar-inner-wrap">
+    {% comment %} Móvil: botón menú + carrito visible; enlaces dentro del drawer {% endcomment %}
+    <button type="button" class="nav-toggle-mobile" id="nav-toggle-mobile" aria-expanded="false" aria-controls="nav-drawer" aria-label="Abrir menú">
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+    </button>
+    <a href="{% url 'commerce:cart' %}" class="nav-link nav-link-mobile-only cart" aria-label="Carrito"><i class="fa-solid fa-cart-shopping"></i><span class="nav-mobile-cart-text">Carrito</span></a>
+
+    {% comment %} Drawer móvil: panel lateral con todos los enlaces {% endcomment %}
+    <div class="nav-drawer-overlay" id="nav-drawer-overlay" aria-hidden="true"></div>
+    <div class="nav-drawer" id="nav-drawer" role="dialog" aria-label="Menú de navegación" aria-modal="true">
+      <div class="nav-drawer-header">
+        <span class="nav-drawer-title">Menú</span>
+        <button type="button" class="nav-drawer-close" id="nav-drawer-close" aria-label="Cerrar menú">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="nav-drawer-body">
+        <a href="{% url 'commerce:home' %}" class="nav-drawer-link{% if request.path == '/' or request.path == '/inicio/' %} active{% endif %}"><i class="fa-solid fa-house"></i> Inicio</a>
+        <a href="{% url 'commerce:home' %}" class="nav-drawer-link">Productos</a>
+        <span class="nav-drawer-divider">Categorías</span>
+        <a href="{% url 'commerce:category' slug='cataliticos' %}" class="nav-drawer-link{% if request.GET.cat == 'cataliticos' or request.GET.cat|slice:':11' == 'cataliticos-' %} active{% endif %}">Convertidores Catalíticos</a>
+        <a href="{% url 'commerce:category' slug='flexibles' %}" class="nav-drawer-link{% if request.GET.cat == 'flexibles' or request.GET.cat|slice:':9' == 'flexibles' %} active{% endif %}">Flexibles Reforzados</a>
+        <a href="{% url 'commerce:category' slug='resonador-deportivo-alto-flujo-ltm' %}" class="nav-drawer-link{% if request.GET.cat == 'resonador-deportivo-alto-flujo-ltm' %} active{% endif %}">Resonadores Deportivo Alto Flujo</a>
+        <a href="{% url 'commerce:category' slug='silenciador-linea-dw' %}" class="nav-drawer-link{% if request.GET.cat == 'silenciador-linea-dw' %} active{% endif %}">Silenciadores</a>
+        <a href="{% url 'commerce:category' slug='silenciador-alto-flujo-lt' %}" class="nav-drawer-link{% if request.GET.cat == 'silenciador-alto-flujo-lt' %} active{% endif %}">Silenciadores Alto Flujo</a>
+        <a href="{% url 'commerce:category' slug='colas-de-escape' %}" class="nav-drawer-link{% if request.GET.cat == 'colas-de-escape' %} active{% endif %}">Colas de escapes</a>
+        <span class="nav-drawer-divider">Búsqueda</span>
+        {% comment %}TODO EGARAGE: core:vehicle_search no existe en Commerce{% endcomment %}
+        {% comment %}TODO EGARAGE: catalog:escape_search no existe en Commerce{% endcomment %}
+        {% comment %}TODO EGARAGE: catalog:buscar_escape no existe en Commerce{% endcomment %}
+        <span class="nav-drawer-divider">Más</span>
+        <a href="{% url 'commerce:home' %}#punto-retiro" class="nav-drawer-link"><i class="fa-solid fa-location-dot"></i> Exhibición y Ventas</a>
+        <a href="#contacto" class="nav-drawer-link"><i class="fa-solid fa-comment-dots"></i> Contacto</a>
+        <a href="{% url 'commerce:cart' %}" class="nav-drawer-link nav-drawer-link-cart"><i class="fa-solid fa-cart-shopping"></i> Carrito</a>
+      </div>
+    </div>
+
+    {% comment %} Desktop: barra horizontal de enlaces (oculta en móvil) {% endcomment %}
+    <div class="nav-menu-desk">
+      <a href="{% url 'commerce:category' slug='cataliticos' %}" class="nav-link{% if request.GET.cat == 'cataliticos' or request.GET.cat|slice:':11' == 'cataliticos-' %} active{% endif %}">Convertidores Catalíticos<i class="fa-solid fa-chevron-down nav-chevron"></i></a>
+      <a href="{% url 'commerce:category' slug='flexibles' %}" class="nav-link{% if request.GET.cat == 'flexibles' or request.GET.cat|slice:':9' == 'flexibles' %} active{% endif %}">Flexibles Reforzados<i class="fa-solid fa-chevron-down nav-chevron"></i></a>
+      <a href="{% url 'commerce:category' slug='resonador-deportivo-alto-flujo-ltm' %}" class="nav-link{% if request.GET.cat == 'resonador-deportivo-alto-flujo-ltm' %} active{% endif %}">Resonadores Deportivo Alto Flujo</a>
+      <a href="{% url 'commerce:category' slug='silenciador-linea-dw' %}" class="nav-link{% if request.GET.cat == 'silenciador-linea-dw' %} active{% endif %}">Silenciadores</a>
+      <a href="{% url 'commerce:category' slug='silenciador-alto-flujo-lt' %}" class="nav-link{% if request.GET.cat == 'silenciador-alto-flujo-lt' %} active{% endif %}">Silenciadores Alto Flujo</a>
+      <a href="{% url 'commerce:category' slug='colas-de-escape' %}" class="nav-link{% if request.GET.cat == 'colas-de-escape' %} active{% endif %}">Colas de escapes</a>
+      <a href="{% url 'commerce:home' %}" class="nav-link{% if request.path == '/' or request.path == '/inicio/' %} active{% endif %}"><i class="fa-solid fa-house"></i>Inicio</a>
+      <a href="{% url 'commerce:home' %}#punto-retiro" class="nav-link"><i class="fa-solid fa-location-dot"></i>Exhibición y Ventas</a>
+      <a href="#contacto" class="nav-link"><i class="fa-solid fa-comment-dots"></i>Contacto</a>
+      <a href="{% url 'commerce:cart' %}" class="nav-link cart"><i class="fa-solid fa-cart-shopping"></i>Carrito</a>
+    </div>
+  </div>
+</nav>

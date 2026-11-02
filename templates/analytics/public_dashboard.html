@@ -1,0 +1,1165 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<style>
+:root {
+    --eg-bg: #07111f;
+    --eg-panel: rgba(15, 23, 42, .92);
+    --eg-panel-2: rgba(30, 41, 59, .72);
+    --eg-border: rgba(148, 163, 184, .16);
+    --eg-text: #e2e8f0;
+    --eg-muted: #94a3b8;
+    --eg-cyan: #22d3ee;
+    --eg-blue: #3b82f6;
+    --eg-green: #10b981;
+    --eg-red: #ef4444;
+    --eg-purple: #a855f7;
+    --eg-orange: #f59e0b;
+}
+
+#content {
+    padding: 0 !important;
+}
+
+.eg-analytics {
+    min-height: 100vh;
+    padding: 28px;
+    color: var(--eg-text);
+    background:
+        radial-gradient(circle at 10% 0%, rgba(34,211,238,.12), transparent 28%),
+        radial-gradient(circle at 90% 10%, rgba(168,85,247,.10), transparent 25%),
+        linear-gradient(135deg, #07111f 0%, #0f172a 55%, #07111f 100%);
+}
+
+.eg-shell {
+    width: min(1600px, 100%);
+    margin: 0 auto;
+}
+
+.eg-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.eg-title-wrap h1 {
+    margin: 0;
+    color: #f8fafc;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 900;
+    letter-spacing: -.035em;
+}
+
+.eg-title-wrap h1 span {
+    background: linear-gradient(90deg, var(--eg-cyan), #60a5fa, #c084fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.eg-subtitle {
+    max-width: 820px;
+    margin: 10px 0 0;
+    color: var(--eg-muted);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.eg-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 10px 16px;
+    border: 1px solid rgba(34,211,238,.25);
+    border-radius: 12px;
+    background: rgba(15,23,42,.72);
+    color: #cffafe !important;
+    font-weight: 700;
+    text-decoration: none !important;
+    transition: .2s ease;
+}
+
+.eg-back:hover {
+    border-color: var(--eg-cyan);
+    background: rgba(34,211,238,.10);
+    transform: translateY(-1px);
+}
+
+.eg-kpis {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(150px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.eg-command {
+    margin: 0 0 22px;
+    padding: 18px 20px;
+    border: 1px solid rgba(34,211,238,.28);
+    border-radius: 18px;
+    background: linear-gradient(120deg, rgba(8,20,37,.96), rgba(15,23,42,.88));
+    box-shadow: 0 0 35px rgba(34,211,238,.07), inset 0 1px rgba(255,255,255,.05);
+}
+.eg-command-title { color:#67e8f9; font:700 12px/1.2 ui-monospace,monospace; letter-spacing:.18em; text-transform:uppercase; }
+.eg-luxury-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin:0 0 20px; }
+.eg-luxury-card { padding:18px; border:1px solid var(--eg-border); border-radius:16px; background:rgba(15,23,42,.78); }
+.eg-luxury-card h3 { margin:0 0 14px; color:#f8fafc; font-size:14px; letter-spacing:.04em; }
+.eg-health { display:flex; align-items:center; gap:9px; color:#86efac; font-size:12px; font-weight:700; }
+.eg-health-dot { width:9px; height:9px; border-radius:50%; background:#22c55e; box-shadow:0 0 12px #22c55e; }
+.eg-source-row,.eg-error-row { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid rgba(148,163,184,.10); color:#cbd5e1; font-size:12px; }
+.eg-source-row:last-child,.eg-error-row:last-child { border-bottom:0; }
+.eg-live-funnel { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.eg-live-step { position:relative; padding:13px; border-radius:12px; background:rgba(2,6,23,.72); border:1px solid rgba(34,211,238,.18); }
+.eg-live-step strong { display:block; color:#67e8f9; font-size:21px; }
+.eg-live-step span { color:#94a3b8; font-size:11px; }
+
+.eg-kpi {
+    position: relative;
+    overflow: hidden;
+    min-height: 126px;
+    padding: 20px;
+    border: 1px solid var(--eg-border);
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(30,41,59,.88), rgba(15,23,42,.95));
+    box-shadow: 0 18px 45px rgba(0,0,0,.18);
+}
+
+.eg-kpi::after {
+    content: "";
+    position: absolute;
+    right: -28px;
+    bottom: -28px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    filter: blur(4px);
+    opacity: .13;
+    background: currentColor;
+}
+
+.eg-kpi .eg-label {
+    color: var(--eg-muted);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.eg-kpi .eg-value {
+    margin-top: 12px;
+    color: #fff;
+    font-size: 34px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.eg-kpi .eg-mini {
+    margin-top: 10px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.eg-kpi.total { color: var(--eg-cyan); }
+.eg-kpi.human { color: var(--eg-green); }
+.eg-kpi.bot { color: var(--eg-red); }
+.eg-kpi.landing { color: var(--eg-blue); }
+.eg-kpi.welcome { color: var(--eg-purple); }
+
+.eg-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.eg-panel {
+    grid-column: span 6;
+    padding: 20px;
+    border: 1px solid var(--eg-border);
+    border-radius: 20px;
+    background:
+        linear-gradient(145deg, rgba(15,23,42,.96), rgba(15,23,42,.82));
+    box-shadow: 0 18px 45px rgba(0,0,0,.18);
+}
+
+.eg-panel.wide {
+    grid-column: span 12;
+}
+
+.eg-panel.third {
+    grid-column: span 4;
+}
+
+.eg-panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.eg-panel-title h2 {
+    margin: 0;
+    color: #f1f5f9;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.eg-panel-title small {
+    color: var(--eg-muted);
+}
+
+.eg-chart {
+    position: relative;
+    width: 100%;
+    min-height: 310px;
+}
+
+.eg-chart.tall {
+    min-height: 360px;
+}
+
+.eg-chart canvas {
+    width: 100% !important;
+    height: 310px !important;
+}
+
+.eg-chart.tall canvas {
+    height: 360px !important;
+}
+
+.eg-table-wrap {
+    max-height: 430px;
+    overflow: auto;
+    border: 1px solid rgba(148,163,184,.12);
+    border-radius: 14px;
+    background: #0d1526;
+}
+
+.eg-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+}
+
+.eg-table th,
+.eg-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(148,163,184,.10);
+    text-align: left;
+    background: transparent;
+}
+
+.eg-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #111c2e !important;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.eg-table td {
+    color: #dbeafe;
+    font-size: 13px;
+    background: transparent !important;
+}
+
+.eg-table tbody tr {
+    background: transparent;
+}
+
+.eg-table tbody tr:hover {
+    background: rgba(34,211,238,.08) !important;
+}
+
+.eg-number {
+    font-weight: 900;
+    color: #fff;
+}
+
+.eg-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border: 1px solid rgba(34,211,238,.18);
+    border-radius: 999px;
+    background: rgba(34,211,238,.08);
+    color: #a5f3fc;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.eg-note {
+    margin: 12px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.eg-empty {
+    padding: 30px 15px !important;
+    color: #64748b !important;
+    text-align: center !important;
+}
+
+@media (max-width: 1180px) {
+    .eg-kpis {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .eg-panel.third {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 820px) {
+    .eg-analytics {
+        padding: 16px;
+    }
+
+    .eg-header {
+        flex-direction: column;
+    }
+
+    .eg-kpis {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .eg-panel,
+    .eg-panel.third,
+    .eg-panel.wide {
+        grid-column: span 12;
+    }
+}
+
+@media (max-width: 520px) {
+    .eg-kpis {
+        grid-template-columns: 1fr;
+    }
+
+    .eg-kpi {
+        min-height: 105px;
+    }
+}
+</style>
+
+
+<div class="eg-analytics">
+<div class="eg-shell">
+
+    <header class="eg-header">
+        <div class="eg-title-wrap">
+            <h1>Analytics <span>eGarage</span></h1>
+            <p class="eg-subtitle">
+                Inteligencia de tráfico público por país, rubro y landing.
+                Las métricas comerciales usan tráfico humano para evitar
+                distorsión provocada por bots y pruebas automatizadas.
+            </p>
+        </div>
+
+        <a class="eg-back" href="/admin/">
+            ← Panel Admin
+        </a>
+    </header>
+
+    <form method="get" style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+        <label for="analytics-period" style="color:var(--eg-muted);font-size:13px;">Ventana de medición</label>
+        <select id="analytics-period" name="period" onchange="this.form.submit()" style="padding:8px 12px;border-radius:8px;background:#0f172a;color:#e2e8f0;border:1px solid var(--eg-border);">
+            {% for value,label in period_choices %}<option value="{{ value }}" {% if value == period %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+    </form>
+
+    <section class="eg-command">
+        <div class="eg-command-title">eGarage Command Center // Analytics &amp; Health Monitor</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:10px;">
+            <span style="color:#cbd5e1;font-size:13px;">Estado operativo de la ventana seleccionada</span>
+            <span class="eg-health"><i class="eg-health-dot"></i>SISTEMA ESTABLE</span>
+        </div>
+    </section>
+
+    <section class="eg-kpis" style="margin-bottom:20px;">
+        <article class="eg-kpi human"><div class="eg-label">Visitas humanas</div><div class="eg-value">{{ humanos }}</div><div class="eg-mini">Ventana {{ period }}</div></article>
+        <article class="eg-kpi" style="color:var(--eg-green);"><div class="eg-label">Signups exitosos</div><div class="eg-value">{{ eventos_funnel.signup_success }}</div><div class="eg-mini">signup_success</div></article>
+        <article class="eg-kpi" style="color:var(--eg-orange);"><div class="eg-label">Drop-off formulario</div><div class="eg-value">{{ salud.dropoff_rate }}%</div><div class="eg-mini">Submit vs cuenta creada</div></article>
+        <article class="eg-kpi" style="color:var(--eg-purple);"><div class="eg-label">Clientes activos</div><div class="eg-value">{{ salud.clientes_activos }}</div><div class="eg-mini">Pago vigente</div></article>
+        <article class="eg-kpi" style="color:var(--eg-red);"><div class="eg-label">Error de formulario</div><div class="eg-value">{{ salud.system_error_rate }}%</div><div class="eg-mini">Validaciones rechazadas</div></article>
+        <article class="eg-kpi" style="color:var(--eg-cyan);"><div class="eg-label">Consultas Kiosko</div><div class="eg-value">{{ salud.kiosko_consultas }}</div><div class="eg-mini">Rutas públicas kiosko</div></article>
+    </section>
+
+    <section class="eg-luxury-grid">
+        <article class="eg-luxury-card">
+            <h3>01 // Atribución comercial</h3>
+            {% for row in atribucion %}<div class="eg-source-row"><span>{{ row.attribution_type|default:"direct"|title }}</span><strong>{{ row.total }}</strong></div>{% empty %}<div class="eg-source-row"><span>Sin sesiones en ventana</span><strong>0</strong></div>{% endfor %}
+            <div style="margin-top:12px;color:#94a3b8;font-size:11px;">Mayor intención por rubro: {{ por_rubro.0.label|default:"Sin datos" }}</div>
+        </article>
+        <article class="eg-luxury-card">
+            <h3>02 // Salud y errores de usuarios</h3>
+            <div class="eg-source-row"><span>Errores de validación</span><strong>{{ eventos_funnel.signup_validation_errors }}</strong></div>
+            {% for error in salud.errores_formulario %}<div class="eg-error-row"><span>{{ error.path|default:"Formulario" }}</span><strong>{{ error.created_at|date:"H:i" }}</strong></div>{% empty %}<div class="eg-error-row"><span>Sin errores recientes</span><strong>OK</strong></div>{% endfor %}
+        </article>
+    </section>
+
+    <section class="eg-luxury-card" style="margin-bottom:20px;">
+        <h3>03 // Embudo en tiempo real</h3>
+        <div class="eg-live-funnel">{% for step in funnel_real_time %}<div class="eg-live-step"><strong>{{ step.pct }}%</strong><span>{{ step.label }} · {{ step.value }}</span></div>{% endfor %}</div>
+    </section>
+
+    <section class="eg-luxury-card" style="margin-bottom:20px;">
+        <h3>// Telemetría continental // Tráfico y conversión panamericana</h3>
+        <div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(220px,1fr);gap:16px;align-items:center;">
+            <svg viewBox="0 0 500 520" role="img" aria-label="Mapa de telemetría de América" style="width:100%;height:360px;background:radial-gradient(ellipse at 50% 48%,#0b2944 0%,#020617 72%);border:1px solid rgba(34,211,238,.22);border-radius:12px;">
+                <defs>
+                    <linearGradient id="landFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#123d5a" stop-opacity=".92"/><stop offset="1" stop-color="#071827" stop-opacity=".9"/></linearGradient>
+                    <filter id="mapGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                    <pattern id="latlon" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0V42" fill="none" stroke="#38bdf8" stroke-opacity=".07" stroke-width=".7"/></pattern>
+                </defs>
+                <rect x="0" y="0" width="500" height="520" fill="url(#latlon)"/>
+                <g id="geojson-layer" fill="url(#landFill)" stroke="#38bdf8" stroke-opacity=".62" stroke-width=".8"></g>
+                <text x="22" y="28" fill="#67e8f9" fill-opacity=".65" font-size="9" font-family="monospace" letter-spacing="2">AMERICAS // LIVE</text>
+                {% for iso,data in resumen_mapa.items %}<g onclick="mostrarDetallePais('{{ iso }}','{{ data.nombre }}','{{ data.visitas }}','{{ data.altas }}')" style="cursor:pointer"><circle cx="{{ data.x }}" cy="{{ data.y }}" r="{% if data.activo %}12{% else %}4{% endif %}" fill="{% if data.activo %}#00f0ff{% else %}#334155{% endif %}" opacity="{% if data.activo %}.85{% else %}.7{% endif %}"/><text x="{{ data.x|add:8 }}" y="{{ data.y|add:3 }}" fill="{% if data.activo %}#a5f3fc{% else %}#64748b{% endif %}" font-size="10" font-family="monospace">{{ iso }}</text></g>{% endfor %}
+            </svg>
+            <div id="map-country-detail" style="padding:16px;border:1px solid rgba(34,211,238,.18);border-radius:12px;background:rgba(2,6,23,.52);color:#cbd5e1;font-size:12px;">
+                <div style="color:#67e8f9;font:700 11px ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;">Terminal de país</div>
+                <h4 id="map-country-name" style="color:#fff;font-size:18px;margin:14px 0;">Chile</h4>
+                <div>Visitas humanas: <strong id="map-country-visits" style="color:#67e8f9;">—</strong></div>
+                <div style="margin-top:8px;">Altas: <strong id="map-country-signups" style="color:#86efac;">—</strong></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="eg-luxury-card" style="margin-bottom:20px;overflow:auto;">
+        <h3>// Rendimiento por canal de adquisición</h3>
+        <table class="eg-table" style="min-width:680px;"><thead><tr><th>Canal</th><th>Visitas</th><th>CTA registro</th><th>WhatsApp</th><th>Conversión</th></tr></thead><tbody>
+        {% for canal in metricas_canales %}<tr><td><strong>{{ canal.nombre }}</strong></td><td>{{ canal.visitas }}</td><td>{{ canal.cta_signup }}</td><td>{{ canal.cta_whatsapp }}</td><td>{{ canal.tasa_conversion }}%</td></tr>{% empty %}<tr><td colspan="5" class="eg-empty">Sin datos de canal en la ventana.</td></tr>{% endfor %}
+        </tbody></table>
+    </section>
+
+<script>
+    (function loadRealMap() {
+      var svg = document.querySelector('svg[aria-label="Mapa de telemetría de América"]');
+      var layer = document.getElementById('geojson-layer');
+      if (!svg || !layer) return;
+      var ns = 'http://www.w3.org/2000/svg';
+      var project = function (point) {
+        var lon = point[0], lat = point[1];
+        return [25 + ((lon + 170) / 140) * 450, 25 + ((75 - lat) / 135) * 470];
+      };
+      var drawPolygon = function (ring) {
+        if (!ring || !ring.length) return '';
+        return 'M ' + ring.map(function (p, i) { var q = project(p); return (i ? 'L ' : '') + q[0].toFixed(2) + ' ' + q[1].toFixed(2); }).join(' ') + ' Z';
+      };
+      var drawGeometry = function (geometry) {
+        var paths = [];
+        if (geometry.type === 'Polygon') paths = geometry.coordinates.map(drawPolygon);
+        if (geometry.type === 'MultiPolygon') geometry.coordinates.forEach(function (poly) { poly.forEach(function (ring) { paths.push(drawPolygon(ring)); }); });
+        paths.filter(Boolean).forEach(function (d) { var path = document.createElementNS(ns, 'path'); path.setAttribute('d', d); path.setAttribute('vector-effect', 'non-scaling-stroke'); layer.appendChild(path); });
+      };
+      fetch('/static/analytics/ne_110m_admin_0_countries.geojson', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (geo) {
+        (geo.features || []).forEach(function (feature) {
+          var c = feature.geometry && feature.geometry.coordinates;
+          if (!c || !feature.geometry) return;
+          var text = JSON.stringify(c);
+          if (!text.match(/-([3-9][0-9]|1[0-7][0-9])/)) return;
+          drawGeometry(feature.geometry);
+        });
+      }).catch(function () { layer.setAttribute('data-fallback', 'true'); });
+    })();
+
+    function mostrarDetallePais(iso, nombre, visitas, altas) {
+      document.getElementById('map-country-name').textContent = iso + ' · ' + nombre;
+      document.getElementById('map-country-visits').textContent = Number(visitas).toLocaleString('es-CL');
+      document.getElementById('map-country-signups').textContent = Number(altas).toLocaleString('es-CL');
+    }
+    </script>
+
+
+    <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;">
+        <div class="eg-kpi" style="color:var(--eg-cyan);text-align:center;">
+            <div class="eg-label">Sesiones landing</div>
+            <div class="eg-value">{{ funnel.sesiones_landing }}</div>
+            <div class="eg-mini">Con sesión pública</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-blue);text-align:center;">
+            <div class="eg-label">Empresas atribuidas</div>
+            <div class="eg-value">{{ funnel.empresas }}</div>
+            <div class="eg-mini">Vinculadas a sesión web</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-purple);text-align:center;">
+            <div class="eg-label">Trials atribuidos</div>
+            <div class="eg-value">{{ funnel.trials }}</div>
+            <div class="eg-mini">Desde embudo web</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-green);text-align:center;">
+            <div class="eg-label">Pagadas atribuidas</div>
+            <div class="eg-value">{{ funnel.suscripciones }}</div>
+            <div class="eg-mini">Activas desde sesión web</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-orange);text-align:center;">
+            <div class="eg-label">Conversión landing</div>
+            <div class="eg-value">{{ funnel.tasa_conversion }}%</div>
+            <div class="eg-mini">Empresas / sesiones landing</div>
+        </div>
+    </section>
+
+    <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+        <div class="eg-kpi" style="color:var(--eg-cyan);text-align:center;">
+            <div class="eg-label">Altas globales</div>
+            <div class="eg-value">{{ crecimiento_global.empresas }}</div>
+            <div class="eg-mini">Sistema completo</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-purple);text-align:center;">
+            <div class="eg-label">Trials globales</div>
+            <div class="eg-value">{{ crecimiento_global.trials }}</div>
+            <div class="eg-mini">Incluye canales no medidos</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-green);text-align:center;">
+            <div class="eg-label">Pagadas globales</div>
+            <div class="eg-value">{{ crecimiento_global.suscripciones }}</div>
+            <div class="eg-mini">Suscripciones activas</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-red);text-align:center;">
+            <div class="eg-label">Sin atribución web</div>
+            <div class="eg-value">{{ crecimiento_global.altas_sin_atribucion }}</div>
+            <div class="eg-mini">Admin, importadas o directas</div>
+        </div>
+    </section>
+
+    <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+        <div class="eg-kpi" style="color:var(--eg-cyan);text-align:center;">
+            <div class="eg-label">Landings canónicas</div>
+            <div class="eg-value">{{ conversion_real.landings_canonicas }}</div>
+            <div class="eg-mini">Solo egarage.cl / www</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-orange);text-align:center;">
+            <div class="eg-label">CTA / WhatsApp</div>
+            <div class="eg-value">{{ conversion_real.cta_whatsapp }}</div>
+            <div class="eg-mini">Eventos de intención</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-purple);text-align:center;">
+            <div class="eg-label">Leads capturados</div>
+            <div class="eg-value">{{ conversion_real.leads_capturados }}</div>
+            <div class="eg-mini">{{ leads_pendientes }} pendientes de contacto</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-green);text-align:center;">
+            <div class="eg-label">Altas creadas</div>
+            <div class="eg-value">{{ conversion_real.altas_creadas }}</div>
+            <div class="eg-mini">Empresas reales</div>
+        </div>
+    </section>
+
+    <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+        <div class="eg-kpi" style="color:var(--eg-orange);text-align:center;">
+            <div class="eg-label">CTA WhatsApp</div>
+            <div class="eg-value">{{ eventos_funnel.cta_whatsapp }}</div>
+            <div class="eg-mini">cta_whatsapp_click</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-blue);text-align:center;">
+            <div class="eg-label">CTA registro</div>
+            <div class="eg-value">{{ eventos_funnel.cta_signup }}</div>
+            <div class="eg-mini">cta_signup_click</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-purple);text-align:center;">
+            <div class="eg-label">Signup exitosos</div>
+            <div class="eg-value">{{ eventos_funnel.signup_success }}</div>
+            <div class="eg-mini">signup_success</div>
+        </div>
+        <div class="eg-kpi" style="color:var(--eg-red);text-align:center;">
+            <div class="eg-label">Ráfagas humanas</div>
+            <div class="eg-value">{{ visitas_rafaga }}</div>
+            <div class="eg-mini">Excluidas de prospectos</div>
+        </div>
+    </section>
+
+    <section class="eg-kpis">
+
+        <article class="eg-kpi total">
+            <div class="eg-label">Total registrado</div>
+            <div class="eg-value">{{ total }}</div>
+            <div class="eg-mini">Todas las solicitudes</div>
+        </article>
+
+        <article class="eg-kpi human">
+            <div class="eg-label">Visitas humanas</div>
+            <div class="eg-value">{{ humanos }}</div>
+            <div class="eg-mini">Tráfico sin user-agent bot</div>
+        </article>
+
+        <article class="eg-kpi bot">
+            <div class="eg-label">Bots / pruebas</div>
+            <div class="eg-value">{{ bots }}</div>
+            <div class="eg-mini">Excluidos del análisis comercial</div>
+        </article>
+
+        <article class="eg-kpi landing">
+            <div class="eg-label">Landings humanas</div>
+            <div class="eg-value">{{ landings_humanas }}</div>
+            <div class="eg-mini">Visitas a páginas por rubro</div>
+        </article>
+
+        <article class="eg-kpi welcome">
+            <div class="eg-label">Bienvenidas humanas</div>
+            <div class="eg-value">{{ bienvenidas_humanas }}</div>
+            <div class="eg-mini">Entradas por país / idioma</div>
+        </article>
+
+        <article class="eg-kpi">
+            <div class="eg-label">Home humanas</div>
+            <div class="eg-value">{{ home_humanas }}</div>
+            <div class="eg-mini">Visitas humanas a página principal</div>
+        </article>
+
+    </section>
+
+
+    <section class="eg-grid">
+
+        <article class="eg-panel">
+            <div class="eg-panel-title">
+                <h2>🌎 Tráfico humano por país</h2>
+                <small>Distribución</small>
+            </div>
+            <div class="eg-chart">
+                <canvas id="chartPaises"></canvas>
+            </div>
+        </article>
+
+
+        <article class="eg-panel">
+            <div class="eg-panel-title">
+                <h2>🔧 Interés por rubro</h2>
+                <small>Landings</small>
+            </div>
+            <div class="eg-chart">
+                <canvas id="chartRubros"></canvas>
+            </div>
+        </article>
+
+
+        <article class="eg-panel wide">
+            <div class="eg-panel-title">
+                <h2>📈 Tendencia diaria humana</h2>
+                <small>Últimos registros</small>
+            </div>
+            <div class="eg-chart tall">
+                <canvas id="chartTendencia"></canvas>
+            </div>
+        </article>
+
+
+        <article class="eg-panel third">
+            <div class="eg-panel-title">
+                <h2>🏁 Bienvenidas</h2>
+                <small>Por país</small>
+            </div>
+
+            <div class="eg-table-wrap">
+                <table class="eg-table">
+                    <thead>
+                        <tr>
+                            <th>País</th>
+                            <th>Visitas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in por_bienvenida %}
+                        <tr>
+                            <td><span class="eg-pill">{{ row.label }}</span></td>
+                            <td class="eg-number">{{ row.total }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="2" class="eg-empty">Sin datos todavía.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+
+        <article class="eg-panel third">
+            <div class="eg-panel-title">
+                <h2>🎯 País + rubro</h2>
+                <small>Segmentación</small>
+            </div>
+
+            <div class="eg-table-wrap">
+                <table class="eg-table">
+                    <thead>
+                        <tr>
+                            <th>País</th>
+                            <th>Rubro</th>
+                            <th>Visitas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in pais_rubro %}
+                        <tr>
+                            <td>{{ row.country_label }}</td>
+                            <td>{{ row.rubro_label }}</td>
+                            <td class="eg-number">{{ row.total }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="eg-empty">Sin datos todavía.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+
+        <article class="eg-panel third">
+            <div class="eg-panel-title">
+                <h2>🚗 Landings principales</h2>
+                <small>Personas</small>
+            </div>
+
+            <div class="eg-table-wrap">
+                <table class="eg-table">
+                    <thead>
+                        <tr>
+                            <th>Landing</th>
+                            <th>Visitas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in paginas_top %}
+                        <tr>
+                            <td>{{ row.path }}</td>
+                            <td class="eg-number">{{ row.total }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="2" class="eg-empty">Sin datos todavía.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="eg-panel wide">
+            <div class="eg-panel-title">
+                <h2>📞 Leads capturados del signup</h2>
+                <small>Prospectos antes de completar registro</small>
+            </div>
+            <div class="eg-table-wrap">
+                <table class="eg-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>WhatsApp</th>
+                            <th>Rubro</th>
+                            <th>País</th>
+                            <th>Contacto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for lead in leads_recientes %}
+                        <tr>
+                            <td>{{ lead.fecha_creacion|date:"Y-m-d H:i" }}</td>
+                            <td>{{ lead.nombre|default:"-" }}</td>
+                            <td>{{ lead.email|default:"-" }}</td>
+                            <td>{{ lead.whatsapp|default:"-" }}</td>
+                            <td>{{ lead.rubro|default:"-" }}</td>
+                            <td>{{ lead.pais|default:"-" }}</td>
+                            <td>
+                                {% if lead.whatsapp_url %}
+                                    <a class="eg-pill" href="{{ lead.whatsapp_url }}" target="_blank" rel="noopener">WhatsApp</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="7" class="eg-empty">Sin leads capturados todavía.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="eg-panel third">
+            <div class="eg-panel-title">
+                <h2>🔗 Fuentes de tráfico</h2>
+                <small>Referrers humanos</small>
+            </div>
+            <div class="eg-table-wrap">
+                <table class="eg-table">
+                    <thead>
+                        <tr><th>Referrer</th><th>Visitas</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for row in por_referrer %}
+                        <tr>
+                            <td style="word-break:break-all;font-size:11px;">{{ row.referrer }}</td>
+                            <td class="eg-number">{{ row.total }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="2" class="eg-empty">Sin referrers externos.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="eg-panel third">
+            <div class="eg-panel-title">
+                <h2>📱 Dispositivo</h2>
+                <small>Mobile vs Desktop</small>
+            </div>
+            <div class="eg-chart">
+                <canvas id="chartMobile"></canvas>
+            </div>
+        </article>
+
+        <article class="eg-panel third">
+            <div class="eg-panel-title">
+                <h2>🌐 Idioma</h2>
+                <small>Visitas humanas</small>
+            </div>
+            <div class="eg-table-wrap">
+                <table class="eg-table">
+                    <thead>
+                        <tr><th>Idioma</th><th>Visitas</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for row in por_idioma %}
+                        <tr>
+                            <td><span class="eg-pill">{{ row.language|upper }}</span></td>
+                            <td class="eg-number">{{ row.total }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="2" class="eg-empty">Sin datos de idioma.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="eg-panel third">
+            <div class="eg-panel-title">
+                <h2>🏢 Empresas / día</h2>
+                <small>Por fecha_inicio</small>
+            </div>
+            <div class="eg-table-wrap">
+                <table class="eg-table">
+                    <thead>
+                        <tr><th>Día</th><th>Altas</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for row in empresas_por_dia %}
+                        <tr>
+                            <td>{{ row.dia|date:"Y-m-d" }}</td>
+                            <td class="eg-number">{{ row.total }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="2" class="eg-empty">Sin registros todavía.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+    </section>
+
+    <p class="eg-note">
+        El rubro se deriva de la landing pública visitada:
+        taller mecánico, desarmaduría, casa de repuestos,
+        carwash o vulcanización / llantera.
+    </p>
+
+</div>
+</div>
+
+
+<script>
+(function () {
+    if (typeof Chart === "undefined") {
+        console.error("Chart.js no está disponible.");
+        return;
+    }
+
+    Chart.defaults.color = "#94a3b8";
+    Chart.defaults.borderColor = "rgba(148,163,184,.10)";
+    Chart.defaults.font.family =
+        '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif';
+
+    const palette = [
+        "#22d3ee",
+        "#3b82f6",
+        "#10b981",
+        "#a855f7",
+        "#f59e0b",
+        "#ef4444",
+        "#14b8a6",
+        "#6366f1",
+        "#84cc16",
+        "#ec4899",
+        "#06b6d4",
+        "#8b5cf6"
+    ];
+
+
+    const paisLabels = [
+        {% for row in por_pais %}
+        "{{ row.label|escapejs }}"{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const paisValues = [
+        {% for row in por_pais %}
+        {{ row.total|default:0 }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const paisCanvas = document.getElementById("chartPaises");
+
+    if (paisCanvas && paisLabels.length) {
+        new Chart(paisCanvas, {
+            type: "doughnut",
+            data: {
+                labels: paisLabels,
+                datasets: [{
+                    data: paisValues,
+                    backgroundColor: palette,
+                    borderColor: "#0f172a",
+                    borderWidth: 3,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "65%",
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            usePointStyle: true,
+                            padding: 18
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return " " + ctx.label + ": " + ctx.raw + " visitas";
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+
+    const rubroLabels = [
+        {% for row in por_rubro %}
+        "{{ row.label|escapejs }}"{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const rubroValues = [
+        {% for row in por_rubro %}
+        {{ row.total|default:0 }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const rubroCanvas = document.getElementById("chartRubros");
+
+    if (rubroCanvas && rubroLabels.length) {
+        new Chart(rubroCanvas, {
+            type: "bar",
+            data: {
+                labels: rubroLabels,
+                datasets: [{
+                    label: "Visitas humanas",
+                    data: rubroValues,
+                    backgroundColor: [
+                        "rgba(34,211,238,.72)",
+                        "rgba(168,85,247,.72)",
+                        "rgba(132,204,22,.72)",
+                        "rgba(245,158,11,.72)",
+                        "rgba(59,130,246,.72)"
+                    ],
+                    borderColor: [
+                        "#22d3ee",
+                        "#a855f7",
+                        "#84cc16",
+                        "#f59e0b",
+                        "#3b82f6"
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: "y",
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        },
+                        grid: {
+                            color: "rgba(148,163,184,.08)"
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+
+    const tendenciaLabels = [
+        {% for row in tendencia reversed %}
+        "{{ row.fecha|date:'d M'|escapejs }}"{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const tendenciaHumanos = [
+        {% for row in tendencia reversed %}
+        {{ row.humanos|default:0 }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const tendenciaBots = [
+        {% for row in tendencia reversed %}
+        {{ row.bots|default:0 }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const tendenciaCanvas = document.getElementById("chartTendencia");
+
+    if (tendenciaCanvas && tendenciaLabels.length) {
+        const ctx = tendenciaCanvas.getContext("2d");
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, 360);
+        gradient.addColorStop(0, "rgba(34,211,238,.35)");
+        gradient.addColorStop(1, "rgba(34,211,238,0)");
+
+        new Chart(tendenciaCanvas, {
+            type: "line",
+            data: {
+                labels: tendenciaLabels,
+                datasets: [
+                    {
+                        label: "Humanos",
+                        data: tendenciaHumanos,
+                        borderColor: "#22d3ee",
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: .35,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: "#0f172a",
+                        pointBorderColor: "#22d3ee",
+                        pointBorderWidth: 2
+                    },
+                    {
+                        label: "Bots",
+                        data: tendenciaBots,
+                        borderColor: "#f43f5e",
+                        backgroundColor: "rgba(244,63,94,.10)",
+                        fill: true,
+                        tension: .35,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: "#0f172a",
+                        pointBorderColor: "#f43f5e",
+                        pointBorderWidth: 2,
+                        borderDash: [4, 3]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: "index",
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: { usePointStyle: true, padding: 16 }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        },
+                        grid: {
+                            color: "rgba(148,163,184,.08)"
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+    const mobileCanvas = document.getElementById("chartMobile");
+    if (mobileCanvas) {
+        new Chart(mobileCanvas, {
+            type: "doughnut",
+            data: {
+                labels: ["Desktop", "Mobile"],
+                datasets: [{
+                    data: [{{ mobile_share.desktop }}, {{ mobile_share.mobile }}],
+                    backgroundColor: ["rgba(34,211,238,.72)", "rgba(168,85,247,.72)"],
+                    borderColor: "#0f172a",
+                    borderWidth: 3,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "62%",
+                plugins: {
+                    legend: { position: "bottom", labels: { usePointStyle: true, padding: 16 } },
+                    tooltip: { callbacks: { label: function(ctx) { return " " + ctx.label + ": " + ctx.raw; } } }
+                }
+            }
+        });
+    }
+})();
+</script>
+
+{% endblock %}

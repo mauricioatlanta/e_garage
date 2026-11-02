@@ -1,0 +1,23 @@
+{
+  "source_sha256": "199e21d082ada04580dfd1e267573f335a71aef553482f6ccde38d2f8b68fc16",
+  "geometry_edited": false,
+  "optical_correction": "Original irregular headlamp faces reassigned as dark recess; symmetric independent housings, lenses, two projectors and fine DRL added.",
+  "face_material_counts": {
+    "body": 48890,
+    "housing": 316,
+    "tire": 9861,
+    "rim": 44201,
+    "glass": 10888
+  },
+  "body_alpha": {
+    "soft": 0.92
+  },
+  "glass_alpha": 0.34,
+  "component_count": 7,
+  "tail_lamp_review": "Rear lamps are not emissive blobs in the approved treatment and were left unchanged.",
+  "limitations": [
+    "The replacement follows a fitted analytic nose surface because the source has no clean lamp boundary loops.",
+    "No bloom compositor is used; the signature remains legible from material and geometry alone.",
+    "The source body topology and proportions are unchanged."
+  ]
+}

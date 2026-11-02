@@ -1,0 +1,120 @@
+{% if request.user.is_authenticated and request.user.is_superuser %}
+<style>
+  .eg-support-switcher {
+    position: sticky;
+    top: 0;
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .65rem;
+    min-height: 38px;
+    padding: .35rem .75rem;
+    color: #f8fafc;
+    background: #111827;
+    border-bottom: 1px solid rgba(245, 158, 11, .55);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .28);
+    font: 600 .75rem/1.2 Inter, system-ui, sans-serif;
+  }
+  .eg-support-switcher__badge {
+    color: #fef3c7;
+    white-space: nowrap;
+    letter-spacing: .02em;
+  }
+  .eg-support-switcher form {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    margin: 0;
+  }
+  .eg-support-switcher select,
+  .eg-support-switcher fieldset,
+  .eg-support-switcher button {
+    min-height: 29px;
+    border: 1px solid rgba(148, 163, 184, .45);
+    border-radius: 5px;
+    padding: .25rem .45rem;
+    color: #e5e7eb;
+    background: #1f2937;
+    font: inherit;
+  }
+  .eg-support-switcher button {
+    color: #111827;
+    background: #fbbf24;
+    border-color: #fcd34d;
+    cursor: pointer;
+    font-weight: 800;
+  }
+  .eg-support-switcher button:hover { background: #fcd34d; }
+  .eg-support-switcher__rubros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .3rem;
+    max-width: 38rem;
+    padding: .3rem;
+    border: 1px solid rgba(34, 211, 238, .32);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, .95);
+  }
+  .eg-support-switcher__rubros label {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    min-height: 27px;
+    padding: .25rem .5rem;
+    border: 1px solid rgba(148, 163, 184, .3);
+    border-radius: 6px;
+    color: #cbd5e1;
+    background: rgba(30, 41, 59, .82);
+    white-space: nowrap;
+    font-size: .68rem;
+    cursor: pointer;
+  }
+  .eg-support-switcher__rubros label:hover { border-color: #22d3ee; color: #ecfeff; }
+  .eg-support-switcher__rubros input { accent-color: #22d3ee; }
+  .eg-support-switcher__reset {
+    color: #cbd5e1 !important;
+    background: transparent !important;
+    border-color: rgba(148, 163, 184, .35) !important;
+  }
+  @media (max-width: 700px) {
+    .eg-support-switcher { flex-wrap: wrap; justify-content: flex-start; }
+    .eg-support-switcher form { flex-wrap: wrap; }
+    .eg-support-switcher select { max-width: 8.5rem; }
+  }
+</style>
+<div class="eg-support-switcher" role="region" aria-label="Entorno de soporte">
+  <span class="eg-support-switcher__badge">🛡️ Modo Soporte</span>
+  <form method="post" action="{% url 'switch_support_environment' %}">
+    {% csrf_token %}
+    <label for="support-country" class="sr-only">País</label>
+    <select id="support-country" name="country" aria-label="País">
+      <option value="cl" {% if request.session.modo_soporte_pais == "cl" or request.session.support_country == "cl" or "/cl/" in request.path and "/us/" not in request.path %}selected{% endif %}>Chile (CL)</option>
+      <option value="us" {% if request.session.modo_soporte_pais == "us" or request.session.support_country == "us" or "/us/" in request.path %}selected{% endif %}>USA (US)</option>
+      <option value="ve" {% if support_country|lower == 've' %}selected{% endif %}>Venezuela (VE)</option>
+      <option value="mx" {% if support_country|lower == 'mx' %}selected{% endif %}>México (MX)</option>
+      <option value="br" {% if support_country|lower == 'br' %}selected{% endif %}>Brasil (BR)</option>
+      <option value="ar" {% if support_country|lower == 'ar' %}selected{% endif %}>Argentina (AR)</option>
+      <option value="co" {% if support_country|lower == 'co' %}selected{% endif %}>Colombia (CO)</option>
+      <option value="pe" {% if support_country|lower == 'pe' %}selected{% endif %}>Perú (PE)</option>
+      <option value="ec" {% if support_country|lower == 'ec' %}selected{% endif %}>Ecuador (EC)</option>
+      <option value="uy" {% if support_country|lower == 'uy' %}selected{% endif %}>Uruguay (UY)</option>
+    </select>
+    <fieldset class="eg-support-switcher__rubros" aria-label="Rubros activos en soporte">
+      <legend>Rubros a activar</legend>
+      <label><input type="checkbox" name="rubros" value="TALLER" {% if 'WORKSHOP' in support_rubros %}checked{% endif %}> Taller mecánico</label>
+      <label><input type="checkbox" name="rubros" value="DESARMADURIA" {% if 'DESARMADURIA' in support_rubros %}checked{% endif %}> Desarmaduría</label>
+      <label><input type="checkbox" name="rubros" value="REPUESTOS" {% if 'PARTS' in support_rubros %}checked{% endif %}> Casa de repuestos</label>
+      <label><input type="checkbox" name="rubros" value="VULCANIZACION" {% if 'TIRE' in support_rubros %}checked{% endif %}> Vulcanización</label>
+      <label><input type="checkbox" name="rubros" value="CARWASH" {% if 'DETAILING' in support_rubros %}checked{% endif %}> Carwash</label>
+      <label><input type="checkbox" name="rubros" value="GRUAS" {% if 'TOWING' in support_rubros %}checked{% endif %}> Grúas y asistencia vial</label>
+    </fieldset>
+    <button type="submit">Aplicar</button>
+  </form>
+  <form method="post" action="{% url 'switch_support_environment' %}">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="reset">
+    <button type="submit" class="eg-support-switcher__reset">Restablecer</button>
+  </form>
+</div>
+{% endif %}

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalíticos | Atlanta Reciclajes</title>
+    <meta name="description" content="Compra de convertidores catalíticos con tasación transparente desde 2005. Qué es un catalítico, cómo se recuperan sus metales preciosos, y el precio referencial de platino, paladio y rodio.">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+      body {
+        min-height: 100vh;
+        background: #0f2027;
+        background: linear-gradient(120deg, #0f2027 0%, #2c5364 100%);
+        overflow-x: hidden;
+        position: relative;
+      }
+      #futuristic-bg {
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        z-index: 0;
+        pointer-events: none;
+        background: transparent;
+      }
+      .ambient-glow {
+        position: fixed;
+        border-radius: 9999px;
+        filter: blur(80px);
+        opacity: 0.25;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .glow-cyan { width: 30rem; height: 30rem; background: #00fff7; top: -8rem; right: -8rem; }
+      .glow-blue { width: 26rem; height: 26rem; background: #2c5364; bottom: -6rem; left: -6rem; }
+      .page-content { position: relative; z-index: 2; }
+      .glass {
+        background: rgba(20, 30, 60, 0.15) !important;
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.15);
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+      .neon { color: #00fff7; text-shadow: 0 0 12px #00fff7a0; }
+      .futur-btn {
+        background: linear-gradient(90deg, #00fff7 0%, #0ff 100%);
+        color: #0f2027 !important;
+        font-weight: bold;
+        transition: transform 0.2s;
+      }
+      .futur-btn:hover { transform: scale(1.03); }
+      .btn-secondary {
+        background: rgba(255,255,255,0.08);
+        color: #e5e7eb !important;
+        font-weight: bold;
+        border: 1px solid rgba(255,255,255,0.2);
+      }
+      .whatsapp-btn { background: #25D366; color: #fff !important; }
+      .step-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 9999px;
+        background: rgba(0,255,247,0.12);
+        border: 1px solid rgba(0,255,247,0.4);
+        font-size: 1.4rem;
+        flex-shrink: 0;
+      }
+      .metal-row { margin-bottom: 1.25rem; }
+      .metal-row:last-child { margin-bottom: 0; }
+      .metal-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 0.4rem;
+      }
+      .metal-name { color: #e5e7eb; font-weight: bold; letter-spacing: 0.03em; }
+      .metal-price { color: #00fff7; font-weight: bold; font-size: 1.15rem; }
+      .metal-track {
+        width: 100%;
+        height: 0.9rem;
+        border-radius: 9999px;
+        background: rgba(255,255,255,0.08);
+        overflow: hidden;
+      }
+      .metal-bar {
+        height: 100%;
+        border-radius: 9999px;
+        background: linear-gradient(90deg, #0891b2 0%, #00fff7 100%);
+        box-shadow: 0 0 10px rgba(0,255,247,0.5);
+        transition: width 1s ease-out;
+      }
+      .metal-bar.rodio { background: linear-gradient(90deg, #a855f7 0%, #00fff7 100%); }
+      .metal-bar.paladio { background: linear-gradient(90deg, #64748b 0%, #00fff7 100%); }
+    </style>
+</head>
+<body class="min-h-screen text-white font-sans">
+  <div id="futuristic-bg"></div>
+  <div class="ambient-glow glow-cyan"></div>
+  <div class="ambient-glow glow-blue"></div>
+
+  <div class="page-content max-w-5xl mx-auto py-16 px-4">
+    <div class="text-center mb-10">
+      <a href="/" class="text-cyan-300 text-sm">&larr; Volver al inicio</a>
+      <h1 class="text-4xl md:text-5xl font-bold neon mt-6 mb-4 tracking-wide">🚗 Catalíticos</h1>
+      <p class="text-lg text-cyan-300 mb-2">Convertidores Catalíticos · Tasación transparente desde 2005</p>
+      <p class="text-xl md:text-2xl text-cyan-200 max-w-2xl mx-auto">
+        Compra inmediata con <span class="neon font-semibold">precios reales</span>.
+        Tasamos justa y transparentemente el metal precioso (platino, paladio y rodio)
+        que contiene tu catalítico usado.
+      </p>
+    </div>
+
+    {% if precios_metal.platino or precios_metal.paladio or precios_metal.rodio %}
+    <div class="glass p-8 mb-10">
+      <h2 class="text-2xl neon font-bold mb-1 text-center">📊 Valor Referencial de Metales Preciosos</h2>
+      <p class="text-cyan-300 text-sm text-center mb-8">
+        Precios en CLP por gramo, actualizados por nuestro equipo el {{ precios_metal.actualizado_en|date:"d/m/Y" }}.
+        Referenciales — el valor final depende de la pureza y el estado de tu catalítico.
+      </p>
+      {% if precios_metal.platino %}
+      <div class="metal-row">
+        <div class="metal-label">
+          <span class="metal-name">⚪ Platino</span>
+          <span class="metal-price">${{ precios_metal.platino|floatformat:0 }} <span class="text-sm font-normal text-cyan-300">/g</span></span>
+        </div>
+        <div class="metal-track"><div class="metal-bar" style="width: {% widthratio precios_metal.platino precio_metal_max 100 %}%;"></div></div>
+      </div>
+      {% endif %}
+      {% if precios_metal.paladio %}
+      <div class="metal-row">
+        <div class="metal-label">
+          <span class="metal-name">⚫ Paladio</span>
+          <span class="metal-price">${{ precios_metal.paladio|floatformat:0 }} <span class="text-sm font-normal text-cyan-300">/g</span></span>
+        </div>
+        <div class="metal-track"><div class="metal-bar paladio" style="width: {% widthratio precios_metal.paladio precio_metal_max 100 %}%;"></div></div>
+      </div>
+      {% endif %}
+      {% if precios_metal.rodio %}
+      <div class="metal-row">
+        <div class="metal-label">
+          <span class="metal-name">🟣 Rodio</span>
+          <span class="metal-price">${{ precios_metal.rodio|floatformat:0 }} <span class="text-sm font-normal text-cyan-300">/g</span></span>
+        </div>
+        <div class="metal-track"><div class="metal-bar rodio" style="width: {% widthratio precios_metal.rodio precio_metal_max 100 %}%;"></div></div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div class="glass p-6 text-center">
+        <div class="text-4xl mb-3">🛡️</div>
+        <h3 class="text-lg font-bold text-cyan-200 mb-2">Pago al Contado</h3>
+        <p class="text-cyan-300 text-sm">Transferencia inmediata con trazabilidad y guía de despacho.</p>
+      </div>
+      <div class="glass p-6 text-center">
+        <div class="text-4xl mb-3">📈</div>
+        <h3 class="text-lg font-bold text-cyan-200 mb-2">Precios Reales</h3>
+        <p class="text-cyan-300 text-sm">Tasación basada en cotizaciones internacionales y mercado actual.</p>
+      </div>
+      <div class="glass p-6 text-center">
+        <div class="text-4xl mb-3">🌐</div>
+        <h3 class="text-lg font-bold text-cyan-200 mb-2">Cobertura Nacional</h3>
+        <p class="text-cyan-300 text-sm">Logística flexible y servicio en todo Chile con retiro a domicilio.</p>
+      </div>
+    </div>
+
+    <div class="glass p-8 mb-10">
+      <h2 class="text-2xl neon font-bold mb-4 text-center">🔬 ¿Qué es un catalítico y por qué tiene valor?</h2>
+      <p class="text-cyan-200 mb-4">
+        El convertidor catalítico es la pieza del escape que transforma los gases tóxicos de la
+        combustión (monóxido de carbono, óxidos de nitrógeno e hidrocarburos no quemados) en
+        gases menos dañinos antes de salir del vehículo. Para lograrlo, su núcleo cerámico o
+        metálico está recubierto de una capa microscópica de <strong class="text-cyan-100">platino,
+        paladio y rodio</strong> — los mismos metales preciosos que se cotizan en los mercados
+        internacionales, y que son los que le dan valor real a un catalítico usado.
+      </p>
+      <p class="text-cyan-200">
+        A diferencia de la chatarra común, un catalítico no vale por su peso en metal base, sino
+        por la cantidad y pureza de esos metales preciosos que contiene — por eso el precio varía
+        según el código, marca y modelo del vehículo del que proviene.
+      </p>
+    </div>
+
+    <div class="glass p-8 mb-10">
+      <h2 class="text-2xl neon font-bold mb-6 text-center">¿Cómo funciona la compra?</h2>
+      <div class="space-y-5">
+        <div class="flex items-start gap-4">
+          <span class="step-icon">🔍</span>
+          <p class="text-cyan-200 pt-2">Identificas tu catalítico por código, marca o modelo.</p>
+        </div>
+        <div class="flex items-start gap-4">
+          <span class="step-icon">💵</span>
+          <p class="text-cyan-200 pt-2">Consultas el precio referencial de compra al instante, sin llamarnos.</p>
+        </div>
+        <div class="flex items-start gap-4">
+          <span class="step-icon">🚚</span>
+          <p class="text-cyan-200 pt-2">Coordinamos la entrega o retiro y recibes tu pago al contado.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass p-8 mb-10">
+      <h2 class="text-2xl neon font-bold mb-6 text-center">♻️ ¿Cómo se recuperan los metales?</h2>
+      <div class="space-y-5">
+        <div class="flex items-start gap-4">
+          <span class="step-icon">🔨</span>
+          <p class="text-cyan-200 pt-2"><strong class="text-cyan-100">Trituración:</strong> el núcleo cerámico o metálico del catalítico se muele hasta convertirlo en un polvo fino, separándolo de la carcasa metálica exterior (que se recicla aparte como chatarra de acero/aluminio).</p>
+        </div>
+        <div class="flex items-start gap-4">
+          <span class="step-icon">🔥</span>
+          <p class="text-cyan-200 pt-2"><strong class="text-cyan-100">Fundición:</strong> el polvo se envía a fundiciones y refinerías certificadas, donde se funde a altas temperaturas junto con otros materiales.</p>
+        </div>
+        <div class="flex items-start gap-4">
+          <span class="step-icon">🧪</span>
+          <p class="text-cyan-200 pt-2"><strong class="text-cyan-100">Refinación química:</strong> mediante procesos de disolución y precipitación selectiva, se separan y purifican el platino, paladio y rodio de forma individual.</p>
+        </div>
+        <div class="flex items-start gap-4">
+          <span class="step-icon">♻️</span>
+          <p class="text-cyan-200 pt-2"><strong class="text-cyan-100">Reingreso al mercado:</strong> los metales recuperados vuelven a fabricar catalíticos nuevos, joyería o componentes electrónicos — cerrando el ciclo sin necesidad de nueva minería.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass p-8 mb-10 text-center" style="background: rgba(0, 255, 255, 0.06) !important;">
+      <p class="text-cyan-200 mb-6">
+        Más de 13 años reciclando catalíticos de forma responsable, evitando que sus
+        metales terminen contaminando y devolviéndoles valor real.
+      </p>
+      <div class="flex flex-col md:flex-row gap-4 justify-center">
+        <a href="{% url 'reciclaje:consulta_catalitico' %}" class="futur-btn rounded-lg px-8 py-4 text-lg">
+          🔍 Consultar precio de mi catalítico
+        </a>
+        {% if user.is_authenticated %}
+        <a href="{{ dashboard_url }}" class="btn-secondary rounded-lg px-8 py-4 text-lg">
+          📊 Panel de Reciclaje
+        </a>
+        {% else %}
+        <a href="/accounts/login/" class="btn-secondary rounded-lg px-8 py-4 text-lg">
+          🔐 Iniciar sesión
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="text-center">
+      <a href="https://wa.me/56963607348?text=¡Hola!%20Quiero%20cotizar%20mi%20catalítico" class="whatsapp-btn inline-block rounded-lg px-6 py-3 font-bold">
+        📱 Cotizar por WhatsApp
+      </a>
+    </div>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'futuristic-bg';
+    document.body.prepend(canvas);
+    const ctx = canvas.getContext('2d');
+    let w = window.innerWidth, h = window.innerHeight;
+    canvas.width = w; canvas.height = h;
+    let particles = [];
+    for (let i = 0; i < 50; i++) {
+        particles.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * 1.5 + 1,
+            dx: (Math.random() - 0.5) * 0.4,
+            dy: (Math.random() - 0.5) * 0.4,
+            c: `rgba(0,255,255,${Math.random() * 0.2 + 0.1})`
+        });
+    }
+    function draw() {
+        ctx.clearRect(0, 0, w, h);
+        for (let p of particles) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+            ctx.fillStyle = p.c;
+            ctx.shadowColor = 'rgba(0,255,255,0.2)';
+            ctx.shadowBlur = 6;
+            ctx.fill();
+        }
+    }
+    function update() {
+        for (let p of particles) {
+            p.x += p.dx; p.y += p.dy;
+            if (p.x < 0 || p.x > w) p.dx *= -1;
+            if (p.y < 0 || p.y > h) p.dy *= -1;
+        }
+    }
+    function loop() { draw(); update(); requestAnimationFrame(loop); }
+    loop();
+    window.addEventListener('resize', () => {
+        w = window.innerWidth; h = window.innerHeight;
+        canvas.width = w; canvas.height = h;
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Error Admin{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto mt-8 p-6 bg-slate-900 border border-slate-700 rounded-2xl">
+    <h1 class="text-3xl font-bold text-rose-400 mb-3">Ocurrió un error</h1>
+    <p class="text-slate-300 mb-4">{{ error_message|default:'No se pudo cargar la vista administrativa en este momento.' }}</p>
+    <div class="mt-6">
+        <a href="{% url 'admin_suscriptores' %}" class="inline-flex items-center px-4 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-500">Volver a Suscriptores</a>
+    </div>
+</div>
+{% endblock %}

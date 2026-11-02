@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}POS Mostrador{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-950 text-white">
+  <main class="mx-auto max-w-6xl px-4 py-6">
+    <header class="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-cyan-200">POS Mostrador</h1>
+        <p class="text-sm text-gray-400">Venta rápida de repuestos, neumáticos y servicios de mesón.</p>
+      </div>
+      <a href="../" class="text-sm text-cyan-300 hover:text-cyan-100">Inventario</a>
+    </header>
+
+    <section class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+      <div class="rounded-lg border border-cyan-400/20 bg-gray-900 p-4">
+        <label class="mb-2 block text-sm font-semibold text-cyan-200" for="pos-search">
+          Buscar por código, OEM, equivalente, nombre o medida
+        </label>
+        <input id="pos-search" type="search" autocomplete="off" placeholder="205/55R16, D1184, Bosch..."
+               class="w-full rounded border border-cyan-400/30 bg-black px-3 py-3 text-white">
+        <div id="pos-results" class="mt-4 space-y-2"></div>
+      </div>
+
+      <div class="rounded-lg border border-cyan-400/20 bg-gray-900 p-4">
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-cyan-200">Carrito</h2>
+          <span id="pos-total" class="font-mono text-xl text-green-300">$0</span>
+        </div>
+        <div class="mb-3 grid grid-cols-2 gap-x-3 gap-y-1 border-b border-cyan-400/10 pb-3 text-xs">
+          <span class="text-gray-500">Subtotal</span><span id="pos-subtotal" class="text-right text-gray-300">$0</span>
+          <span id="pos-tax-label" class="text-gray-500">{{ tax_name|default:"Impuesto" }} ({{ tax_rate|default:0 }}%)</span><span id="pos-tax" class="text-right text-amber-300">$0</span>
+        </div>
+        <div id="pos-cart" class="min-h-32 space-y-2 text-sm text-gray-300"></div>
+        <div class="mt-4 rounded border border-cyan-400/20 bg-black/30 p-3">
+          <h3 class="mb-2 text-sm font-semibold text-cyan-200">Cliente de la compra</h3>
+          <label class="mb-1 block text-xs text-gray-400" for="pos-client-search">Buscar por nombre, apellido o teléfono</label>
+          <input id="pos-client-search" type="search" autocomplete="off" autocapitalize="words" placeholder="Ej: Ana Pérez o +56912345678"
+                 class="mb-2 w-full rounded border border-cyan-400/30 bg-black px-3 py-2 text-white">
+          <div id="pos-client-results" class="mb-2 hidden space-y-1 rounded border border-cyan-400/20 bg-black/80 p-2"></div>
+          <label class="mb-1 block text-xs text-gray-400" for="pos-phone">Teléfono</label>
+          <input id="pos-phone" type="tel" autocomplete="off" placeholder="Ej: +56912345678"
+                 class="mb-2 w-full rounded border border-cyan-400/30 bg-black px-3 py-2 text-white">
+          <p id="pos-client-status" class="mb-2 min-h-5 text-xs text-gray-400"></p>
+          <label class="mb-1 block text-xs text-gray-400" for="pos-client-name">Nombre</label>
+          <input id="pos-client-name" type="text" autocomplete="off" placeholder="Nombre del cliente"
+                 class="w-full rounded border border-cyan-400/30 bg-black px-3 py-2 text-white">
+        </div>
+        <label class="mt-3 flex items-center gap-2 text-sm text-gray-300">
+          <input id="pos-apply-tax" type="checkbox" checked data-tax-rate="{{ tax_rate|default:'0' }}" class="accent-cyan-400">
+          Aplicar {{ tax_name|default:"impuesto" }} ({{ tax_rate|default:0 }}%)
+        </label>
+        <div class="mt-3">
+          <p class="mb-1 text-[11px] uppercase tracking-wide text-gray-500">Medio de pago</p>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" data-pay="efectivo" class="pos-pay rounded border border-green-500/40 bg-green-600/80 px-3 py-1.5 text-xs font-semibold">Efectivo</button>
+            <button type="button" data-pay="tarjeta" class="pos-pay rounded border border-blue-500/40 bg-blue-600/80 px-3 py-1.5 text-xs font-semibold">Tarjeta</button>
+            <button type="button" data-pay="transferencia" class="pos-pay rounded border border-cyan-500/40 bg-cyan-600/80 px-3 py-1.5 text-xs font-semibold">Transferencia</button>
+          </div>
+        </div>
+        <button id="pos-confirm" type="button" class="mt-3 w-full rounded-lg bg-cyan-500 px-3 py-2 text-sm font-bold text-gray-950 transition hover:bg-cyan-300 disabled:cursor-wait disabled:opacity-60">
+          Confirmar venta
+        </button>
+        {% csrf_token %}
+        <p id="pos-status" class="mt-3 text-sm text-gray-400"></p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  const search = document.getElementById("pos-search");
+  const results = document.getElementById("pos-results");
+  const cartBox = document.getElementById("pos-cart");
+  const totalBox = document.getElementById("pos-total");
+  const subtotalBox = document.getElementById("pos-subtotal");
+  const taxBox = document.getElementById("pos-tax");
+  const status = document.getElementById("pos-status");
+  const phoneInput = document.getElementById("pos-phone");
+  const clientSearch = document.getElementById("pos-client-search");
+  const clientResults = document.getElementById("pos-client-results");
+  const nameInput = document.getElementById("pos-client-name");
+  const clientStatus = document.getElementById("pos-client-status");
+  const taxInput = document.getElementById("pos-apply-tax");
+  const taxRate = Number.parseFloat(String(taxInput.dataset.taxRate || "0").replace(",", ".")) || 0;
+  const cart = new Map();
+  let payment = "efectivo";
+  let clientId = null;
+  const resultItems = new Map();
+
+  function money(value) {
+    return new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(value || 0);
+  }
+
+  function stockLabel(stock) {
+    const available = Number(stock || 0);
+    if (available <= 0) return '<span class="rounded-full border border-red-400/50 bg-red-950/60 px-2 py-1 text-xs font-bold text-red-300">Agotado</span>';
+    if (available < 5) return `<span class="rounded-full border border-amber-400/50 bg-amber-950/60 px-2 py-1 text-xs font-bold text-amber-300">⚠ ${available} disponibles</span>`;
+    return `<span class="rounded-full border border-emerald-400/40 bg-emerald-950/50 px-2 py-1 text-xs font-bold text-emerald-300">✓ ${available} disponibles</span>`;
+  }
+
+  function renderCart() {
+    let subtotal = 0;
+    cartBox.innerHTML = "";
+    for (const item of cart.values()) {
+      subtotal += item.cantidad * Number(item.precio_venta || 0);
+      const row = document.createElement("div");
+      row.className = "flex flex-wrap items-center justify-between gap-2 rounded bg-black/40 px-3 py-2";
+      const remaining = Math.max(0, Number(item.stock || 0) - item.cantidad);
+      row.innerHTML = `<span class="min-w-0 flex-1">${item.nombre} <span class="text-xs text-gray-500">${item.part_number || ""}</span><br><span class="text-[11px] text-cyan-300">Stock restante: ${remaining}</span></span>
+        <span class="flex items-center gap-1">
+          <button type="button" data-qty="dec" class="rounded bg-gray-700 px-2 py-1">−</button>
+          <input type="number" min="1" max="${Math.max(1, item.stock || 1)}" value="${item.cantidad}" data-qty="input" class="w-14 rounded bg-black px-1 py-1 text-center text-white">
+          <button type="button" data-qty="inc" class="rounded bg-gray-700 px-2 py-1">+</button>
+          <span class="ml-2 w-24 text-right">${money(item.cantidad * Number(item.precio_venta || 0))}</span>
+        </span>`;
+      row.querySelector('[data-qty="dec"]').addEventListener("click", () => changeQty(item, item.cantidad - 1));
+      row.querySelector('[data-qty="inc"]').addEventListener("click", () => changeQty(item, item.cantidad + 1));
+      row.querySelector('[data-qty="input"]').addEventListener("change", (event) => changeQty(item, event.target.value));
+      cartBox.appendChild(row);
+    }
+    const tax = taxInput.checked ? subtotal * taxRate / 100 : 0;
+    const total = subtotal + tax;
+    subtotalBox.textContent = money(subtotal);
+    taxBox.textContent = money(tax);
+    totalBox.textContent = money(total);
+    if (!cart.size) cartBox.textContent = "Agrega productos desde la búsqueda.";
+  }
+
+  taxInput.addEventListener("change", renderCart);
+  taxInput.addEventListener("input", renderCart);
+  taxInput.addEventListener("click", () => window.setTimeout(renderCart, 0));
+
+  function addItem(item) {
+    const current = cart.get(item.id) || { ...item, cantidad: 0 };
+    current.cantidad += 1;
+    cart.set(item.id, current);
+    renderCart();
+  }
+
+  function changeQty(item, value) {
+    const max = Math.max(1, Number(item.stock || 1));
+    const quantity = Math.min(max, Math.max(1, Number.parseInt(value, 10) || 1));
+    item.cantidad = quantity;
+    cart.set(item.id, item);
+    renderCart();
+  }
+
+  let phoneTimer;
+  let clientSearchTimer;
+
+  function selectClient(cliente) {
+    clientId = cliente.id;
+    nameInput.value = [cliente.nombre, cliente.apellido].filter(Boolean).join(" ");
+    phoneInput.value = cliente.telefono || "";
+    clientSearch.value = nameInput.value || phoneInput.value;
+    clientResults.innerHTML = "";
+    clientResults.classList.add("hidden");
+    clientStatus.textContent = "Cliente seleccionado de esta empresa.";
+  }
+
+  function resetClientFields() {
+    clientId = null;
+    clientSearch.value = "";
+    phoneInput.value = "";
+    nameInput.value = "";
+    clientResults.innerHTML = "";
+    clientResults.classList.add("hidden");
+    clientStatus.textContent = "Ingresa un teléfono, nombre o apellido para buscar.";
+  }
+
+  resetClientFields();
+  window.addEventListener("pageshow", resetClientFields);
+
+  function renderClientResults(clientes) {
+    clientResults.innerHTML = "";
+    if (!clientes.length) {
+      clientResults.classList.add("hidden");
+      return;
+    }
+    for (const cliente of clientes) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "block w-full rounded px-2 py-2 text-left text-sm text-gray-200 hover:bg-cyan-950/60";
+      button.textContent = `${[cliente.nombre, cliente.apellido].filter(Boolean).join(" ")} · ${cliente.telefono || "Sin teléfono"}`;
+      button.addEventListener("click", () => selectClient(cliente));
+      clientResults.appendChild(button);
+    }
+    clientResults.classList.remove("hidden");
+  }
+
+  clientSearch.addEventListener("input", () => {
+    clientId = null;
+    clearTimeout(clientSearchTimer);
+    const query = clientSearch.value.trim();
+    if (query.length < 2) {
+      renderClientResults([]);
+      return;
+    }
+    clientStatus.textContent = "Buscando cliente…";
+    clientSearchTimer = setTimeout(async () => {
+      try {
+        const response = await fetch(`clientes/buscar/?q=${encodeURIComponent(query)}`);
+        if (!response.ok) throw new Error("client_search_failed");
+        const data = await response.json();
+        renderClientResults(data.results || []);
+        clientStatus.textContent = data.results?.length ? "Selecciona el cliente encontrado." : "Cliente no encontrado. Puedes registrarlo al confirmar.";
+      } catch (_) {
+        renderClientResults([]);
+        clientStatus.textContent = "No se pudo consultar el cliente; puedes continuar con sus datos.";
+      }
+    }, 300);
+  });
+
+  phoneInput.addEventListener("input", () => {
+    clientId = null;
+    clearTimeout(phoneTimer);
+    const phone = phoneInput.value.trim();
+    if (phone.length < 3) {
+      clientStatus.textContent = "Ingresa un teléfono para buscar o registrar al cliente.";
+      return;
+    }
+    clientStatus.textContent = "Buscando cliente…";
+    phoneTimer = setTimeout(async () => {
+      try {
+        const response = await fetch(`clientes/buscar/?telefono=${encodeURIComponent(phone)}`);
+        const data = await response.json();
+        if (data.found) {
+          selectClient(data.cliente);
+          clientStatus.textContent = "Cliente encontrado en esta empresa.";
+        } else {
+          clientStatus.textContent = "Cliente no encontrado. Escribe su nombre para registrarlo.";
+        }
+      } catch (_) {
+        clientStatus.textContent = "No se pudo consultar el cliente; puedes continuar con sus datos.";
+      }
+    }, 300);
+  });
+
+  search.addEventListener("input", async () => {
+    const q = search.value.trim();
+    if (q.length < 2) {
+      results.innerHTML = "";
+      return;
+    }
+    try {
+      const res = await fetch(`buscar/?q=${encodeURIComponent(q)}`);
+      if (!res.ok) throw new Error("search_failed");
+      const data = await res.json();
+      resultItems.clear();
+      results.innerHTML = "";
+      for (const item of data.results || []) {
+        resultItems.set(String(item.id), item);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.dataset.partId = String(item.id);
+      btn.className = "flex w-full cursor-pointer items-center justify-between gap-3 rounded border border-cyan-400/20 bg-black/50 p-3 text-left hover:border-cyan-300 hover:bg-cyan-950/40";
+      const available = Number(item.stock || 0);
+      btn.disabled = available <= 0;
+      btn.classList.toggle("opacity-50", available <= 0);
+      btn.innerHTML = `<span><strong>${item.nombre}</strong><br><span class="text-xs text-gray-400">${item.part_number || item.codigo_oem || "Sin código"} · ${item.ubicacion || "Sin ubicación"} ${item.medida ? "· " + item.medida : ""}</span></span><span class="flex shrink-0 flex-col items-end gap-1">${stockLabel(available)}<span class="rounded bg-cyan-500 px-2 py-1 text-xs font-bold text-gray-950">${available > 0 ? "Agregar" : "Sin stock"}</span></span>`;
+      results.appendChild(btn);
+      }
+    } catch (_) {
+      results.innerHTML = '<p class="rounded border border-red-400/30 bg-red-950/30 p-3 text-sm text-red-200">No se pudo cargar la coincidencia. Intenta nuevamente.</p>';
+    }
+  });
+
+  results.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-part-id]");
+    if (!button || !results.contains(button)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const item = resultItems.get(button.dataset.partId);
+    if (!item) return;
+    addItem(item);
+    resultItems.clear();
+    results.innerHTML = "";
+    search.value = "";
+    search.focus();
+    status.textContent = `${item.nombre} agregado al carrito.`;
+  });
+
+  document.querySelectorAll(".pos-pay").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      payment = btn.dataset.pay;
+      document.querySelectorAll(".pos-pay").forEach((option) => option.classList.remove("ring-2", "ring-white"));
+      btn.classList.add("ring-2", "ring-white");
+      status.textContent = `Pago seleccionado: ${btn.textContent}`;
+    });
+  });
+
+  document.getElementById("pos-confirm").addEventListener("click", async (event) => {
+    const confirmButton = event.currentTarget;
+    const items = Array.from(cart.values()).map((item) => ({
+      repuesto_id: item.id,
+      cantidad: item.cantidad,
+      precio_unitario: item.precio_venta,
+    }));
+    if (!items.length) {
+      status.textContent = "Agrega al menos un producto antes de confirmar la venta.";
+      return;
+    }
+    confirmButton.disabled = true;
+    status.textContent = "Procesando venta…";
+    try {
+      const csrf = document.querySelector("[name=csrfmiddlewaretoken]")?.value || "{{ csrf_token }}";
+      const res = await fetch("confirmar/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrf },
+        body: JSON.stringify({
+          payment_method: payment,
+          items,
+          cliente_id: clientId,
+          cliente_nombre: nameInput.value.trim(),
+          cliente_telefono: phoneInput.value.trim(),
+          apply_vat: taxInput.checked,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        status.textContent = (data.errors || [`No se pudo confirmar la venta (${res.status}).`]).join(" ");
+        return;
+      }
+      status.innerHTML = `Venta ${data.numero} creada. Total ${money(data.total)} · Impuesto ${money(data.tax_amount || 0)}. <a class="text-cyan-300" href="${data.print_url}">Ver documento</a>`;
+      cart.clear();
+      renderCart();
+      resetClientFields();
+      window.setTimeout(() => {
+        window.location.assign(data.sales_url || data.print_url);
+      }, 700);
+    } catch (_) {
+      status.textContent = "No se pudo conectar con el servidor. La venta no fue confirmada.";
+    } finally {
+      confirmButton.disabled = false;
+    }
+  });
+
+  renderCart();
+})();
+</script>
+{% endblock %}

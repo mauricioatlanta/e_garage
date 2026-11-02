@@ -1,0 +1,172 @@
+{% load static %}
+
+<header class="egc-header" id="site-header">
+  <div class="egc-container egc-header__inner">
+
+    <a
+      href="{% url 'commerce:home' %}"
+      class="egc-header__brand"
+      aria-label="{{ brand.brand_name }} — Inicio"
+      title="{{ brand.brand_name }}"
+    >
+      {% if brand.logo_url %}
+        <img
+          src="{{ brand.logo_url }}"
+          alt="{{ brand.brand_name }}"
+          width="176"
+          height="44"
+        >
+      {% else %}
+        <span>{{ brand.brand_name }}</span>
+      {% endif %}
+    </a>
+
+    <form
+      action="{% url 'commerce:search' %}"
+      method="get"
+      class="egc-header__search"
+      role="search"
+    >
+      <label for="egc-header-search" class="sr-only">
+        Buscar repuesto, código, medida o vehículo
+      </label>
+
+      <div class="egc-search">
+        <span class="egc-search__icon" aria-hidden="true">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+
+        <input
+          id="egc-header-search"
+          class="egc-search__input"
+          type="search"
+          name="q"
+          value="{{ request.GET.q|default:'' }}"
+          placeholder="Buscar repuesto, código, medida o vehículo"
+          autocomplete="off"
+        >
+
+        <button
+          type="submit"
+          class="egc-button egc-button--primary egc-search__button"
+          aria-label="Buscar"
+        >
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <span class="egc-search__button-label">Buscar</span>
+        </button>
+      </div>
+    </form>
+
+    <nav class="egc-header__nav" aria-label="Navegación principal">
+      <a
+        href="{% url 'commerce:home' %}"
+        class="egc-header__link"
+        {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}
+      >
+        Inicio
+      </a>
+
+      <details class="egc-nav-menu">
+        <summary class="egc-header__link egc-nav-menu__trigger">
+          Categorías
+          <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+        </summary>
+
+        <div class="egc-nav-menu__panel">
+          <a href="{% url 'commerce:category' slug='cataliticos' %}">
+            Convertidores catalíticos
+          </a>
+          <a href="{% url 'commerce:category' slug='flexibles' %}">
+            Flexibles reforzados
+          </a>
+          <a href="{% url 'commerce:category' slug='resonador-deportivo-alto-flujo-ltm' %}">
+            Resonadores
+          </a>
+          <a href="{% url 'commerce:category' slug='silenciador-linea-dw' %}">
+            Silenciadores
+          </a>
+          <a href="{% url 'commerce:category' slug='silenciador-alto-flujo-lt' %}">
+            Silenciadores alto flujo
+          </a>
+          <a href="{% url 'commerce:category' slug='colas-de-escape' %}">
+            Colas de escape
+          </a>
+        </div>
+      </details>
+
+      <a href="{% url 'commerce:home' %}#productos" class="egc-header__link">
+        Productos
+      </a>
+
+      <a href="#contacto" class="egc-header__link">
+        Contacto
+      </a>
+    </nav>
+
+    <a
+      href="{% url 'commerce:cart' %}"
+      class="egc-cart-link"
+      aria-label="Ver carrito"
+    >
+      <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+      <span class="egc-cart-link__text">Carrito</span>
+      <span
+        id="cart-count-badge"
+        class="egc-cart-link__badge hidden"
+        aria-live="polite"
+      >
+        0
+      </span>
+    </a>
+
+    <details class="egc-mobile-menu">
+      <summary class="egc-mobile-menu__trigger" aria-label="Abrir menú">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </summary>
+
+      <nav class="egc-mobile-menu__panel" aria-label="Navegación móvil">
+        <a href="{% url 'commerce:home' %}">
+          <i class="fa-solid fa-house" aria-hidden="true"></i>
+          Inicio
+        </a>
+
+        <span class="egc-mobile-menu__label">Categorías</span>
+
+        <a href="{% url 'commerce:category' slug='cataliticos' %}">
+          Convertidores catalíticos
+        </a>
+        <a href="{% url 'commerce:category' slug='flexibles' %}">
+          Flexibles reforzados
+        </a>
+        <a href="{% url 'commerce:category' slug='resonador-deportivo-alto-flujo-ltm' %}">
+          Resonadores
+        </a>
+        <a href="{% url 'commerce:category' slug='silenciador-linea-dw' %}">
+          Silenciadores
+        </a>
+        <a href="{% url 'commerce:category' slug='silenciador-alto-flujo-lt' %}">
+          Silenciadores alto flujo
+        </a>
+        <a href="{% url 'commerce:category' slug='colas-de-escape' %}">
+          Colas de escape
+        </a>
+
+        <span class="egc-mobile-menu__label">Más</span>
+
+        <a href="{% url 'commerce:home' %}#productos">
+          <i class="fa-solid fa-box-open" aria-hidden="true"></i>
+          Productos
+        </a>
+        <a href="#contacto">
+          <i class="fa-solid fa-comment-dots" aria-hidden="true"></i>
+          Contacto
+        </a>
+        <a href="{% url 'commerce:cart' %}">
+          <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+          Carrito
+        </a>
+      </nav>
+    </details>
+
+  </div>
+</header>

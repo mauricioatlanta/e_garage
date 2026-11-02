@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% comment %}Layout cuenta: panel claro + menú; no usar block content aquí (lo rellenan las vistas).{% endcomment %}
+{% block title %}{% block head_title %}{% trans "Account" %}{% endblock head_title %} | eGarage{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+  /*
+   * Panel claro sobre el fondo oscuro del sitio: evita títulos/labels heredados en gris/negro
+   * ilegibles (p. ej. utilidades Tailwind en base.html).
+   */
+  .eg-allauth-manage {
+    max-width: 40rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1rem 1rem 2.5rem;
+  }
+  .eg-allauth-panel {
+    background: linear-gradient(165deg, #f8fafc 0%, #ecfeff 45%, #e0f2fe 100%);
+    border: 2px solid #06b6d4;
+    border-radius: 1rem;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+      0 12px 40px rgba(0, 0, 0, 0.35);
+    padding: 1.25rem 1.35rem 1.5rem;
+    color: #0f172a;
+  }
+  .eg-allauth-account-menu {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(6, 182, 212, 0.45);
+  }
+  .eg-allauth-account-menu > strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #0e7490;
+  }
+  .eg-allauth-account-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  /* Enlaces del submenú: legibles sobre panel claro */
+  .eg-allauth-panel .eg-allauth-account-menu a.nav-button-standard {
+    background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+    border-color: #14b8a6;
+    color: #134e4a !important;
+    font-weight: 600;
+  }
+  .eg-allauth-panel .eg-allauth-account-menu a.nav-button-standard:hover {
+    color: #042f2e !important;
+    border-color: #0d9488;
+    background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
+  }
+  .eg-allauth-manage-inner {
+    padding-top: 0.35rem;
+    color: #0f172a;
+  }
+  /* Salidas element (p, field) fuera de form.as_p */
+  .eg-allauth-manage-inner > p,
+  .eg-allauth-manage-inner form > p {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+    max-width: 100%;
+  }
+  .eg-allauth-manage-inner [class*="field"],
+  .eg-allauth-manage-inner .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.85rem;
+    max-width: 100%;
+  }
+  /* Títulos h1–h3 (marcado allauth / element "h1") */
+  .eg-allauth-manage-inner h1,
+  .eg-allauth-manage-inner h2,
+  .eg-allauth-manage-inner h3 {
+    color: #0f172a !important;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    margin: 0 0 1rem;
+    line-height: 1.25;
+    text-shadow: none !important;
+  }
+  .eg-allauth-manage-inner h1 {
+    font-size: 1.5rem;
+    border-bottom: 2px solid #06b6d4;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.15rem;
+  }
+  .eg-allauth-manage-inner p,
+  .eg-allauth-manage-inner span:not(.eg-allauth-skip) {
+    color: inherit;
+  }
+  .eg-allauth-manage-inner form p {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .eg-allauth-manage-inner form label {
+    font-weight: 700;
+    color: #0c4a6e !important;
+    font-size: 0.9rem;
+  }
+  .eg-allauth-manage-inner form input[type="password"],
+  .eg-allauth-manage-inner form input[type="email"],
+  .eg-allauth-manage-inner form input[type="text"],
+  .eg-allauth-manage-inner form input[type="url"],
+  .eg-allauth-manage-inner form textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0.7rem 0.9rem;
+    border-radius: 0.5rem;
+    background: #ffffff !important;
+    border: 2px solid #0891b2 !important;
+    color: #0f172a !important;
+    font-size: 1rem;
+  }
+  .eg-allauth-manage-inner form input::placeholder,
+  .eg-allauth-manage-inner form textarea::placeholder {
+    color: #64748b;
+    opacity: 1;
+  }
+  .eg-allauth-manage-inner form input:focus,
+  .eg-allauth-manage-inner form textarea:focus {
+    outline: none;
+    border-color: #0e7490 !important;
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.35);
+  }
+  .eg-allauth-manage-inner button[type="submit"],
+  .eg-allauth-manage-inner input[type="submit"],
+  .eg-allauth-manage-inner button:not([type]) {
+    margin-top: 0.35rem;
+    padding: 0.75rem 1.35rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%) !important;
+    border: 2px solid #155e75 !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  .eg-allauth-manage-inner button[type="submit"]:hover,
+  .eg-allauth-manage-inner input[type="submit"]:hover,
+  .eg-allauth-manage-inner button:not([type]):hover {
+    filter: brightness(1.08);
+  }
+  .eg-allauth-manage-inner a {
+    color: #0369a1 !important;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .eg-allauth-manage-inner a:hover {
+    color: #0c4a6e !important;
+  }
+  .eg-allauth-manage-inner ul.errorlist {
+    color: #b91c1c !important;
+    font-size: 0.85rem;
+    font-weight: 600;
+    list-style: none;
+    padding: 0;
+    margin: 0.25rem 0 0;
+  }
+  /* Acciones del formulario (botón + enlace) */
+  .eg-allauth-manage-inner form > *:last-child,
+  .eg-allauth-manage-inner form [class*="actions"] {
+    margin-top: 0.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="eg-allauth-manage">
+  <div class="eg-allauth-panel">
+  <div class="eg-allauth-account-menu">
+    <strong>{% trans "Menu:" %}</strong>
+    <ul>
+      {% if user.is_authenticated %}
+        {% url 'account_email' as email_url_ %}
+        {% if email_url_ %}
+          <li><a href="{{ email_url_ }}" class="nav-button-standard">{% trans "Change Email" %}</a></li>
+        {% endif %}
+        {% url 'account_change_password' as change_password_url_ %}
+        {% if change_password_url_ %}
+          <li><a href="{{ change_password_url_ }}" class="nav-button-standard">{% trans "Change Password" %}</a></li>
+        {% endif %}
+        {% url 'socialaccount_connections' as connections_url_ %}
+        {% if connections_url_ %}
+          <li><a href="{{ connections_url_ }}" class="nav-button-standard">{% trans "Account Connections" %}</a></li>
+        {% endif %}
+        {% url 'mfa_index' as mfa_url_ %}
+        {% if mfa_url_ %}
+          <li><a href="{{ mfa_url_ }}" class="nav-button-standard">{% trans "Two-Factor Authentication" %}</a></li>
+        {% endif %}
+        {% url 'usersessions_list' as usersessions_list_url_ %}
+        {% if usersessions_list_url_ %}
+          <li><a href="{{ usersessions_list_url_ }}" class="nav-button-standard">{% trans "Sessions" %}</a></li>
+        {% endif %}
+        {% url 'account_logout' as logout_url_ %}
+        {% if logout_url_ %}
+          <li><a href="{{ logout_url_ }}" class="nav-button-standard">{% trans "Sign Out" %}</a></li>
+        {% endif %}
+      {% else %}
+        {% url 'account_login' as login_url_ %}
+        {% if login_url_ %}
+          <li><a href="{{ login_url_ }}" class="nav-button-standard">{% trans "Sign In" %}</a></li>
+        {% endif %}
+        {% url 'account_signup' as signup_url_ %}
+        {% if signup_url_ %}
+          <li><a href="{{ signup_url_ }}" class="nav-button-standard">{% trans "Sign Up" %}</a></li>
+        {% endif %}
+      {% endif %}
+    </ul>
+  </div>
+  <div class="eg-allauth-manage-inner">
+    {% block manage_inner %}{% endblock %}
+  </div>
+  {% block extra_body %}{% endblock %}
+  </div>
+</div>
+{% endblock %}

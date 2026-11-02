@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "egarage/contracts/schemas/tax.policy.snapshot.schema.json",
+  "title": "tax.policy.snapshot — Payload Schema",
+  "description": "Full snapshot of all active tax policies exported by erp.tax-engine. This contract exports policy definitions — not calculations. commerce.engine applies the policy to compute the tax amount at checkout time. A new snapshot is published whenever any policy changes. Pending ADR-005: whether Commerce estimates the tax at checkout or defers final computation to ERP.",
+  "type": "object",
+  "required": ["policies", "effective_from"],
+  "additionalProperties": false,
+  "properties": {
+
+    "policies": {
+      "type": "array",
+      "description": "Full set of tax policies active from effective_from onwards. Replaces the previous snapshot entirely.",
+      "items": {
+        "type": "object",
+        "required": ["id", "country", "tax_type", "rate", "applies_to", "rounding", "currency"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable policy identifier. Referenced in order line items as policy_id."
+          },
+          "country": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "description": "ISO 3166-1 alpha-2 country code. Supported: CL, MX, US, AR, UY, BR, PE, VE."
+          },
+          "region": {
+            "type": ["string", "null"],
+            "description": "State or region code. Required for US SalesTax where rates vary by jurisdiction. Null for country-wide policies."
+          },
+          "tax_type": {
+            "type": "string",
+            "enum": ["IVA", "IGV", "SalesTax", "Exempt"],
+            "description": "IVA: Chile (19%). IGV: Peru (18%). SalesTax: USA (varies by state/city). Exempt: no tax applied."
+          },
+          "rate": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Tax rate as a decimal fraction. Examples: 0.19 = 19%, 0.18 = 18%, 0 = Exempt."
+          },
+          "applies_to": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": ["parts", "services", "all"]
+            },
+            "description": "Item categories subject to this policy. Chile taxes parts only. Peru taxes all."
+          },
+          "rounding": {
+            "type": "string",
+            "enum": ["nearest", "up", "down"],
+            "description": "Rounding rule applied to the computed tax amount. Must match the rounding used in ERP fiscal documents."
+          },
+          "currency": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3,
+            "description": "ISO 4217 currency code for this policy's country."
+          }
+        }
+      }
+    },
+
+    "effective_from": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp. All policies in this snapshot are valid from this date onwards. Consumers must not apply this snapshot before effective_from."
+    }
+  }
+}

@@ -1,0 +1,369 @@
+"""
+Servicio de salida de documentos (Document Output Service)
+
+Maneja la generación de PDFs y enlaces de WhatsApp para documentos.
+Implementa la lógica de "The Fulfillment Loop" - el cliente recibe su comprobante.
+"""
+
+import logging
+from pathlib import Path
+
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.utils import timezone
+from django.utils.text import slugify
+
+from taller.utils.whatsapp_helper import get_document_whatsapp_url
+
+log = logging.getLogger(__name__)
+
+
+def _generated_at():
+    now = timezone.now()
+    return timezone.localtime(now) if timezone.is_aware(now) else now
+
+
+def _line_subtotal(linea):
+    try:
+        if isinstance(linea, dict):
+            return linea.get("subtotal", 0) or 0
+        return getattr(linea, "subtotal", 0) or 0
+    except Exception:
+        return 0
+
+
+def _build_pdf_line_items(documento):
+    lineas_repuesto = list(documento.lineas_repuesto.select_related("repuesto").all())
+    lineas_servicio = list(documento.lineas_servicio.all())
+    lineas_otro_servicio = list(documento.lineas_otro_servicio.all())
+    items = []
+
+    for linea in lineas_repuesto:
+        code = getattr(linea, "codigo", "") or getattr(getattr(linea, "repuesto", None), "codigo", "")
+        items.append(
+            {
+                "tipo": "Repuesto",
+                "nombre": getattr(linea, "nombre", "") or str(getattr(linea, "repuesto", "")),
+                "codigo": code,
+                "cantidad": getattr(linea, "cantidad", 1) or 1,
+                "precio_unitario": getattr(linea, "precio_unitario", 0) or 0,
+                "subtotal": _line_subtotal(linea),
+            }
+        )
+
+    for linea in lineas_servicio:
+        items.append(
+            {
+                "tipo": "Servicio",
+                "nombre": getattr(linea, "nombre", "") or str(getattr(linea, "servicio", "")),
+                "codigo": "",
+                "cantidad": getattr(linea, "cantidad", 1) or 1,
+                "precio_unitario": getattr(linea, "precio_unitario", 0) or 0,
+                "subtotal": _line_subtotal(linea),
+            }
+        )
+
+    for linea in lineas_otro_servicio:
+        items.append(
+            {
+                "tipo": "Servicio externo",
+                "nombre": getattr(linea, "nombre", "") or str(getattr(linea, "servicio", "")),
+                "codigo": "",
+                "cantidad": getattr(linea, "cantidad", 1) or 1,
+                "precio_unitario": getattr(linea, "precio_cliente", 0) or 0,
+                "subtotal": _line_subtotal(linea),
+            }
+        )
+
+    return items, lineas_repuesto, lineas_servicio, lineas_otro_servicio
+
+
+class DocumentOutputService:
+    """
+    Servicio dedicado para generar PDFs y enlaces de WhatsApp de documentos.
+
+    Features:
+    - Generación de PDF con WeasyPrint (HTML/CSS a PDF)
+    - Multi-tenant seguro (usa logo, colores y datos de la empresa)
+    - Formato de moneda según país (CL/US/MX)
+    - Enlaces de WhatsApp pre-llenados
+    - Thread-safe y optimizado
+    """
+
+    # Importar WeasyPrint de forma perezosa (evita fallos en startup)
+    _weasyprint_available = None
+
+    @staticmethod
+    def _check_weasyprint():
+        """Verifica si WeasyPrint está disponible"""
+        if DocumentOutputService._weasyprint_available is True:
+            return True
+
+        try:
+            from weasyprint import HTML  # noqa: F401
+            from weasyprint.text.fonts import FontConfiguration  # noqa: F401
+
+            DocumentOutputService._weasyprint_available = True
+        except ImportError:
+            DocumentOutputService._weasyprint_available = False
+            log.warning(
+                "[DocumentOutputService] WeasyPrint not available. Install with: pip install weasyprint"
+            )
+        return DocumentOutputService._weasyprint_available
+
+    @staticmethod
+    def _get_empresa_config(empresa, request=None):
+        """
+        Obtiene configuración de la empresa con fallbacks multi-tenant.
+
+        Prioridad:
+        1. CompanySettings (configuración por usuario)
+        2. ConfiguracionEmpresa (configuración legacy)
+        3. Datos directos de Empresa
+        """
+        config = {}
+
+        # Intentar obtener CompanySettings (nuevo sistema)
+        try:
+            from taller.models.company_settings import CompanySettings
+
+            company_settings = CompanySettings.objects.filter(user=empresa.user).first()
+            if company_settings:
+                config["logo"] = company_settings.logo
+                config["nombre"] = company_settings.company_name or empresa.nombre_taller
+                config["tagline"] = company_settings.tagline or ""
+                config["direccion"] = company_settings.address or empresa.direccion or ""
+                config["telefono"] = company_settings.phone or empresa.telefono or ""
+                config["email"] = company_settings.email or empresa.email or ""
+                config["website"] = company_settings.website or ""
+                config["primary_color"] = company_settings.primary_color or "#0d6efd"
+                config["secondary_color"] = company_settings.secondary_color or "#6c757d"
+                config["tax_id"] = company_settings.tax_id or ""
+                return config
+        except Exception as e:
+            log.debug(f"[DocumentOutputService] CompanySettings no disponible: {e}")
+
+        # Intentar obtener ConfiguracionEmpresa (legacy)
+        try:
+            config_empresa = getattr(empresa, "config", None)
+            if config_empresa:
+                config["logo"] = config_empresa.logo
+                config["nombre"] = config_empresa.nombre_publico or empresa.nombre_taller
+                config["tagline"] = config_empresa.tagline or ""
+                config["direccion"] = (
+                    getattr(config_empresa, "direccion", "") or empresa.direccion or ""
+                )
+                config["telefono"] = config_empresa.telefono or empresa.telefono or ""
+                config["email"] = config_empresa.email_contacto or empresa.email or ""
+                config["website"] = getattr(config_empresa, "sitio_web", "") or ""
+                config["primary_color"] = getattr(config_empresa, "brand_color", "#0d6efd")
+                config["secondary_color"] = "#6c757d"
+                config["tax_id"] = (
+                    getattr(config_empresa, "rut", "") or getattr(config_empresa, "ein", "") or ""
+                )
+                return config
+        except Exception as e:
+            log.debug(f"[DocumentOutputService] ConfiguracionEmpresa no disponible: {e}")
+
+        # Fallback: usar datos directos de Empresa
+        config["logo"] = empresa.logo
+        config["nombre"] = empresa.nombre_taller
+        config["tagline"] = ""
+        config["direccion"] = empresa.direccion or ""
+        config["telefono"] = empresa.telefono or ""
+        config["email"] = empresa.email or ""
+        config["website"] = ""
+        config["primary_color"] = "#0d6efd"
+        config["secondary_color"] = "#6c757d"
+        config["tax_id"] = ""
+
+        return config
+
+    @staticmethod
+    def _get_currency_config(empresa):
+        """Obtiene configuración de moneda según país"""
+        pais = (empresa.pais or "CL").upper()
+
+        if pais == "US":
+            return {
+                "symbol": "US$",
+                "code": "USD",
+                "decimals": 2,
+                "thousands_separator": ",",
+                "decimal_separator": ".",
+            }
+        elif pais == "MX":
+            return {
+                "symbol": "MX$",
+                "code": "MXN",
+                "decimals": 2,
+                "thousands_separator": ",",
+                "decimal_separator": ".",
+            }
+        else:  # CL (Chile)
+            return {
+                "symbol": "$",
+                "code": "CLP",
+                "decimals": 0,
+                "thousands_separator": ".",
+                "decimal_separator": ",",
+            }
+
+    @staticmethod
+    def generate_pdf(documento, request=None):
+        """
+        Genera un objeto PDF en memoria (bytes).
+
+        Args:
+            documento: Instancia de Documento
+            request: HttpRequest (opcional, necesario para URLs absolutas de imágenes)
+
+        Returns:
+            tuple: (pdf_bytes, filename)
+
+        Raises:
+            ImportError: Si WeasyPrint no está disponible
+            Exception: Si hay error en la generación
+        """
+        if not DocumentOutputService._check_weasyprint():
+            raise ImportError("WeasyPrint is not available. Install with: pip install weasyprint")
+
+        empresa = documento.empresa
+        config = DocumentOutputService._get_empresa_config(empresa, request)
+        currency = DocumentOutputService._get_currency_config(empresa)
+
+        # Obtener cliente y vehículo
+        cliente = documento.cliente
+        vehiculo = getattr(documento, "vehiculo", None)
+
+        line_items, lineas_repuesto, lineas_servicio, lineas_otro_servicio = _build_pdf_line_items(
+            documento
+        )
+
+        # Etiqueta del documento (Invoice / Recibo)
+        tipo = (getattr(documento, "tipo", "") or "").lower()
+        numero = (getattr(documento, "numero", "") or "").strip().upper()
+        if (
+            tipo == "invoice"
+            or numero.startswith("INV-")
+            or (getattr(documento, "tipo", "") or "") == "PTS"
+        ):
+            document_label = "Invoice"
+        else:
+            document_label = "Recibo"
+
+        # Subtotal y total (compatibles con documento_profesional.html)
+        line_subtotal = sum(_line_subtotal(item) for item in line_items)
+        subtotal = line_subtotal or (
+            (getattr(documento, "neto_repuestos", 0) or 0)
+            + (getattr(documento, "neto_servicios", 0) or 0)
+            + (getattr(documento, "neto_otros_servicios", 0) or 0)
+        )
+        total = getattr(documento, "total", None)
+        if not total:
+            total = subtotal + (getattr(documento, "tax_amount", 0) or 0) - (
+                getattr(documento, "descuento", 0) or 0
+            )
+
+        # Logo URL absoluta para WeasyPrint
+        logo_url = None
+        if config.get("logo") and request:
+            try:
+                logo_url = request.build_absolute_uri(config["logo"].url)
+            except Exception:
+                pass
+
+        # Contexto para taller/documentos/pdf/documento_profesional.html (cabecera suscriptor)
+        context = {
+            "documento": documento,
+            "empresa": empresa,
+            "company_name": config.get("nombre")
+            or getattr(empresa, "nombre_taller", "")
+            or getattr(empresa, "empresa", ""),
+            "company_tagline": config.get("tagline", ""),
+            "company_address": config.get("direccion", ""),
+            "company_phone": config.get("telefono", ""),
+            "company_email": config.get("email", ""),
+            "company_website": config.get("website", ""),
+            "cliente": cliente,
+            "vehiculo": vehiculo,
+            "line_items": line_items,
+            "lineas_repuesto": lineas_repuesto,
+            "lineas_servicio": lineas_servicio,
+            "lineas_otro_servicio": lineas_otro_servicio,
+            "subtotal": subtotal,
+            "tax_amount": getattr(documento, "tax_amount", 0) or 0,
+            "descuento": getattr(documento, "descuento", 0) or 0,
+            "total": total,
+            "document_label": document_label,
+            "logo_url": logo_url,
+            "generated_at": _generated_at(),
+            "pdf_mode": True,
+            "public_url": None,
+            "qr_data_uri": None,
+        }
+
+        # Renderizar HTML con template que incluye cabecera (nombre, dirección, lema, teléfono, email, web, logo)
+        try:
+            html_string = render_to_string(
+                "taller/documentos/pdf/documento_profesional.html", context, request=request
+            )
+        except Exception as e:
+            log.error(f"[DocumentOutputService] Error renderizando template: {e}", exc_info=True)
+            raise
+
+        # Generar PDF con WeasyPrint (misma hoja de estilos que desarme/views_pdf)
+        try:
+            from weasyprint import CSS, HTML
+            from weasyprint.text.fonts import FontConfiguration
+
+            font_config = FontConfiguration()
+            base_url = None
+            if request:
+                try:
+                    base_url = request.build_absolute_uri("/")
+                except Exception:
+                    base_url = None
+            elif hasattr(settings, "BASE_URL"):
+                base_url = settings.BASE_URL
+            else:
+                base_url = getattr(settings, "MEDIA_URL", None)
+
+            stylesheets = []
+            base_dir = getattr(settings, "BASE_DIR", Path(__file__).resolve().parent.parent.parent)
+            css_path = (
+                Path(base_dir) / "static" / "css" / "documentos" / "pdf_documento_profesional.css"
+            )
+            if css_path.exists():
+                stylesheets.append(CSS(filename=str(css_path)))
+
+            html = HTML(string=html_string, base_url=base_url)
+            pdf_bytes = html.write_pdf(font_config=font_config, stylesheets=stylesheets)
+
+            # Generar nombre de archivo
+            nombre_cliente = slugify(cliente.nombre) if cliente else "cliente"
+            tipo_doc = documento.tipo or "DOC"
+            numero_doc = documento.numero or str(documento.id)
+            filename = f"{tipo_doc}_{numero_doc}_{nombre_cliente}.pdf"
+
+            log.info(f"[DocumentOutputService] PDF generado: {filename}")
+            return pdf_bytes, filename
+
+        except Exception as e:
+            log.error(f"[DocumentOutputService] Error generando PDF: {e}", exc_info=True)
+            raise
+
+    @staticmethod
+    def generate_whatsapp_link(documento, request=None, pdf_url=None):
+        """
+        Genera un enlace 'wa.me' con un mensaje pre-llenado.
+
+        Args:
+            documento: Instancia de Documento
+            request: HttpRequest (opcional, para generar URL de PDF)
+            pdf_url: URL pública del PDF (opcional, si no se proporciona se intenta generar)
+
+        Returns:
+            str: URL de WhatsApp con mensaje pre-llenado, o None si no hay teléfono
+        """
+        return get_document_whatsapp_url(documento, request=request, pdf_url=pdf_url)

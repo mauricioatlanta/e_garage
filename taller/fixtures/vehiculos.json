@@ -1,0 +1,14 @@
+[
+  {
+    "fields": {
+      "anio": 2020,
+      "cliente": 1,
+      "marca": 1,
+      "modelo": 1,
+      "patente": "ABC123",
+      "vin": "1HGCM82633A123456"
+    },
+    "model": "taller.vehiculo",
+    "pk": 1
+  }
+]

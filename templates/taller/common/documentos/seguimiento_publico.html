@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% load money %}
+{% load country_url %}
+
+{% block title %}Seguimiento - {{ documento.numero_documento }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+  <div class="container mx-auto px-4 py-8">
+    
+    <!-- Header del documento -->
+    <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6 mb-6">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-3xl font-bold text-cyan-200 mb-2">
+            📄 {{ documento.get_tipo_display }}
+          </h1>
+          <p class="text-xl text-cyan-300 font-mono">
+            {{ documento.numero_documento }}
+          </p>
+          <p class="text-gray-300 mt-2">
+            Fecha: {{ documento.fecha_emision|date:"d/m/Y" }}
+          </p>
+        </div>
+        
+        <div class="text-right">
+          <div class="text-2xl font-bold text-green-400">
+            {{ total|default_if_none:0|money_by_country:documento.country }}
+          </div>
+          <div class="text-sm text-gray-400 mt-2">
+            Estado:
+            <span class="px-2 py-1 rounded text-xs font-semibold
+              {% if documento.estado == 'EMITIDO' %}bg-green-600 text-white
+              {% elif documento.estado == 'BORRADOR' %}bg-yellow-600 text-white
+              {% else %}bg-red-600 text-white{% endif %}">
+              {{ documento.get_estado_display }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del cliente y vehículo -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <!-- Cliente -->
+      <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6">
+        <h3 class="text-xl font-semibold text-cyan-200 mb-4 flex items-center">
+          👤 Cliente
+        </h3>
+        <div class="space-y-2">
+          <p class="text-white">
+            <span class="text-cyan-300">Nombre:</span>
+            {{ documento.cliente.nombre }} {{ documento.cliente.apellido }}
+          </p>
+          {% if documento.cliente.email %}
+          <p class="text-white">
+            <span class="text-cyan-300">Email:</span>
+            {{ documento.cliente.email }}
+          </p>
+          {% endif %}
+          {% if documento.cliente.telefono %}
+          <p class="text-white">
+            <span class="text-cyan-300">Teléfono:</span>
+            {{ documento.cliente.telefono }}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Vehículo -->
+      {% if documento.vehiculo %}
+      <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6">
+        <h3 class="text-xl font-semibold text-cyan-200 mb-4 flex items-center">
+          🚗 Vehículo
+        </h3>
+        <div class="space-y-2">
+          <p class="text-white">
+            <span class="text-cyan-300">Patente:</span>
+            {{ documento.vehiculo.patente }}
+          </p>
+          <p class="text-white">
+            <span class="text-cyan-300">Marca:</span>
+            {{ documento.vehiculo.marca }}
+          </p>
+          <p class="text-white">
+            <span class="text-cyan-300">Modelo:</span>
+            {{ documento.vehiculo.modelo }}
+          </p>
+          {% if documento.vehiculo.ano %}
+          <p class="text-white">
+            <span class="text-cyan-300">Año:</span>
+            {{ documento.vehiculo.ano }}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Resumen de Totales -->
+    <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-emerald-400/30 p-6 mb-6">
+      <h3 class="text-xl font-semibold text-emerald-200 mb-4">💰 Resumen de Totales</h3>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div class="text-center">
+          <p class="text-gray-400 text-sm">Repuestos</p>
+          <p class="text-lg font-semibold text-emerald-400">
+            {{ subtotal_repuestos|default_if_none:0|money_by_country:documento.country }}
+          </p>
+        </div>
+        <div class="text-center">
+          <p class="text-gray-400 text-sm">Servicios</p>
+          <p class="text-lg font-semibold text-emerald-400">
+            {{ subtotal_servicios|default_if_none:0|money_by_country:documento.country }}
+          </p>
+        </div>
+        <div class="text-center">
+          <p class="text-gray-400 text-sm">Otros</p>
+          <p class="text-lg font-semibold text-emerald-400">
+            {{ subtotal_otros_servicios|default_if_none:0|money_by_country:documento.country }}
+          </p>
+        </div>
+        <div class="text-center">
+          <p class="text-gray-400 text-sm">IVA</p>
+          <p class="text-lg font-semibold text-yellow-400">
+            {{ iva|default_if_none:0|money_by_country:documento.country }}
+          </p>
+        </div>
+        <div class="text-center">
+          <p class="text-gray-400 text-sm">Total</p>
+          <p class="text-2xl font-bold text-green-400">
+            {{ total|default_if_none:0|money_by_country:documento.country }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Evidencias Compartibles -->
+    {% if evidencias %}
+    <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-emerald-400/30 p-6 mb-6">
+      <h3 class="text-xl font-semibold text-emerald-200 mb-4 flex items-center">
+        📸 Evidencias del Trabajo
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for evidencia in evidencias %}
+        <div class="bg-gray-900/50 rounded-lg p-4 border border-emerald-400/20">
+          {% if evidencia.tipo == "FOTO" %}
+          <img src="{{ evidencia.archivo.url }}" alt="{{ evidencia.descripcion|default:'Evidencia' }}"
+               class="w-full h-48 object-cover rounded-lg mb-2">
+          {% else %}
+          <video src="{{ evidencia.archivo.url }}" controls
+                 class="w-full h-48 object-cover rounded-lg mb-2"></video>
+          {% endif %}
+          {% if evidencia.descripcion %}
+          <p class="text-sm text-gray-300 mt-2">{{ evidencia.descripcion }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Nota: No se muestran notas ni etiquetas internas en seguimiento público -->
+    <div class="text-center text-gray-400 text-sm mb-6">
+      <p>Esta es una vista pública de seguimiento. Para más información, contacta con el taller.</p>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

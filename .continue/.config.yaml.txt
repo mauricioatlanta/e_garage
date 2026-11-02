@@ -1,0 +1,16 @@
+models:
+  - title: Qwen Local
+    provider: ollama
+    model: qwen2.5-coder:7b
+    apiBase: http://127.0.0.1:11434
+
+  - title: Llama Local
+    provider: ollama
+    model: llama3.1:8b
+    apiBase: http://127.0.0.1:11434
+
+autocompleteModel:
+  title: Qwen Local
+  provider: ollama
+  model: qwen2.5-coder:7b
+  apiBase: http://127.0.0.1:11434

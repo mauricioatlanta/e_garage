@@ -1,0 +1,74 @@
+/* =============================
+   🖨️ Estilos para impresión de documentos
+   ============================= */
+
+@media print {
+
+    /* Eliminar navegación, botones, pie de página */
+    nav, footer,
+    .navbar, .btn, .btn-primary, .btn-secondary,
+    .no-print, .print-hide {
+        display: none !important;
+    }
+
+    /* Fondo blanco y tipografía legible */
+    body {
+        background: white !important;
+        color: #000 !important;
+        font-family: 'Arial', sans-serif;
+        font-size: 12pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Asegurar márgenes adecuados */
+    @page {
+        margin: 1.5cm;
+    }
+
+    main, .container, .form-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+    }
+
+    /* Títulos centrados y claros */
+    h1, h2, h3 {
+        color: #000;
+        text-align: center;
+        text-transform: uppercase;
+        margin: 0 0 10px 0;
+    }
+
+    /* Bordes visibles para las tablas */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    table, th, td {
+        border: 1px solid #000;
+        padding: 6px;
+        text-align: left;
+    }
+
+    /* Evitar salto de página dentro de bloques */
+    .form-repuesto,
+    .form-servicio,
+    .documento-section {
+        page-break-inside: avoid;
+    }
+
+    /* Mostrar totales destacados */
+    #total_general_mostrar,
+    #iva_mostrar,
+    #total_repuestos_mostrar,
+    #total_servicios_mostrar {
+        font-weight: bold;
+        font-size: 14pt;
+        text-align: right;
+    }
+}

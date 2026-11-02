@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ brand.meta_title }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{{ brand.meta_description }}{% endblock %}">
+  {% block meta %}{% endblock %}
+
+  {% if brand.favicon_url %}
+  <link rel="icon" type="image/png" href="{{ brand.favicon_url }}">
+  {% endif %}
+
+  {% if brand.font_primary != "system-ui" %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family={{ brand.font_primary }}:wght@400;500;600;700&display=swap" rel="stylesheet">
+  {% endif %}
+
+  <link rel="stylesheet" href="/static/css/output.css">
+
+  <style>
+    :root {
+      --color-primary: {{ brand.colors.primary }};
+      --color-secondary: {{ brand.colors.secondary }};
+      --color-accent: {{ brand.colors.accent }};
+      --font-primary: '{{ brand.font_primary }}', system-ui, sans-serif;
+    }
+    body { font-family: var(--font-primary); }
+    .btn-primary {
+      background-color: var(--color-primary);
+      color: #fff;
+    }
+    .btn-primary:hover { background-color: var(--color-secondary); }
+    .text-brand { color: var(--color-primary); }
+    .border-brand { border-color: var(--color-primary); }
+    /* Ocultar scrollbar en nav de categorías manteniendo el scroll funcional */
+    .nav-cats::-webkit-scrollbar { display: none; }
+    .nav-cats { -ms-overflow-style: none; scrollbar-width: none; }
+    /* Tipografía explícita para cuerpos de páginas estáticas */
+    .page-body p,
+    .page-body li { color: #374151; }
+    .page-body h1,
+    .page-body h2,
+    .page-body h3,
+    .page-body h4 { color: #111827; font-weight: 600; margin-top: 1.5em; margin-bottom: 0.5em; }
+    .page-body strong { color: #111827; }
+    .page-body a { color: var(--color-primary); text-decoration: underline; }
+    .page-body a:hover { opacity: 0.8; }
+    .page-body ul,
+    .page-body ol { padding-left: 1.5rem; }
+    .page-body ul { list-style-type: disc; }
+    .page-body ol { list-style-type: decimal; }
+    .page-body p + p,
+    .page-body p + ul,
+    .page-body p + ol { margin-top: 1em; }
+  </style>
+</head>
+<body class="h-full bg-white text-gray-900 flex flex-col">
+
+  <!-- Barra superior -->
+  <header class="border-b border-gray-200 bg-white sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 gap-4">
+
+        <!-- Logo / nombre — truncate para nombres largos; title= como tooltip -->
+        <a href="{% url 'commerce:home' %}"
+           class="flex-shrink-0 font-bold text-lg sm:text-xl tracking-tight text-gray-900
+                  max-w-[140px] sm:max-w-xs lg:max-w-sm flex items-center gap-2"
+           title="{{ brand.brand_name }}">
+          {% if brand.logo_url %}
+          <img src="{{ brand.logo_url }}" alt="{{ brand.brand_name }}" class="h-8 w-auto">
+          {% else %}
+          <span class="truncate">{{ brand.brand_name }}</span>
+          {% endif %}
+        </a>
+
+        <!-- Buscador -->
+        <form action="{% url 'commerce:search' %}" method="get" class="flex-1 max-w-lg">
+          <div class="relative">
+            <input
+              type="search"
+              name="q"
+              value="{{ request.GET.q }}"
+              placeholder="Buscar repuesto, SKU, número de parte..."
+              class="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 pl-4 pr-10 text-sm focus:outline-none focus:ring-1"
+              style="focus:border-color: var(--color-primary); focus:ring-color: var(--color-primary);"
+            >
+            <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </button>
+          </div>
+        </form>
+
+      </div>
+
+      <!-- Categorías + páginas estáticas en nav -->
+      {% if categories or brand.static_pages %}
+      <div class="relative">
+        <div class="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent sm:hidden"></div>
+        <nav class="nav-cats flex gap-6 pb-2 overflow-x-auto text-sm">
+          {% for cat in categories %}
+          <a href="{% url 'commerce:category' cat.slug %}"
+             class="whitespace-nowrap text-gray-600 hover:text-brand font-medium py-1
+                    border-b-2 border-transparent hover:border-brand transition-colors flex-shrink-0">
+            {{ cat.name }}
+          </a>
+          {% endfor %}
+          {% if brand.static_pages %}
+          <span class="text-gray-300 py-1 flex-shrink-0">|</span>
+          {% for pg in brand.static_pages %}
+          <a href="{% url 'commerce:page' pg.slug %}"
+             class="whitespace-nowrap text-gray-500 hover:text-brand font-medium py-1
+                    border-b-2 border-transparent hover:border-brand transition-colors flex-shrink-0">
+            {{ pg.title }}
+          </a>
+          {% endfor %}
+          {% endif %}
+        </nav>
+      </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- Contenido -->
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-200 bg-gray-50 mt-12">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+        <span>© {% now "Y" %} {{ brand.brand_name }}. Todos los derechos reservados.</span>
+        <div class="flex gap-4">
+          {% if brand.whatsapp.url %}
+          <a href="{{ brand.whatsapp.url }}" target="_blank" rel="noopener" class="hover:text-brand">WhatsApp</a>
+          {% endif %}
+          {% if brand.social.instagram_url %}
+          <a href="{{ brand.social.instagram_url }}" target="_blank" rel="noopener" class="hover:text-brand">Instagram</a>
+          {% endif %}
+          {% if brand.social.facebook_url %}
+          <a href="{{ brand.social.facebook_url }}" target="_blank" rel="noopener" class="hover:text-brand">Facebook</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Pago de Suscripción - eGarage Chile{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.payment-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+}
+
+.payment-header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.payment-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 8px;
+}
+
+.payment-subtitle {
+    color: #718096;
+    font-size: 14px;
+}
+
+.plan-info {
+    background: linear-gradient(135deg, #667eea15, #764ba215);
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+}
+
+.plan-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 8px;
+}
+
+.plan-price {
+    font-size: 36px;
+    font-weight: 900;
+    color: #1a202c;
+    margin-bottom: 4px;
+}
+
+.plan-period {
+    color: #718096;
+    font-size: 14px;
+}
+
+.bank-details {
+    background: #f7fafc;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.bank-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bank-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.bank-row:last-child {
+    border-bottom: none;
+}
+
+.bank-label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 14px;
+}
+
+.bank-value {
+    font-weight: 700;
+    color: #1a202c;
+    font-size: 15px;
+    font-family: 'Courier New', monospace;
+}
+
+.copy-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: all 0.2s;
+}
+
+.copy-btn:hover {
+    background: #764ba2;
+}
+
+.instructions {
+    background: #fff7ed;
+    border: 2px solid #fb923c;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.instructions-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ea580c;
+    margin-bottom: 12px;
+}
+
+.instructions ol {
+    margin-left: 20px;
+    color: #78350f;
+}
+
+.instructions li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.upload-section {
+    border: 2px dashed #cbd5e0;
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.upload-button {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 14px 32px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.upload-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.alert {
+    padding: 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.alert-info {
+    background: #dbeafe;
+    border: 2px solid #3b82f6;
+    color: #1e40af;
+}
+
+.back-link {
+    text-align: center;
+    margin-top: 24px;
+}
+
+.back-link a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-container">
+    <div class="payment-header">
+        <div class="payment-title">💳 Completa tu Suscripción</div>
+        <div class="payment-subtitle">{{ empresa.nombre_taller }} - 🇨🇱 Chile</div>
+    </div>
+
+    <!-- Plan Info -->
+    <div class="plan-info">
+        <div class="plan-name">Plan {{ plan_info.nombre }}</div>
+        <div class="plan-price">${{ plan_info.valor|intcomma }} CLP</div>
+        <div class="plan-period">{{ plan_info.dias }} días de acceso</div>
+    </div>
+
+    <!-- Instrucciones -->
+    <div class="instructions">
+        <div class="instructions-title">📋 Instrucciones de Pago</div>
+        <ol>
+            <li>Realiza una <strong>transferencia bancaria</strong> por el monto indicado</li>
+            <li>Usa la referencia: <strong>{{ referencia }}</strong></li>
+            <li>Toma una <strong>foto o screenshot</strong> del comprobante</li>
+            <li>Sube el comprobante usando el botón de abajo</li>
+            <li>Tu suscripción será activada en <strong>24-48 horas</strong></li>
+        </ol>
+    </div>
+
+    <!-- Datos Bancarios -->
+    <div class="bank-details">
+        <div class="bank-title">
+            🏦 Datos Bancarios
+        </div>
+
+        <div class="bank-row">
+            <span class="bank-label">Banco:</span>
+            <span class="bank-value">{{ datos_banco.banco }}</span>
+        </div>
+
+        <div class="bank-row">
+            <span class="bank-label">Tipo de Cuenta:</span>
+            <span class="bank-value">{{ datos_banco.tipo_cuenta }}</span>
+        </div>
+
+        <div class="bank-row">
+            <span class="bank-label">Titular:</span>
+            <span class="bank-value">{{ datos_banco.titular }}</span>
+        </div>
+
+        <div class="bank-row">
+            <span class="bank-label">RUT:</span>
+            <span class="bank-value">
+                {{ datos_banco.rut }}
+                <button class="copy-btn" onclick="copyToClipboard('{{ datos_banco.rut }}')">Copiar</button>
+            </span>
+        </div>
+
+        <div class="bank-row">
+            <span class="bank-label">N° Cuenta:</span>
+            <span class="bank-value">
+                {{ datos_banco.numero_cuenta }}
+                <button class="copy-btn" onclick="copyToClipboard('{{ datos_banco.numero_cuenta }}')">Copiar</button>
+            </span>
+        </div>
+
+        <div class="bank-row">
+            <span class="bank-label">Monto a Transferir:</span>
+            <span class="bank-value" style="color: #667eea; font-size: 20px;">
+                ${{ monto_pagar|intcomma }} CLP
+                <button class="copy-btn" onclick="copyToClipboard('{{ monto_pagar }}')">Copiar</button>
+            </span>
+        </div>
+
+        <div class="bank-row">
+            <span class="bank-label">Referencia:</span>
+            <span class="bank-value">
+                {{ referencia }}
+                <button class="copy-btn" onclick="copyToClipboard('{{ referencia }}')">Copiar</button>
+            </span>
+        </div>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert alert-info">
+        <strong>📧 Confirmación:</strong> Enviaremos un email a <strong>{{ empresa.email }}</strong> cuando tu suscripción sea activada.
+    </div>
+
+    <!-- Upload Section -->
+    <div class="upload-section">
+        <h3 style="margin-bottom: 16px; color: #1a202c;">📤 Subir Comprobante</h3>
+        <p style="color: #718096; margin-bottom: 20px;">Adjunta tu comprobante de transferencia</p>
+
+        <form method="POST" action="{% url 'subir_comprobante' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="plan" value="{{ plan }}">
+            <input type="hidden" name="monto" value="{{ monto_pagar }}">
+
+            <input type="file" name="comprobante" accept="image/*,.pdf" required
+                   style="margin-bottom: 16px;">
+            <br>
+            <button type="submit" class="upload-button">
+                📤 Subir Comprobante
+            </button>
+        </form>
+    </div>
+
+    <!-- Back Link -->
+    <div class="back-link">
+        <a href="/cl/es/dashboard/">← Volver al Dashboard</a>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('✅ Copiado: ' + text);
+    });
+}
+</script>
+{% endblock %}

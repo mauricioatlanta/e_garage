@@ -1,0 +1,1130 @@
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>
+    Iniciar Sesión - eGarage USA
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  <meta name="theme-color" content="#0a0e27">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="eGarage">
+  <link rel="manifest" href="/us/es/manifest.json">
+  <link rel="apple-touch-icon" href="/static/images/egarage_icon_192x192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/images/egarage_icon_192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/static/images/egarage_icon_512x512.png">
+  <link rel="icon" type="image/svg+xml" href="/static/images/egarage_default_logo.svg">
+  
+  
+  <script src="/static/js/ios-password-fix.js?v=2.1.2" defer></script>
+
+  
+  <link rel="stylesheet" href="/static/css/pwa-install-prompt.css?v=2.1.2">
+
+  
+  <script src="/jsi18n/"></script>
+
+  
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+  <link rel="stylesheet" href="/static/css/output.css">
+
+  
+  
+    <link rel="stylesheet" href="/static/css/starfield.css">
+  
+
+  
+  <style>
+    /* Prioridad: COLOR_PRIMARIO desde logo_empresa > company_color desde company_branding > default */
+    :root{
+      --company-primary: #0d6efd;
+      --company-secondary: #6c757d;
+      
+      /* Variables de Bootstrap para compatibilidad */
+      --bs-primary: #0d6efd;
+      --bs-secondary: #6c757d;
+    }
+    
+    /* Estilos base con colores personalizados */
+    .text-primary,.navbar-brand{color:var(--company-primary)!important}
+    .bg-primary{background-color:var(--company-primary)!important}
+    .btn-primary{
+        background-color:var(--company-primary)!important;
+        border-color:var(--company-primary)!important;
+        /* Mejora legibilidad del texto en botones con colores claros */
+        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        color: #ffffff !important;
+    }
+    
+    /* Efectos hover y bordes con transparencia para botones de navegación */
+    .nav-button-standard {
+        border-color: #0d6efd4D; /* 4D = 30% opacidad */
+        /* Mejora legibilidad del texto en botones de navegación */
+        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    }
+    
+    .nav-button-standard:hover {
+        box-shadow: 0 0 20px #0d6efd66; /* 66 = 40% opacidad */
+        border-color: var(--company-primary);
+    }
+    .btn-primary:hover{
+      background-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
+      border-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
+    }
+    .border-primary{border-color:var(--company-primary)!important}
+    .company-logo{max-height:52px;max-width:200px;object-fit:contain;transition:transform 0.3s ease,filter 0.3s ease}
+    .company-logo:hover{transform:scale(1.05);filter:drop-shadow(0 0 25px rgba(0,245,255,0.9))!important}
+    .company-header{
+      background:linear-gradient(135deg,rgba(10,14,39,0.95) 0%,rgba(15,23,52,0.95) 50%,rgba(10,14,39,0.95) 100%);
+      border-bottom:3px solid rgba(0,212,255,0.6);
+      box-shadow:0 10px 40px rgba(0,212,255,0.3),inset 0 1px 0 rgba(0,255,255,0.2);
+      backdrop-filter:blur(10px)
+    }
+    .company-title{
+      font-family:'Orbitron','Arial Black',monospace !important;
+      color:#00ffff !important;
+      text-shadow:
+        0 0 20px rgba(0,255,255,1),
+        0 0 40px rgba(0,212,255,0.8),
+        0 0 60px rgba(0,212,255,0.6),
+        0 2px 10px rgba(0,0,0,0.8) !important;
+      filter:drop-shadow(0 4px 12px rgba(0,212,255,0.5));
+      font-weight:900 !important;
+      letter-spacing:2px !important;
+      animation:title-glow 3s ease-in-out infinite
+    }
+    @keyframes title-glow{
+      0%,100%{text-shadow:0 0 20px rgba(0,255,255,1),0 0 40px rgba(0,212,255,0.8),0 0 60px rgba(0,212,255,0.6),0 2px 10px rgba(0,0,0,0.8)}
+      50%{text-shadow:0 0 30px rgba(0,255,255,1),0 0 60px rgba(0,212,255,1),0 0 90px rgba(0,212,255,0.8),0 2px 10px rgba(0,0,0,0.8)}
+    }
+    
+    /* Fix de contraste para móvil - NOMBRE DE EMPRESA VISIBLE */
+    @media screen and (max-width: 768px) {
+      .company-title {
+        color: #00ffff !important;
+        font-size: 1.5rem !important;
+        text-shadow: 
+          0 0 20px rgba(0, 255, 255, 1),
+          0 0 40px rgba(0, 255, 255, 0.8),
+          0 2px 8px rgba(0, 0, 0, 1) !important;
+        font-weight: 900 !important;
+        -webkit-text-stroke: 1px rgba(0, 255, 255, 0.3);
+      }
+      
+      .company-tagline,
+      header .text-gray-300,
+      header .text-gray-400 {
+        color: #b0e0ff !important;
+        text-shadow: 0 0 10px rgba(176, 224, 255, 0.6) !important;
+      }
+    }
+
+    /* Botones de navegación compactos y elegantes */
+    .nav-button-standard {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.75rem;
+      background: linear-gradient(135deg, rgba(8, 18, 32, 0.96) 0%, rgba(12, 24, 40, 0.96) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.25);
+      border-radius: 6px;
+      text-decoration: none;
+      color: #a8d8ea;
+      font-weight: 500;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: visible;
+      white-space: nowrap;
+      isolation: isolate;
+      box-shadow: 0 1px 4px rgba(0, 212, 255, 0.12);
+    }
+
+    .nav-button-standard::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 6px;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .nav-button-standard::after {
+      content: none;
+    }
+
+    .nav-button-standard:hover {
+      transform: translateY(-1px);
+      border-color: rgba(0, 212, 255, 0.5);
+      color: #e0f7ff;
+      background: linear-gradient(135deg, rgba(12, 28, 48, 0.98) 0%, rgba(18, 38, 60, 0.98) 100%);
+      box-shadow: 0 2px 12px rgba(0, 212, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-button-standard:hover::before {
+      opacity: 0.8;
+    }
+
+    .nav-button-standard:active {
+      transform: translateY(0);
+    }
+
+    .nav-button-standard .nav-icon {
+      font-size: 1rem;
+      line-height: 1;
+      filter: drop-shadow(0 0 2px rgba(0, 212, 255, 0.4));
+      transition: filter 0.2s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav-button-standard:hover .nav-icon {
+      filter: drop-shadow(0 0 4px rgba(0, 255, 255, 0.7));
+    }
+
+    .nav-button-standard span:last-child,
+    .nav-button-standard .nav-text {
+      position: relative;
+      z-index: 1;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #00d4ff;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 6px rgba(0, 212, 255, 0.4);
+      display: inline-block;
+    }
+
+    .nav-button-standard:hover span:last-child,
+    .nav-button-standard:hover .nav-text {
+      color: #7dd3fc;
+      text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+    }
+
+    /* Estilo para botón de salir (rojo eléctrico) */
+    .nav-button-standard.logout-btn {
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ffb3b3;
+    }
+
+    .nav-button-standard.logout-btn::before {
+      display: none;
+    }
+
+    .nav-button-standard.logout-btn:hover {
+      border-color: rgba(239, 68, 68, 0.6);
+      box-shadow: 0 2px 12px rgba(239, 68, 68, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-button-standard.logout-btn .nav-icon {
+      filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.6));
+    }
+
+    .nav-button-standard.logout-btn:hover .nav-icon {
+      filter: drop-shadow(0 0 6px rgba(255, 100, 100, 1));
+    }
+
+    .nav-button-standard.logout-btn span:last-child {
+      text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+    }
+
+    .nav-button-standard.logout-btn:hover span:last-child {
+      text-shadow: 0 0 12px rgba(255, 100, 100, 0.8);
+    }
+
+    /* Responsive: botones compactos en móviles */
+    @media (max-width: 768px) {
+      .nav-button-standard {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.65rem;
+        gap: 0.2rem;
+        min-width: 0;
+        flex: 1 1 auto;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 52px;
+      }
+
+      .nav-button-standard span:last-child,
+      .nav-button-standard .nav-text {
+        display: block !important;
+        font-family: 'Orbitron', monospace !important;
+        font-weight: 600 !important;
+        font-size: 0.65rem !important;
+        color: #00d4ff !important;
+        text-shadow: 0 0 4px rgba(0, 212, 255, 0.5) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        white-space: nowrap !important;
+        text-align: center !important;
+        line-height: 1.2 !important;
+        margin-top: 0.15rem !important;
+        letter-spacing: 0.3px !important;
+        text-transform: uppercase !important;
+      }
+
+      .nav-button-standard .nav-icon {
+        font-size: 1.05rem !important;
+        display: block !important;
+        margin-bottom: 0 !important;
+        filter: drop-shadow(0 0 2px rgba(0, 212, 255, 0.5)) !important;
+      }
+
+      #main-navigation .flex.flex-col > div {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+        gap: 0.4rem;
+        width: 100%;
+        max-width: 100%;
+        padding: 0 0.4rem;
+      }
+
+      #main-navigation .flex.flex-col > div:first-child {
+        grid-template-columns: repeat(5, 1fr);
+      }
+
+      #main-navigation .flex.flex-col > div:last-child {
+        grid-template-columns: repeat(5, 1fr);
+      }
+
+      @media (max-width: 480px) {
+        #main-navigation .flex.flex-col > div:first-child {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        #main-navigation .flex.flex-col > div:last-child {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .nav-button-standard {
+          padding: 0.3rem 0.35rem;
+          font-size: 0.6rem;
+          gap: 0.15rem;
+          min-height: 48px;
+          border-radius: 5px;
+        }
+
+        .nav-button-standard span:last-child,
+        .nav-button-standard .nav-text {
+          font-size: 0.6rem !important;
+          margin-top: 0.1rem !important;
+        }
+
+        .nav-button-standard .nav-icon {
+          font-size: 0.95rem !important;
+        }
+      }
+
+      @media (min-width: 481px) and (max-width: 640px) {
+        #main-navigation .flex.flex-col > div:first-child {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        #main-navigation .flex.flex-col > div:last-child {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .nav-button-standard {
+          padding: 0.32rem 0.45rem;
+          min-height: 50px;
+        }
+
+        .nav-button-standard .nav-text {
+          font-size: 0.64rem !important;
+        }
+
+        .nav-button-standard .nav-icon {
+          font-size: 1rem !important;
+        }
+      }
+    }
+
+    @media screen and (max-width: 1024px) {
+      .nav-button-standard {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      .nav-button-standard .nav-text,
+      .nav-button-standard span:not(.nav-icon) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 0.7rem !important;
+        font-weight: 600 !important;
+        color: #00d4ff !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        margin-top: 0.15rem !important;
+      }
+
+      .nav-button-standard .nav-icon {
+        display: block !important;
+        margin-bottom: 0 !important;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      body #main-navigation .nav-button-standard {
+        min-height: 48px !important;
+        padding: 0.3rem 0.35rem !important;
+      }
+
+      body #main-navigation .nav-button-standard span.nav-text,
+      body #main-navigation .nav-button-standard span[class="nav-text"],
+      body #main-navigation a.nav-button-standard > span:not(.nav-icon) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 0.6rem !important;
+        font-weight: 600 !important;
+        color: #00d4ff !important;
+        margin-top: 0.1rem !important;
+      }
+
+      body #main-navigation .nav-button-standard .nav-icon {
+        font-size: 0.95rem !important;
+      }
+    }
+
+    /* Mobile hardening: labels in quick menu must stay visible */
+    @media screen and (max-width: 768px) {
+      body #main-navigation .nav-button-standard {
+        display: inline-flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 56px !important;
+        padding: 0.42rem 0.45rem !important;
+        gap: 0.2rem !important;
+        overflow: visible !important;
+      }
+
+      body #main-navigation .nav-button-standard .nav-icon {
+        display: block !important;
+        line-height: 1 !important;
+        font-size: 1.05rem !important;
+      }
+
+      body #main-navigation .nav-button-standard .nav-text,
+      body #main-navigation a.nav-button-standard > span:not(.nav-icon),
+      body #main-navigation button.nav-button-standard > span:not(.nav-icon) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: #ffffff !important;
+        font-size: 0.74rem !important;
+        font-weight: 700 !important;
+        line-height: 1.15 !important;
+        text-transform: none !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95) !important;
+      }
+    }
+
+    @media screen and (min-width: 481px) and (max-width: 768px) {
+      body #main-navigation .nav-button-standard {
+        min-height: 52px !important;
+      }
+
+      body #main-navigation .nav-button-standard span.nav-text,
+      body #main-navigation a.nav-button-standard > span:not(.nav-icon) {
+        display: block !important;
+        font-size: 0.65rem !important;
+        font-weight: 600 !important;
+        color: #00d4ff !important;
+      }
+    }
+
+    /* Desarme dashboard: chrome operativo compacto (body.eg-desarme-dashboard-compact) */
+    .eg-desarme-dashboard-compact header.company-header {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border-bottom-width: 2px;
+      box-shadow: 0 4px 18px rgba(0, 212, 255, 0.12), inset 0 1px 0 rgba(0, 255, 255, 0.08);
+    }
+    .eg-desarme-dashboard-compact header.company-header > .flex.items-center {
+      flex: 1;
+      min-width: 0;
+      gap: 0.65rem !important;
+      align-items: center !important;
+    }
+    .eg-desarme-dashboard-compact header.company-header .company-logo {
+      height: 64px !important;
+      max-height: 68px !important;
+      width: auto !important;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45) !important;
+      filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.45)) !important;
+    }
+    .eg-desarme-dashboard-compact header.company-header .company-logo:hover {
+      transform: none;
+      filter: drop-shadow(0 0 10px rgba(0, 245, 255, 0.55)) !important;
+    }
+    .eg-desarme-dashboard-compact header.company-header h1 {
+      font-size: 1.05rem !important;
+      line-height: 1.2 !important;
+      letter-spacing: 0.06em !important;
+      font-weight: 800 !important;
+      text-shadow: 0 0 12px rgba(0, 255, 255, 0.45), 0 1px 6px rgba(0, 0, 0, 0.85) !important;
+    }
+    .eg-desarme-dashboard-compact header.company-header .company-tagline {
+      font-size: 0.7rem !important;
+      font-weight: 500 !important;
+      margin-top: 0.1rem !important;
+      opacity: 0.85;
+      text-shadow: 0 0 6px rgba(0, 255, 255, 0.35) !important;
+    }
+    @media (max-width: 640px) {
+      .eg-desarme-dashboard-compact header.company-header .company-tagline {
+        display: none;
+      }
+      .eg-desarme-dashboard-compact header.company-header h1 {
+        font-size: 0.95rem !important;
+      }
+      .eg-desarme-dashboard-compact header.company-header .company-logo {
+        height: 52px !important;
+        max-height: 56px !important;
+      }
+    }
+    .eg-desarme-dashboard-compact #main-navigation {
+      margin-top: 0.25rem;
+      margin-bottom: 0.15rem;
+      padding-bottom: 0.15rem;
+      gap: 0.35rem;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      max-width: 100%;
+    }
+    .eg-desarme-dashboard-compact #main-navigation > div {
+      display: contents;
+    }
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard,
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard.logout-btn {
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-height: 34px !important;
+      padding: 0.28rem 0.55rem !important;
+      border-radius: 6px;
+      gap: 0.3rem !important;
+      box-shadow: 0 1px 4px rgba(0, 212, 255, 0.1);
+    }
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard .nav-icon {
+      font-size: 0.95rem !important;
+      margin-bottom: 0 !important;
+    }
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard .nav-text,
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard span:last-child {
+      display: inline !important;
+      margin-top: 0 !important;
+      font-size: 0.62rem !important;
+    }
+    @media (max-width: 768px) {
+      .eg-desarme-dashboard-compact #main-navigation .nav-button-standard,
+      .eg-desarme-dashboard-compact #main-navigation .nav-button-standard.logout-btn {
+        min-height: 36px !important;
+        padding: 0.26rem 0.45rem !important;
+        flex: 0 1 auto;
+      }
+      .eg-desarme-dashboard-compact #main-navigation .nav-button-standard .nav-text,
+      .eg-desarme-dashboard-compact #main-navigation .nav-button-standard span:last-child {
+        font-size: 0.58rem !important;
+      }
+    }
+  </style>
+
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
+  
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  
+  <script>
+  (function() {
+    // Detectar si es móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    
+    if (!isMobile) {
+      console.log('✅ Desktop detectado - sin restricciones de scroll');
+      return; // En desktop, no aplicar restricciones
+    }
+
+    console.log('📱 Móvil detectado - activando protección anti-scroll automático');
+
+    // Flag para detectar interacción real del usuario
+    let isUserInteraction = false;
+    let scrollLock = false;
+    let initialScrollPos = 0;
+
+    // Marcar interacción del usuario en eventos táctiles y de mouse
+    ['touchstart', 'touchmove', 'mousedown', 'wheel', 'scroll'].forEach(function(event) {
+      document.addEventListener(event, function() {
+        isUserInteraction = true;
+        setTimeout(function() { isUserInteraction = false; }, 100);
+      }, { passive: true, capture: true });
+    });
+
+    // Función para restaurar posición de scroll
+    function preventAutoScroll() {
+      if (scrollLock && !isUserInteraction) {
+        window.scrollTo(0, initialScrollPos);
+        document.documentElement.scrollTop = initialScrollPos;
+        document.body.scrollTop = initialScrollPos;
+      }
+    }
+
+    // Interceptar window.scrollTo
+    const origScrollTo = window.scrollTo;
+    window.scrollTo = function(x, y) {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scrollTo(' + x + ',' + y + ') sin interacción del usuario');
+        return; // Bloquear scroll automático
+      }
+      return origScrollTo.call(window, x, y);
+    };
+
+    // Interceptar scrollIntoView
+    const origScrollIntoView = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function() {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scrollIntoView en', this.tagName, this.id || this.className);
+        return; // Bloquear scrollIntoView automático
+      }
+      return origScrollIntoView.apply(this, arguments);
+    };
+
+    // Interceptar window.scroll
+    const origScroll = window.scroll;
+    window.scroll = function(x, y) {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scroll(' + x + ',' + y + ') sin interacción del usuario');
+        return;
+      }
+      return origScroll.call(window, x, y);
+    };
+
+    // Modificar focus para no hacer scroll en móviles
+    const origFocus = HTMLElement.prototype.focus;
+    HTMLElement.prototype.focus = function(options) {
+      if (isMobile) {
+        // En móviles, focus sin scroll
+        const newOptions = Object.assign({}, options, { preventScroll: true });
+        return origFocus.call(this, newOptions);
+      }
+      return origFocus.call(this, options);
+    };
+
+    // Activar protección al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+      initialScrollPos = window.pageYOffset || document.documentElement.scrollTop || 0;
+      scrollLock = true;
+      
+      // Mantener lock por 3 segundos después de carga
+      setTimeout(function() {
+        scrollLock = false;
+        console.log('✅ Protección anti-scroll desactivada - página cargada');
+      }, 3000);
+
+      // Prevenir scroll en focus de inputs
+      document.addEventListener('focusin', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+          if (!isUserInteraction) {
+            const scrollBefore = window.pageYOffset || document.documentElement.scrollTop || 0;
+            setTimeout(function() {
+              const scrollAfter = window.pageYOffset || document.documentElement.scrollTop || 0;
+              if (Math.abs(scrollAfter - scrollBefore) > 3) {
+                window.scrollTo(0, scrollBefore);
+                document.documentElement.scrollTop = scrollBefore;
+                document.body.scrollTop = scrollBefore;
+              }
+            }, 0);
+          }
+        }
+      }, true);
+    });
+
+    // Prevenir scroll al abrir/cerrar teclado virtual
+    let lastHeight = window.innerHeight;
+    window.addEventListener('resize', function() {
+      const currentHeight = window.innerHeight;
+      if (Math.abs(currentHeight - lastHeight) > 100) {
+        // Cambio grande = probablemente teclado virtual
+        setTimeout(preventAutoScroll, 50);
+      }
+      lastHeight = currentHeight;
+    });
+
+    console.log('✅ Protección anti-scroll activada para móvil');
+  })();
+  </script>
+
+  
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+  
+  
+  
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: linear-gradient(135deg, #000814 0%, #001428 50%, #000814 100%);
+    font-family: 'Exo 2', sans-serif;
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.font-futuristic { font-family: 'Orbitron', monospace; letter-spacing: 0.05em; }
+
+.tech-grid {
+    background-image:
+        linear-gradient(rgba(0, 40, 104, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 40, 104, 0.08) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: grid-move 20s linear infinite;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+}
+
+@keyframes grid-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+.login-container { position: relative; z-index: 10; width: 100%; max-width: 500px; padding: 20px; }
+
+.glass-card {
+    background: linear-gradient(135deg, rgba(0, 40, 104, 0.12) 0%, rgba(191, 10, 48, 0.08) 100%);
+    backdrop-filter: blur(30px);
+    border-radius: 2rem;
+    border: 2px solid rgba(0, 40, 104, 0.4);
+    box-shadow: 0 20px 60px rgba(0, 40, 104, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(0, 40, 104, 0.1) 60deg, transparent 120deg);
+    animation: shimmer 4s linear infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.login-content { position: relative; z-index: 1; }
+.logo-section { text-align: center; margin-bottom: 2rem; }
+
+.logo {
+    width: 80px; height: 80px;
+    margin: 0 auto 1rem;
+    filter: drop-shadow(0 0 20px rgba(0, 40, 104, 0.8));
+}
+
+.brand-title {
+    font-size: 2rem; font-weight: 900;
+    background: linear-gradient(135deg, #002868 0%, #BF0A30 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle { color: #94a3b8; font-size: 0.9rem; }
+
+.login-title {
+    font-size: 1.8rem; font-weight: 700;
+    color: #4a90d9;
+    margin-bottom: 2rem; text-align: center;
+    text-shadow: 0 0 15px rgba(0, 40, 104, 0.6);
+}
+
+.form-group { margin-bottom: 1.5rem; }
+.form-label { display: block; font-size: 0.9rem; font-weight: 600; color: #4a90d9; margin-bottom: 0.5rem; }
+
+.form-input {
+    width: 100%; padding: 1rem; font-size: 1rem; color: #ffffff;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(0, 40, 104, 0.4);
+    border-radius: 0.75rem; transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none; border-color: #4a90d9;
+    background: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 20px rgba(0, 40, 104, 0.4);
+}
+
+.form-input::placeholder { color: #64748b; }
+
+.checkbox-container { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; }
+.checkbox-container input[type="checkbox"] { width: 20px; height: 20px; accent-color: #4a90d9; cursor: pointer; }
+.checkbox-label { color: #94a3b8; font-size: 0.9rem; cursor: pointer; }
+
+.login-button {
+    width: 100%; padding: 1.2rem; font-size: 1.1rem; font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, #002868 0%, #BF0A30 100%);
+    border: none; border-radius: 0.75rem; cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 25px rgba(0, 40, 104, 0.5);
+    text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+.login-button:hover { transform: translateY(-3px); box-shadow: 0 0 40px rgba(0, 40, 104, 0.8); }
+
+.forgot-password { text-align: center; margin-top: 1rem; }
+.forgot-password a { color: #4a90d9; text-decoration: none; font-size: 0.9rem; }
+.forgot-password a:hover { text-shadow: 0 0 10px rgba(0, 40, 104, 0.8); }
+
+.divider { margin: 2rem 0; text-align: center; position: relative; }
+.divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(0, 40, 104, 0.3); }
+.divider span { background: rgba(0, 0, 0, 0.8); padding: 0 1rem; position: relative; color: #64748b; font-size: 0.9rem; }
+
+.signup-link { text-align: center; padding-top: 1.5rem; border-top: 1px solid rgba(0, 40, 104, 0.3); }
+.signup-link-text { color: #94a3b8; font-size: 0.9rem; }
+.signup-link a { color: #4a90d9; text-decoration: none; font-weight: 600; margin-left: 0.3rem; }
+.signup-link a:hover { text-shadow: 0 0 10px rgba(0, 40, 104, 0.8); }
+
+.error-message {
+    background: rgba(191, 10, 48, 0.2);
+    border: 1px solid rgba(191, 10, 48, 0.5);
+    color: #ff6b6b; padding: 1rem; border-radius: 0.75rem;
+    margin-bottom: 1.5rem; font-size: 0.9rem;
+}
+
+.flag-bar { display: flex; width: 72px; height: 8px; border-radius: 4px; overflow: hidden; margin: 0 auto 0.75rem; }
+.flag-bar div { flex: 1; }
+@media (max-width: 640px) {
+    .glass-card { padding: 2rem 1.5rem; }
+    .brand-title { font-size: 1.5rem; }
+    .login-title { font-size: 1.5rem; }
+}
+</style>
+
+  
+<link rel='stylesheet' href='/static/css/theme.css'>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+  
+
+
+  
+
+
+  
+  
+    <div id="bg-starfield" aria-hidden="true">
+      <div class="stars layer1"></div>
+      
+        <div class="stars layer2"></div>
+        <div class="stars layer3"></div>
+      
+    </div>
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+  <main class="flex-1">
+    
+<div class="tech-grid"></div>
+
+<div class="login-container">
+    <div class="glass-card">
+        <div class="login-content">
+            <div class="logo-section">
+                <img src="/static/img/logo_egarage.png?v=2" alt="eGarage Logo" class="logo">
+                <div class="flag-bar"><div class="flag-s1" style="background:#B22234"></div><div class="flag-s2" style="background:#FFFFFF"></div><div class="flag-s3" style="background:#3C3B6E"></div></div><h1 class="brand-title font-futuristic">eGarage USA</h1>
+                <p class="subtitle">Gestión Profesional para Talleres</p>
+            </div>
+
+            <h2 class="login-title font-futuristic">Iniciar Sesión</h2>
+
+            
+
+            <form method="POST" action="/us/login/">
+                <input type="hidden" name="csrfmiddlewaretoken" value="JUweIrbz8FPKw4t2KOddrebBLPtYZBio2IuVESfNvmyXryoana2EE9Qz88aF5J4f">
+                
+
+                <div class="form-group">
+                    <label class="form-label">Usuario o Correo Electrónico</label>
+                    <input type="email" name="login" autocomplete="email" placeholder="Dirección de correo electrónico" maxlength="320" class="form-input" required id="id_login">
+                    
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" name="password" placeholder="Contraseña" autocomplete="current-password" class="form-input" required id="id_password">
+                    
+                </div>
+
+                <div class="checkbox-container">
+                    
+                    <label for="id_remember_me" class="checkbox-label">Mantener sesión iniciada</label>
+                </div>
+
+                <button type="submit" class="login-button font-futuristic">🔐 Iniciar Sesión</button>
+
+                <div class="forgot-password">
+                    <a href="/us/es/accounts/password/reset/">¿Olvidaste tu contraseña?</a>
+                </div>
+            </form>
+
+            <div class="divider"><span>o</span></div>
+
+            <div class="signup-link">
+                <span class="signup-link-text">¿No tienes cuenta?</span>
+                <a href="/us/es/accounts/signup/">Regístrate gratis</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const particlesContainer = document.createElement('div');
+particlesContainer.className = 'particles';
+document.body.appendChild(particlesContainer);
+for (let i = 0; i < 20; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = `${Math.random() * 100}%`;
+    particle.style.animationDelay = `${Math.random() * 10}s`;
+    particle.style.animationDuration = `${10 + Math.random() * 10}s`;
+    particlesContainer.appendChild(particle);
+}
+</script>
+
+    
+    <!-- ayuda contextual placeholder -->
+
+    
+  </main>
+
+  
+  
+
+  
+  
+  <script src="/static/js/pwa-install-prompt.js?v=2.1.4"></script>
+  
+  
+  
+  
+
+  
+  
+  <script>
+  (function(){
+    function isAlreadyRegisteredError(e) {
+      if (!e) return false;
+      var msg = typeof e === 'string' ? e : (e.message || (e.toString && e.toString()) || '');
+      return /already been registered/i.test(String(msg));
+    }
+    function wrapRegisterFn(orig, obj) {
+      return function(name, fn) {
+        try { orig.call(obj, name, fn); } catch (e) {
+          if (!isAlreadyRegisteredError(e)) throw e;
+        }
+      };
+    }
+    var _yl = null;
+    try {
+      if (typeof Proxy === 'undefined') throw new Error('no Proxy');
+      Object.defineProperty(window, 'yl', {
+        configurable: true,
+        get: function() { return _yl; },
+        set: function(v) {
+          if (v && typeof v === 'object' && !v._egDalProxy) {
+            if (typeof v.registerFunction === 'function') {
+              v.registerFunction = wrapRegisterFn(v.registerFunction, v);
+            }
+            v = new Proxy(v, {
+              set: function(t, p, val) {
+                if (p === 'registerFunction' && typeof val === 'function') {
+                  t[p] = wrapRegisterFn(val, t);
+                  return true;
+                }
+                t[p] = val;
+                return true;
+              }
+            });
+            v._egDalProxy = true;
+          }
+          _yl = v;
+        }
+      });
+    } catch (err) {}
+  })();
+  </script>
+  
+  
+  
+  
+  
+  
+  {# 
+    <script src="/static/js/starfield.js"></script>
+   #}
+
+  <script>
+    // CSRF helper
+    function getCookie(name){
+      let v=null; if(document.cookie && document.cookie!==''){
+        const cs=document.cookie.split(';');
+        for(let i=0;i<cs.length;i++){
+          const c=cs[i].trim(); if(c.substring(0,name.length+1)===(name+'=')){ v=decodeURIComponent(c.substring(name.length+1)); break; }
+        }
+      } return v;
+    }
+    const csrftoken=getCookie('csrftoken');
+
+    // Confirmación eliminar
+    function confirmarEliminacion(nombreCliente){
+      const message=`⚠️ ¿Está seguro de eliminar a "${nombreCliente}"?\n\nEsta acción NO se puede deshacer.`;
+      return confirm(message);
+    }
+
+    // Service Worker Registration para PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        let swRefreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', function() {
+          if (swRefreshing) {
+            return;
+          }
+          swRefreshing = true;
+          console.log('Nueva version del Service Worker activa. Recargando...');
+          window.location.reload();
+        });
+
+        navigator.serviceWorker.register('/us/es/service-worker.js', { scope: '/' })
+          .then(function(registration) {
+            console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+            
+            // Verificar actualizaciones cada hora
+            setInterval(function() {
+              registration.update();
+            }, 3600000); // 1 hora
+            
+            // Escuchar actualizaciones del service worker
+            registration.addEventListener('updatefound', function() {
+              const newWorker = registration.installing;
+              if (!newWorker) {
+                return;
+              }
+              newWorker.addEventListener('statechange', function() {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('Nueva version de eGarage disponible. Se activara automaticamente.');
+                  return;
+                  // Hay una nueva versión disponible
+                  if (confirm('🎉 Nueva versión de eGarage disponible. ¿Deseas actualizar ahora?')) {
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    window.location.reload();
+                  }
+                }
+              });
+            });
+          })
+          .catch(function(error) {
+            console.warn('⚠️ Error al registrar Service Worker:', error);
+          });
+      });
+    }
+    
+    // PWA Install Prompt Handler (maneja beforeinstallprompt y iOS)
+    // El script pwa-install-prompt.js se carga después y maneja todo
+  </script>
+
+  <!-- 🆘 Botón de Ayuda Contextual Floating -->
+  
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+console.log("?? CUSTOM TABS LOADED");
+
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("?? DOM READY - INIT TABS");
+
+    function activateTab(target) {
+        document.querySelectorAll("#settingsTabs .nav-link").forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+        document.querySelectorAll("#settingsTabsContent .tab-pane").forEach(pane => {
+            pane.style.display = "none";
+        });
+
+        let btn = document.querySelector('[data-bs-target="' + target + '"]');
+        let pane = document.querySelector(target);
+
+        if (btn) btn.classList.add("active");
+        if (pane) {
+            pane.style.display = "block";
+            pane.scrollIntoView({behavior:"smooth"});
+        }
+    }
+
+    document.querySelectorAll("#settingsTabs .nav-link").forEach(btn => {
+        btn.addEventListener("click", function(e) {
+            e.preventDefault();
+            console.log("CLICK TAB:", btn.getAttribute("data-bs-target"));
+            activateTab(btn.getAttribute("data-bs-target"));
+        });
+    });
+
+    activateTab("#profile");
+});
+</script>
+<script src="/static/js/password-toggle.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a52a6ed2190e647b',t:'MTc5MzM2MzQ0Mw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a52a6ed2190e647b',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

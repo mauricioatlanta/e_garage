@@ -1,0 +1,77 @@
+{% extends "commerce/admin/base_admin.html" %}
+
+{% block page_title %}Commerce Admin{% endblock %}
+{% block page_subtitle %}Panel de control de tu tienda online{% endblock %}
+
+{% block main_actions %}
+<a href="{% url 'commerce:admin_product_list' %}" class="ca-btn ca-btn-primary">
+  📦 Gestionar productos
+</a>
+<a href="/commerce/" target="_blank" class="ca-btn ca-btn-ghost">
+  ↗ Ver tienda
+</a>
+{% endblock %}
+
+{% block ca_content %}
+<!-- KPI row -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+  <div class="ca-stat-card">
+    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Productos</p>
+    <p class="text-3xl font-bold text-cyan-300">{{ product_stats.total }}</p>
+    <p class="text-xs text-gray-500 mt-1">{{ product_stats.published }} publicados · {{ product_stats.draft }} borradores</p>
+  </div>
+  <div class="ca-stat-card">
+    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Categorías</p>
+    <p class="text-3xl font-bold text-lime-300">{{ category_stats.total }}</p>
+    <p class="text-xs text-gray-500 mt-1">{{ category_stats.active }} activas · {{ category_stats.inactive }} inactivas</p>
+  </div>
+  <div class="ca-stat-card">
+    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Pedidos totales</p>
+    <p class="text-3xl font-bold text-fuchsia-300">{{ brand.order_count }}</p>
+    <p class="text-xs text-gray-500 mt-1">{{ brand.pending_orders }} pendientes</p>
+  </div>
+  <div class="ca-stat-card">
+    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Ingresos pagados</p>
+    <p class="text-3xl font-bold text-emerald-300">{{ brand.revenue_paid|floatformat:0 }}</p>
+    <p class="text-xs text-gray-500 mt-1">Total acumulado</p>
+  </div>
+</div>
+
+<!-- Accesos rápidos -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+  <!-- Categorías quick -->
+  <div class="ca-stat-card">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-sm font-semibold text-cyan-200">🗂 Categorías</h3>
+      <a href="{% url 'commerce:admin_category_create' %}" class="ca-btn ca-btn-primary text-xs">+ Nueva</a>
+    </div>
+    <a href="{% url 'commerce:admin_category_list' %}" class="block text-sm text-gray-400 hover:text-cyan-300 transition-colors mt-2">
+      Ver árbol de categorías →
+    </a>
+  </div>
+
+  <!-- Productos quick -->
+  <div class="ca-stat-card">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-sm font-semibold text-cyan-200">📦 Productos</h3>
+      <a href="{% url 'commerce:admin_product_list' %}?estado=draft" class="ca-btn ca-btn-ghost text-xs">{{ product_stats.draft }} sin publicar</a>
+    </div>
+    <a href="{% url 'commerce:admin_product_list' %}" class="block text-sm text-gray-400 hover:text-cyan-300 transition-colors mt-2">
+      Ver catálogo completo →
+    </a>
+  </div>
+</div>
+
+<!-- Marca / storefront -->
+<div class="ca-stat-card mt-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <h3 class="text-sm font-semibold text-cyan-200 mb-1">🎨 Storefront</h3>
+      <p class="text-xs text-gray-500">
+        {% if brand.has_logo %}Logo configurado{% else %}Sin logo — configura en Django Admin{% endif %}
+      </p>
+    </div>
+    <a href="/commerce/" target="_blank" class="ca-btn ca-btn-ghost">↗ Abrir tienda</a>
+  </div>
+</div>
+{% endblock %}

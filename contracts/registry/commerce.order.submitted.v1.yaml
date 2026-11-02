@@ -1,0 +1,67 @@
+id: commerce.order.submitted
+version: "1.0.0"
+status: active
+
+description: >
+  Evento publicado cuando un pedido Commerce queda confirmado y listo
+  para ser procesado por el ERP. El consumer crea un Documento PTS BORRADOR.
+
+producer:
+  system: commerce.engine
+  module: commerce.services.order_service
+  trigger: "OrderService.create_from_cart — dentro de transaction.atomic()"
+
+consumers:
+  - system: erp.core
+    module: runtime.consumers.commerce_order_consumer
+    action: "Crea Documento PTS BORRADOR + LineaRepuesto por cada ítem"
+    idempotency: "Por event_id via ProcessedEvent"
+
+schema:
+  $ref: "../schemas/commerce.order.submitted.v1.schema.json"
+
+transport:
+  mechanism: transactional_outbox
+  model: runtime.models.outbox_event.OutboxEvent
+  worker: "python manage.py process_outbox --event-type commerce.order.submitted"
+  delivery: at_least_once
+
+guarantees:
+  - "El evento se persiste en la misma transacción que el CommerceOrder."
+  - "Si la transacción hace rollback, el evento también desaparece."
+  - "El consumer es idempotente: reprocesar el mismo event_id no duplica el Documento."
+  - "El consumer NO emite el Documento, NO descuenta stock, NO crea MovimientoInventario."
+
+boundaries:
+  - "Commerce no importa Documento, Cliente, LineaRepuesto ni MovimientoInventario."
+  - "ERP no importa modelos Commerce; recibe únicamente el payload contractual."
+  - "No existe FK entre CommerceOrder y Documento."
+
+adr_references:
+  - ADR-002  # Transactional Outbox pattern
+  - ADR-006  # Identity Linkage Key
+  - ADR-007  # Guest Identity
+
+payload_example:
+  event_id: "550e8400-e29b-41d4-a716-446655440000"
+  occurred_at: "2026-07-31T20:00:00Z"
+  schema_version: "1.0.0"
+  empresa_id: 2
+  commerce_order_id: 42
+  order_number: "ORD-2-ABCD1234"
+  buyer:
+    full_name: "María García"
+    email: "maria@ejemplo.cl"
+    phone: "+56912345678"
+  items:
+    - commerce_order_item_id: 101
+      product_reference: "filtro-aceite-toyota"
+      sku: "F-001"
+      name: "Filtro de aceite Toyota"
+      quantity: 2
+      unit_price: "4990.00"
+      line_total: "9980.00"
+  subtotal: "9980.00"
+  tax_total: "0.00"
+  total: "9980.00"
+  currency: "CLP"

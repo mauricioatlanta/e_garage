@@ -1,0 +1,30 @@
+<form method="POST" action="{% url 'aplicar_modo_soporte' %}" class="space-y-3">
+  {% csrf_token %}
+  <div class="grid grid-cols-2 gap-2 text-xs">
+    <label class="flex items-center gap-2 cursor-pointer text-slate-200 hover:text-cyan-300">
+      <input type="checkbox" name="rubros" value="desarmaduria" class="accent-cyan-500 rounded"> 
+      Desarmaduría
+    </label>
+    <label class="flex items-center gap-2 cursor-pointer text-slate-200 hover:text-cyan-300">
+      <input type="checkbox" name="rubros" value="repuestos" class="accent-cyan-500 rounded"> 
+      Casa de Repuestos
+    </label>
+    <label class="flex items-center gap-2 cursor-pointer text-slate-200 hover:text-cyan-300">
+      <input type="checkbox" name="rubros" value="taller" class="accent-cyan-500 rounded"> 
+      Taller Mecánico
+    </label>
+    <label class="flex items-center gap-2 cursor-pointer text-slate-200 hover:text-cyan-300">
+      <input type="checkbox" name="rubros" value="gruas" class="accent-cyan-500 rounded"> 
+      Grúas y Asistencia
+    </label>
+  </div>
+  
+  <div class="flex gap-2 pt-2">
+    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-1.5 rounded-lg text-xs transition">
+      Aplicar Múltiples Rubros
+    </button>
+    <a href="{% url 'restablecer_modo_soporte' %}" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs text-center transition">
+      Restablecer
+    </a>
+  </div>
+</form>

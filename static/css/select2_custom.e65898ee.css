@@ -1,0 +1,32 @@
+
+/* ✅ Estilo personalizado para campos Select2 */
+.select2-container--default .select2-selection--single {
+    background-color: #0f172a; /* slate-900 */
+    border: 2px solid #0ea5e9; /* cyan-500 */
+    border-radius: 0.5rem;
+    height: 2.75rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 1rem;
+    color: #e0f2fe;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #e0f2fe;
+    line-height: 2.25rem;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 2.75rem;
+    right: 0.75rem;
+}
+
+.select2-results__option--highlighted {
+    background-color: #0ea5e9 !important;
+    color: white;
+}
+
+.select2-results__option {
+    padding: 0.5rem;
+    font-size: 0.95rem;
+}

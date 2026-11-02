@@ -1,0 +1,13 @@
+<div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50" id="modalMarca">
+<div class="cuadro rounded-lg p-6 w-full max-w-md">
+<h2 class="text-xl font-semibold mb-4">Agregar Nueva Marca</h2>
+<form id="form-nueva-marca">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="text-right mt-4">
+<button class="bg-blue-600 text-white px-4 py-2 rounded btn-futuristic" type="submit">Guardar</button>
+<button class="ml-2 px-4 py-2 border rounded btn-futuristic" id="cerrarModalMarca" type="button">Cancelar</button>
+</div>
+</form>
+</div>
+</div>

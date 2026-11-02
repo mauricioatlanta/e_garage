@@ -1,0 +1,243 @@
+═══════════════════════════════════════════════════════════════
+  CHECKLIST DE DEPLOYMENT - Sistema de Ubicaciones
+═══════════════════════════════════════════════════════════════
+
+📅 Fecha: 4 de Diciembre 2024
+🎯 Objetivo: Actualizar servidor con ubicaciones multi-país
+⏱️ Tiempo: 10-15 minutos
+
+
+═══════════════════════════════════════════════════════════════
+  PASO 1: PREPARACIÓN EN TU PC
+═══════════════════════════════════════════════════════════════
+
+□ Verificar que todo funciona en local:
+  
+  cd E:\projecto\e_garage
+  python manage.py verificar_ubicaciones
+  
+  Debería mostrar:
+    ✅ 230 estados
+    ✅ 858 ciudades
+    ✅ 8 países
+
+
+□ Commit de cambios:
+  
+  git add .
+  git commit -m "feat: Sistema ubicaciones multi-país (8 países, 858 ciudades)"
+  
+  Archivos incluidos:
+    • 3 comandos nuevos (Chile, Colombia, Ecuador)
+    • 4 actualizaciones (modelos, forms, comandos)
+    • 17 documentos técnicos
+    • 2 scripts
+
+
+□ Push al repositorio:
+  
+  git push origin main
+
+
+═══════════════════════════════════════════════════════════════
+  PASO 2: DEPLOYMENT EN SERVIDOR
+═══════════════════════════════════════════════════════════════
+
+□ Conectar al servidor:
+  
+  ssh usuario@tuservidor.com
+
+
+□ Ir al directorio del proyecto:
+  
+  cd /ruta/a/e_garage
+
+
+□ Backup de BD (recomendado):
+  
+  python manage.py dumpdata > backup_$(date +%Y%m%d).json
+
+
+□ Pull de cambios:
+  
+  git pull origin main
+
+
+□ Activar entorno virtual (si usas):
+  
+  source venv/bin/activate
+
+
+□ Verificar modelos:
+  
+  python manage.py check
+  
+  Debería mostrar: "System check identified no issues"
+
+
+□ Cargar ubicaciones:
+  
+  python manage.py cargar_todas_ubicaciones --skip-existing
+  
+  Tiempo: 2-5 minutos
+  Resultado esperado:
+    ✅ 8 países cargados
+    ✅ 230 estados
+    ✅ 858 ciudades
+
+
+□ Verificar datos cargados:
+  
+  python manage.py verificar_ubicaciones
+  
+  Debería mostrar cobertura completa de 8 países
+
+
+□ Backfill de clientes (opcional):
+  
+  # Preview
+  python manage.py backfill_addresses --dry-run
+  
+  # Ejecutar
+  python manage.py backfill_addresses
+  
+  Resultado: Clientes migrados a billing_address
+
+
+□ Restart del servidor:
+  
+  # Opción 1: Gunicorn
+  sudo systemctl restart gunicorn
+  
+  # Opción 2: Supervisor
+  sudo supervisorctl restart egarage
+  
+  # Opción 3: Touch wsgi
+  touch /ruta/a/wsgi.py
+
+
+═══════════════════════════════════════════════════════════════
+  PASO 3: VERIFICACIÓN POST-DEPLOYMENT
+═══════════════════════════════════════════════════════════════
+
+□ Verificar en shell:
+  
+  python manage.py shell
+  
+  >>> from taller.models import Estado, Ciudad
+  >>> print(Estado.objects.count())     # Esperado: 230
+  >>> print(Ciudad.objects.count())     # Esperado: 858
+  >>> exit()
+
+
+□ Verificar en navegador (USA):
+  
+  https://tudominio.com/us/en/clientes/crear/
+  
+  ✅ Select State → Debe mostrar 50 estados
+  ✅ Seleccionar California → Ciudades se cargan
+  ✅ Ver ~100 ciudades en select
+  ✅ Botón "+ ADD CITY" → Modal se abre
+
+
+□ Verificar en navegador (Colombia - NUEVO):
+  
+  https://tudominio.com/co/es/clientes/crear/
+  
+  ✅ Select Departamento → 32 opciones
+  ✅ Seleccionar Antioquia → Ciudades se cargan
+  ✅ Ver Medellín, Bello, etc.
+
+
+□ Verificar en navegador (Ecuador - NUEVO):
+  
+  https://tudominio.com/ec/es/clientes/crear/
+  
+  ✅ Select Provincia → 24 opciones
+  ✅ Seleccionar Pichincha → Ciudades se cargan
+  ✅ Ver Quito, Cayambe, etc.
+
+
+□ Crear cliente de prueba:
+  
+  1. Seleccionar país (USA, Colombia o Ecuador)
+  2. Seleccionar estado/departamento
+  3. Seleccionar ciudad
+  4. Llenar datos
+  5. Guardar
+  6. Verificar que se guardó correctamente
+
+
+□ Verificar logs (15 minutos):
+  
+  tail -f /var/log/gunicorn/error.log
+  
+  No debería haber errores
+
+
+═══════════════════════════════════════════════════════════════
+  PASO 4: DOCUMENTACIÓN
+═══════════════════════════════════════════════════════════════
+
+□ Compartir con equipo:
+  
+  - docs/README_UBICACIONES.md (intro)
+  - docs/GUIA_RAPIDA_UBICACIONES.md (tutorial)
+
+
+□ Actualizar notas de release:
+  
+  VERSIÓN: Sistema de Ubicaciones v1.0
+  FECHA: 4 de Diciembre 2024
+  
+  NUEVAS FUNCIONALIDADES:
+    ✅ 858 ciudades de 8 países
+    ✅ Soporte Colombia y Ecuador
+    ✅ Modales para agregar ubicaciones
+    ✅ Migración automática de clientes
+
+
+═══════════════════════════════════════════════════════════════
+  ROLLBACK (Si algo falla)
+═══════════════════════════════════════════════════════════════
+
+□ Volver a versión anterior:
+  
+  git checkout HEAD~1
+  sudo systemctl restart gunicorn
+
+
+□ Restaurar BD (si hiciste backup):
+  
+  python manage.py loaddata backup_YYYYMMDD.json
+
+
+═══════════════════════════════════════════════════════════════
+  RESUMEN
+═══════════════════════════════════════════════════════════════
+
+ARCHIVOS MODIFICADOS: 26
+  • 3 comandos nuevos
+  • 4 actualizaciones
+  • 17 documentos
+  • 2 scripts
+
+COMANDOS CLAVE:
+  ✅ python manage.py cargar_todas_ubicaciones --skip-existing
+  ✅ python manage.py verificar_ubicaciones
+  ✅ python manage.py backfill_addresses
+
+RESULTADO:
+  ✅ 858 ciudades disponibles
+  ✅ 8 países completos
+  ✅ Formularios funcionando
+  ✅ Modales on-the-fly
+
+TIEMPO: 10-15 minutos
+
+═══════════════════════════════════════════════════════════════
+
+✅ Deployment completado
+📚 Ver: DEPLOYMENT_UBICACIONES.md para detalles
+🎉 Sistema listo para producción
+

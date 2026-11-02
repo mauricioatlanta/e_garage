@@ -1,0 +1,14 @@
+{% extends "components/welcome/_base.html" %}
+{% load static %}
+
+{% block page_meta %}
+<title>eGarage México — Plataforma Automotriz</title>
+<meta name="description" content="{{ meta_description }}">
+<meta property="og:title" content="eGarage México — Plataforma Automotriz">
+<meta property="og:description" content="{{ meta_description }}">
+<meta property="og:image" content="{% static og_image %}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="eGarage México — Plataforma Automotriz">
+<meta name="twitter:description" content="{{ meta_description }}">
+<meta name="twitter:image" content="{% static og_image %}">
+{% endblock %}

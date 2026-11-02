@@ -1,0 +1,110 @@
+{% extends "public/base_landing.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}eGarage Workshop — Software para Talleres Mecánicos{% endblock %}
+{% block meta_description %}Gestiona presupuestos, órdenes de trabajo, inventario y clientes en un solo lugar. Diseñado para talleres mecánicos en Latinoamérica.{% endblock %}
+{% block canonical_path %}/workshop/{% endblock %}
+{% block og_title %}eGarage Workshop — Software para Talleres Mecánicos{% endblock %}
+{% block og_description %}Gestiona tu taller con presupuestos digitales, órdenes de trabajo, inventario y seguimiento de clientes. Gratis para empezar.{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="px-6 py-20 text-center max-w-5xl mx-auto animate-in">
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold mb-6 font-orbitron tracking-widest">
+    ⚙️ eGarage Workshop
+  </div>
+  <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight glow-cyan">
+    Tu taller.<br>
+    <span class="text-cyan-400">Sin papeles.</span>
+  </h1>
+  <p class="text-xl text-slate-300 max-w-2xl mx-auto mb-10">
+    Presupuestos, órdenes de trabajo, inventario de repuestos y seguimiento de clientes — todo en una plataforma pensada para talleres mecánicos en Latinoamérica.
+  </p>
+  <div class="flex flex-col sm:flex-row gap-4 justify-center">
+    <a href="{% url 'account_signup' %}" class="px-8 py-4 rounded-xl bg-cyan-500 text-slate-950 font-bold text-lg hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/30 font-orbitron">
+      Empezar gratis →
+    </a>
+    <a href="{% url 'account_login' %}" class="px-8 py-4 rounded-xl border border-slate-600 text-slate-300 hover:border-cyan-500/50 hover:text-cyan-300 transition-all text-lg">
+      Ya tengo cuenta
+    </a>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="px-6 py-16 max-w-6xl mx-auto">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div class="animate-in delay-1 bg-slate-900/60 border border-slate-700/60 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📄</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Documentos digitales</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">Crea presupuestos y órdenes de trabajo en segundos. Envíalos por WhatsApp. Conviértelos en factura con un clic.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-900/60 border border-slate-700/60 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🔧</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Inventario de repuestos</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">Controla tu stock, registra las piezas que usas en cada orden y mantén el inventario actualizado automáticamente.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-900/60 border border-slate-700/60 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">👥</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Historial de clientes</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">Cada cliente tiene su historial de visitas, vehículos y documentos. Recupera información en segundos, no en minutos.</p>
+    </div>
+
+    <div class="animate-in delay-1 bg-slate-900/60 border border-slate-700/60 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🚗</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Registro de vehículos</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">Marca, modelo, año, kilometraje, VIN. Todo queda en la ficha del vehículo con fotos y notas de inspección.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-900/60 border border-slate-700/60 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📊</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Reportes en tiempo real</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">Ventas del mes, servicios más frecuentes, técnicos más productivos. Toma decisiones con datos, no con intuición.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-900/60 border border-slate-700/60 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">💬</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">WhatsApp integrado</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">Notifica a tus clientes cuando su vehículo está listo. Envía el presupuesto directamente. Todo sin salir del sistema.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Multi-pais -->
+<section class="px-6 py-12 max-w-3xl mx-auto text-center animate-in delay-2">
+  <div class="bg-slate-900/50 border border-slate-700/50 rounded-2xl p-8">
+    <h2 class="font-orbitron text-slate-300 text-lg font-bold mb-3">Disponible en toda Latinoamérica</h2>
+    <p class="text-slate-500 text-sm mb-4">Con soporte para IVA (Chile), IGV (Perú), taxes por estado (USA) y más países en camino.</p>
+    <div class="flex flex-wrap justify-center gap-2 text-lg">
+      <span title="Chile">🇨🇱</span>
+      <span title="Argentina">🇦🇷</span>
+      <span title="Uruguay">🇺🇾</span>
+      <span title="México">🇲🇽</span>
+      <span title="Perú">🇵🇪</span>
+      <span title="Colombia">🇨🇴</span>
+      <span title="Venezuela">🇻🇪</span>
+      <span title="Brasil">🇧🇷</span>
+      <span title="USA">🇺🇸</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA final -->
+<section class="px-6 py-20 text-center animate-in delay-3">
+  <h2 class="font-orbitron text-3xl font-black text-white mb-4">Listo para digitalizar tu taller?</h2>
+  <p class="text-slate-400 mb-8">Período de prueba gratuito. Sin tarjeta de crédito.</p>
+  <a href="{% url 'account_signup' %}" class="px-10 py-5 rounded-xl bg-cyan-500 text-slate-950 font-black text-xl hover:bg-cyan-400 transition-all shadow-xl shadow-cyan-500/30 font-orbitron">
+    Crear cuenta gratis →
+  </a>
+  <p class="mt-6 text-slate-600 text-sm">
+    ¿Tienes una desarmaduria? → <a href="{% url 'landing_salvage' %}" class="text-fuchsia-400 hover:text-fuchsia-300">eGarage Salvage</a> &nbsp;|&nbsp;
+    ¿Casa de repuestos? → <a href="{% url 'landing_parts' %}" class="text-lime-400 hover:text-lime-300">eGarage Parts</a>
+  </p>
+</section>
+
+{% endblock %}

@@ -1,0 +1,604 @@
+[
+  {
+    "name": "107 reused Sculpted_tyre",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "rubber.001"
+    ]
+  },
+  {
+    "name": "107 reused Sculpted_tyre.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "rubber.001"
+    ]
+  },
+  {
+    "name": "107 reused Sculpted_tyre.002",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "rubber.001"
+    ]
+  },
+  {
+    "name": "107 reused Sculpted_tyre.003",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "rubber.001"
+    ]
+  },
+  {
+    "name": "Aerodynamic mirror lower housing",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Aerodynamic mirror lower housing.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Aerodynamic mirror painted cap",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Aerodynamic mirror painted cap.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Crowned roof pressing",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Distinct trunk lid shut line",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Door panel shut line",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Door panel shut line.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Door panel shut line.002",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Door panel shut line.003",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Faceted headlamp reflector interior",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Faceted headlamp reflector interior.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Fine headlamp perimeter gasket",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Fine headlamp perimeter gasket.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Flush corner wrapping ruby lamp lens",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "redlens"
+    ]
+  },
+  {
+    "name": "Flush corner wrapping ruby lamp lens.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "redlens"
+    ]
+  },
+  {
+    "name": "Flush roof side flange",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Flush roof side flange.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Flush swept transparent headlamp lens",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "clearlens"
+    ]
+  },
+  {
+    "name": "Flush swept transparent headlamp lens.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "clearlens"
+    ]
+  },
+  {
+    "name": "Fog lamp recessed housing",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Fog lamp recessed housing.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Formed painted rear bumper cover",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Front bumper continuous shut line",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Front side door glass",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "glass.001"
+    ]
+  },
+  {
+    "name": "Front side door glass rubber seal",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Front side door glass rubber seal.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Front side door glass.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "glass.001"
+    ]
+  },
+  {
+    "name": "Headlamp deep graphite housing",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Headlamp deep graphite housing.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Hood shut line",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Instrument panel",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "interior"
+    ]
+  },
+  {
+    "name": "Mirror reflective insert",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Mirror reflective insert.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Painted door glazing lower sill",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Painted door glazing lower sill.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Painted rear glazing lower surround",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Raked laminated windshield",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "glass.001"
+    ]
+  },
+  {
+    "name": "Raked laminated windshield rubber seal",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Rear bumper corner joint",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Rear bumper corner joint.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Rear bumper formed corner",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Rear bumper formed corner.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Rear bumper joint clear of plate recess",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Rear bumper joint clear of plate recess.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Rear glass lower stop lamp housing",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Rear glass lower stop lens",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "redlens"
+    ]
+  },
+  {
+    "name": "Rear side door glass",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "glass.001"
+    ]
+  },
+  {
+    "name": "Rear side door glass rubber seal",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Rear side door glass rubber seal.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Rear side door glass.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "glass.001"
+    ]
+  },
+  {
+    "name": "Recessed projector optical glass",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "clearlens"
+    ]
+  },
+  {
+    "name": "Recessed projector optical glass.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "clearlens"
+    ]
+  },
+  {
+    "name": "Recessed projector optical glass.002",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "clearlens"
+    ]
+  },
+  {
+    "name": "Recessed projector optical glass.003",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "clearlens"
+    ]
+  },
+  {
+    "name": "Satin door pull handle",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Satin door pull handle.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Satin door pull handle.002",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Satin door pull handle.003",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Sculpted rear lower bumper insert",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Sculpted rocker panel seam",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Sculpted rocker panel seam.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Short mirror plinth",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Short mirror plinth.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Sloping rear glass",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "glass.001"
+    ]
+  },
+  {
+    "name": "Sloping rear glass rubber seal",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Surface integrated sedan rear roof pillar",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Surface integrated sedan rear roof pillar.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "paint"
+    ]
+  },
+  {
+    "name": "Tail lamp molded perimeter housing",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Tail lamp molded perimeter housing.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Tail lamp optical separator",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Tail lamp optical separator.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Tail lamp optical separator.002",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Tail lamp optical separator.003",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Tail lamp recessed inner housing",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Tail lamp recessed inner housing.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Tail lamp reflective optical inner",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Tail lamp reflective optical inner.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "chrome"
+    ]
+  },
+  {
+    "name": "Wheelhouse inner liner",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Wheelhouse inner liner.001",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Wheelhouse inner liner.002",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  },
+  {
+    "name": "Wheelhouse inner liner.003",
+    "parent": "Graphite four-door sedan",
+    "materials": [
+      "black.001"
+    ]
+  }
+]

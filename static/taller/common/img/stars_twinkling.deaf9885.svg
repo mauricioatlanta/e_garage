@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="600" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="starGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="white" stop-opacity="1"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1000" height="600" fill="black"/>
+  <!-- Estrellas pequeñas -->
+  <circle cx="818" cy="253" r="0.644790082167978" fill="url(#starGradient)" opacity="0.62"/>
+  <circle cx="411" cy="448" r="1.431298554612447" fill="url(#starGradient)" opacity="0.57"/>
+  <circle cx="34" cy="176" r="0.6362654130920757" fill="url(#starGradient)" opacity="0.89"/>
+  <circle cx="33" cy="538" r="1.2990762447046316" fill="url(#starGradient)" opacity="0.67"/>
+  <circle cx="807" cy="543" r="0.7443296036974867" fill="url(#starGradient)" opacity="0.3"/>
+  <circle cx="485" cy="39" r="1.4396550765419334" fill="url(#starGradient)" opacity="0.67"/>
+  <circle cx="273" cy="15" r="0.7432339311772264" fill="url(#starGradient)" opacity="0.57"/>
+  <circle cx="901" cy="65" r="0.9197546930147372" fill="url(#starGradient)" opacity="0.81"/>
+  <circle cx="819" cy="477" r="0.5852117166473608" fill="url(#starGradient)" opacity="0.47"/>
+  <circle cx="362" cy="521" r="1.4752656289198371" fill="url(#starGradient)" opacity="0.7"/>
+  <circle cx="390" cy="304" r="1.0611003995871457" fill="url(#starGradient)" opacity="0.62"/>
+  <circle cx="965" cy="247" r="0.6652263776840722" fill="url(#starGradient)" opacity="0.46"/>
+  <circle cx="341" cy="329" r="0.889181475457687" fill="url(#starGradient)" opacity="0.58"/>
+  <circle cx="74" cy="10" r="0.761002190744464" fill="url(#starGradient)" opacity="0.64"/>
+  <circle cx="44" cy="489" r="1.4577890666623357" fill="url(#starGradient)" opacity="0.69"/>
+  <circle cx="877" cy="538" r="1.2155728494525047" fill="url(#starGradient)" opacity="0.66"/>
+  <circle cx="181" cy="484" r="0.7570135217619278" fill="url(#starGradient)" opacity="0.56"/>
+  <circle cx="252" cy="519" r="1.4014664127108583" fill="url(#starGradient)" opacity="0.6"/>
+  <circle cx="23" cy="117" r="0.7435178246882499" fill="url(#starGradient)" opacity="0.86"/>
+  <circle cx="327" cy="433" r="1.285952358345752" fill="url(#starGradient)" opacity="0.89"/>
+  <circle cx="988" cy="459" r="1.3159083811250776" fill="url(#starGradient)" opacity="0.57"/>
+  <circle cx="937" cy="491" r="1.1256956849812054" fill="url(#starGradient)" opacity="0.36"/>
+  <circle cx="266" cy="129" r="0.6075466014175278" fill="url(#starGradient)" opacity="0.67"/>
+  <circle cx="912" cy="51" r="1.4985671739564805" fill="url(#starGradient)" opacity="0.35"/>
+  <circle cx="970" cy="255" r="1.3509646061324903" fill="url(#starGradient)" opacity="0.62"/>
+  <circle cx="839" cy="228" r="0.5722567177272513" fill="url(#starGradient)" opacity="0.75"/>
+  <circle cx="952" cy="11" r="0.5117503001344424" fill="url(#starGradient)" opacity="0.89"/>
+  <circle cx="61" cy="296" r="0.6852912377778985" fill="url(#starGradient)" opacity="0.56"/>
+  <circle cx="13" cy="305" r="0.7920966121739712" fill="url(#starGradient)" opacity="0.79"/>
+  <circle cx="428" cy="72" r="1.261595967174642" fill="url(#starGradient)" opacity="0.45"/>
+  <circle cx="511" cy="360" r="0.9900498001248853" fill="url(#starGradient)" opacity="0.32"/>
+  <circle cx="336" cy="360" r="0.6076352716213993" fill="url(#starGradient)" opacity="0.39"/>
+  <circle cx="131" cy="389" r="0.8310471947556978" fill="url(#starGradient)" opacity="0.59"/>
+  <circle cx="99" cy="33" r="1.0283291247594692" fill="url(#starGradient)" opacity="0.68"/>
+  <circle cx="436" cy="491" r="0.9873907117444857" fill="url(#starGradient)" opacity="0.68"/>
+  <circle cx="216" cy="144" r="1.3397461909938624" fill="url(#starGradient)" opacity="0.82"/>
+  <circle cx="883" cy="223" r="0.9837149487405275" fill="url(#starGradient)" opacity="0.62"/>
+  <circle cx="72" cy="187" r="0.6068257766417628" fill="url(#starGradient)" opacity="0.42"/>
+  <circle cx="123" cy="85" r="0.9731356293894623" fill="url(#starGradient)" opacity="0.86"/>
+  <circle cx="557" cy="553" r="1.0939297470091247" fill="url(#starGradient)" opacity="0.81"/>
+  <circle cx="909" cy="331" r="0.8317760413542702" fill="url(#starGradient)" opacity="0.33"/>
+  <circle cx="746" cy="485" r="0.6230227080525198" fill="url(#starGradient)" opacity="0.72"/>
+  <circle cx="381" cy="240" r="0.9325124702764637" fill="url(#starGradient)" opacity="0.47"/>
+  <circle cx="861" cy="443" r="1.1381406925032662" fill="url(#starGradient)" opacity="0.58"/>
+  <circle cx="937" cy="146" r="1.0647406580497245" fill="url(#starGradient)" opacity="0.41"/>
+  <circle cx="963" cy="31" r="0.7944006758313406" fill="url(#starGradient)" opacity="0.68"/>
+  <circle cx="82" cy="512" r="0.9546924407287546" fill="url(#starGradient)" opacity="0.39"/>
+  <circle cx="365" cy="456" r="0.7220826117477439" fill="url(#starGradient)" opacity="0.35"/>
+  <circle cx="85" cy="37" r="1.1033522598442675" fill="url(#starGradient)" opacity="0.86"/>
+  <circle cx="188" cy="126" r="0.5300516020484254" fill="url(#starGradient)" opacity="0.63"/>
+  <circle cx="570" cy="114" r="1.1912776960223703" fill="url(#starGradient)" opacity="0.48"/>
+  <circle cx="832" cy="366" r="1.4742022824826098" fill="url(#starGradient)" opacity="0.43"/>
+  <circle cx="318" cy="505" r="0.768056276297876" fill="url(#starGradient)" opacity="0.67"/>
+  <circle cx="865" cy="306" r="1.0806453721953277" fill="url(#starGradient)" opacity="0.65"/>
+  <circle cx="408" cy="24" r="1.3389454182714657" fill="url(#starGradient)" opacity="0.64"/>
+  <circle cx="646" cy="56" r="1.4333576729029975" fill="url(#starGradient)" opacity="0.66"/>
+  <circle cx="254" cy="77" r="1.0375501505534124" fill="url(#starGradient)" opacity="0.57"/>
+  <circle cx="385" cy="391" r="1.1168307479144346" fill="url(#starGradient)" opacity="0.58"/>
+  <circle cx="172" cy="17" r="1.2645619476313739" fill="url(#starGradient)" opacity="0.53"/>
+  <circle cx="470" cy="339" r="1.4432009694119143" fill="url(#starGradient)" opacity="0.88"/>
+  <circle cx="207" cy="181" r="0.61763689156808" fill="url(#starGradient)" opacity="0.34"/>
+  <circle cx="77" cy="236" r="0.5311137499692481" fill="url(#starGradient)" opacity="0.77"/>
+  <circle cx="566" cy="283" r="0.8093023489621762" fill="url(#starGradient)" opacity="0.55"/>
+  <circle cx="573" cy="117" r="0.6522763521807835" fill="url(#starGradient)" opacity="0.87"/>
+  <circle cx="155" cy="298" r="1.4501533968448381" fill="url(#starGradient)" opacity="0.7"/>
+  <circle cx="347" cy="141" r="1.0691973379782382" fill="url(#starGradient)" opacity="0.55"/>
+  <circle cx="600" cy="45" r="1.3396018785459605" fill="url(#starGradient)" opacity="0.83"/>
+  <circle cx="993" cy="350" r="0.755958509448062" fill="url(#starGradient)" opacity="0.87"/>
+  <circle cx="304" cy="92" r="0.7534344294397876" fill="url(#starGradient)" opacity="0.8"/>
+  <circle cx="151" cy="18" r="0.725689463457612" fill="url(#starGradient)" opacity="0.79"/>
+  <circle cx="729" cy="176" r="1.1483862314871232" fill="url(#starGradient)" opacity="0.66"/>
+  <circle cx="440" cy="285" r="0.5780303399268933" fill="url(#starGradient)" opacity="0.72"/>
+  <circle cx="105" cy="50" r="0.9070562877952274" fill="url(#starGradient)" opacity="0.66"/>
+  <circle cx="898" cy="218" r="0.5299152868471669" fill="url(#starGradient)" opacity="0.9"/>
+  <circle cx="784" cy="476" r="1.4368845873109017" fill="url(#starGradient)" opacity="0.43"/>
+  <circle cx="435" cy="474" r="0.9794515929466161" fill="url(#starGradient)" opacity="0.62"/>
+  <circle cx="6" cy="471" r="1.4617703333591512" fill="url(#starGradient)" opacity="0.83"/>
+  <circle cx="920" cy="10" r="1.0050964792651444" fill="url(#starGradient)" opacity="0.4"/>
+  <circle cx="520" cy="434" r="1.459767730673206" fill="url(#starGradient)" opacity="0.83"/>
+  <circle cx="925" cy="550" r="0.7945982856626409" fill="url(#starGradient)" opacity="0.61"/>
+  <circle cx="950" cy="187" r="1.193034811985018" fill="url(#starGradient)" opacity="0.76"/>
+  <circle cx="871" cy="311" r="1.2395722785526841" fill="url(#starGradient)" opacity="0.8"/>
+  <circle cx="896" cy="119" r="0.9168051766882416" fill="url(#starGradient)" opacity="0.68"/>
+  <circle cx="37" cy="180" r="0.5588493367653159" fill="url(#starGradient)" opacity="0.78"/>
+  <circle cx="502" cy="377" r="0.6187646750056264" fill="url(#starGradient)" opacity="0.49"/>
+  <circle cx="987" cy="440" r="1.1458594240081665" fill="url(#starGradient)" opacity="0.31"/>
+  <circle cx="255" cy="24" r="0.5675417289398398" fill="url(#starGradient)" opacity="0.88"/>
+  <circle cx="433" cy="413" r="1.039610391785664" fill="url(#starGradient)" opacity="0.85"/>
+  <circle cx="696" cy="213" r="1.3024152172160344" fill="url(#starGradient)" opacity="0.68"/>
+  <circle cx="829" cy="125" r="1.0245964525395082" fill="url(#starGradient)" opacity="0.51"/>
+  <circle cx="396" cy="338" r="1.2313679544112475" fill="url(#starGradient)" opacity="0.78"/>
+  <circle cx="684" cy="399" r="1.3759888918246452" fill="url(#starGradient)" opacity="0.72"/>
+  <circle cx="183" cy="504" r="0.5648439239874363" fill="url(#starGradient)" opacity="0.37"/>
+  <circle cx="417" cy="319" r="1.412005441753005" fill="url(#starGradient)" opacity="0.59"/>
+  <circle cx="626" cy="523" r="0.8153618715726763" fill="url(#starGradient)" opacity="0.81"/>
+  <circle cx="535" cy="370" r="0.71218522339278" fill="url(#starGradient)" opacity="0.5"/>
+  <circle cx="41" cy="446" r="1.025097159142148" fill="url(#starGradient)" opacity="0.73"/>
+  <circle cx="213" cy="127" r="0.6623029862830637" fill="url(#starGradient)" opacity="0.7"/>
+  <circle cx="645" cy="491" r="1.2528457154656782" fill="url(#starGradient)" opacity="0.84"/>
+  <circle cx="511" cy="144" r="0.9293078858651276" fill="url(#starGradient)" opacity="0.63"/>
+</svg>

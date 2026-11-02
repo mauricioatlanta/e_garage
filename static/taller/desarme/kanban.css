@@ -1,0 +1,49 @@
+/* Kanban tablero de desarmaduría */
+.kanban-desarme {
+  min-height: 400px;
+}
+.kanban-col {
+  min-width: 200px;
+}
+.kanban-column {
+  min-height: 300px;
+}
+.kanban-card {
+  transition: box-shadow 0.2s ease;
+}
+.kanban-card:hover {
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
+}
+.badge-estado {
+  font-size: 0.65rem;
+  padding: 0.2em 0.4em;
+}
+.badge-ingresado {
+  background-color: rgba(13, 110, 253, 0.2);
+  color: #6ea8fe;
+}
+.badge-en_desarme {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+.badge-con_piezas {
+  background-color: rgba(25, 135, 84, 0.2);
+  color: #75b798;
+}
+.badge-agotado {
+  background-color: rgba(108, 117, 125, 0.2);
+  color: #adb5bd;
+}
+.badge-cerrado {
+  background-color: rgba(111, 66, 193, 0.2);
+  color: #cda4de;
+}
+.kanban-empty {
+  border: 1px dashed #495057;
+  background: rgba(0, 0, 0, 0.2);
+}
+@media (max-width: 991px) {
+  .kanban-col {
+    min-width: 100%;
+  }
+}

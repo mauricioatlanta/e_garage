@@ -1,0 +1,95 @@
+# ======================================================
+# Requirements para eGarage - Sistema de Gestión de Taller
+# ======================================================
+# Generado: Dec 2, 2025
+# Python: 3.10+ recomendado
+# ======================================================
+
+# Django Core
+Django>=4.2,<5.0
+django-extensions>=3.2.3
+django-crispy-forms>=2.0
+crispy-bootstrap5>=0.7
+django-widget-tweaks>=1.5.0
+
+# Autenticación y Usuarios
+django-allauth>=0.57.0
+
+# API REST
+djangorestframework>=3.14.0
+
+# Autocompletado y Select2
+django-autocomplete-light>=3.9.7
+
+# Variables de Entorno
+python-dotenv>=1.0.0
+django-anymail>=14.0,<15.0
+requests>=2.32.0
+
+# Gmail API (envío por HTTPS, sin SMTP)
+google-api-python-client
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+
+# Archivos Estáticos en Producción
+whitenoise>=6.5.0
+
+# Base de Datos (SQLite incluido en Python)
+psycopg2-binary>=2.9.7
+
+# Monitoreo de Errores (Opcional pero recomendado)
+sentry-sdk>=1.32.0
+
+# Servidor WSGI para Producción
+gunicorn>=21.2.0
+
+# Utilidades
+Pillow>=10.0.0  # Para manejo de imágenes (logos, fotos)
+python-dateutil>=2.8.2
+
+# PDF (exportar documentos / reportes)
+weasyprint>=62.0  # HTML/CSS to PDF para /documentos/<id>/exportar_pdf/. En Linux: apt install libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0
+
+# Testing (Desarrollo)
+pytest>=7.4.0
+pytest-django>=4.5.0
+pytest-cov>=4.1.0
+
+# Seguridad
+django-cors-headers>=4.2.0  # Si necesitas CORS para API
+
+# Ofuscación de Código (Solo para desarrollo/build)
+pyarmor>=8.5.0  # Para ofuscar motor_ia_core.py antes de producción
+
+# ======================================================
+# Notas de Instalación:
+# ======================================================
+# 
+# Para instalar todas las dependencias:
+#   pip install -r requirements.txt
+#
+# Para desarrollo:
+#   pip install -r requirements.txt
+#
+# Para producción en DigitalOcean u otro servidor:
+#   pip install -r requirements.txt
+#
+# Para crear un entorno virtual:
+#   python -m venv venv
+#   source venv/bin/activate  # En Windows: venv\Scripts\activate
+#   pip install -r requirements.txt
+#
+# ======================================================
+
+
+
+
+
+pytz==2026.2
+pandas==3.0.3
+openpyxl==3.1.5
+resend>=2.0.0
+django-redis>=5.4.0
+dnspython>=2.6.0
+transbank-sdk>=4.0

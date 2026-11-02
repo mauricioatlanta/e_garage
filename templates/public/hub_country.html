@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="{{ language|default:'es' }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% if language == "en" %}
+  <title>eGarage {{ country_name }} — Choose your business</title>
+  <meta name="description" content="eGarage {{ country_name }} — Management software for automotive businesses.">
+  {% else %}
+  <title>eGarage {{ country_name }} — Elige tu negocio</title>
+  <meta name="description" content="eGarage {{ country_name }} — Software de gestión para negocios automotrices.">
+  {% endif %}
+  <link rel="canonical" href="https://egarage.cl{{ canonical_path }}">
+  {% for hreflang, href in hreflang_alternates %}<link rel="alternate" hreflang="{{ hreflang }}" href="https://egarage.cl{{ href }}">
+  {% endfor %}<link rel="icon" type="image/png" href="{% static 'images/egarage_icon_192x192.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'images/egarage_icon_192x192.png' %}">
+  <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin:0; font-family:'Exo 2',sans-serif; background:#020617; color:#ffffff; }
+    .font-orbitron { font-family: 'Orbitron', monospace; }
+
+    /* Hero background */
+    .hub-hero {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background-image: url("{{ hero_image }}");
+      background-size: cover;
+      background-position: center 35%;
+      padding: 3rem 1.25rem 2rem;
+    }
+    .hub-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(2, 6, 23, 0.90) 0%,
+        rgba(2, 6, 23, 0.78) 35%,
+        rgba(2, 6, 23, 0.96) 100%
+      );
+    }
+    .hub-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 860px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.75rem;
+    }
+
+    /* Back link */
+    .hub-back {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color:#e2e8f0;
+      font-size: 0.78rem;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .hub-back:hover { color:#ffffff; }
+
+    /* Header */
+    .hub-logo{
+      height:6rem;
+      width:auto;
+      margin-bottom:.75rem;
+      filter:drop-shadow(0 0 20px rgba(0,245,255,.55));
+    }
+
+    @media (max-width:768px){
+      .hub-logo{
+        height:5rem;
+      }
+    }
+    .hub-flag { font-size: 1.75rem; line-height: 1; }
+    .hub-title {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1.25rem, 4vw, 1.75rem);
+      font-weight: 700;
+      color: #f1f5f9;
+      text-align: center;
+      margin: 0;
+      letter-spacing: 0.03em;
+    }
+    .hub-subtitle {
+      color:#e2e8f0;
+      font-size: 0.9rem;
+      text-align: center;
+      margin: 0;
+    }
+    .hub-signup {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:3.45rem;
+      padding:.9rem 1.35rem;
+      border-radius:.9rem;
+      background:#22d3ee;
+      color:#082f49;
+      font-weight:900;
+      text-decoration:none;
+      box-shadow:0 18px 42px rgba(34,211,238,.24), inset 0 0 0 1px rgba(255,255,255,.30);
+      transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
+      animation: hub-fade-up 0.4s 0.15s ease-out both;
+    }
+    .hub-signup:hover {
+      background:#67e8f9;
+      transform:translateY(-1px);
+      box-shadow:0 22px 52px rgba(34,211,238,.32), inset 0 0 0 1px rgba(255,255,255,.34);
+    }
+
+    /* Grid */
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      width: 100%;
+    }
+    @media (min-width: 480px) { .hub-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width: 700px) { .hub-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    /* Rubro card — active */
+    .hub-card {
+      background:rgba(2,6,23,.88);
+      border: 1px solid rgba(0, 245, 255, 0.12);
+      border-radius: 0.875rem;
+      padding: 1.25rem 0.875rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      position: relative;
+    }
+    .hub-card:hover {
+      border-color: rgba(0, 245, 255, 0.4);
+      background:rgba(15,23,42,.98);
+      transform: translateY(-2px);
+    }
+    .hub-card-image {
+      width:calc(100% + 1.75rem);
+      height:110px;
+      margin:-1.25rem -.875rem .45rem;
+      object-fit:cover;
+      display:block;
+      border-radius:.82rem .82rem .35rem .35rem;
+      filter:saturate(.92) contrast(1.05);
+      transition:transform .45s ease, filter .45s ease;
+    }
+
+    .hub-card {
+      overflow:hidden;
+    }
+
+    .hub-card:hover .hub-card-image {
+      transform:scale(1.05);
+      filter:saturate(1.08) contrast(1.08);
+    }
+
+    .hub-card-icon { font-size: 1.45rem; line-height: 1; }
+    .hub-card-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color:#ffffff;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    /* Rubro card — próximamente */
+    .hub-card-soon {
+      background: rgba(15, 30, 56, 0.40);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 0.875rem;
+      padding: 1.25rem 0.875rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      opacity:.76;
+    }
+    .hub-card-soon .hub-card-icon { filter: grayscale(1); }
+    .hub-card-soon .hub-card-name { color:#cbd5e1; }
+    .hub-badge-soon {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: rgba(100, 116, 139, 0.25);
+      border: 1px solid rgba(100, 116, 139, 0.3);
+      border-radius: 0.375rem;
+      padding: 0.1rem 0.4rem;
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: #64748b;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Animations */
+    @keyframes hub-fade-up {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hub-back    { animation: hub-fade-up 0.4s ease-out both; }
+    .hub-logo    { animation: hub-fade-up 0.4s 0.05s ease-out both; }
+    .hub-flag    { animation: hub-fade-up 0.4s 0.08s ease-out both; }
+    .hub-title   { animation: hub-fade-up 0.4s 0.10s ease-out both; }
+    .hub-subtitle{ animation: hub-fade-up 0.4s 0.13s ease-out both; }
+    .hub-grid    { animation: hub-fade-up 0.4s 0.18s ease-out both; }
+    .hub-whatsapp {
+      animation: hub-fade-up 0.4s 0.16s ease-out both;
+      width:100%;
+      display:flex;
+      justify-content:center;
+    }
+    .eg-whatsapp-cta {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.7rem;
+      min-height:3.55rem;
+      padding:.9rem 1.25rem;
+      border-radius:.9rem;
+      background:#25D366;
+      color:#042f18;
+      font-weight:900;
+      text-decoration:none;
+      box-shadow:0 18px 40px rgba(37,211,102,.28), inset 0 0 0 1px rgba(255,255,255,.28);
+      transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+    .eg-whatsapp-cta:hover {
+      background:#32e374;
+      transform:translateY(-1px);
+      box-shadow:0 22px 48px rgba(37,211,102,.36), inset 0 0 0 1px rgba(255,255,255,.32);
+    }
+    .eg-whatsapp-cta-icon {
+      width:1.65rem;
+      height:1.65rem;
+      flex:0 0 auto;
+    }
+    .eg-whatsapp-cta span {
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      line-height:1.1;
+      text-align:left;
+    }
+    .eg-whatsapp-cta strong {
+      font-size:1rem;
+      letter-spacing:0;
+    }
+    .eg-whatsapp-cta small {
+      margin-top:.18rem;
+      font-size:.72rem;
+      font-weight:800;
+      color:rgba(4,47,24,.76);
+    }
+    .eg-whatsapp-cta-floating {
+      position:fixed;
+      right:1rem;
+      bottom:1rem;
+      z-index:60;
+      min-height:3.35rem;
+      padding:.82rem 1rem;
+      border-radius:999px;
+    }
+    .eg-whatsapp-cta-floating small {
+      display:none;
+    }
+    @media (min-width:768px) {
+      .eg-whatsapp-cta-floating {
+        display:none;
+      }
+    }
+    @media (max-width:480px) {
+      .eg-whatsapp-cta,
+      .hub-signup,
+      .hub-whatsapp {
+        width:100%;
+      }
+      .eg-whatsapp-cta-floating {
+        width:auto;
+        max-width:calc(100vw - 2rem);
+      }
+    }
+  </style>
+  {% if egarage_analytics_id %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ egarage_analytics_id }}"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '{{ egarage_analytics_id }}');
+  </script>
+  {% endif %}
+</head>
+<body>
+
+<div class="hub-hero">
+  <div class="hub-overlay"></div>
+
+  <div class="hub-content">
+
+    <!-- Back to gateway -->
+    <a href="/" class="hub-back" aria-label="{% if language == 'en' %}Back to country selector{% else %}Volver al selector de país{% endif %}">
+      ← eGarage
+    </a>
+
+    <!-- Logo + país -->
+    <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage" class="hub-logo">
+    <span class="hub-flag" aria-hidden="true">{{ flag }}</span>
+    {% if language == "en" %}
+    <h1 class="hub-title">Welcome to eGarage {{ country_name }}</h1>
+    <p class="hub-subtitle">Choose the type of business you want to manage.</p>
+    {% else %}
+    <h1 class="hub-title">Bienvenido a eGarage {{ country_name }}</h1>
+    <p class="hub-subtitle">Elige el tipo de negocio que quieres gestionar.</p>
+    {% endif %}
+
+    <a href="{% if signup_url %}{{ signup_url }}{% else %}{% url 'account_signup' %}{% endif %}"
+       class="hub-signup"
+       data-public-signup-cta="hub"
+       data-country="{{ country_code|default:'' }}">
+      {% if language == "en" %}Start free trial{% else %}Crear cuenta gratis{% endif %}
+    </a>
+
+    {% if whatsapp_cta %}
+    <div class="hub-whatsapp">
+      {% include "components/whatsapp_cta_button.html" with cta_position="hub" %}
+    </div>
+    {% endif %}
+
+    <!-- Rubro cards -->
+    <div class="hub-grid" role="list">
+
+      <a href="{{ landing_urls.workshop|default:'/talleres/' }}" class="hub-card" role="listitem">
+        <img class="hub-card-image"
+             src="{% static 'img/welcome/scenes/taller.webp' %}"
+             alt="{{ workshop_name }}">
+        <span class="hub-card-icon" aria-hidden="true">🔧</span>
+        <span class="hub-card-name">{{ workshop_name }}</span>
+      </a>
+
+      <a href="{{ landing_urls.salvage|default:'/desarmadurias/' }}" class="hub-card" role="listitem">
+        <img class="hub-card-image"
+             src="{% static 'img/welcome/scenes/desarme.webp' %}"
+             alt="{{ salvage_name }}">
+        <span class="hub-card-icon" aria-hidden="true">🔩</span>
+        <span class="hub-card-name">{{ salvage_name }}</span>
+      </a>
+
+      <a href="{{ landing_urls.parts|default:'/casas-de-repuestos/' }}" class="hub-card" role="listitem">
+        <img class="hub-card-image"
+             src="{% static 'img/welcome/scenes/repuestos.webp' %}"
+             alt="{{ parts_name }}">
+        <span class="hub-card-icon" aria-hidden="true">🏪</span>
+        <span class="hub-card-name">{{ parts_name }}</span>
+      </a>
+
+      <a href="{{ landing_urls.tire|default:'/vulcanizaciones/' }}" class="hub-card" role="listitem">
+        <img class="hub-card-image"
+             src="{% static 'img/welcome/scenes/taller.webp' %}"
+             alt="{{ tire_name }}">
+        <span class="hub-card-icon" aria-hidden="true">🛞</span>
+        <span class="hub-card-name">{{ tire_name }}</span>
+      </a>
+
+      <a href="{{ landing_urls.carwash|default:'/carwash/' }}" class="hub-card" role="listitem">
+        <img class="hub-card-image"
+             src="{% static 'img/welcome/scenes/carwash.webp' %}"
+             alt="{{ carwash_name }}">
+        <span class="hub-card-icon" aria-hidden="true">💧</span>
+        <span class="hub-card-name">{{ carwash_name }}</span>
+      </a>
+
+      {% if landing_urls.recycling %}
+      <a href="{{ landing_urls.recycling }}" class="hub-card" role="listitem">
+        <img class="hub-card-image"
+             src="{% static 'img/welcome/scenes/reciclaje.webp' %}"
+             alt="{{ recycling_name }}">
+        <span class="hub-card-icon" aria-hidden="true">♻️</span>
+        <span class="hub-card-name">{{ recycling_name }}</span>
+      </a>
+      {% endif %}
+
+    </div><!-- /hub-grid -->
+
+  </div><!-- /hub-content -->
+</div><!-- /hub-hero -->
+
+{% if whatsapp_cta %}
+  {% include "components/whatsapp_cta_button.html" with cta_variant="floating" cta_position="floating" %}
+{% endif %}
+
+<script>
+  (function () {
+    function getCookie(name) {
+      var prefix = name + "=";
+      var parts = document.cookie ? document.cookie.split(";") : [];
+      for (var i = 0; i < parts.length; i += 1) {
+        var value = parts[i].trim();
+        if (value.indexOf(prefix) === 0) {
+          return decodeURIComponent(value.slice(prefix.length));
+        }
+      }
+      return "";
+    }
+
+    function trackCtaClick(link, kind) {
+      var csrfToken = getCookie("csrftoken");
+      if (!csrfToken || typeof window.fetch !== "function" || !link) {
+        return;
+      }
+      var ctaKey = kind === "signup"
+        ? (link.getAttribute("data-public-signup-cta") || "signup")
+        : (link.getAttribute("data-public-whatsapp-cta") || "cta");
+      var ctaId = kind + "_" + ctaKey;
+      window.fetch("/analytics/public/event/", {
+        method: "POST",
+        credentials: "same-origin",
+        keepalive: true,
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({
+          event_type: kind === "signup" ? "cta_signup_click" : "cta_whatsapp_click",
+          path: window.location.pathname,
+          dedupe_key: window.location.pathname + ":" + kind + ":" + ctaKey,
+          metadata: {
+            cta_id: ctaId,
+            cta_label: (link.textContent || "").trim().slice(0, 120),
+            country: link.getAttribute("data-country") || "",
+            vertical: link.getAttribute("data-vertical") || "",
+            href: link.getAttribute("href") || ""
+          }
+        })
+      }).catch(function () {});
+    }
+
+    document.addEventListener("click", function (event) {
+      var signupLink = event.target.closest("a[data-public-signup-cta]");
+      if (signupLink) {
+        trackCtaClick(signupLink, "signup");
+        return;
+      }
+      var whatsappLink = event.target.closest("a[data-event='cta_whatsapp_click']");
+      if (whatsappLink) {
+        trackCtaClick(whatsappLink, "whatsapp");
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>

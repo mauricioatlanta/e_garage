@@ -1,0 +1,621 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Panel de Administración - Suscriptores{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-[1400px] mx-auto px-2 sm:px-4 py-3 mt-4">
+    <!-- Cabecera + stats compactos -->
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mb-2">
+        <h1 class="text-base font-bold text-cyan-400 whitespace-nowrap">📊 Suscriptores</h1>
+        <div class="flex flex-wrap gap-2 text-xs">
+            <span class="bg-gray-800 border border-cyan-700 rounded px-2 py-0.5 text-cyan-300">Total <strong>{{ total_empresas }}</strong></span>
+            <span class="bg-gray-800 border border-green-700 rounded px-2 py-0.5 text-green-300">Activas <strong>{{ empresas_activas }}</strong></span>
+            <span class="bg-gray-800 border border-red-700 rounded px-2 py-0.5 text-red-300">Vencidas <strong>{{ empresas_vencidas }}</strong></span>
+            <span class="bg-gray-800 border border-yellow-700 rounded px-2 py-0.5 text-yellow-300">Críticas <strong>{{ empresas_criticas|length }}</strong></span>
+        </div>
+    </div>
+
+    <!-- Filtros compactos en una línea -->
+    <div class="bg-gray-800 rounded px-3 py-2 mb-3 border border-gray-700">
+        <form method="get" class="flex flex-wrap items-center gap-2">
+            {% if ord %}<input type="hidden" name="ord" value="{{ ord }}">{% endif %}
+            <select name="pais" class="bg-gray-700 text-white rounded px-2 py-1 border border-gray-600 text-xs">
+                <option value="">País</option>
+                {% for codigo, config in paises.items %}
+                <option value="{{ codigo }}" {% if pais_filter == codigo %}selected{% endif %}>{{ config.name|default:codigo }}</option>
+                {% endfor %}
+            </select>
+            <select name="status" class="bg-gray-700 text-white rounded px-2 py-1 border border-gray-600 text-xs">
+                <option value="">Estado</option>
+                <option value="activa" {% if status_filter == 'activa' %}selected{% endif %}>Activa</option>
+                <option value="vencida" {% if status_filter == 'vencida' %}selected{% endif %}>Vencida</option>
+                <option value="trial" {% if status_filter == 'trial' %}selected{% endif %}>Prueba</option>
+            </select>
+            <select name="dias" class="bg-gray-700 text-white rounded px-2 py-1 border border-gray-600 text-xs">
+                <option value="">Días rest.</option>
+                <option value="critico" {% if dias_filter == 'critico' %}selected{% endif %}>🔴 Crítico</option>
+                <option value="advertencia" {% if dias_filter == 'advertencia' %}selected{% endif %}>⚠️ Advertencia</option>
+                <option value="vencido" {% if dias_filter == 'vencido' %}selected{% endif %}>❌ Vencido</option>
+            </select>
+            <input type="text" name="search" value="{{ search_query }}"
+                   placeholder="Nombre, email…"
+                   class="bg-gray-700 text-white rounded px-2 py-1 border border-gray-600 text-xs w-44">
+            <label class="inline-flex items-center gap-1 text-xs text-gray-400 cursor-pointer select-none whitespace-nowrap">
+                <input type="checkbox" name="incluir_bajas" value="1" {% if incluir_bajas %}checked{% endif %} class="rounded border-gray-600 bg-gray-700 text-cyan-500 focus:ring-cyan-500">
+                Incluir bajas
+            </label>
+            <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold py-1 px-3 rounded">
+                🔍 Filtrar
+            </button>
+        </form>
+    </div>
+
+    <!-- Tabla de Suscriptores: table-fixed + columnas ocultas en breakpoints para evitar scroll horizontal en medianas -->
+    <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden min-w-0">
+        <div class="w-full min-w-0">
+            <table class="w-full table-fixed text-left text-sm">
+                <thead class="bg-gray-700/90 border-b border-gray-600">
+                    <tr>
+                        <th scope="col" class="w-[180px] px-2 py-2 align-top text-xs font-semibold uppercase tracking-wide">
+                            <a href="{{ sort_href.empresa }}" class="inline-flex items-center gap-0.5 text-gray-200 hover:text-cyan-300 no-underline">
+                                Empresa
+                                {% if ord == "empresa" %}<span class="text-cyan-400" title="Ascendente">▲</span>{% elif ord == "-empresa" %}<span class="text-cyan-400" title="Descendente">▼</span>{% endif %}
+                            </a>
+                        </th>
+                        <th scope="col" class="w-[80px] px-2 py-2 align-top text-xs font-semibold uppercase tracking-wide">
+                            <a href="{{ sort_href.pais }}" class="inline-flex items-center gap-0.5 text-gray-200 hover:text-cyan-300 no-underline">
+                                País
+                                {% if ord == "pais" %}<span class="text-cyan-400" title="Ascendente">▲</span>{% elif ord == "-pais" %}<span class="text-cyan-400" title="Descendente">▼</span>{% endif %}
+                            </a>
+                        </th>
+                        <th scope="col" class="hidden lg:table-cell w-[220px] px-2 py-2 align-top text-xs font-semibold text-gray-300 uppercase tracking-wide">Email</th>
+                        <th scope="col" class="w-[90px] px-2 py-2 align-top text-xs font-semibold uppercase tracking-wide">
+                            <a href="{{ sort_href.plan }}" class="inline-flex items-center gap-0.5 text-gray-200 hover:text-cyan-300 no-underline">
+                                Plan
+                                {% if ord == "plan" %}<span class="text-cyan-400" title="Ascendente">▲</span>{% elif ord == "-plan" %}<span class="text-cyan-400" title="Descendente">▼</span>{% endif %}
+                            </a>
+                        </th>
+                        <th scope="col" class="hidden md:table-cell w-[110px] px-2 py-2 align-top text-xs font-semibold text-gray-300 uppercase tracking-wide">Días rest.</th>
+                        <th scope="col" class="w-[92px] px-2 py-2 align-top text-xs font-semibold uppercase tracking-wide">
+                            <a href="{{ sort_href.fecha }}" class="inline-flex items-center gap-0.5 text-gray-200 hover:text-cyan-300 no-underline">
+                                Fecha
+                                {% if ord == "fecha" %}<span class="text-cyan-400" title="Ascendente">▲</span>{% elif ord == "-fecha" %}<span class="text-cyan-400" title="Descendente">▼</span>{% endif %}
+                            </a>
+                        </th>
+                        <th scope="col" class="w-[120px] px-2 py-2 align-top text-xs font-semibold uppercase tracking-wide">
+                            <a href="{{ sort_href.estado }}" class="inline-flex items-center gap-0.5 text-gray-200 hover:text-cyan-300 no-underline">
+                                Estado
+                                {% if ord == "estado" %}<span class="text-cyan-400" title="Ascendente">▲</span>{% elif ord == "-estado" %}<span class="text-cyan-400" title="Descendente">▼</span>{% endif %}
+                            </a>
+                        </th>
+                        <th scope="col" class="hidden md:table-cell w-[110px] px-2 py-2 align-top text-xs font-semibold text-gray-300 uppercase tracking-wide">Vence</th>
+                        <th scope="col" class="w-[210px] px-2 py-2 align-top text-xs font-semibold text-gray-300 uppercase tracking-wide">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    {% for empresa in empresas %}
+                    {% if empresa.user %}
+                    <tr class="align-top hover:bg-gray-700/50
+                        {% if empresa.estado_suscripcion == 'vencida' %}bg-gray-900/30
+                        {% elif empresa.estado_suscripcion == 'critico' %}bg-red-900/30
+                        {% elif empresa.estado_suscripcion == 'advertencia' %}bg-yellow-900/20
+                        {% else %}bg-green-900/10{% endif %}">
+                        <td class="px-2 py-2 align-top min-w-0">
+                            <div class="font-medium text-white text-sm leading-snug break-words">{{ empresa.nombre_taller|default:"N/A" }}</div>
+                            {% if empresa.telefono %}
+                            <div class="text-xs text-gray-400 mt-0.5 truncate" title="{{ empresa.telefono }}">📱 {{ empresa.telefono }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-2 align-top">
+                            <span class="inline-block px-1.5 py-0.5 text-[10px] sm:text-xs rounded bg-cyan-900 text-cyan-300 whitespace-nowrap">
+                                {{ empresa.pais|default:"N/A" }}
+                            </span>
+                        </td>
+                        <td class="hidden lg:table-cell px-2 py-2 align-top text-gray-300 text-xs min-w-0">
+                            <span class="break-all" title="{{ empresa.user.email|default:'N/A' }}">{{ empresa.user.email|default:"N/A" }}</span>
+                        </td>
+                        <td class="px-2 py-2 align-top">
+                            <span class="inline-block px-1.5 py-0.5 text-[10px] sm:text-xs rounded whitespace-nowrap {% if empresa.plan == 'trial' %}bg-yellow-900 text-yellow-300{% else %}bg-green-900 text-green-300{% endif %}">
+                                {{ empresa.plan|default:"N/A"|title }}
+                            </span>
+                        </td>
+                        <td class="hidden md:table-cell px-2 py-2 align-top">
+                            <span class="font-semibold text-xs sm:text-sm
+                                {% if empresa.estado_suscripcion == 'vencida' %}text-gray-400
+                                {% elif empresa.estado_suscripcion == 'critico' %}text-red-400
+                                {% elif empresa.estado_suscripcion == 'advertencia' %}text-yellow-400
+                                {% else %}text-green-400{% endif %}">
+                                {% if empresa.dias_restantes is not None %}{{ empresa.dias_restantes }} días{% else %}N/A{% endif %}
+                            </span>
+                        </td>
+                        <td class="px-2 py-2 align-top text-gray-300 text-[11px] sm:text-xs whitespace-nowrap">
+                            {% if empresa.admin_fecha_suscripcion %}
+                            {{ empresa.admin_fecha_suscripcion|date:"d/m/y" }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-2 align-top">
+                            {% if empresa.estado_suscripcion == 'activa' %}
+                            <span class="inline-block px-1.5 py-0.5 text-[10px] sm:text-xs rounded bg-green-900 text-green-300 whitespace-nowrap">✅ Activa</span>
+                            {% elif empresa.estado_suscripcion == 'advertencia' %}
+                            <span class="inline-block px-1.5 py-0.5 text-[10px] sm:text-xs rounded bg-yellow-900 text-yellow-300 whitespace-nowrap">⚠️ Advert.</span>
+                            {% elif empresa.estado_suscripcion == 'critico' %}
+                            <span class="inline-block px-1.5 py-0.5 text-[10px] sm:text-xs rounded bg-red-900 text-red-300 whitespace-nowrap">🔴 Crítico</span>
+                            {% else %}
+                            <span class="inline-block px-1.5 py-0.5 text-[10px] sm:text-xs rounded bg-gray-900 text-gray-300 whitespace-nowrap">❌ Vencida</span>
+                            {% endif %}
+                        </td>
+                        <td class="hidden md:table-cell px-2 py-2 align-top text-gray-300 text-xs whitespace-nowrap">
+                            {% if empresa.fecha_fin %}
+                            {{ empresa.fecha_fin|date:"d/m/Y" }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-2 align-top min-w-0">
+                            <div class="flex flex-wrap gap-1 justify-end sm:justify-start">
+                                <button type="button" onclick="mostrarModalExtension({{ empresa.id }}, '{{ empresa.nombre_taller|escapejs }}')"
+                                        class="inline-flex items-center justify-center bg-cyan-600 hover:bg-cyan-700 text-white text-[11px] px-2 py-1 rounded whitespace-nowrap">
+                                    ⏱️ Extender
+                                </button>
+                                <button type="button" onclick="mostrarModalCambiarPlan({{ empresa.id }}, '{{ empresa.nombre_taller|escapejs }}', '{{ empresa.plan|escapejs }}')"
+                                        class="inline-flex items-center justify-center bg-violet-700 hover:bg-violet-600 text-white text-[11px] px-2 py-1 rounded whitespace-nowrap">
+                                    📋 Plan
+                                </button>
+                                <a href="{% url 'admin_detalle_suscriptor' empresa.id %}"
+                                   class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-[11px] px-2 py-1 rounded whitespace-nowrap no-underline">
+                                    👁️ Ver
+                                </a>
+                                <button type="button"
+                                        class="inline-flex items-center justify-center bg-amber-700 hover:bg-amber-600 text-white text-[11px] px-2 py-1 rounded whitespace-nowrap border border-amber-600"
+                                        data-accion="desactivar"
+                                        data-url="{% url 'admin_desactivar_suscripcion' empresa.id %}"
+                                        data-nombre="{{ empresa.nombre_taller|default:'Empresa'|escape }}">
+                                    ⏸️ Desactivar
+                                </button>
+                                <button type="button"
+                                        class="inline-flex items-center justify-center bg-red-900/80 hover:bg-red-800 text-white text-[11px] px-2 py-1 rounded whitespace-nowrap border border-red-700"
+                                        data-accion="eliminar"
+                                        data-url="{% url 'admin_eliminar_suscriptor' empresa.id %}"
+                                        data-nombre="{{ empresa.nombre_taller|default:'Empresa'|escape }}">
+                                    🗑️ Eliminar
+                                </button>
+                                {% with kiosko=empresa.configuracion_comision.kiosko_autorizado %}
+                                <div role="button" tabindex="0"
+                                        class="inline-flex items-center justify-center text-[11px] px-2 py-1 rounded whitespace-nowrap border cursor-pointer kiosko-toggle-btn
+                                            {% if kiosko %}bg-emerald-900/80 hover:bg-emerald-800 text-emerald-300 border-emerald-700{% else %}bg-gray-700/80 hover:bg-gray-600 text-gray-400 border-gray-600{% endif %}"
+                                        data-accion="toggle-kiosko"
+                                        data-url="{% url 'admin_toggle_kiosko' empresa.id %}"
+                                        data-nombre="{{ empresa.nombre_taller|default:'Empresa'|escape }}"
+                                        data-estado="{{ kiosko|yesno:'true,false' }}">
+                                    🏪 {% if kiosko %}Kiosko ✓{% else %}Kiosko{% endif %}
+                                </div>
+                                {% endwith %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="px-2 py-8 text-center text-gray-400 text-sm">
+                            No se encontraron suscriptores con los filtros seleccionados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        {% if page_obj.has_other_pages %}
+        <div class="px-2 sm:px-4 py-3 bg-gray-700 border-t border-gray-600">
+            <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2">
+                <div class="text-xs sm:text-sm text-gray-400">
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    {% if page_obj.has_previous %}
+                    <a href="{{ previous_page_url }}"
+                       class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1.5 rounded text-sm whitespace-nowrap">Anterior</a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                    <a href="{{ next_page_url }}"
+                       class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1.5 rounded text-sm whitespace-nowrap">Siguiente</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Extensión -->
+<div id="modalExtension" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full border border-cyan-500">
+        <h3 class="text-xl font-bold text-cyan-400 mb-4">⏱️ Extender Suscripción</h3>
+        <p class="text-gray-300 mb-4">Empresa: <span id="modalEmpresaNombre" class="font-bold"></span></p>
+
+        <form id="formExtension" onsubmit="extenderSuscripcion(event)">
+            {% csrf_token %}
+            <input type="hidden" id="modalEmpresaId" name="empresa_id">
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Meses a extender</label>
+                <select id="mesesExtension" name="meses" class="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600" required>
+                    <option value="1">1 mes</option>
+                    <option value="6">6 meses</option>
+                    <option value="12">12 meses</option>
+                </select>
+                <p class="text-xs text-gray-400 mt-1">Nota: Solo se permiten 1, 6 o 12 meses (según admin_grant_courtesy_extension)</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="flex items-center text-gray-300">
+                    <input type="checkbox" id="enviarNotificacion" name="enviar_notificacion" checked class="mr-2">
+                    Enviar notificación (Email + WhatsApp)
+                </label>
+            </div>
+
+            <div class="flex gap-2">
+                <button type="submit" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded">
+                    ✅ Extender
+                </button>
+                <button type="button" onclick="cerrarModal()" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+
+        <div id="mensajeResultado" class="mt-4 hidden"></div>
+    </div>
+</div>
+
+<!-- Modal Cambiar Plan -->
+<div id="modalCambiarPlan" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full border border-violet-500">
+        <h3 class="text-xl font-bold text-violet-400 mb-1">📋 Cambiar Plan</h3>
+        <p class="text-gray-300 mb-4 text-sm">Empresa: <span id="modalPlanNombre" class="font-bold text-white"></span></p>
+
+        <form id="formCambiarPlan" onsubmit="enviarCambiarPlan(event)">
+            {% csrf_token %}
+            <input type="hidden" id="modalPlanEmpresaId" name="empresa_id">
+
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Nuevo plan</label>
+                <div class="flex flex-col gap-2" id="planOpciones">
+                    <label class="flex items-center gap-3 bg-gray-700 rounded px-3 py-2 cursor-pointer border border-gray-600 hover:border-violet-500 transition-colors">
+                        <input type="radio" name="plan" value="trial" class="accent-violet-500">
+                        <span class="text-sm text-gray-200">
+                            <span class="font-semibold">Trial</span>
+                            <span class="text-gray-400 ml-1">— 1 usuario, acceso de prueba</span>
+                        </span>
+                    </label>
+                    <label class="flex items-center gap-3 bg-gray-700 rounded px-3 py-2 cursor-pointer border border-gray-600 hover:border-violet-500 transition-colors">
+                        <input type="radio" name="plan" value="express" class="accent-violet-500">
+                        <span class="text-sm text-gray-200">
+                            <span class="font-semibold">Express</span>
+                            <span class="text-gray-400 ml-1">— 1 usuario</span>
+                        </span>
+                    </label>
+                    <label class="flex items-center gap-3 bg-gray-700 rounded px-3 py-2 cursor-pointer border border-gray-600 hover:border-violet-500 transition-colors">
+                        <input type="radio" name="plan" value="taller" class="accent-violet-500">
+                        <span class="text-sm text-gray-200">
+                            <span class="font-semibold">Taller</span>
+                            <span class="text-gray-400 ml-1">— hasta 4 usuarios</span>
+                        </span>
+                    </label>
+                    <label class="flex items-center gap-3 bg-gray-700 rounded px-3 py-2 cursor-pointer border border-gray-600 hover:border-violet-500 transition-colors">
+                        <input type="radio" name="plan" value="pro" class="accent-violet-500">
+                        <span class="text-sm text-gray-200">
+                            <span class="font-semibold">Pro</span>
+                            <span class="text-gray-400 ml-1">— hasta 10 usuarios</span>
+                        </span>
+                    </label>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">⚠️ Cambiar a un plan con menor límite no desactiva usuarios existentes — eso es responsabilidad del dueño del taller.</p>
+            </div>
+
+            <div class="flex gap-2">
+                <button type="submit" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded">
+                    ✅ Cambiar Plan
+                </button>
+                <button type="button" onclick="cerrarModalPlan()" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+
+        <div id="mensajePlanResultado" class="mt-4 hidden"></div>
+    </div>
+</div>
+
+<script>
+function mostrarModalExtension(empresaId, empresaNombre) {
+    document.getElementById('modalEmpresaId').value = empresaId;
+    document.getElementById('modalEmpresaNombre').textContent = empresaNombre;
+    document.getElementById('modalExtension').classList.remove('hidden');
+}
+
+function cerrarModal() {
+    document.getElementById('modalExtension').classList.add('hidden');
+    document.getElementById('mensajeResultado').classList.add('hidden');
+    document.getElementById('formExtension').reset();
+}
+
+function mostrarModalCambiarPlan(empresaId, empresaNombre, planActual) {
+    document.getElementById('modalPlanEmpresaId').value = empresaId;
+    document.getElementById('modalPlanNombre').textContent = empresaNombre;
+    document.getElementById('mensajePlanResultado').classList.add('hidden');
+    // Preseleccionar el plan actual
+    var radios = document.querySelectorAll('#planOpciones input[type=radio]');
+    radios.forEach(function(r) {
+        r.checked = (r.value === planActual);
+        var label = r.closest('label');
+        if (label) {
+            label.classList.toggle('border-violet-500', r.checked);
+            label.classList.toggle('bg-violet-900/30', r.checked);
+        }
+    });
+    document.getElementById('modalCambiarPlan').classList.remove('hidden');
+}
+
+function cerrarModalPlan() {
+    document.getElementById('modalCambiarPlan').classList.add('hidden');
+    document.getElementById('mensajePlanResultado').classList.add('hidden');
+    document.getElementById('formCambiarPlan').reset();
+}
+
+function enviarCambiarPlan(event) {
+    event.preventDefault();
+    var empresaId = document.getElementById('modalPlanEmpresaId').value;
+    var planSeleccionado = document.querySelector('#planOpciones input[type=radio]:checked');
+    var mensajeDiv = document.getElementById('mensajePlanResultado');
+
+    if (!planSeleccionado) {
+        mensajeDiv.innerHTML = '<div class="bg-red-900 text-red-300 p-3 rounded text-sm">❌ Selecciona un plan.</div>';
+        mensajeDiv.classList.remove('hidden');
+        return;
+    }
+
+    mensajeDiv.innerHTML = '<div class="text-violet-400 text-sm">⏳ Actualizando plan...</div>';
+    mensajeDiv.classList.remove('hidden');
+
+    var formData = new FormData();
+    formData.append('plan', planSeleccionado.value);
+
+    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+        document.cookie.split('; ').find(function(r) { return r.startsWith('csrftoken='); })?.split('=')[1];
+
+    fetch('/admin/suscriptores/' + empresaId + '/cambiar-plan/', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-CSRFToken': csrftoken }
+    })
+    .then(function(response) {
+        if (!response.headers.get('content-type')?.includes('application/json')) {
+            return response.text().then(function(t) { throw new Error('Error del servidor: ' + t.substring(0, 200)); });
+        }
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            mensajeDiv.innerHTML = '<div class="bg-green-900 text-green-300 p-3 rounded text-sm">✅ ' + data.message + '<br><span class="text-xs text-gray-400">Límite de usuarios: ' + data.limite_usuarios + '</span></div>';
+            setTimeout(function() { window.location.reload(); }, 1800);
+        } else {
+            mensajeDiv.innerHTML = '<div class="bg-red-900 text-red-300 p-3 rounded text-sm">❌ ' + data.error + '</div>';
+        }
+    })
+    .catch(function(error) {
+        mensajeDiv.innerHTML = '<div class="bg-red-900 text-red-300 p-3 rounded text-sm">❌ ' + error.message + '</div>';
+    });
+}
+
+// Resaltar opción seleccionada al hacer clic en el radio
+document.addEventListener('change', function(e) {
+    if (e.target.name === 'plan' && e.target.closest('#planOpciones')) {
+        document.querySelectorAll('#planOpciones label').forEach(function(l) {
+            l.classList.remove('border-violet-500', 'bg-violet-900/30');
+        });
+        var selectedLabel = e.target.closest('label');
+        if (selectedLabel) {
+            selectedLabel.classList.add('border-violet-500', 'bg-violet-900/30');
+        }
+    }
+});
+
+function extenderSuscripcion(event) {
+    event.preventDefault();
+
+    const empresaId = document.getElementById('modalEmpresaId').value;
+    const meses = document.getElementById('mesesExtension').value;
+    const enviarNotificacion = document.getElementById('enviarNotificacion').checked;
+    const mensajeDiv = document.getElementById('mensajeResultado');
+
+    // Mostrar loading
+    mensajeDiv.innerHTML = '<div class="text-cyan-400">⏳ Extendiendo suscripción...</div>';
+    mensajeDiv.classList.remove('hidden');
+
+    // Enviar petición AJAX
+    const formData = new FormData();
+    formData.append('meses', meses);
+    formData.append('enviar_notificacion', enviarNotificacion);
+
+    // Obtener CSRF token
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+                      document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+
+    fetch(`/admin/suscriptores/${empresaId}/extender/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrftoken
+        }
+    })
+    .then(response => {
+        // Verificar si la respuesta es JSON
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            // Si no es JSON, intentar leer como texto para ver el error
+            return response.text().then(text => {
+                throw new Error(`El servidor devolvió HTML en lugar de JSON. Status: ${response.status}. Contenido: ${text.substring(0, 200)}`);
+            });
+        }
+        // Si es JSON, parsearlo
+        if (!response.ok) {
+            // Si hay un error HTTP, intentar parsear el JSON del error
+            return response.json().then(data => {
+                throw new Error(data.error || `Error HTTP ${response.status}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            mensajeDiv.innerHTML = `
+                <div class="bg-green-900 text-green-300 p-3 rounded">
+                    ✅ ${data.message}<br>
+                    Nueva fecha: ${data.nueva_fecha_fin}<br>
+                    Días restantes: ${data.dias_restantes}<br>
+                    ${data.notificaciones_enviadas ? '📧 Notificaciones enviadas' : '⚠️ Notificaciones no enviadas'}
+                </div>
+            `;
+            // Recargar página después de 2 segundos
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            mensajeDiv.innerHTML = `
+                <div class="bg-red-900 text-red-300 p-3 rounded">
+                    ❌ Error: ${data.error}
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        mensajeDiv.innerHTML = `
+            <div class="bg-red-900 text-red-300 p-3 rounded">
+                ❌ Error de conexión: ${error.message}
+            </div>
+        `;
+    });
+}
+
+// Cerrar modal al hacer clic fuera
+document.getElementById('modalExtension').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModal();
+});
+document.getElementById('modalCambiarPlan').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalPlan();
+});
+
+function egAdminSuscriptoresCsrf() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+        document.cookie.split('; ').find(function(row) { return row.startsWith('csrftoken='); })?.split('=')[1];
+}
+
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-accion="desactivar"], [data-accion="eliminar"]');
+    if (!btn || btn.disabled) return;
+    var url = btn.getAttribute('data-url');
+    var nombre = btn.getAttribute('data-nombre') || 'esta empresa';
+    var accion = btn.getAttribute('data-accion');
+    if (!url) return;
+
+    var msg = accion === 'eliminar'
+        ? '¿Dar de baja lógica a "' + nombre + '"? El usuario no podrá iniciar sesión. Esta acción no borra datos del taller.'
+        : '¿Desactivar la suscripción de "' + nombre + '"? El acceso puede quedar restringido según las reglas del sistema.';
+    if (!window.confirm(msg)) return;
+
+    var csrftoken = egAdminSuscriptoresCsrf();
+    btn.disabled = true;
+    fetch(url, {
+        method: 'POST',
+        headers: csrftoken ? { 'X-CSRFToken': csrftoken } : {},
+        credentials: 'same-origin'
+    })
+    .then(function(response) {
+        var ct = response.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+            return response.text().then(function(text) {
+                throw new Error('Respuesta no JSON (status ' + response.status + ')');
+            });
+        }
+        return response.json().then(function(data) {
+            if (!response.ok) {
+                throw new Error(data.error || ('Error HTTP ' + response.status));
+            }
+            return data;
+        });
+    })
+    .then(function(data) {
+        if (data.success) {
+            window.alert(data.message || 'Listo.');
+            window.location.reload();
+        } else {
+            window.alert(data.error || 'Error desconocido');
+            btn.disabled = false;
+        }
+    })
+    .catch(function(err) {
+        window.alert('Error: ' + (err.message || String(err)));
+        btn.disabled = false;
+    });
+});
+
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-accion="toggle-kiosko"]');
+    if (!btn || btn.disabled) return;
+    var url = btn.getAttribute('data-url');
+    var nombre = btn.getAttribute('data-nombre') || 'esta empresa';
+    var estadoActual = btn.getAttribute('data-estado') === 'true';
+    if (!url) return;
+
+    var msg = estadoActual
+        ? '¿Deshabilitar el kiosko para "' + nombre + '"? Sus piezas dejarán de aparecer en el marketplace.'
+        : '¿Habilitar el kiosko para "' + nombre + '"? Sus piezas aparecerán en el marketplace público.';
+    if (!window.confirm(msg)) return;
+
+    var csrftoken = egAdminSuscriptoresCsrf();
+    btn.disabled = true;
+    fetch(url, {
+        method: 'POST',
+        headers: csrftoken ? { 'X-CSRFToken': csrftoken } : {},
+        credentials: 'same-origin'
+    })
+    .then(function(response) {
+        var ct = response.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+            throw new Error('Respuesta no JSON (status ' + response.status + ')');
+        }
+        return response.json().then(function(data) {
+            if (!response.ok) throw new Error(data.error || ('Error HTTP ' + response.status));
+            return data;
+        });
+    })
+    .then(function(data) {
+        if (data.success) {
+            var activo = data.kiosko_autorizado;
+            btn.setAttribute('data-estado', activo ? 'true' : 'false');
+            btn.textContent = activo ? '🏪 Kiosko ✓' : '🏪 Kiosko';
+            btn.className = btn.className
+                .replace(/bg-\S+|text-\S+|border-\S+/g, '')
+                .trim();
+            if (activo) {
+                btn.classList.add('bg-emerald-900/80', 'hover:bg-emerald-800', 'text-emerald-300', 'border-emerald-700');
+            } else {
+                btn.classList.add('bg-gray-700/80', 'hover:bg-gray-600', 'text-gray-400', 'border-gray-600');
+            }
+        } else {
+            window.alert(data.error || 'Error desconocido');
+        }
+        btn.disabled = false;
+    })
+    .catch(function(err) {
+        window.alert('Error: ' + (err.message || String(err)));
+        btn.disabled = false;
+    });
+});
+</script>
+{% endblock %}

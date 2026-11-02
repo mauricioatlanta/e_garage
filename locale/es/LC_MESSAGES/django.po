@@ -1,0 +1,1017 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-22 09:30+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Configuración"
+msgstr "Configuración"
+
+msgid "Cerrar sesión"
+msgstr "Cerrar sesión"
+
+msgid "Iniciar sesión o registrarse"
+msgstr "Iniciar sesión o registrarse"
+
+msgid "o"
+msgstr "o"
+
+msgid "Iniciar sesión"
+msgstr "Iniciar sesión"
+
+msgid "Gestión inteligente para talleres"
+msgstr "Gestión inteligente para talleres"
+
+msgid "Welcome to eGarage USA"
+msgstr "Bienvenido a eGarage USA"
+
+msgid "Sectors We Empower"
+msgstr "Sectores que potenciamos"
+
+msgid "Auto Repair Shop"
+msgstr "Taller Mecánico"
+
+msgid "Tire & Vulcanization"
+msgstr "Vulcanización y Neumáticos"
+
+msgid "Paint & Body Shop"
+msgstr "Pintura y Hojalatería"
+
+msgid "Parts Store"
+msgstr "Casa de Repuestos"
+
+msgid "Simple Plans, No Fine Print"
+msgstr "Planes simples y sin letra chica"
+
+msgid "Monthly"
+msgstr "Mensual"
+
+msgid "Semi-Annual"
+msgstr "Semestral"
+
+msgid "Annual"
+msgstr "Anual"
+
+msgid "Real Stories from Real Shops"
+msgstr "Historias reales de talleres reales"
+
+msgid "Higher average revenue"
+msgstr "Mayor facturación promedio"
+
+msgid "Less time in reception"
+msgstr "Menos tiempo en recepción"
+
+msgid "Customer satisfaction"
+msgstr "Satisfacción de clientes"
+
+msgid "Language"
+msgstr "Idioma"
+
+msgid "Agregar nuevo color..."
+msgstr "Agregar nuevo color..."
+
+msgid "Add new body type..."
+msgstr "Agregar nuevo tipo de carrocería..."
+
+msgid "Start Now"
+msgstr "Comenzar Ahora"
+
+msgid "Start Free Trial"
+msgstr "Comenzar Prueba Gratuita"
+
+msgid "See Pricing"
+msgstr "Ver Precios"
+
+msgid "Recommended"
+msgstr "Recomendado"
+
+msgid "Choose Semi-Annual"
+msgstr "Elegir Semestral"
+
+msgid "Choose Annual"
+msgstr "Elegir Anual"
+
+msgid "per month"
+msgstr "por mes"
+
+msgid "every 6 months"
+msgstr "cada 6 meses"
+
+msgid "per year"
+msgstr "por año"
+
+msgid "Unlimited users"
+msgstr "Usuarios ilimitados"
+
+msgid "Digital documents"
+msgstr "Documentos digitales"
+
+msgid "Bilingual support"
+msgstr "Soporte bilingüe"
+
+msgid "Everything from Monthly plan"
+msgstr "Todo del plan Mensual"
+
+msgid "Automatic reminders"
+msgstr "Recordatorios automáticos"
+
+msgid "Profit reports"
+msgstr "Reportes de utilidad"
+
+msgid "Everything from Semi-Annual plan"
+msgstr "Todo del plan Semestral"
+
+msgid "Volume discounts"
+msgstr "Descuentos por volumen"
+
+msgid "Priority support"
+msgstr "Soporte priorizado"
+
+msgid "Work orders, reception checklists, technician times and performance tracking."
+msgstr "Órdenes de trabajo, checklist de recepción, tiempos y desempeño por técnico."
+
+msgid "Rotation, balancing, tire set history, stock alerts and quick quotes."
+msgstr "Rotación, balanceo, historial por juego, alertas de stock y cotizaciones rápidas."
+
+msgid "Process stages, materials per job, before/after photos and estimates."
+msgstr "Etapas del proceso, materiales por trabajo, fotos antes/después y presupuestos."
+
+msgid "Catalog, part numbers, margins, sales and digital document integration."
+msgstr "Catálogo, part number, márgenes, ventas e integración con documentos digitales."
+
+msgid "This software changed how we work; now everything is tracked and we get paid faster."
+msgstr "Este software cambió cómo trabajamos; ahora todo queda trazado y cobramos más rápido."
+
+msgid "Bilingual support and quick migration. Perfect for growing shops."
+msgstr "Soporte bilingüe y migración rápida. Ideal para talleres que crecen."
+
+msgid "The free trial convinced us. Now everything is digital and customers notice."
+msgstr "La prueba gratis nos convenció. Hoy todo es digital y los clientes lo notan."
+
+msgid "Command Center"
+msgstr "Centro de Comando"
+
+msgid "TACTICAL INTELLIGENCE"
+msgstr "INTELIGENCIA TÁCTICA"
+
+msgid "COMMAND CENTER"
+msgstr "CENTRO DE COMANDO"
+
+msgid "REPORTS"
+msgstr "REPORTES"
+
+msgid "ADVANCED AI"
+msgstr "IA AVANZADA"
+
+msgid "BUSINESS INTEL"
+msgstr "INTELIGENCIA DE NEGOCIOS"
+
+msgid "Unified strategic analysis"
+msgstr "Análisis estratégico unificado"
+
+msgid "Predictive operational AI"
+msgstr "IA operativa predictiva"
+
+msgid "Total strategic control"
+msgstr "Control estratégico total"
+
+msgid "TECHNICAL PERSONNEL"
+msgstr "PERSONAL TÉCNICO"
+
+msgid "Individual analysis"
+msgstr "Análisis individual"
+
+msgid "DOC ENGINE"
+msgstr "MOTOR DE DOCUMENTOS"
+
+msgid "Digital Workflow"
+msgstr "Flujo de Trabajo Digital"
+
+msgid "AI document management"
+msgstr "Gestión de documentos con IA"
+
+msgid "CLIENT MATRIX"
+msgstr "MATRIZ DE CLIENTES"
+
+msgid "360° Database"
+msgstr "Base de Datos 360°"
+
+msgid "Relational ecosystem"
+msgstr "Ecosistema relacional"
+
+msgid "FLEET CMD"
+msgstr "COMANDO DE FLOTA"
+
+msgid "Vehicle Control"
+msgstr "Control de Vehículos"
+
+msgid "Smart vehicle system"
+msgstr "Sistema inteligente de vehículos"
+
+msgid "PARTS"
+msgstr "REPUESTOS"
+
+msgid "Parts Management"
+msgstr "Gestión de Repuestos"
+
+msgid "Parts inventory"
+msgstr "Inventario de repuestos"
+
+msgid "SERVICE CORE"
+msgstr "NÚCLEO DE SERVICIOS"
+
+msgid "Service Center"
+msgstr "Centro de Servicios"
+
+msgid "Service management"
+msgstr "Gestión de servicios"
+
+msgid "SYSTEM CORE"
+msgstr "NÚCLEO DEL SISTEMA"
+
+msgid "Settings Center"
+msgstr "Centro de Configuración"
+
+msgid "Advanced configuration"
+msgstr "Configuración avanzada"
+
+msgid "USA TEMPLATE - FIXED URL"
+msgstr "PLANTILLA USA - URL CORREGIDA"
+
+msgid "SMART MOSAIC - WINDOWS STYLE"
+msgstr "MOSAICO INTELIGENTE - ESTILO WINDOWS"
+
+msgid "OPERATIONAL INCOME"
+msgstr "INGRESOS OPERACIONALES"
+
+msgid "TOP SERVICES"
+msgstr "SERVICIOS PRINCIPALES"
+
+msgid "DOCS TODAY"
+msgstr "DOCUMENTOS HOY"
+
+msgid "Today's documents"
+msgstr "Documentos de hoy"
+
+msgid "CUSTOMERS"
+msgstr "CLIENTES"
+
+msgid "Current week"
+msgstr "Semana actual"
+
+msgid "TECHNICIAN PRODUCTIVITY"
+msgstr "PRODUCTIVIDAD DE TÉCNICOS"
+
+msgid "OPERATIONAL METRICS"
+msgstr "MÉTRICAS OPERACIONALES"
+
+msgid "Today's revenue"
+msgstr "Ingresos de hoy"
+
+msgid "Orders in Process"
+msgstr "Órdenes en Proceso"
+
+msgid "EFFICIENCY METRICS"
+msgstr "MÉTRICAS DE EFICIENCIA"
+
+msgid "Projected Revenue"
+msgstr "Ingresos Proyectados"
+
+msgid "SERVICES"
+msgstr "SERVICIOS"
+
+msgid "VEHICLES"
+msgstr "VEHÍCULOS"
+
+msgid "SETTINGS"
+msgstr "CONFIGURACIÓN"
+
+msgid "CENTER"
+msgstr "CENTRO"
+
+msgid "CLIENTS"
+msgstr "CLIENTES"
+
+msgid "DOCUMENTS"
+msgstr "DOCUMENTOS"
+
+msgid "LOGOUT"
+msgstr "CERRAR SESIÓN"
+
+msgid "AJUSTES"
+msgstr "CONFIGURACIÓN"
+
+msgid "SALIR"
+msgstr "CERRAR SESIÓN"
+
+msgid "EXTRA"
+msgstr "EXTRA"
+
+# Nav bar (respects language switch)
+msgid "Settings"
+msgstr "Ajustes"
+
+msgid "Center"
+msgstr "Centro"
+
+msgid "Clients"
+msgstr "Clientes"
+
+msgid "Documents"
+msgstr "Documentos"
+
+msgid "Extra"
+msgstr "Extra"
+
+msgid "Parts"
+msgstr "Repuestos"
+
+msgid "Reports"
+msgstr "Reportes"
+
+msgid "Services"
+msgstr "Servicios"
+
+msgid "Disassembly"
+msgstr "Desarme"
+
+msgid "Vehicles"
+msgstr "Vehículos"
+
+msgid "Logout"
+msgstr "Salir"
+
+msgid "Used Parts"
+msgstr "Piezas Usadas"
+
+msgid "from disassembly yard"
+msgstr "de yarda de desarme"
+
+msgid "Search by code or name..."
+msgstr "Buscar por código o nombre..."
+
+msgid "No used parts found"
+msgstr "No se encontraron piezas usadas"
+
+msgid "Stock"
+msgstr "Stock"
+
+msgid "MISSION COMMAND PANEL"
+msgstr "PANEL DE COMANDO DE MISIÓN"
+
+msgid "EFFICIENCY"
+msgstr "EFICIENCIA"
+
+msgid "SYSTEM"
+msgstr "SISTEMA"
+
+msgid "ONLINE"
+msgstr "EN LÍNEA"
+
+msgid "All modules"
+msgstr "Todos los módulos"
+
+msgid "Conversion Rate"
+msgstr "Tasa de Conversión"
+
+msgid "DOCS WEEK"
+msgstr "DOCS SEMANA"
+
+msgid "Last 7 days"
+msgstr "Últimos 7 días"
+
+msgid "SALES TODAY"
+msgstr "VENTAS HOY"
+
+msgid "MONTH SALES"
+msgstr "VENTAS DEL MES"
+
+msgid "This month"
+msgstr "Este mes"
+
+msgid "ACTIVE CLIENTS"
+msgstr "CLIENTES ACTIVOS"
+
+msgid "Total clients"
+msgstr "Total de clientes"
+
+msgid "NEW CLIENTS"
+msgstr "NUEVOS CLIENTES"
+
+msgid "TECHNICIANS"
+msgstr "TÉCNICOS"
+
+msgid "Active"
+msgstr "Activos"
+
+msgid "DOCUMENT STATUS"
+msgstr "ESTADO DE DOCUMENTOS"
+
+msgid "Pending Quotes"
+msgstr "Presupuestos Pendientes"
+
+msgid "Month Invoices"
+msgstr "Facturas del Mes"
+
+msgid "Average Ticket"
+msgstr "Ticket Promedio"
+
+msgid "Brands Served"
+msgstr "Marcas Atendidas"
+
+msgid "AI PROJECTIONS"
+msgstr "PROYECCIONES IA"
+
+msgid "Projected Docs/Month"
+msgstr "Docs Proyectados/Mes"
+
+msgid "No service data"
+msgstr "Sin datos de servicios"
+
+msgid "TOP TECHNICIANS"
+msgstr "TOP TÉCNICOS"
+
+msgid "No technician data"
+msgstr "Sin datos de técnicos"
+
+msgid "ALERTS & OPPORTUNITIES"
+msgstr "ALERTAS Y OPORTUNIDADES"
+
+msgid "Salesperson"
+msgstr "Vendedor"
+
+msgid "Part Sale"
+msgstr "Venta de Repuestos"
+
+msgid "Advanced vehicle management system"
+msgstr "Sistema avanzado de gestión de vehículos"
+
+# Document form - formulario de documentos
+msgid "CREATE DOCUMENT"
+msgstr "CREAR DOCUMENTO"
+
+msgid "EDIT DOCUMENT"
+msgstr "EDITAR DOCUMENTO"
+
+msgid "Save Document"
+msgstr "Guardar Documento"
+
+msgid "Back"
+msgstr "Volver"
+
+msgid "Back to List"
+msgstr "Volver a la Lista"
+
+msgid "Document"
+msgstr "Documento"
+
+msgid "Document No."
+msgstr "Documento N°"
+
+msgid "Document Type"
+msgstr "Tipo de Documento"
+
+msgid "Will be generated automatically"
+msgstr "Se generará automáticamente"
+
+msgid "Document Management"
+msgstr "Gestión de Documento"
+
+msgid "Document Form"
+msgstr "Formulario de Documento"
+
+msgid "Document Information"
+msgstr "Información del Documento"
+
+msgid "This is the base template for documents. Specific content should be defined in the 'documento_content' block."
+msgstr "Este es el template base para documentos. El contenido específico debe ser definido en el bloque 'documento_content'."
+
+msgid "View Document"
+msgstr "Ver Documento"
+
+msgid "User"
+msgstr "Usuario"
+
+msgid "Please select a customer before continuing."
+msgstr "Por favor seleccione un cliente antes de continuar."
+
+msgid "Validation errors"
+msgstr "Errores de validación"
+
+msgid "Date"
+msgstr "Fecha"
+
+msgid "Payment Status"
+msgstr "Estado de Pago"
+
+msgid "Operation"
+msgstr "Operación"
+
+msgid "Part sale only"
+msgstr "Solo venta de repuestos"
+
+msgid "CLIENT"
+msgstr "CLIENTE"
+
+msgid "New client"
+msgstr "Nuevo cliente"
+
+msgid "Select client..."
+msgstr "Seleccionar cliente..."
+
+msgid "VEHICLE"
+msgstr "VEHÍCULO"
+
+msgid "Kilometraje"
+msgstr "Kilometraje"
+
+msgid "Mileage"
+msgstr "Kilometraje"
+
+msgid "USED PARTS"
+msgstr "PIEZAS USADAS"
+
+msgid "ADD"
+msgstr "AGREGAR"
+
+msgid "Used"
+msgstr "Usado"
+
+msgid "Code"
+msgstr "Código"
+
+msgid "Part name"
+msgstr "Nombre de repuesto"
+
+msgid "Qty"
+msgstr "Cant."
+
+msgid "Price"
+msgstr "Precio"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "OTHER SERVICES"
+msgstr "OTROS SERVICIOS"
+
+msgid "NOTES"
+msgstr "NOTAS"
+
+msgid "DOCUMENT TOTALS"
+msgstr "TOTALES DEL DOCUMENTO"
+
+msgid "Apply all taxes"
+msgstr "Aplicar todos los impuestos"
+
+msgid "Other"
+msgstr "Otros"
+
+msgid "TOTAL"
+msgstr "TOTAL"
+
+msgid "Search client"
+msgstr "Buscar cliente"
+
+msgid "Type at least 2 characters to search"
+msgstr "Escriba al menos 2 caracteres para buscar"
+
+msgid "Close"
+msgstr "Cerrar"
+
+msgid "Searching..."
+msgstr "Buscando..."
+
+msgid "Server error"
+msgstr "Error del servidor"
+
+msgid "Document paid"
+msgstr "Documento pagado"
+
+msgid "Document Type is required"
+msgstr "El tipo de documento es obligatorio"
+
+msgid "Service"
+msgstr "Servicio"
+
+msgid "Click + Add to add services, then type to search."
+msgstr "Haz clic en + Agregar para añadir servicios, luego escribe para buscar."
+
+msgid "Click + Add for external/outsourced services."
+msgstr "Haz clic en + Agregar para servicios externos."
+
+msgid "Auto-saved"
+msgstr "Guardado automático"
+
+# ---------------------------------------------------------------------------
+# Workspace UI 2.0 — Terminología por producto (claves semánticas)
+# ---------------------------------------------------------------------------
+
+# -- Taller: marca --
+msgid "workspace.taller.brand.name"
+msgstr "eGarage Taller"
+
+msgid "workspace.taller.brand.tagline"
+msgstr "Gestión integral de tu taller"
+
+# -- Taller: navegación --
+msgid "workspace.taller.nav.home"
+msgstr "Inicio"
+
+msgid "workspace.taller.nav.documents"
+msgstr "Presupuestos/OT"
+
+msgid "workspace.taller.nav.vehicles"
+msgstr "Vehículos"
+
+msgid "workspace.taller.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.taller.nav.services"
+msgstr "Servicios"
+
+msgid "workspace.taller.nav.parts"
+msgstr "Repuestos"
+
+msgid "workspace.taller.nav.fleet"
+msgstr "Flota"
+
+msgid "workspace.taller.nav.reports"
+msgstr "Reportes"
+
+msgid "workspace.taller.nav.settings"
+msgstr "Configuración"
+
+# -- Taller: acciones --
+msgid "workspace.taller.action.new_document"
+msgstr "Nueva OT"
+
+msgid "workspace.taller.action.new_vehicle"
+msgstr "Nuevo Vehículo"
+
+msgid "workspace.taller.action.new_client"
+msgstr "Nuevo Cliente"
+
+# -- Desarmaduría: marca --
+msgid "workspace.desarm.brand.name"
+msgstr "eGarage Desarmaduría"
+
+msgid "workspace.desarm.brand.tagline"
+msgstr "Control total de tu desarmaduría"
+
+# -- Desarmaduría: navegación --
+msgid "workspace.desarm.nav.home"
+msgstr "Inicio"
+
+msgid "workspace.desarm.nav.vehicles"
+msgstr "Vehículos de Desarme"
+
+msgid "workspace.desarm.nav.parts"
+msgstr "Inventario de desarme"
+
+msgid "workspace.desarm.nav.documents"
+msgstr "Ventas de desarme"
+
+msgid "workspace.desarm.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.desarm.nav.reports"
+msgstr "Reportes"
+
+msgid "workspace.desarm.nav.settings"
+msgstr "Configuración"
+
+# -- Desarmaduría: acciones --
+msgid "workspace.desarm.action.new_vehicle"
+msgstr "Ingresar Vehículo"
+
+msgid "workspace.desarm.action.new_sale"
+msgstr "Registrar Venta"
+
+msgid "workspace.desarm.action.view_inventory"
+msgstr "Ver Inventario"
+
+# -- Casa de Repuestos: marca --
+msgid "workspace.parts.brand.name"
+msgstr "eGarage Casa de repuestos"
+
+msgid "workspace.parts.brand.tagline"
+msgstr "Tu casa de repuestos digitalizada"
+
+# -- Casa de Repuestos: navegación --
+msgid "workspace.parts.nav.home"
+msgstr "Inicio"
+
+msgid "workspace.parts.nav.parts"
+msgstr "Inventario de repuestos"
+
+msgid "workspace.parts.nav.documents"
+msgstr "Ventas de repuestos"
+
+msgid "workspace.parts.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.parts.nav.reports"
+msgstr "Reportes"
+
+msgid "workspace.parts.nav.settings"
+msgstr "Configuración"
+
+# -- Casa de Repuestos: acciones --
+msgid "workspace.parts.action.new_sale"
+msgstr "Nueva Venta"
+
+msgid "workspace.parts.action.new_quote"
+msgstr "Nueva Cotización"
+
+msgid "workspace.parts.action.new_parts_sale"
+msgstr "Nueva Venta"
+
+msgid "workspace.parts.action.add_part"
+msgstr "Agregar Repuesto"
+
+msgid "workspace.parts.action.view_inventory"
+msgstr "Ver Inventario"
+
+# -- Reciclaje: marca --
+msgid "workspace.recycling.brand.name"
+msgstr "eGarage Reciclaje"
+
+msgid "workspace.recycling.brand.tagline"
+msgstr "Compra y control de catalíticos, chatarra y metales"
+
+# -- Reciclaje: navegación --
+msgid "workspace.recycling.nav.home"
+msgstr "Inicio"
+
+msgid "workspace.recycling.nav.purchases"
+msgstr "Compras"
+
+msgid "workspace.recycling.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.recycling.nav.reports"
+msgstr "Reportes"
+
+msgid "workspace.recycling.nav.settings"
+msgstr "Configuración"
+
+# -- Reciclaje: acciones --
+msgid "workspace.recycling.action.new_purchase"
+msgstr "Nueva Compra"
+
+msgid "workspace.recycling.action.view_stock"
+msgstr "Ver Stock"
+
+msgid "workspace.recycling.action.view_reports"
+msgstr "Reportes"
+
+# -- Carwash: marca --
+msgid "workspace.carwash.brand.name"
+msgstr "eGarage Carwash"
+
+msgid "workspace.carwash.brand.tagline"
+msgstr "Gestión simple para tu carwash"
+
+# -- Carwash: navegación --
+msgid "workspace.carwash.nav.home"
+msgstr "Inicio"
+
+msgid "workspace.carwash.nav.documents"
+msgstr "Caja"
+
+msgid "workspace.carwash.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.carwash.nav.services"
+msgstr "Servicios"
+
+msgid "workspace.carwash.nav.reports"
+msgstr "Reportes"
+
+msgid "workspace.carwash.nav.settings"
+msgstr "Configuración"
+
+# -- Carwash: acciones --
+msgid "workspace.carwash.action.new_service"
+msgstr "Registrar Servicio"
+
+msgid "workspace.carwash.action.new_client"
+msgstr "Nuevo Cliente"
+
+# -- Textos contextuales de UI (workspace.texts) --
+msgid "workspace.taller.texts.search_title"
+msgstr "Buscar vehículo o cliente"
+
+msgid "workspace.taller.texts.search_label"
+msgstr "Vehículo o cliente"
+
+msgid "workspace.taller.texts.search_placeholder"
+msgstr "Busca patente, VIN, nombre, teléfono o correo"
+
+msgid "workspace.taller.texts.search_hint"
+msgstr "la acción que más vas a usar, todo el día"
+
+msgid "workspace.taller.texts.live_title"
+msgstr "centro de mando"
+
+msgid "workspace.taller.texts.live_metric"
+msgstr "en el taller"
+
+msgid "workspace.taller.texts.quick_actions"
+msgstr "Accesos rápidos"
+
+msgid "workspace.taller.texts.activity_feed"
+msgstr "Actividad reciente"
+
+msgid "workspace.desarm.texts.search_title"
+msgstr "Buscar vehículo de desarme"
+
+msgid "workspace.desarm.texts.search_label"
+msgstr "Vehículo o pieza"
+
+msgid "workspace.desarm.texts.search_placeholder"
+msgstr "Busca patente, marca, modelo o número de pieza"
+
+msgid "workspace.desarm.texts.search_hint"
+msgstr "localiza cada vehículo o pieza al instante"
+
+msgid "workspace.desarm.texts.live_title"
+msgstr "centro de mando"
+
+msgid "workspace.desarm.texts.live_metric"
+msgstr "vehículos en desarme"
+
+msgid "workspace.desarm.texts.quick_actions"
+msgstr "Accesos rápidos"
+
+msgid "workspace.desarm.texts.activity_feed"
+msgstr "Movimientos recientes"
+
+msgid "workspace.parts.texts.search_title"
+msgstr "Buscar repuesto"
+
+msgid "workspace.parts.texts.search_label"
+msgstr "Repuesto o cliente"
+
+msgid "workspace.parts.texts.search_placeholder"
+msgstr "Busca por código, SKU, nombre o proveedor"
+
+msgid "workspace.parts.texts.search_hint"
+msgstr "tu inventario en tiempo real"
+
+msgid "workspace.parts.texts.live_title"
+msgstr "centro de operaciones"
+
+msgid "workspace.parts.texts.live_metric"
+msgstr "productos críticos"
+
+msgid "workspace.parts.texts.quick_actions"
+msgstr "Acciones rápidas"
+
+msgid "workspace.parts.texts.activity_feed"
+msgstr "Movimientos recientes"
+
+msgid "workspace.carwash.texts.search_title"
+msgstr "Buscar cliente o vehículo"
+
+msgid "workspace.carwash.texts.search_label"
+msgstr "Cliente o vehículo"
+
+msgid "workspace.carwash.texts.search_placeholder"
+msgstr "Busca nombre, patente, teléfono"
+
+msgid "workspace.carwash.texts.search_hint"
+msgstr "registra servicios al instante"
+
+msgid "workspace.carwash.texts.live_title"
+msgstr "caja del día"
+
+msgid "workspace.carwash.texts.live_metric"
+msgstr "servicios hoy"
+
+msgid "workspace.carwash.texts.quick_actions"
+msgstr "Servicios rápidos"
+
+msgid "workspace.carwash.texts.activity_feed"
+msgstr "Servicios del día"
+
+# -- Grúas y asistencia vial --
+msgid "workspace.towing.brand.name"
+msgstr "eGarage Grúas"
+
+msgid "workspace.towing.brand.tagline"
+msgstr "Despacho, traslado y cobranza de asistencia vial"
+
+msgid "workspace.towing.nav.home"
+msgstr "Inicio"
+
+msgid "workspace.towing.nav.orders"
+msgstr "Órdenes de traslado"
+
+msgid "workspace.towing.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.towing.nav.documents"
+msgstr "Documentos"
+
+msgid "workspace.towing.nav.reports"
+msgstr "Reportes"
+
+msgid "workspace.towing.nav.settings"
+msgstr "Configuración"
+
+msgid "workspace.towing.texts.search_title"
+msgstr "Buscar orden o cliente"
+
+msgid "workspace.towing.texts.search_label"
+msgstr "Orden o cliente"
+
+msgid "workspace.towing.texts.search_placeholder"
+msgstr "Busca número de orden, patente o cliente"
+
+msgid "workspace.towing.texts.search_hint"
+msgstr "coordina tus traslados en tiempo real"
+
+msgid "workspace.towing.texts.live_title"
+msgstr "despacho en vivo"
+
+msgid "workspace.towing.texts.live_metric"
+msgstr "traslados hoy"
+
+msgid "workspace.towing.texts.quick_actions"
+msgstr "Acciones rápidas"
+
+msgid "workspace.towing.texts.activity_feed"
+msgstr "Actividad reciente"
+
+msgid "workspace.recycling.texts.search_title"
+msgstr "Buscar catalítico"
+
+msgid "workspace.recycling.texts.search_label"
+msgstr "Código, marca o modelo"
+
+msgid "workspace.recycling.texts.search_placeholder"
+msgstr "Busca por código, marca o modelo"
+
+msgid "workspace.recycling.texts.search_hint"
+msgstr "tu catálogo de catalíticos y chatarra"
+
+msgid "workspace.recycling.texts.live_title"
+msgstr "centro de reciclaje"
+
+msgid "workspace.recycling.texts.live_metric"
+msgstr "chatarra bajo stock mínimo"
+
+msgid "workspace.recycling.texts.quick_actions"
+msgstr "Acciones rápidas"
+
+msgid "workspace.recycling.texts.activity_feed"
+msgstr "Compras recientes"
+
+# -- Títulos de widgets (dashboard_service) --
+msgid "OT Abiertas"
+msgstr "OT Abiertas"
+
+msgid "Documentos hoy"
+msgstr "Documentos hoy"
+
+msgid "Ventas del día"
+msgstr "Ventas del día"
+
+msgid "Clientes este mes"
+msgstr "Clientes este mes"
+
+msgid "Stock crítico"
+msgstr "Stock crítico"
+
+msgid "Vehículos disponibles"
+msgstr "Vehículos disponibles"
+
+msgid "Valor inventario"
+msgstr "Valor inventario"
+
+msgid "Servicios hoy"
+msgstr "Servicios hoy"
+
+msgid "Vehículos agotados"
+msgstr "Vehículos agotados"
+
+msgid "Piezas vendidas hoy"
+msgstr "Piezas vendidas hoy"
+
+msgid "Piezas inventariadas"
+msgstr "Piezas inventariadas"

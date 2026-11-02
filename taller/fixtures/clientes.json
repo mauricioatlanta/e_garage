@@ -1,0 +1,14 @@
+[
+  {
+    "fields": {
+      "activo": true,
+      "apellido": "P\u00e9rez",
+      "correo": "juanperez@example.com",
+      "direccion": "Av. Siempre Viva 123",
+      "nombre": "Juan",
+      "telefono": "912345678"
+    },
+    "model": "taller.cliente",
+    "pk": 1
+  }
+]

@@ -1,0 +1,55 @@
+{% extends "commerce/base.html" %}
+{% load humanize %}
+
+{% block title %}
+  {% if query %}Búsqueda: "{{ query }}"{% else %}Buscar{% endif %} — {{ brand.brand_name }}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <h1 class="text-2xl font-bold text-gray-900 mb-2">
+    {% if query %}
+      Resultados para <span class="text-blue-600">"{{ query }}"</span>
+    {% else %}
+      Buscar productos
+    {% endif %}
+  </h1>
+
+  <!-- Búsqueda secundaria -->
+  <form action="{% url 'commerce:search' %}" method="get" class="mb-8 max-w-lg">
+    <div class="flex gap-2">
+      <input type="search" name="q" value="{{ query }}"
+             placeholder="SKU, nombre, número de parte..."
+             class="flex-1 rounded-lg border border-gray-300 py-2.5 px-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+      <button type="submit"
+              class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors">
+        Buscar
+      </button>
+    </div>
+  </form>
+
+  <!-- Resultados -->
+  {% if query %}
+    {% if results %}
+    <p class="text-sm text-gray-500 mb-6">{{ results|length }} resultado{% if results|length != 1 %}s{% endif %} encontrado{% if results|length != 1 %}s{% endif %}</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+      {% for product in results %}
+      {% include "commerce/components/product_card.html" %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-20">
+      <p class="text-lg text-gray-500">No encontramos resultados para <strong>"{{ query }}"</strong>.</p>
+      <p class="text-sm text-gray-400 mt-2">Intenta con el número de parte, SKU o nombre del producto.</p>
+      <a href="{% url 'commerce:home' %}" class="mt-6 inline-block text-blue-600 hover:underline text-sm">
+        Ver todo el catálogo
+      </a>
+    </div>
+    {% endif %}
+  {% else %}
+  <p class="text-gray-400 text-sm">Ingresa un término para buscar en el catálogo.</p>
+  {% endif %}
+
+</div>
+{% endblock %}

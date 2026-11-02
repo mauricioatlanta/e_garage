@@ -1,0 +1,281 @@
+"""
+Modelo VehiculoDesarme: vehículos comprados por el taller para desarme.
+Entidad separada de Vehiculo (cliente/reparación).
+"""
+
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import Q
+
+from core.models import TenantScoped
+
+from .extras_vehiculo import (
+    CajaVehiculo,
+    CajaVehiculoEmpresa,
+    ColorVehiculo,
+    MotorVehiculo,
+    MotorVehiculoEmpresa,
+)
+from .marca import Marca
+from .modelo import Modelo
+
+class EstadoOperativo(models.TextChoices):
+    INGRESADO       = "INGRESADO",       "Ingresado"
+    EN_REVISION     = "EN_REVISION",     "En revisión"
+    EN_PROCESAMIENTO = "EN_PROCESAMIENTO", "En procesamiento"
+    EN_CIERRE       = "EN_CIERRE",       "En cierre"
+    CERRADO         = "CERRADO",         "Cerrado"
+
+
+ESTADO_DESARME_CHOICES = [
+    ("INGRESADO", "Ingresado"),
+    ("DESARMANDO", "Desarmando"),
+    ("DESARMADO", "Desarmado"),
+    ("AGOTADO", "Agotado"),
+    ("RECUPERADO", "Recuperado"),
+    ("CERRADO", "Cerrado"),
+    ("BAJA", "Baja"),
+]
+
+TIPO_CARROCERIA_CHOICES = [
+    ("sedan", "Sedán"),
+    ("suv", "SUV"),
+    ("pickup", "Pickup"),
+    ("hatchback", "Hatchback"),
+    ("coupe", "Coupé"),
+    ("station_wagon", "Station Wagon"),
+    ("van", "Van"),
+    ("minivan", "Minivan"),
+    ("convertible", "Convertible"),
+    ("crossover", "Crossover"),
+    ("compacto", "Compacto"),
+    ("utilitario", "Utilitario"),
+    ("camion", "Camión"),
+    ("moto", "Motocicleta"),
+    ("otro", "Otro"),
+]
+
+
+class VehiculoDesarme(TenantScoped):
+    """
+    Vehículo comprado por el taller para desarme.
+    Solo para flujo inventario/compra/despiece; no para reparación.
+    """
+
+    # Campo temporal de migración: ID del Vehiculo origen (mapeo por ID).
+    vehiculo_origen_id = models.IntegerField(
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="ID del Vehiculo origen (solo para migración; null en registros nuevos).",
+    )
+
+    # Identificación (espejo de Vehiculo para desarme)
+    marca = models.ForeignKey(
+        Marca,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="Marca del vehículo (Chile: FK; USA: usar marca_texto).",
+    )
+    marca_texto = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Marca como texto (USA catálogo global).",
+    )
+    modelo = models.ForeignKey(
+        Modelo,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="Modelo del vehículo (Chile: FK; USA: usar modelo_texto).",
+    )
+    modelo_texto = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+        help_text="Modelo como texto (USA catálogo global).",
+    )
+    patente = models.CharField(
+        max_length=20,
+        db_index=True,
+        blank=True,
+        default="",
+        help_text="Patente o placa; vacío si solo VIN.",
+    )
+    anio = models.PositiveIntegerField(
+        verbose_name="Año",
+        null=True,
+        blank=True,
+        help_text="No inventar valores; copiar tal cual del origen.",
+    )
+    color = models.ForeignKey(
+        ColorVehiculo,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    vin = models.CharField(max_length=50, blank=True, null=True, db_index=True)
+    motor = models.ForeignKey(
+        MotorVehiculo,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    caja = models.ForeignKey(
+        CajaVehiculo,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    motor_empresa = models.ForeignKey(
+        MotorVehiculoEmpresa,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vehiculos_desarme",
+        verbose_name="Motor privado",
+    )
+    caja_empresa = models.ForeignKey(
+        CajaVehiculoEmpresa,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vehiculos_desarme",
+        verbose_name="Caja privada",
+    )
+    millas = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name="Millas/Kilometraje",
+    )
+
+    # Campos de desarme
+    costo_adquisicion = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    fecha_ingreso_desarme = models.DateField(null=True, blank=True)
+    estado_desarme = models.CharField(
+        max_length=20,
+        choices=ESTADO_DESARME_CHOICES,
+        null=True,
+        blank=True,
+    )
+    estado_operativo = models.CharField(
+        max_length=24,
+        choices=EstadoOperativo.choices,
+        default=EstadoOperativo.INGRESADO,
+        db_index=True,
+        help_text=(
+            "Estado operacional del ciclo de vida del vehículo. "
+            "Independiente del campo legacy estado_desarme. "
+            "Alimenta el Centro de Operaciones."
+        ),
+    )
+    ubicacion_fisica = models.CharField(
+        max_length=120,
+        null=True,
+        blank=True,
+        help_text="Ubicación en la yarda (ej: fila 3, posición 12).",
+    )
+    fecha_baja_desarme = models.DateField(null=True, blank=True)
+    observaciones_desarme = models.TextField(blank=True, null=True)
+
+    # Campos para paridad con Vehiculo(tipo_uso=DESARME)
+    es_placeholder = models.BooleanField(
+        default=False,
+        help_text="True cuando se creó para agrupar una pieza suelta sin vehículo real.",
+    )
+    tipo_carroceria = models.CharField(
+        max_length=20,
+        choices=TIPO_CARROCERIA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Tipo de carrocería",
+    )
+    numero_puertas = models.PositiveSmallIntegerField(
+        verbose_name="Número de puertas",
+        default=4,
+        choices=[
+            (2, "2 Puertas / Cabina Simple"),
+            (3, "3 Puertas / Portón"),
+            (4, "4 Puertas / Doble Cabina"),
+            (5, "5 Puertas"),
+        ],
+        help_text="Define la silueta visual y las opciones de carrocería en el mapa visual.",
+    )
+    precio_compra = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    monto_chatarra = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    transporte_grua_desarme = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Costo transporte/grúa",
+    )
+    otros_gastos_desarme = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    vendedor_desarme = models.ForeignKey(
+        "taller.VendedorDesarme",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vehiculos_en_desarme",
+        verbose_name="Vendedor / comprado a",
+    )
+
+    def __str__(self):
+        marca_str = self.get_marca_display()
+        modelo_str = self.get_modelo_display()
+        ident = self.patente or self.vin or f"ID {self.pk}"
+        return f"{ident} - {marca_str} {modelo_str}".strip()
+
+    def get_marca_display(self):
+        if self.marca_texto:
+            return self.marca_texto
+        if self.marca:
+            return str(self.marca)
+        return "Sin marca"
+
+    def get_modelo_display(self):
+        if self.modelo_texto:
+            return self.modelo_texto
+        if self.modelo:
+            return str(self.modelo)
+        return "Sin modelo"
+
+    def clean(self):
+        super().clean()
+        if not (self.patente and str(self.patente).strip()) and not (
+            self.vin and str(self.vin).strip()
+        ):
+            raise ValidationError("Debe registrar al menos VIN o Patente.")
+
+    class Meta(TenantScoped.Meta):
+        ordering = ["-fecha_ingreso_desarme", "-id"]
+        verbose_name = "Vehículo de desarme"
+        verbose_name_plural = "Vehículos de desarme"
+        indexes = [
+            models.Index(fields=["empresa"]),
+            models.Index(fields=["empresa", "estado_desarme"]),
+            models.Index(fields=["empresa", "estado_operativo"]),
+            models.Index(fields=["vehiculo_origen_id"]),
+        ]

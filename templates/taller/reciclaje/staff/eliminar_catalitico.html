@@ -1,0 +1,25 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load country_url %}
+
+{% block page_title %}Eliminar {{ catalitico.codigo }}{% endblock %}
+{% block page_icon %}🗑️{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .rec-card { background: rgba(0,0,0,0.7); border: 1px solid rgba(239,68,68,0.4); border-radius: 10px; padding: 20px; max-width: 480px; }
+  .rec-btn-danger { background: #ef4444; color: #fff; font-weight: bold; border: none; border-radius: 8px; padding: 0.6rem 1.5rem; cursor: pointer; }
+  .rec-btn-cancel { color: #9ca3af; margin-left: 1rem; text-decoration: none; }
+</style>
+{% endblock %}
+
+{% block panel_content %}
+<div class="rec-card">
+  <p>¿Eliminar el catalítico <strong>{{ catalitico.codigo }}</strong> ({{ catalitico.nombre }})?</p>
+  <p style="color:#9ca3af;font-size:0.85rem;">No se puede deshacer. Si tiene compras o ventas registradas, no podrá eliminarse.</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="rec-btn-danger">Eliminar</button>
+    <a href="{% country_url 'reciclaje_staff:resumen_stock' %}" class="rec-btn-cancel">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

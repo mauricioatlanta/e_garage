@@ -1,0 +1,16 @@
+{# Uso: incluye y pasa explícitamente si quieres sobreescribir: with country=... #}
+{% with c=country|default:"CL" %}
+  {% if c == "US" %}
+    <span class="inline-flex items-center gap-2 px-2 py-1 rounded-md bg-slate-800/60">
+      🇺🇸 <span>USA</span>
+    </span>
+  {% elif c == "CL" %}
+    <span class="inline-flex items-center gap-2 px-2 py-1 rounded-md bg-slate-800/60">
+      🇨🇱 <span>Chile</span>
+    </span>
+  {% else %}
+    <span class="inline-flex items-center gap-2 px-2 py-1 rounded-md bg-slate-800/60">
+      🌐 <span>—</span>
+    </span>
+  {% endif %}
+{% endwith %}

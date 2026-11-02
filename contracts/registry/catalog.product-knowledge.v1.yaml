@@ -1,0 +1,79 @@
+id: catalog.product-knowledge.v1
+display_name: Product Knowledge Contract
+category: Truth
+
+owner: erp.catalog
+publisher: erp.catalog
+write_authority: erp.catalog
+
+message_types:
+
+  - id: catalog.product.changed
+    description: >-
+      Incremental notification emitted when a product is created or modified in ERP.
+      Consumers must re-fetch the full product state; this event does not carry
+      the complete payload. Published via transactional outbox (ADR-002).
+    version: "1.0.0"
+    schema_ref: schemas/catalog.product.changed.schema.json
+    interaction: event
+    transport: queue
+    frequency: near-realtime
+    guarantees:
+      idempotent: true
+      ordered: false
+      consistency: eventual
+      completeness: delta
+      max_staleness: "5m"
+
+  - id: catalog.product.snapshot
+    description: >-
+      Full snapshot of all published products including the attribute schema and
+      publication rules. Used for initial indexing and periodic reconciliation.
+      Consumers that only need reconciliation should subscribe to this type only.
+    version: "1.0.0"
+    schema_ref: schemas/catalog.product.snapshot.schema.json
+    interaction: snapshot
+    transport: queue
+    frequency: batch
+    guarantees:
+      idempotent: true
+      ordered: false
+      consistency: eventual
+      completeness: full-snapshot
+      max_staleness: "24h"
+
+  - id: catalog.product.tombstone
+    description: >-
+      Signals that a product has been permanently deleted from ERP and must be
+      removed from every consumer index. Consumers must not interpret the absence
+      of this event as a guarantee that the product still exists.
+    version: "1.0.0"
+    schema_ref: schemas/catalog.product.tombstone.schema.json
+    interaction: event
+    transport: queue
+    frequency: near-realtime
+    guarantees:
+      idempotent: true
+      ordered: false
+      consistency: eventual
+      completeness: delta
+      max_staleness: "5m"
+
+consumers:
+  - subsystem: commerce.engine
+    message_types:
+      - catalog.product.changed
+      - catalog.product.tombstone
+
+  - subsystem: analytics
+    message_types:
+      - catalog.product.snapshot
+
+version: "1.0.0"
+status: draft
+breaking_change_policy: semver-major
+min_consumer_version: null
+
+pending_decisions:
+  - ADR-001  # Accepted with amendments. Amendments 3 (reference type) and 4 (label i18n) remain open and block Stable.
+  - ADR-002  # Proposed. Publication trigger not yet Accepted.

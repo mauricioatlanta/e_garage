@@ -1,0 +1,228 @@
+{% extends "taller/base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Dashboard de Rentabilidad{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-8 px-4 md:px-8">
+
+  <!-- Encabezado -->
+  <div class="mb-8">
+    <div class="flex items-center gap-3 mb-1">
+      <div class="w-1 h-8 bg-cyan-500 rounded-full"></div>
+      <h1 class="text-2xl font-bold text-cyan-200" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;">
+        Dashboard de Rentabilidad
+      </h1>
+    </div>
+    <p class="text-gray-400 text-sm ml-4 pl-4 border-l border-gray-700">Análisis completo de rentabilidad y servicios subcontratados</p>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+    <div class="resumen-card border-l-4 border-cyan-600/60">
+      <p class="resumen-label">Total Facturado</p>
+      <p class="resumen-value text-cyan-300">{{ total_facturado|formatear_pesos_compacto }}</p>
+    </div>
+    <div class="resumen-card border-l-4 border-red-600/60">
+      <p class="resumen-label">Costos Externos</p>
+      <p class="resumen-value text-red-300">{{ costos_externos|formatear_pesos_compacto }}</p>
+    </div>
+    <div class="resumen-card border-l-4 border-green-600/60">
+      <p class="resumen-label">Ganancia Neta</p>
+      <p class="resumen-value text-green-300">{{ ganancia_neta|formatear_pesos_compacto }}</p>
+    </div>
+    <div class="resumen-card border-l-4 border-amber-600/60">
+      <p class="resumen-label">Margen General</p>
+      <p class="resumen-value text-amber-300">{{ margen_general }}%</p>
+    </div>
+  </div>
+
+  <!-- Gráfico + Métricas clave -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+    <div class="panel-card">
+      <h2 class="panel-title">Distribución de Ingresos</h2>
+      <div style="position: relative; height: 280px;">
+        <canvas id="chartIngresos"></canvas>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <h2 class="panel-title">Métricas Clave</h2>
+      <div class="space-y-3 mt-2">
+
+        <div class="metric-row border-l-4 border-cyan-600/60">
+          <p class="text-xs text-gray-500 uppercase tracking-wider mb-0.5">Servicios Internos</p>
+          <p class="text-white font-semibold">{{ ingresos_internos|formatear_pesos }}</p>
+        </div>
+
+        <div class="metric-row border-l-4 border-blue-600/60">
+          <p class="text-xs text-gray-500 uppercase tracking-wider mb-0.5">Servicios Externos</p>
+          <p class="text-white font-semibold">{{ ingresos_externos|formatear_pesos }}
+            <span class="text-gray-500 text-xs font-normal ml-1">Margen prom. {{ margen_general }}%</span>
+          </p>
+        </div>
+
+        {% if mejor_proveedor %}
+        <div class="metric-row border-l-4 border-green-600/60">
+          <p class="text-xs text-gray-500 uppercase tracking-wider mb-0.5">Mejor Proveedor</p>
+          <p class="text-green-300 font-semibold">{{ mejor_proveedor.empresa_externa }}
+            <span class="text-gray-500 text-xs font-normal ml-1">{{ mejor_proveedor.margen_promedio|floatformat:1 }}% margen</span>
+          </p>
+        </div>
+        {% endif %}
+
+        {% if peor_proveedor %}
+        <div class="metric-row border-l-4 border-amber-600/60">
+          <p class="text-xs text-gray-500 uppercase tracking-wider mb-0.5">Revisar Proveedor</p>
+          <p class="text-amber-300 font-semibold">{{ peor_proveedor.empresa_externa }}
+            <span class="text-gray-500 text-xs font-normal ml-1">{{ peor_proveedor.margen_promedio|floatformat:1 }}% margen</span>
+          </p>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Reportes detallados -->
+  <div class="panel-card">
+    <h2 class="panel-title">Reportes Detallados</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+      <a href="{% url 'reportes:reportes_rentabilidad' %}"
+         class="nav-report-link">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-2 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+        <span class="font-semibold text-gray-200 block">Análisis de Rentabilidad</span>
+        <span class="text-xs text-gray-500 mt-1 block">Rentabilidad por tipo de servicio y proveedor</span>
+      </a>
+      <a href="{% url 'reportes:reporte_comparativo_precios' %}"
+         class="nav-report-link">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-2 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+        </svg>
+        <span class="font-semibold text-gray-200 block">Comparativo de Precios</span>
+        <span class="text-xs text-gray-500 mt-1 block">Precio cliente vs. costo proveedor</span>
+      </a>
+      <a href="{% url 'reportes:reporte_servicios_subcontratados' %}"
+         class="nav-report-link">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span class="font-semibold text-gray-200 block">Servicios Subcontratados</span>
+        <span class="text-xs text-gray-500 mt-1 block">Análisis de servicios externos más frecuentes</span>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<style>
+  .panel-card {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+  }
+  .panel-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(71, 85, 105, 0.4);
+  }
+
+  .resumen-card {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(71, 85, 105, 0.4);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+  }
+  .resumen-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 0.4rem;
+  }
+  .resumen-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    line-height: 1.2;
+  }
+
+  .metric-row {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(71, 85, 105, 0.3);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .nav-report-link {
+    display: block;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(71, 85, 105, 0.4);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .nav-report-link:hover {
+    background: rgba(6, 182, 212, 0.06);
+    border-color: rgba(6, 182, 212, 0.35);
+  }
+</style>
+
+<script>
+new Chart(document.getElementById('chartIngresos').getContext('2d'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Servicios Internos', 'Servicios Externos'],
+    datasets: [{
+      data: [{{ ingresos_internos }}, {{ ingresos_externos }}],
+      backgroundColor: [
+        'rgba(6, 182, 212, 0.7)',
+        'rgba(239, 68, 68, 0.7)',
+      ],
+      borderColor: 'rgba(15, 23, 42, 0.8)',
+      borderWidth: 2,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#94a3b8', font: { size: 13 }, padding: 16 }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+        titleColor: '#94a3b8',
+        bodyColor: '#e2e8f0',
+        borderColor: '#334155',
+        borderWidth: 1,
+        cornerRadius: 6,
+        callbacks: {
+          label: function(context) {
+            const value = context.parsed;
+            const total = {{ total_facturado }};
+            const pct = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+            return context.label + ': $' + value.toLocaleString() + ' (' + pct + '%)';
+          }
+        }
+      }
+    }
+  }
+});
+</script>
+{% endblock %}

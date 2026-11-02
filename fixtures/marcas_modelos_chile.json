@@ -1,0 +1,242 @@
+[
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Audi"
+    },
+    "model": "taller.marca",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "BYD"
+    },
+    "model": "taller.marca",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Changan"
+    },
+    "model": "taller.marca",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Chery"
+    },
+    "model": "taller.marca",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Chevrolet"
+    },
+    "model": "taller.marca",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Citro\u00ebn"
+    },
+    "model": "taller.marca",
+    "pk": 6
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Daihatsu"
+    },
+    "model": "taller.marca",
+    "pk": 7
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Fiat"
+    },
+    "model": "taller.marca",
+    "pk": 8
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Ford"
+    },
+    "model": "taller.marca",
+    "pk": 9
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Great Wall"
+    },
+    "model": "taller.marca",
+    "pk": 10
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Honda"
+    },
+    "model": "taller.marca",
+    "pk": 11
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Hyundai"
+    },
+    "model": "taller.marca",
+    "pk": 12
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Isuzu"
+    },
+    "model": "taller.marca",
+    "pk": 13
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "JAC"
+    },
+    "model": "taller.marca",
+    "pk": 14
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Jeep"
+    },
+    "model": "taller.marca",
+    "pk": 15
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Kia"
+    },
+    "model": "taller.marca",
+    "pk": 16
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Mahindra"
+    },
+    "model": "taller.marca",
+    "pk": 17
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Mazda"
+    },
+    "model": "taller.marca",
+    "pk": 18
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Mercedes-Benz"
+    },
+    "model": "taller.marca",
+    "pk": 19
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "MG"
+    },
+    "model": "taller.marca",
+    "pk": 20
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Mitsubishi"
+    },
+    "model": "taller.marca",
+    "pk": 21
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Nissan"
+    },
+    "model": "taller.marca",
+    "pk": 22
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Opel"
+    },
+    "model": "taller.marca",
+    "pk": 23
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Peugeot"
+    },
+    "model": "taller.marca",
+    "pk": 24
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Renault"
+    },
+    "model": "taller.marca",
+    "pk": 25
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "SsangYong"
+    },
+    "model": "taller.marca",
+    "pk": 26
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Subaru"
+    },
+    "model": "taller.marca",
+    "pk": 27
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Suzuki"
+    },
+    "model": "taller.marca",
+    "pk": 28
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Toyota"
+    },
+    "model": "taller.marca",
+    "pk": 29
+  },
+  {
+    "fields": {
+      "country": "CL",
+      "nombre": "Volkswagen"
+    },
+    "model": "taller.marca",
+    "pk": 30
+  }
+]

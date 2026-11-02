@@ -1,0 +1,5 @@
+
+/* Extra layer for glow or neón borders if needed */
+.group:hover {
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+}

@@ -1,0 +1,223 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n static %}
+{% load country_url %}
+
+{% block page_title %}{% trans "Vehicle Fleet" %}{% endblock %}
+{% block page_subtitle %}{% trans "Advanced vehicle management system" %}{% endblock %}
+{% block page_icon %}🚗{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  /* Vehicle Cards - Compact and Transparent */
+  .vehicle-card {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 10px;
+    padding: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .vehicle-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #a855f7, #ec4899, #3b82f6);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .vehicle-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .vehicle-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(168, 85, 247, 0.6);
+    box-shadow:
+      0 10px 25px rgba(0, 0, 0, 0.3),
+      0 0 20px rgba(168, 85, 247, 0.2);
+  }
+
+  /* Interactive Elements */
+  .interactive-btn {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.2));
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #c084fc;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .interactive-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.3s ease;
+  }
+
+  .interactive-btn:hover::before {
+    left: 100%;
+  }
+
+  .interactive-btn:hover {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(236, 72, 153, 0.4));
+    border-color: rgba(168, 85, 247, 0.8);
+    color: #d8b4fe;
+    transform: translateY(-1px);
+  }
+
+  /* Status Indicators */
+  .status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    position: relative;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .status-active {
+    background: #a855f7;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+  }
+
+  .status-inactive {
+    background: #ff4444;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.2); }
+  }
+
+  /* Futuristic Search */
+  .futuristic-search {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+  }
+
+  .futuristic-search::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(168, 85, 247, 0.05), rgba(236, 72, 153, 0.05));
+    border-radius: 16px;
+    z-index: -1;
+  }
+
+  .search-input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #a855f7;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #a855f7;
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .search-input::placeholder {
+    color: rgba(168, 85, 247, 0.5);
+  }
+
+  /* Grid Layout for Compact Cards */
+  .vehicles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  /* Futuristic Cards */
+  .futuristic-card {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .futuristic-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .futuristic-card:hover::before {
+    left: 100%;
+  }
+
+  .futuristic-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow:
+      0 20px 40px rgba(168, 85, 247, 0.1),
+      0 0 20px rgba(168, 85, 247, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .vehicles-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .vehicle-card {
+      padding: 10px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block main_actions %}
+<a href="{% country_url 'vehiculos:crear_vehiculo' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-sm font-semibold border border-emerald-400/40 shadow-lg shadow-emerald-900/40 transition-all">
+  <span>➕</span>
+  <span>{% trans "Add Vehicle" %}</span>
+</a>
+{% endblock %}
+
+{% block search_bar %}
+  {% include "taller/common/vehiculos/_filters_toolbar.html" %}
+{% endblock %}
+
+{% block panel_content %}
+  {% include "taller/common/vehiculos/_ai_badges.html" %}
+  {% include "taller/common/vehiculos/_table.html" %}
+  {% include "taller/common/vehiculos/_empty_state.html" %}
+  {% include "taller/common/vehiculos/_pagination.html" %}
+{% endblock %}

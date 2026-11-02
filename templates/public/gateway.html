@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>eGarage</title>
+  <meta name="description" content="eGarage — Software de gestión para negocios automotrices en Latinoamérica y Estados Unidos.">
+
+  <link rel="canonical" href="https://egarage.cl/">
+
+  <meta property="og:title" content="eGarage">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="{% static 'images/egarage_icon_512x512.png' %}">
+
+  <link rel="icon" type="image/png" href="{% static 'images/egarage_icon_192x192.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'images/egarage_icon_192x192.png' %}">
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --cyan: #00f5ff;
+      --cyan-rgb: 0,245,255;
+      --blue: #38bdf8;
+      --surface: rgba(4,15,34,.70);
+      --border: rgba(103,232,249,.22);
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #020617;
+      color: var(--text);
+      font-family: "Exo 2", sans-serif;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    .gateway {
+      position: relative;
+      min-height: 100dvh;
+      overflow: hidden;
+      isolation: isolate;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.25rem 1.25rem;
+    }
+
+    /* =========================================================
+       BACKGROUND CINEMATOGRÁFICO MULTICAPA
+       ========================================================= */
+
+    .gw-background {
+      position: absolute;
+      inset: 0;
+      z-index: -10;
+      overflow: hidden;
+      background: #020617;
+    }
+
+    .gw-bg-image {
+      position: absolute;
+      inset: -3%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transform: scale(1.08);
+      filter: saturate(.9) contrast(1.08);
+      animation: bgCycle 24s infinite;
+      will-change: opacity, transform;
+    }
+
+    .gw-bg-1 {
+      background-image: url("{% static 'img/welcome/scenes/taller.webp' %}");
+      animation-delay: 0s;
+    }
+
+    .gw-bg-2 {
+      background-image: url("{% static 'img/welcome/scenes/repuestos.webp' %}");
+      animation-delay: 6s;
+    }
+
+    .gw-bg-3 {
+      background-image: url("{% static 'img/welcome/scenes/desarme.webp' %}");
+      animation-delay: 12s;
+    }
+
+    .gw-bg-4 {
+      background-image: url("{% static 'img/welcome/scenes/carwash.webp' %}");
+      animation-delay: 18s;
+    }
+
+    @keyframes bgCycle {
+      0% {
+        opacity: 0;
+        transform: scale(1.08);
+      }
+
+      6% {
+        opacity: .62;
+      }
+
+      25% {
+        opacity: .62;
+        transform: scale(1.015);
+      }
+
+      31% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(1.08);
+      }
+    }
+
+    .gw-dark-layer {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 28%, rgba(0,245,255,.06), transparent 32%),
+        linear-gradient(
+          180deg,
+          rgba(2,6,23,.84) 0%,
+          rgba(2,6,23,.70) 45%,
+          rgba(2,6,23,.94) 100%
+        );
+      z-index: 2;
+    }
+
+    .gw-grid {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      opacity: .16;
+      background-image:
+        linear-gradient(rgba(var(--cyan-rgb),.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(var(--cyan-rgb),.12) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: linear-gradient(to bottom, transparent 2%, black 42%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 2%, black 42%, transparent 100%);
+      animation: gridMove 18s linear infinite;
+    }
+
+    @keyframes gridMove {
+      from {
+        background-position: 0 0;
+      }
+
+      to {
+        background-position: 54px 54px;
+      }
+    }
+
+    .gw-scanline {
+      position: absolute;
+      z-index: 4;
+      left: 0;
+      right: 0;
+      height: 1px;
+      top: -5%;
+      opacity: .25;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0,245,255,.05),
+        rgba(0,245,255,.8),
+        rgba(0,245,255,.05),
+        transparent
+      );
+      box-shadow: 0 0 18px rgba(0,245,255,.55);
+      animation: scan 8s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes scan {
+      from {
+        top: -4%;
+      }
+
+      to {
+        top: 104%;
+      }
+    }
+
+    .gw-orb {
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: .12;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .gw-orb-a {
+      background: #00e5ff;
+      left: -180px;
+      top: 8%;
+      animation: orbA 11s ease-in-out infinite alternate;
+    }
+
+    .gw-orb-b {
+      background: #2563eb;
+      right: -190px;
+      bottom: -80px;
+      animation: orbB 13s ease-in-out infinite alternate;
+    }
+
+    @keyframes orbA {
+      to {
+        transform: translate(120px, 80px) scale(1.15);
+      }
+    }
+
+    @keyframes orbB {
+      to {
+        transform: translate(-100px, -70px) scale(.9);
+      }
+    }
+
+    /* =========================================================
+       CONTENIDO
+       ========================================================= */
+
+    .gw-content {
+      width: min(100%, 1040px);
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .gw-logo-wrap {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: .65rem;
+      animation: reveal .9s cubic-bezier(.22,.7,.27,1) both;
+    }
+
+    .gw-logo-wrap::before {
+      content: "";
+      position: absolute;
+      width: 230px;
+      height: 90px;
+      border-radius: 50%;
+      background: rgba(0,245,255,.18);
+      filter: blur(46px);
+      animation: logoAura 3.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes logoAura {
+      to {
+        opacity: .55;
+        transform: scale(1.18);
+      }
+    }
+
+    .gw-logo {
+      position: relative;
+      height: clamp(7rem, 12vw, 10.5rem);
+      width: auto;
+      display: block;
+      filter:
+        drop-shadow(0 0 14px rgba(0,245,255,.40))
+        drop-shadow(0 0 44px rgba(0,245,255,.22));
+    }
+
+    .gw-brand-line {
+      width: min(420px, 70vw);
+      height: 1px;
+      margin: 0 auto 1.15rem;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0,245,255,.20),
+        rgba(0,245,255,.85),
+        rgba(0,245,255,.20),
+        transparent
+      );
+      box-shadow: 0 0 16px rgba(0,245,255,.28);
+      animation: lineReveal 1.3s .15s ease-out both;
+    }
+
+    @keyframes lineReveal {
+      from {
+        opacity: 0;
+        transform: scaleX(.15);
+      }
+
+      to {
+        opacity: 1;
+        transform: scaleX(1);
+      }
+    }
+
+    .gw-question {
+      margin: 0 0 1.65rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .6rem;
+      font-family: "Orbitron", monospace;
+      font-size: clamp(.72rem, 1.5vw, .9rem);
+      font-weight: 500;
+      color: #e2e8f0;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      text-align: center;
+      text-shadow: 0 2px 12px rgba(0,0,0,.8);
+      animation: reveal .8s .12s ease-out both;
+    }
+
+    .gw-question-icon {
+      width: 18px;
+      height: 18px;
+      color: var(--cyan);
+      filter: drop-shadow(0 0 8px rgba(0,245,255,.8));
+    }
+
+    .gw-whatsapp {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.7rem;
+      min-height:3.55rem;
+      margin:0 0 1.35rem;
+      padding:.9rem 1.25rem;
+      border-radius:.95rem;
+      background:#25D366;
+      color:#042f18;
+      font-weight:900;
+      text-decoration:none;
+      box-shadow:0 18px 40px rgba(37,211,102,.28), inset 0 0 0 1px rgba(255,255,255,.28);
+      animation: reveal .8s .16s ease-out both;
+      transition:transform .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+
+    .gw-whatsapp:hover {
+      background:#32e374;
+      transform:translateY(-1px);
+      box-shadow:0 22px 48px rgba(37,211,102,.36), inset 0 0 0 1px rgba(255,255,255,.32);
+    }
+
+    .gw-whatsapp svg {
+      width:1.6rem;
+      height:1.6rem;
+      flex:0 0 auto;
+    }
+
+    .gw-whatsapp span {
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      line-height:1.1;
+      text-align:left;
+    }
+
+    .gw-whatsapp strong {
+      font-size:1rem;
+      letter-spacing:0;
+    }
+
+    .gw-whatsapp small {
+      margin-top:.18rem;
+      font-size:.72rem;
+      font-weight:800;
+      color:rgba(4,47,24,.76);
+    }
+
+    /* =========================================================
+       CARDS
+       ========================================================= */
+
+    .gw-cards {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: .9rem;
+      perspective: 1300px;
+    }
+
+    .gw-card {
+      --rx: 0deg;
+      --ry: 0deg;
+
+      min-height: 190px;
+      position: relative;
+      border-radius: 1.35rem;
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(
+          145deg,
+          rgba(15,35,63,.70),
+          rgba(4,12,28,.62)
+        );
+      box-shadow:
+        0 22px 55px rgba(0,0,0,.32),
+        inset 0 1px 0 rgba(255,255,255,.10);
+      backdrop-filter: blur(20px) saturate(145%);
+      -webkit-backdrop-filter: blur(20px) saturate(145%);
+      text-decoration: none;
+      color: white;
+      overflow: hidden;
+      cursor: pointer;
+
+      transform:
+        perspective(1000px)
+        rotateX(var(--rx))
+        rotateY(var(--ry))
+        translateY(0);
+
+      transition:
+        transform .24s ease,
+        border-color .24s ease,
+        box-shadow .24s ease,
+        background .24s ease;
+
+      opacity: 0;
+      animation: cardReveal .65s cubic-bezier(.2,.72,.25,1) forwards;
+    }
+
+    .gw-card:nth-child(1) { animation-delay: .18s; }
+    .gw-card:nth-child(2) { animation-delay: .27s; }
+    .gw-card:nth-child(3) { animation-delay: .36s; }
+    .gw-card:nth-child(4) { animation-delay: .45s; }
+    .gw-card:nth-child(5) { animation-delay: .54s; }
+
+    @keyframes cardReveal {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(.94);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .gw-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        radial-gradient(
+          300px circle at var(--mx, 50%) var(--my, 50%),
+          rgba(0,245,255,.17),
+          transparent 46%
+        );
+      opacity: 0;
+      transition: opacity .3s ease;
+      pointer-events: none;
+    }
+
+    .gw-card::after {
+      content: "";
+      position: absolute;
+      left: -50%;
+      top: -130%;
+      width: 200%;
+      height: 100%;
+      transform: rotate(18deg);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.05),
+        rgba(255,255,255,.22),
+        rgba(255,255,255,.05),
+        transparent
+      );
+      transition: top .65s ease;
+      pointer-events: none;
+    }
+
+    .gw-card:hover {
+      border-color: rgba(103,232,249,.68);
+      background:
+        linear-gradient(
+          145deg,
+          rgba(10,44,72,.85),
+          rgba(3,15,34,.80)
+        );
+      box-shadow:
+        0 30px 70px rgba(0,0,0,.48),
+        0 0 0 1px rgba(0,245,255,.12),
+        0 0 42px rgba(0,245,255,.15),
+        inset 0 1px 0 rgba(255,255,255,.15);
+
+      transform:
+        perspective(1000px)
+        rotateX(var(--rx))
+        rotateY(var(--ry))
+        translateY(-8px)
+        scale(1.025);
+    }
+
+    .gw-card:hover::before {
+      opacity: 1;
+    }
+
+    .gw-card:hover::after {
+      top: 135%;
+    }
+
+    .gw-card-inner {
+      position: relative;
+      z-index: 2;
+      min-height: 190px;
+      padding: 1.5rem 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .gw-flag-shell {
+      width: 76px;
+      height: 76px;
+      border-radius: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: .9rem;
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,.10),
+          rgba(255,255,255,.025)
+        );
+      border: 1px solid rgba(255,255,255,.09);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.12),
+        0 14px 28px rgba(0,0,0,.25);
+      transition:
+        transform .3s ease,
+        box-shadow .3s ease;
+    }
+
+    .gw-card:hover .gw-flag-shell {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.16),
+        0 18px 34px rgba(0,0,0,.30),
+        0 0 24px rgba(0,245,255,.12);
+    }
+
+    .gw-flag {
+      font-size: 2.7rem;
+      line-height: 1;
+      filter: drop-shadow(0 6px 7px rgba(0,0,0,.32));
+    }
+
+    .gw-country {
+      font-family: "Orbitron", monospace;
+      font-size: clamp(.76rem, 1vw, .93rem);
+      font-weight: 700;
+      letter-spacing: .025em;
+      text-align: center;
+      color: #f8fafc;
+      text-shadow: 0 3px 10px rgba(0,0,0,.9);
+    }
+
+    .gw-country-glow {
+      width: 34px;
+      height: 2px;
+      border-radius: 10px;
+      margin-top: .85rem;
+      background: rgba(0,245,255,.68);
+      box-shadow: 0 0 12px rgba(0,245,255,.60);
+      transform: scaleX(.55);
+      transition:
+        transform .28s ease,
+        width .28s ease;
+    }
+
+    .gw-card:hover .gw-country-glow {
+      transform: scaleX(1);
+      width: 68px;
+    }
+
+    /* =========================================================
+       USA / IDIOMA
+       ========================================================= */
+
+    .gw-card-usa {
+      user-select: none;
+    }
+
+    .gw-lang-toggle {
+      margin-top: .75rem;
+      position: relative;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: .2rem;
+      padding: .18rem;
+      border-radius: .65rem;
+      background: rgba(1,5,15,.62);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.45);
+    }
+
+    .gw-lang-btn {
+      min-width: 40px;
+      min-height: 32px;
+      border: 0;
+      border-radius: .48rem;
+      background: transparent;
+      color: #94a3b8;
+      font-family: "Orbitron", monospace;
+      font-size: .66rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      cursor: pointer;
+      transition:
+        background .2s ease,
+        color .2s ease,
+        box-shadow .2s ease;
+    }
+
+    .gw-lang-btn:hover {
+      color: white;
+    }
+
+    .gw-lang-btn.active {
+      color: #e6fdff;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(6,182,212,.34),
+          rgba(8,145,178,.20)
+        );
+      box-shadow:
+        inset 0 0 0 1px rgba(103,232,249,.22),
+        0 0 14px rgba(0,245,255,.15);
+    }
+
+    .gw-lang-btn:focus-visible,
+    .gw-card:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 4px;
+    }
+
+    /* =========================================================
+       DETALLES INFERIORES
+       ========================================================= */
+
+    .gw-footer-mark {
+      margin-top: 1.65rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      color: rgba(203,213,225,.58);
+      font-family: "Orbitron", monospace;
+      font-size: .58rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      animation: reveal .8s .58s ease-out both;
+    }
+
+    .gw-footer-mark::before,
+    .gw-footer-mark::after {
+      content: "";
+      display: block;
+      width: 42px;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(103,232,249,.42)
+      );
+    }
+
+    .gw-footer-mark::after {
+      transform: rotate(180deg);
+    }
+
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 900px) {
+      .gw-cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .gw-card:nth-child(4),
+      .gw-card:nth-child(5) {
+        min-height: 170px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .gateway {
+        align-items: flex-start;
+        padding:
+          max(1.5rem, env(safe-area-inset-top))
+          .85rem
+          2rem;
+      }
+
+      .gw-logo {
+        height: 7rem;
+      }
+
+      .gw-brand-line {
+        margin-bottom: .9rem;
+      }
+
+      .gw-question {
+        margin-bottom: 1.15rem;
+        letter-spacing: .08em;
+      }
+
+      .gw-whatsapp {
+        width:100%;
+        margin-bottom:1rem;
+      }
+
+      .gw-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .7rem;
+      }
+
+      .gw-card,
+      .gw-card-inner {
+        min-height: 150px;
+      }
+
+      .gw-card-inner {
+        padding: 1rem .7rem;
+      }
+
+      .gw-flag-shell {
+        width: 58px;
+        height: 58px;
+        border-radius: 1rem;
+        margin-bottom: .65rem;
+      }
+
+      .gw-flag {
+        font-size: 2.15rem;
+      }
+
+      .gw-country {
+        font-size: .72rem;
+      }
+
+      .gw-country-glow {
+        margin-top: .55rem;
+      }
+
+      .gw-footer-mark {
+        margin-top: 1rem;
+        font-size: .5rem;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .gw-card,
+      .gw-card-inner {
+        min-height: 140px;
+      }
+
+      .gw-logo {
+        height: 6rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+
+      .gw-bg-1 {
+        opacity: .58;
+      }
+
+      .gw-bg-2,
+      .gw-bg-3,
+      .gw-bg-4 {
+        display: none;
+      }
+    }
+  </style>
+  {% if egarage_analytics_id %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ egarage_analytics_id }}"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '{{ egarage_analytics_id }}');
+  </script>
+  {% endif %}
+</head>
+
+<body>
+
+<main class="gateway">
+
+  <div class="gw-background" aria-hidden="true">
+    <div class="gw-bg-image gw-bg-1"></div>
+    <div class="gw-bg-image gw-bg-2"></div>
+    <div class="gw-bg-image gw-bg-3"></div>
+    <div class="gw-bg-image gw-bg-4"></div>
+
+    <div class="gw-orb gw-orb-a"></div>
+    <div class="gw-orb gw-orb-b"></div>
+
+    <div class="gw-dark-layer"></div>
+    <div class="gw-grid"></div>
+    <div class="gw-scanline"></div>
+  </div>
+
+  <div class="gw-content">
+
+    <div class="gw-logo-wrap">
+      <img
+        src="{% static 'img/logo_egarage.png' %}?v=3"
+        alt="eGarage"
+        class="gw-logo">
+    </div>
+
+    <div class="gw-brand-line"></div>
+
+    <p class="gw-question">
+      <svg
+        class="gw-question-icon"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        aria-hidden="true">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+      </svg>
+
+      ¿Desde qué país nos visitas?
+    </p>
+
+    {% if whatsapp_cta %}
+    <a
+      href="{{ whatsapp_cta.url }}"
+      class="gw-whatsapp"
+      target="_blank"
+      rel="noopener noreferrer"
+      data-public-gateway-cta="whatsapp_demo"
+      data-event="cta_whatsapp_click"
+      aria-label="{{ whatsapp_cta.button_label }}">
+      <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M16.04 4C9.42 4 4.04 9.33 4.04 15.88c0 2.1.56 4.15 1.61 5.95L4 28l6.35-1.64a12.12 12.12 0 0 0 5.69 1.43C22.66 27.79 28 22.45 28 15.9 28 9.34 22.66 4 16.04 4Zm0 21.78c-1.84 0-3.64-.49-5.22-1.43l-.37-.22-3.77.98 1-3.64-.24-.38a9.86 9.86 0 0 1-1.5-5.21c0-5.45 4.53-9.88 10.1-9.88 5.56 0 10.08 4.43 10.08 9.9 0 5.45-4.52 9.88-10.08 9.88Zm5.53-7.4c-.3-.15-1.8-.88-2.08-.98-.28-.1-.48-.15-.68.15-.2.3-.78.98-.96 1.18-.18.2-.35.22-.65.07-.3-.15-1.27-.46-2.42-1.48-.9-.79-1.5-1.77-1.68-2.07-.17-.3-.02-.46.13-.6.14-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.68-1.62-.93-2.22-.25-.58-.5-.5-.68-.51h-.58c-.2 0-.52.07-.8.37-.27.3-1.05 1.02-1.05 2.49 0 1.47 1.08 2.9 1.23 3.1.15.2 2.13 3.22 5.16 4.52.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.8-.73 2.05-1.43.25-.7.25-1.3.18-1.43-.08-.13-.28-.2-.58-.35Z"/>
+      </svg>
+      <span>
+        <strong>{{ whatsapp_cta.button_label }}</strong>
+        <small>{{ whatsapp_cta.secondary_label }}</small>
+      </span>
+    </a>
+    {% endif %}
+
+    <div class="gw-cards" role="list">
+
+      <a
+        href="/cl/"
+        class="gw-card"
+        role="listitem"
+        aria-label="eGarage Chile"
+        data-public-gateway-cta="country_cl">
+
+        <div class="gw-card-inner">
+          <div class="gw-flag-shell">
+            <span class="gw-flag" aria-hidden="true">🇨🇱</span>
+          </div>
+
+          <span class="gw-country">Chile</span>
+          <span class="gw-country-glow" aria-hidden="true"></span>
+        </div>
+      </a>
+
+      <div
+        id="usa-card"
+        class="gw-card gw-card-usa"
+        role="link"
+        tabindex="0"
+        aria-label="eGarage United States"
+        data-public-gateway-cta="country_us"
+        data-url="/us/en/">
+
+        <div class="gw-card-inner">
+          <div class="gw-flag-shell">
+            <span class="gw-flag" aria-hidden="true">🇺🇸</span>
+          </div>
+
+          <span class="gw-country">United States</span>
+
+          <div
+            class="gw-lang-toggle"
+            role="group"
+            aria-label="Select language">
+
+            <button
+              type="button"
+              id="usa-btn-en"
+              class="gw-lang-btn"
+              aria-pressed="false">
+              EN
+            </button>
+
+            <button
+              type="button"
+              id="usa-btn-es"
+              class="gw-lang-btn"
+              aria-pressed="false">
+              ES
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <a
+        href="/mx/"
+        class="gw-card"
+        role="listitem"
+        aria-label="eGarage México"
+        data-public-gateway-cta="country_mx">
+
+        <div class="gw-card-inner">
+          <div class="gw-flag-shell">
+            <span class="gw-flag" aria-hidden="true">🇲🇽</span>
+          </div>
+
+          <span class="gw-country">México</span>
+          <span class="gw-country-glow" aria-hidden="true"></span>
+        </div>
+      </a>
+
+      <a
+        href="/ar/"
+        class="gw-card"
+        role="listitem"
+        aria-label="eGarage Argentina"
+        data-public-gateway-cta="country_ar">
+
+        <div class="gw-card-inner">
+          <div class="gw-flag-shell">
+            <span class="gw-flag" aria-hidden="true">🇦🇷</span>
+          </div>
+
+          <span class="gw-country">Argentina</span>
+          <span class="gw-country-glow" aria-hidden="true"></span>
+        </div>
+      </a>
+
+      <a
+        href="/pe/"
+        class="gw-card"
+        role="listitem"
+        aria-label="eGarage Perú"
+        data-public-gateway-cta="country_pe">
+
+        <div class="gw-card-inner">
+          <div class="gw-flag-shell">
+            <span class="gw-flag" aria-hidden="true">🇵🇪</span>
+          </div>
+
+          <span class="gw-country">Perú</span>
+          <span class="gw-country-glow" aria-hidden="true"></span>
+        </div>
+      </a>
+
+
+      <a
+        href="/ec/"
+        class="gw-card"
+        role="listitem"
+        aria-label="eGarage Ecuador"
+        data-public-gateway-cta="country_ec">
+
+        <div class="gw-card-inner">
+          <div class="gw-flag-shell">
+            <span class="gw-flag" aria-hidden="true">🇪🇨</span>
+          </div>
+
+          <span class="gw-country">Ecuador</span>
+          <span class="gw-country-glow" aria-hidden="true"></span>
+        </div>
+      </a>
+
+      <a
+        href="/ve/"
+        class="gw-card"
+        role="listitem"
+        aria-label="eGarage Venezuela"
+        data-public-gateway-cta="country_ve">
+
+        <div class="gw-card-inner">
+          <div class="gw-flag-shell">
+            <span class="gw-flag" aria-hidden="true">🇻🇪</span>
+          </div>
+
+          <span class="gw-country">Venezuela</span>
+          <span class="gw-country-glow" aria-hidden="true"></span>
+        </div>
+      </a>
+
+      <a
+        href="/br/"
+        class="gw-card"
+        role="listitem"
+        aria-label="eGarage Brasil"
+        data-public-gateway-cta="country_br">
+
+        <div class="gw-card-inner">
+          <div class="gw-flag-shell">
+            <span class="gw-flag" aria-hidden="true">🇧🇷</span>
+          </div>
+
+          <span class="gw-country">Brasil</span>
+          <span class="gw-country-glow" aria-hidden="true"></span>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="gw-footer-mark">
+      Automotive Business Operating System
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+  (function () {
+    var usaCard = document.getElementById("usa-card");
+    var btnEn = document.getElementById("usa-btn-en");
+    var btnEs = document.getElementById("usa-btn-es");
+
+    function setUsaLang(lang) {
+      var normalized = lang === "en" ? "en" : "es";
+
+      usaCard.dataset.url = "/us/" + normalized + "/";
+
+      btnEn.classList.toggle("active", normalized === "en");
+      btnEs.classList.toggle("active", normalized === "es");
+
+      btnEn.setAttribute(
+        "aria-pressed",
+        normalized === "en" ? "true" : "false"
+      );
+
+      btnEs.setAttribute(
+        "aria-pressed",
+        normalized === "es" ? "true" : "false"
+      );
+
+      try {
+        localStorage.setItem("egarage-usa-lang", normalized);
+      } catch (e) {}
+    }
+
+    function navigateUsa() {
+      postGatewayCta(usaCard, usaCard.dataset.url || "/us/en/");
+      window.location.href = usaCard.dataset.url || "/us/en/";
+    }
+
+    btnEn.addEventListener("click", function (event) {
+      event.stopPropagation();
+      setUsaLang("en");
+      navigateUsa();
+    });
+
+    btnEs.addEventListener("click", function (event) {
+      event.stopPropagation();
+      setUsaLang("es");
+      navigateUsa();
+    });
+
+    usaCard.addEventListener("click", function (event) {
+      if (event.target.closest(".gw-lang-toggle")) {
+        return;
+      }
+
+      navigateUsa();
+    });
+
+    usaCard.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        if (event.target.closest(".gw-lang-toggle")) {
+          return;
+        }
+
+        event.preventDefault();
+        navigateUsa();
+      }
+    });
+
+    var savedLang = null;
+
+    try {
+      savedLang = localStorage.getItem("egarage-usa-lang");
+    } catch (e) {}
+
+    if (savedLang !== "en" && savedLang !== "es") {
+      var browserLang = (
+        navigator.language ||
+        navigator.userLanguage ||
+        "es"
+      ).toLowerCase();
+
+      savedLang = browserLang.startsWith("en") ? "en" : "es";
+    }
+
+    setUsaLang(savedLang);
+
+    function getCookie(name) {
+      var prefix = name + "=";
+      var parts = document.cookie ? document.cookie.split(";") : [];
+      for (var i = 0; i < parts.length; i += 1) {
+        var value = parts[i].trim();
+        if (value.indexOf(prefix) === 0) {
+          return decodeURIComponent(value.slice(prefix.length));
+        }
+      }
+      return "";
+    }
+
+    function postGatewayCta(element, href) {
+      var csrfToken = getCookie("csrftoken");
+      if (!csrfToken || typeof window.fetch !== "function" || !element) {
+        return;
+      }
+      var ctaId = element.getAttribute("data-public-gateway-cta") || "gateway_cta";
+      window.fetch("/analytics/public/event/", {
+        method: "POST",
+        credentials: "same-origin",
+        keepalive: true,
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({
+          event_type: element.getAttribute("data-event") === "cta_whatsapp_click"
+            ? "cta_whatsapp_click"
+            : "cta_signup_click",
+          path: "/",
+          dedupe_key: "/:" + ctaId,
+          metadata: {
+            cta_id: ctaId,
+            cta_label: (element.getAttribute("aria-label") || element.textContent || "").trim().slice(0, 120),
+            href: href || element.getAttribute("href") || ""
+          }
+        })
+      }).catch(function () {});
+    }
+
+    document.addEventListener("click", function (event) {
+      var link = event.target.closest("a[data-public-gateway-cta]");
+      if (!link) {
+        return;
+      }
+      postGatewayCta(link, link.getAttribute("href") || "");
+    });
+
+    /* Tilt + luz siguiendo el cursor */
+    var cards = document.querySelectorAll(".gw-card");
+
+    cards.forEach(function (card) {
+      card.addEventListener("mousemove", function (event) {
+        if (window.matchMedia("(pointer: coarse)").matches) {
+          return;
+        }
+
+        var rect = card.getBoundingClientRect();
+
+        var x = event.clientX - rect.left;
+        var y = event.clientY - rect.top;
+
+        var px = x / rect.width;
+        var py = y / rect.height;
+
+        var rotateY = (px - .5) * 8;
+        var rotateX = (.5 - py) * 8;
+
+        card.style.setProperty("--rx", rotateX + "deg");
+        card.style.setProperty("--ry", rotateY + "deg");
+
+        card.style.setProperty("--mx", (px * 100) + "%");
+        card.style.setProperty("--my", (py * 100) + "%");
+      });
+
+      card.addEventListener("mouseleave", function () {
+        card.style.setProperty("--rx", "0deg");
+        card.style.setProperty("--ry", "0deg");
+        card.style.setProperty("--mx", "50%");
+        card.style.setProperty("--my", "50%");
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

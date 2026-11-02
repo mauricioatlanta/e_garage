@@ -1,0 +1,51 @@
+
+body.galaxy-bg {
+  background: radial-gradient(circle at center, #0d1b2a, #000);
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+.hero {
+  padding: 60px 20px;
+}
+.hero-title {
+  font-size: 3rem;
+  color: #00bcd4;
+}
+.hero-subtitle {
+  font-size: 1.5rem;
+  margin-top: 10px;
+}
+.hero-pitch {
+  font-size: 1.2rem;
+  margin-top: 20px;
+}
+.highlight {
+  color: #29b6f6;
+}
+.btn-primary {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 10px 25px;
+  background: #00acc1;
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+.btn-primary:hover {
+  background: #00838f;
+}
+.features {
+  padding: 50px 20px;
+}
+.feature {
+  margin-bottom: 40px;
+}
+.footer {
+  padding: 20px;
+  background: #000;
+  font-size: 0.9rem;
+}

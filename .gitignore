@@ -1,0 +1,185 @@
+# FUSE filesystem artifacts
+.fuse_hidden*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtualenv
+venv/
+env/
+.venv/
+ENV/
+
+# Django
+staticfiles/
+media/
+company_logos/
+comprobantes/
+*.log
+local_settings.py
+
+# Databases / dumps
+*.sqlite3
+db.sqlite3*
+*.sql
+*.dump
+*.bak
+*.backup
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build/cache
+dist/
+build/
+.cache/
+tmp/
+temp/
+
+# Backups / archives / legacy
+_backup/
+_backups/
+_templates_archive/
+_disabled_templates/
+_legacy/
+archive/
+root_legacy/
+deploy_atlantareciclajes/
+deploy_pythonanywhere/
+egarage_update*/
+revision templates/
+*.BAK*
+*.bak*
+*.old
+*.orig
+*.tmp
+
+# OS / editors
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Generated root junk
+cookies.txt
+headers_login_get.txt
+login_page.html
+document_form_corrected.html
+diagnostico_*.txt
+diagnostico_*.js
+tmp_*.py
+fix_*.py
+patch_*.py
+check_*.py
+deepseek.py
+atlantarecic
+atlantar
+atlantareciclajes@ss
+for
+from
+et
+There
+tatus
+*SecurityMiddleware*
+*MessageMiddleware*
+
+# Massive contaminated roots
+Z_BORRAR_DUPLICADOS/
+backups/
+backup_static_cleanup/
+deploy/
+deploy_atlantareciclajes/
+deploy_pythonanywhere/
+revision templates/
+actualizacion_pythonanywhere/
+egarage_update*/
+migrations_conflict_backup/
+
+# Secrets / local env
+.env.local
+.env.prod
+
+# Root garbage discovered
+There
+from
+for
+et
+tatus
+*ecurity.SecurityMiddleware*
+*sages.middleware.MessageMiddleware'*
+*.html.backup
+
+# Generated junk
+node_modules/
+logs/
+*.zip
+*.tar
+*.gz
+*.7z
+
+# Root garbage discovered after production audit
+There
+for
+from
+et
+tatus
+atlantar
+atlantarecic
+atlantareciclajes@ss
+ir agregando tus otras apps si el sitio principal falla
+ecurity.SecurityMiddleware',
+sages.middleware.MessageMiddleware',
+.path.join(BASE_DIR, 'static')
+.path.join(BASE_DIR, 'templates')],
+diagnostico_fondos_runtime.txt
+backup_20251204.html
+*.backup_error
+
+# Root sqlite/dumps/env backups
+*.sqlite3
+*.sql
+*.bak
+*.BAK*
+scripts/diagnostico_bienvenida.py
+
+# deploy local
+deploy_atlantareciclajes/
+
+# backups
+backups/
+*.BAK
+*.bak
+*.tar.gz
+company_logos/
+comprobantes/
+reporte_cambios_*.md
+seed_datos_mauricio.py
+reporte_cambios_*.md
+seed_datos_mauricio.py
+
+# Artefactos locales generados
+/audit_migraciones_0077_0078.txt
+/catalogo_desarme_para_revision.xlsx
+
+# Marketing masters pesados — fuentes locales, no versionar
+marketing/Assets/Master/*
+!marketing/Assets/Master/.gitkeep
+.aider*

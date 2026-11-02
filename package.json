@@ -1,0 +1,31 @@
+{
+  "author": "",
+  "description": "Pruebas E2E con Playwright para egarage.cl - Validación de flujos de autenticación y legibilidad visual",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0",
+    "autoprefixer": "^10.5.4",
+    "postcss": "^8.5.25",
+    "tailwindcss": "^3.4.19"
+  },
+  "keywords": [
+    "playwright",
+    "e2e",
+    "testing",
+    "accessibility",
+    "a11y"
+  ],
+  "license": "ISC",
+  "name": "egarage-e2e-tests",
+  "scripts": {
+    "test": "playwright test",
+    "test:auth": "playwright test auth-flows-visual.spec.js",
+    "test:debug": "playwright test --debug",
+    "test:desktop": "playwright test --project=\"Desktop Chrome\"",
+    "test:headed": "playwright test --headed",
+    "test:mobile": "playwright test --project=\"Mobile iPhone 12\"",
+    "test:report": "playwright show-report",
+    "test:ui": "playwright test --ui"
+  },
+  "version": "1.0.0"
+}

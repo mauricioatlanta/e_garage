@@ -1,0 +1,457 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "eGarage" %} — {% trans "La plataforma para negocios automotrices" %}</title>
+    <meta name="description" content="{% trans "eGarage — Workshop, Salvage y Parts. La plataforma de gestión para talleres mecánicos, desarmadurias y casas de repuestos en Latinoamérica." %}">
+    <meta property="og:title" content="eGarage — La plataforma para negocios automotrices">
+    <meta property="og:description" content="Workshop · Salvage · Parts. Software de gestión para negocios automotrices en Latinoamérica.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="{% static 'images/egarage_icon_512x512.png' %}">
+    <link rel="canonical" href="https://egarage.cl/">
+    <link rel="icon" type="image/png" href="{% static 'images/egarage_icon_192x192.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/egarage_icon_192x192.png' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', 'Exo 2', sans-serif;
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #vanta-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .logo-container {
+            margin-bottom: 1.5rem;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.02); }
+        }
+
+        .logo {
+            height: 100px;
+            width: auto;
+            filter: drop-shadow(0 0 30px rgba(0, 245, 255, 0.8)) drop-shadow(0 0 60px rgba(0, 245, 255, 0.4));
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoGlow {
+            0% { filter: drop-shadow(0 0 30px rgba(0, 245, 255, 0.8)) drop-shadow(0 0 60px rgba(0, 245, 255, 0.4)); }
+            100% { filter: drop-shadow(0 0 50px rgba(0, 245, 255, 1)) drop-shadow(0 0 100px rgba(0, 245, 255, 0.6)); }
+        }
+
+        .countries-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .countries-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.8rem;
+            width: 100%;
+            max-width: 1000px;
+            padding: 0.5rem;
+            justify-items: center;
+            margin: 0 auto;
+        }
+
+        .country-btn {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            width: 100%;
+            min-width: 100px;
+            max-width: 120px;
+            aspect-ratio: 1;
+            padding: 0;
+            border-radius: 16px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+            text-decoration: none;
+            color: #ffffff;
+            border: 3px solid #00f5ff;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 
+                0 0 10px #00f5ff,
+                0 0 20px #00f5ff,
+                0 0 30px #00f5ff,
+                inset 0 0 20px rgba(0, 245, 255, 0.2);
+        }
+
+        .country-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 0%, transparent 50%, rgba(0, 0, 0, 0.7) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .country-flag {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .country-name {
+            font-size: 0.65rem;
+            text-align: center;
+            line-height: 1.1;
+            text-shadow: 
+                0 2px 8px rgba(0, 0, 0, 1),
+                0 0 15px rgba(0, 0, 0, 0.9),
+                0 0 25px rgba(0, 0, 0, 0.8);
+            z-index: 2;
+            position: relative;
+            font-weight: 800;
+            padding: 0.5rem;
+            width: 100%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
+        }
+
+        .country-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.3), transparent);
+            transition: left 0.6s;
+            z-index: 1;
+        }
+
+        .country-btn:hover::after {
+            left: 100%;
+        }
+
+        .country-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            border-color: #00ffff;
+            box-shadow: 
+                0 0 20px #00f5ff,
+                0 0 40px #00f5ff,
+                0 0 60px #00f5ff,
+                0 0 80px #00f5ff,
+                0 15px 45px rgba(0, 0, 0, 0.6),
+                inset 0 0 30px rgba(0, 245, 255, 0.3);
+        }
+
+        .country-btn:hover .country-flag {
+            transform: scale(1.1);
+        }
+
+        /* Chile */
+        .country-chile {
+            border-color: #00f5ff;
+        }
+
+        .country-chile:hover {
+            border-color: #00ffff;
+        }
+
+        /* USA */
+        .country-usa {
+            border-color: #00f5ff;
+        }
+
+        .country-usa:hover {
+            border-color: #00ffff;
+        }
+
+        /* México */
+        .country-mexico {
+            border-color: #00f5ff;
+        }
+
+        .country-mexico:hover {
+            border-color: #00ffff;
+        }
+
+        /* Perú */
+        .country-peru {
+            border-color: #00f5ff;
+        }
+
+        .country-peru:hover {
+            border-color: #00ffff;
+        }
+
+        /* Colombia */
+        .country-colombia {
+            border-color: #00f5ff;
+        }
+
+        .country-colombia:hover {
+            border-color: #00ffff;
+        }
+
+        /* Ecuador */
+        .country-ecuador {
+            border-color: #00f5ff;
+        }
+
+        .country-ecuador:hover {
+            border-color: #00ffff;
+        }
+
+        /* Venezuela */
+        .country-venezuela {
+            border-color: #00f5ff;
+        }
+
+        .country-venezuela:hover {
+            border-color: #00ffff;
+        }
+
+        /* Brasil */
+        .country-brasil {
+            border-color: #00f5ff;
+        }
+
+        .country-brasil:hover {
+            border-color: #00ffff;
+        }
+
+        /* Argentina */
+        .country-argentina {
+            border-color: #00f5ff;
+        }
+
+        .country-argentina:hover {
+            border-color: #00ffff;
+        }
+
+        /* Uruguay */
+        .country-uruguay {
+            border-color: #00f5ff;
+        }
+
+        .country-uruguay:hover {
+            border-color: #00ffff;
+        }
+
+        @media (max-width: 1200px) {
+            .countries-grid {
+                grid-template-columns: repeat(5, 1fr);
+                max-width: 900px;
+                gap: 0.6rem;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .countries-grid {
+                grid-template-columns: repeat(5, 1fr);
+                max-width: 800px;
+                gap: 0.5rem;
+            }
+            
+            .country-btn {
+                min-width: 90px;
+                max-width: 110px;
+                padding: 0.5rem;
+            }
+            
+            
+            .country-name {
+                font-size: 0.6rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                height: 80px;
+            }
+
+            .logo-container {
+                margin-bottom: 1rem;
+            }
+
+            .countries-grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 0.5rem;
+                padding: 0.5rem;
+                max-width: 100%;
+            }
+
+            .country-btn {
+                min-width: 70px;
+                max-width: 90px;
+                padding: 0.4rem;
+                font-size: 0.6rem;
+            }
+
+
+            .country-name {
+                font-size: 0.55rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .countries-grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 0.4rem;
+            }
+            
+            .country-btn {
+                min-width: 60px;
+                max-width: 75px;
+                padding: 0.3rem;
+            }
+            
+            
+            .country-name {
+                font-size: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Vanta.js Background -->
+    <div id="vanta-background"></div>
+
+    <!-- SEO H1 oculto para Google -->
+    <h1 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">eGarage - Sistema operativo para negocios automotrices en 10 países - Talleres, Desarmadurías, Casas de Repuestos</h1>
+
+    <!-- Content -->
+    <div class="content-wrapper">
+        <!-- Logo -->
+        <div class="logo-container">
+            <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage Logo" class="logo" >
+            <p style="font-family:'Orbitron',monospace; font-size:0.6rem; letter-spacing:0.22em; color:#00f5ff88; text-align:center; margin-top:0.5rem; text-transform:uppercase;">La plataforma para negocios automotrices</p>
+        </div>
+
+        <!-- Countries Container -->
+        <div class="countries-container">
+            <!-- Countries Grid - Ordenados alfabéticamente -->
+            <div class="countries-grid">
+                <!-- Argentina -->
+                <a href="/ar/es/bienvenida/" class="country-btn country-argentina" style="background-image: url('https://flagcdn.com/w320/ar.png');">
+                    <span class="country-name">Argentina</span>
+                </a>
+                <!-- Brasil -->
+                <a href="/br/es/bienvenida/" class="country-btn country-brasil" style="background-image: url('https://flagcdn.com/w320/br.png');">
+                    <span class="country-name">Brasil</span>
+                </a>
+                <!-- Chile -->
+                <a href="/cl/es/bienvenida/" class="country-btn country-chile" style="background-image: url('https://flagcdn.com/w320/cl.png');">
+                    <span class="country-name">Chile</span>
+                </a>
+                <!-- Colombia -->
+                <a href="/co/es/bienvenida/" class="country-btn country-colombia" style="background-image: url('https://flagcdn.com/w320/co.png');">
+                    <span class="country-name">Colombia</span>
+                </a>
+                <!-- Ecuador -->
+                <a href="/ec/es/bienvenida/" class="country-btn country-ecuador" style="background-image: url('https://flagcdn.com/w320/ec.png');">
+                    <span class="country-name">Ecuador</span>
+                </a>
+                <!-- México -->
+                <a href="/mx/es/bienvenida/" class="country-btn country-mexico" style="background-image: url('https://flagcdn.com/w320/mx.png');">
+                    <span class="country-name">México</span>
+                </a>
+                <!-- Perú -->
+                <a href="/pe/es/bienvenida/" class="country-btn country-peru" style="background-image: url('https://flagcdn.com/w320/pe.png');">
+                    <span class="country-name">Perú</span>
+                </a>
+                <!-- USA -->
+                <a href="/us/en/bienvenida/" class="country-btn country-usa" style="background-image: url('https://flagcdn.com/w320/us.png');">
+                    <span class="country-name">USA</span>
+                </a>
+                <!-- Uruguay -->
+                <a href="/uy/es/bienvenida/" class="country-btn country-uruguay" style="background-image: url('https://flagcdn.com/w320/uy.png');">
+                    <span class="country-name">Uruguay</span>
+                </a>
+                <!-- Venezuela -->
+                <a href="/ve/es/bienvenida/" class="country-btn country-venezuela" style="background-image: url('https://flagcdn.com/w320/ve.png');">
+                    <span class="country-name">Venezuela</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Products row -->
+        <div style="margin-top:1.5rem; display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap;">
+            <a href="{% url 'landing_workshop' %}" style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; letter-spacing:0.12em; padding:0.3rem 0.9rem; border-radius:99px; border:1px solid #00f5ff44; color:#00f5ffaa; text-decoration:none; transition:all 0.2s; background:rgba(0,245,255,0.04);" onmouseover="this.style.borderColor='#00f5ff';this.style.color='#00f5ff'" onmouseout="this.style.borderColor='#00f5ff44';this.style.color='#00f5ffaa'">⚙ Taller mecánico / Workshop</a>
+            <a href="{% url 'landing_desarmadurias' %}" style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; letter-spacing:0.12em; padding:0.3rem 0.9rem; border-radius:99px; border:2px solid #d946ef88; color:#d946ef; text-decoration:none; transition:all 0.2s; background:rgba(217,70,239,0.08);" onmouseover="this.style.borderColor='#d946ef';this.style.background='rgba(217,70,239,0.15)'" onmouseout="this.style.borderColor='#d946ef88';this.style.background='rgba(217,70,239,0.08)'">🧩 Desarmaduría · Desarmadero (AR) · Yonke / Deshuesadero (MX) · Salvage Yard (US)</a>
+            <a href="{% url 'landing_parts' %}" style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; letter-spacing:0.12em; padding:0.3rem 0.9rem; border-radius:99px; border:1px solid #a3e63544; color:#a3e635aa; text-decoration:none; transition:all 0.2s; background:rgba(163,230,53,0.04);" onmouseover="this.style.borderColor='#a3e635';this.style.color='#a3e635'" onmouseout="this.style.borderColor='#a3e63544';this.style.color='#a3e635aa'">🏪 Casa de Repuestos / Autopartes</a>
+        </div>
+        <p style="font-size:0.55rem; color:#4b5563; text-align:center; margin-top:1rem; max-width:640px; margin-left:auto; margin-right:auto; line-height:1.5;">eGarage disponible en Chile (desarmaduría), Argentina (desarmadero), México (deshuesadero, yonke), Perú, Colombia, Ecuador, Venezuela, Uruguay, Brasil y USA (salvage yard). Sistema con IVA, IGV, impuestos locales y pagos Mercado Pago, PSE, SPEI.</p>
+    </div>
+
+    <script>
+        // Initialize Vanta.js with NET effect
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof VANTA !== 'undefined' && VANTA.NET) {
+                VANTA.NET({
+                    el: "#vanta-background",
+                    mouseControls: true,
+                    touchControls: true,
+                    gyroControls: false,
+                    minHeight: 200.00,
+                    minWidth: 200.00,
+                    scale: 1.00,
+                    scaleMobile: 1.00,
+                    color: 0x00f5ff,
+                    color2: 0x0099cc,
+                    backgroundColor: 0x0a0a0a,
+                    points: 15.00,
+                    maxDistance: 25.00,
+                    spacing: 20.00
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+Hello {{ user.first_name|default:user.username }},
+
+Thank you for signing up for eGarage!
+
+To complete your registration and activate your account, please confirm your email address by clicking the link below:
+
+{{ activate_url }}
+
+This link expires in {{ expiration_days|default:"2" }} days.
+
+If you did not request this registration, simply ignore this email.
+
+Best regards,
+The eGarage Team

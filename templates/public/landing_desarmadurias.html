@@ -1,0 +1,352 @@
+{% extends "public/base_landing.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}eGarage Desarmadurias — Kiosko automático, semáforo de piezas, precio inteligente{% endblock %}
+{% block meta_description %}Guarda el vehículo y tu kiosko online se crea solo. Sistema semáforo Verde/Amarillo/Rojo para elegir qué vendes. Precio inteligente y ubicación Bodega/Estante. Prueba gratis 30 días. Sin cobrar por ingresar inventario.{% endblock %}
+{% block canonical_path %}/desarmadurias/{% endblock %}
+{% block og_title %}eGarage Desarmadurias — Kiosko automático de repuestos usados{% endblock %}
+{% block og_description %}Encuentra cualquier repuesto en tu patio en 5 segundos desde el celular. Sin Excel, sin cuaderno, sin memoria. Nació en desarmaduría real en USA.{% endblock %}
+
+{% block extra_head %}
+<style>
+  .accent-fuchsia { color: #e879f9; }
+  .card-glow-f:hover { box-shadow: 0 0 30px rgba(217, 70, 239, 0.2), 0 25px 50px -12px rgba(0,0,0,0.5); }
+  .atlanta-quote {
+    border-left: 3px solid #d946ef;
+    background: linear-gradient(90deg, rgba(217,70,239,0.08) 0%, transparent 100%);
+  }
+  .semaforo-verde  { border-color: rgba(34,197,94,0.5);  background: rgba(34,197,94,0.06); }
+  .semaforo-amarillo { border-color: rgba(234,179,8,0.5); background: rgba(234,179,8,0.06); }
+  .semaforo-rojo   { border-color: rgba(239,68,68,0.5);  background: rgba(239,68,68,0.06); }
+  .semaforo-verde:hover  { box-shadow: 0 0 24px rgba(34,197,94,0.25); }
+  .semaforo-amarillo:hover { box-shadow: 0 0 24px rgba(234,179,8,0.25); }
+  .semaforo-rojo:hover   { box-shadow: 0 0 24px rgba(239,68,68,0.25); }
+  @keyframes waPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
+    50% { box-shadow: 0 0 0 12px rgba(34,197,94,0); }
+  }
+  .wa-pulse { animation: waPulse 2s ease-in-out infinite; }
+  .precio-btn { transition: all 0.2s; }
+  .precio-btn:hover { transform: scale(1.05); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="px-6 py-20 text-center max-w-5xl mx-auto animate-in">
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-semibold mb-6 font-orbitron tracking-widest">
+    🧩 eGarage · Desarmadurias
+  </div>
+  <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight glow-fuchsia">
+    Encuentra cualquier repuesto<br>
+    <span class="text-fuchsia-400">en tu patio en 5 segundos desde el celular.</span>
+  </h1>
+  <p class="text-xl text-slate-200 max-w-2xl mx-auto mb-4">
+    Guarda el vehículo que vas a desarmar y tu kiosko online se crea solo.<br>
+    Sin escribir repuesto por repuesto. Sin Excel. Sin memoria.
+  </p>
+  <p class="text-lg text-slate-300 max-w-2xl mx-auto mb-10">
+    Tú eliges qué vendes y qué no. Con precio inteligente y ubicación <strong class="text-fuchsia-300">Bodega/Estante</strong>.
+  </p>
+  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+    <a href="https://wa.me/56953574683?text=Hola%20quiero%20probar%20eGarage%20Desarmaduria%2030%20dias%20gratis"
+       class="wa-pulse px-8 py-4 rounded-xl bg-green-600 text-white font-bold text-lg hover:bg-green-500 transition-all shadow-lg shadow-green-500/30 font-orbitron flex items-center gap-2 justify-center">
+      💬 WhatsApp — Probar gratis
+    </a>
+    <a href="{% url 'account_signup' %}?rubro=DESARMADURIA" class="px-8 py-4 rounded-xl bg-fuchsia-600 text-white font-bold text-lg hover:bg-fuchsia-500 transition-all shadow-lg shadow-fuchsia-500/30 font-orbitron">
+      Crear cuenta gratis →
+    </a>
+  </div>
+  <p class="text-slate-400 text-sm">Sin tarjeta de crédito · Sin cobrar por ingresar inventario · Cancela cuando quieras</p>
+  <div class="landing-media mt-12 border-fuchsia-500/20">
+    <img
+      src="{% static 'img/welcome/scenes/desarme.webp' %}"
+      alt=""
+      loading="eager"
+      decoding="async">
+    <div class="landing-media-caption">
+      Del vehículo al inventario: cada pieza identificada, publicada y lista para vender.
+    </div>
+  </div>
+
+</section>
+
+<!-- Dolor real -->
+<section class="px-6 py-12 max-w-4xl mx-auto animate-in delay-1">
+  <div class="bg-slate-800/60 border border-fuchsia-500/20 rounded-2xl p-8">
+    <p class="text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-6">El problema que nadie resuelve</p>
+    <div class="space-y-6">
+      <div class="flex gap-4 items-start">
+        <div class="text-2xl shrink-0">📱</div>
+        <div>
+          <p class="text-slate-200 text-base leading-relaxed"><strong class="text-fuchsia-300">Cliente pregunta por WhatsApp "¿Tienes foco V16?"</strong> — Estás en el patio con barro, 20 minutos buscando de memoria. A veces lo tienes y no lo encuentras.</p>
+        </div>
+      </div>
+      <div class="flex gap-4 items-start">
+        <div class="text-2xl shrink-0">💸</div>
+        <div>
+          <p class="text-slate-200 text-base leading-relaxed"><strong class="text-fuchsia-300">Pierdes el 15% de ventas</strong> porque no sabes con certeza qué tienes, dónde está, ni cuánto cobrar sin quedar caro ni barato.</p>
+        </div>
+      </div>
+      <div class="flex gap-4 items-start">
+        <div class="text-2xl shrink-0">📦</div>
+        <div>
+          <p class="text-slate-200 text-base leading-relaxed"><strong class="text-fuchsia-300">Un V16 que ingresa son 200 repuestos potenciales.</strong> Cuaderno, fotos desordenadas y memoria no escalan.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Kiosko automático - 3 pasos -->
+<section class="px-6 py-16 max-w-5xl mx-auto animate-in delay-2">
+  <p class="text-center text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-4">La solución</p>
+  <h2 class="font-orbitron text-3xl font-bold text-center text-white mb-4">Tu kiosko online se crea solo en 3 clicks</h2>
+  <p class="text-center text-slate-300 mb-12">Sin escribir repuesto por repuesto. Sin catálogo manual.</p>
+
+  <!-- Video placeholder -->
+  <div class="bg-slate-800/40 border border-fuchsia-500/20 border-dashed rounded-2xl p-8 text-center mb-12">
+    <div class="text-4xl mb-3">🎬</div>
+    <p class="text-slate-300 text-sm font-orbitron">Video 37s grabado en patio — ver guion en docs/instrucciones_video.md</p>
+    <p class="text-slate-500 text-xs mt-2">(0-37s) Demostración real: ingresar vehículo → kiosko generado → link por WhatsApp</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1 text-center">
+      <div class="w-12 h-12 rounded-full bg-fuchsia-600 text-white font-black text-xl font-orbitron flex items-center justify-center mx-auto mb-4">1</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Ingresa el vehículo</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Patente / modelo / año / costo de compra + 3 fotos. Listo. Menos de 2 minutos.</p>
+    </div>
+    <div class="bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1 text-center">
+      <div class="w-12 h-12 rounded-full bg-fuchsia-600 text-white font-black text-xl font-orbitron flex items-center justify-center mx-auto mb-4">2</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Kiosko generado automáticamente</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">El sistema genera el catálogo con 43 piezas estándar: foto, precio sugerido y ubicación Bodega/Estante.</p>
+    </div>
+    <div class="bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1 text-center">
+      <div class="w-12 h-12 rounded-full bg-fuchsia-600 text-white font-black text-xl font-orbitron flex items-center justify-center mx-auto mb-4">3</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Link listo para WhatsApp</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Mandas el link al cliente. Él ve foto, precio y <em class="text-fuchsia-300">Bodega B Estante 3</em>. Sin ir al patio.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Sistema Semáforo -->
+<section class="px-6 py-16 max-w-5xl mx-auto animate-in">
+  <p class="text-center text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-4">Sistema semáforo</p>
+  <h2 class="font-orbitron text-3xl font-bold text-center text-white mb-4">Tú decides qué vendes y qué no</h2>
+  <p class="text-center text-slate-300 mb-12">No toda pieza vale el tiempo. El semáforo te protege de perder horas en lo que no rinde.</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Verde -->
+    <div class="semaforo-verde border rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-4 h-4 rounded-full bg-green-500 shadow-lg shadow-green-500/50"></div>
+        <h3 class="font-orbitron text-green-400 font-bold text-lg">VERDE — Vender siempre</h3>
+      </div>
+      <p class="text-slate-400 text-xs mb-3">Venta en 15 min · No se daña al sacar · Alta demanda</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2 py-1 rounded bg-green-500/15 text-green-300 text-xs">Focos</span>
+        <span class="px-2 py-1 rounded bg-green-500/15 text-green-300 text-xs">Espejos</span>
+        <span class="px-2 py-1 rounded bg-green-500/15 text-green-300 text-xs">Puertas</span>
+        <span class="px-2 py-1 rounded bg-green-500/15 text-green-300 text-xs">Capot</span>
+        <span class="px-2 py-1 rounded bg-green-500/15 text-green-300 text-xs">Parachoques</span>
+        <span class="px-2 py-1 rounded bg-green-500/15 text-green-300 text-xs">Tapabarros</span>
+      </div>
+      <p class="text-green-400 text-xs mt-3 font-semibold">✓ Activados por defecto al guardar el vehículo</p>
+    </div>
+
+    <!-- Amarillo -->
+    <div class="semaforo-amarillo border rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-4 h-4 rounded-full bg-yellow-500 shadow-lg shadow-yellow-500/50"></div>
+        <h3 class="font-orbitron text-yellow-400 font-bold text-lg">AMARILLO — Con criterio</h3>
+      </div>
+      <p class="text-slate-400 text-xs mb-3">2h + ayudante · Solo si el precio lo justifica</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2 py-1 rounded bg-yellow-500/15 text-yellow-300 text-xs">Motor</span>
+        <span class="px-2 py-1 rounded bg-yellow-500/15 text-yellow-300 text-xs">Caja de cambios</span>
+        <span class="px-2 py-1 rounded bg-yellow-500/15 text-yellow-300 text-xs">Culata</span>
+        <span class="px-2 py-1 rounded bg-yellow-500/15 text-yellow-300 text-xs">Tren trasero</span>
+      </div>
+      <p class="text-yellow-400 text-xs mt-3 font-semibold">⚠ Activar solo cuando el cliente ya comprometió precio</p>
+    </div>
+
+    <!-- Rojo -->
+    <div class="semaforo-rojo border rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-4 h-4 rounded-full bg-red-500 shadow-lg shadow-red-500/50"></div>
+        <h3 class="font-orbitron text-red-400 font-bold text-lg">ROJO — No vender / A pedido</h3>
+      </div>
+      <p class="text-slate-400 text-xs mb-3">3h de trabajo · Precio final 2 lucas · No rinde</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2 py-1 rounded bg-red-500/15 text-red-300 text-xs">Ramales eléctricos</span>
+        <span class="px-2 py-1 rounded bg-red-500/15 text-red-300 text-xs">Clips y tornillería</span>
+        <span class="px-2 py-1 rounded bg-red-500/15 text-red-300 text-xs">Tapiz techo</span>
+      </div>
+      <p class="text-red-400 text-xs mt-3 font-semibold">✗ Quedan ocultos en el kiosko por defecto</p>
+    </div>
+  </div>
+</section>
+
+<!-- Precio inteligente -->
+<section class="px-6 py-16 max-w-4xl mx-auto animate-in delay-1">
+  <p class="text-center text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-4">Precio inteligente</p>
+  <h2 class="font-orbitron text-3xl font-bold text-center text-white mb-4">Sin quedar caro ni barato</h2>
+  <p class="text-center text-slate-300 mb-10">El sistema calcula el precio base desde lo que pagaste por el auto. Tú ajustas con un click.</p>
+
+  <div class="bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-8">
+    <div class="text-center mb-8">
+      <p class="text-slate-400 text-sm mb-2 font-orbitron">Fórmula base</p>
+      <div class="inline-flex items-center gap-3 bg-fuchsia-950/40 border border-fuchsia-500/30 rounded-xl px-6 py-4">
+        <span class="text-fuchsia-300 text-lg font-bold font-orbitron">(Costo auto ÷ 2.5)</span>
+        <span class="text-slate-400">×</span>
+        <span class="text-fuchsia-300 text-lg font-bold font-orbitron">% pieza</span>
+      </div>
+    </div>
+
+    <div class="bg-slate-900/40 rounded-xl p-6 mb-6">
+      <p class="text-slate-400 text-xs font-orbitron uppercase mb-3">Ejemplo: Yaris 2015 comprado en $800.000</p>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between"><span class="text-slate-300">Base: $800.000 ÷ 2.5</span><span class="text-fuchsia-300 font-bold">$320.000</span></div>
+        <div class="flex justify-between"><span class="text-slate-300">Foco delantero (5%)</span><span class="text-fuchsia-300 font-bold">$16.000 sugerido</span></div>
+        <div class="flex justify-between"><span class="text-slate-300">Puerta delantera (8%)</span><span class="text-fuchsia-300 font-bold">$25.600 sugerido</span></div>
+      </div>
+    </div>
+
+    <p class="text-center text-slate-400 text-sm mb-4">¿El mercado está distinto hoy? Ajusta con un click:</p>
+    <div class="flex gap-3 justify-center flex-wrap">
+      <button class="precio-btn px-6 py-3 rounded-xl bg-sky-600/30 border border-sky-500/50 text-sky-300 font-bold text-sm font-orbitron">
+        💧 Barato −30%
+      </button>
+      <button class="precio-btn px-6 py-3 rounded-xl bg-fuchsia-600/30 border border-fuchsia-500/50 text-fuchsia-300 font-bold text-sm font-orbitron">
+        ⚡ Normal
+      </button>
+      <button class="precio-btn px-6 py-3 rounded-xl bg-amber-600/30 border border-amber-500/50 text-amber-300 font-bold text-sm font-orbitron">
+        🔥 Caro +30%
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Historia sin nombre -->
+<section class="px-6 py-16 max-w-3xl mx-auto animate-in delay-2">
+  <div class="atlanta-quote rounded-2xl p-8">
+    <p class="text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-6">La historia detrás del software</p>
+    <p class="text-fuchsia-200 italic text-lg mb-4">
+      "Después de años trabajando en una desarmaduría real en Atlanta, GA, construimos el sistema que nosotros mismos necesitábamos y no encontrábamos en ningún lado."
+    </p>
+    <div class="space-y-4 text-slate-200 text-base leading-relaxed">
+      <p>Buscamos software para gestionar inventario de piezas — y no encontramos nada que entendiera cómo funciona una desarmaduría de verdad.</p>
+      <p>Los sistemas genéricos tratan cada pieza como un artículo suelto. Pero un Yaris 2015 que entra son 200 piezas con origen, condición y precio distintos. Nadie lo modelaba así. Entonces lo construimos nosotros.</p>
+      <p class="text-fuchsia-300 font-semibold">
+        eGarage Desarmadurias nació en una desarmaduría real en USA. Hoy lo abrimos para toda Latinoamérica.
+      </p>
+    </div>
+    <div class="mt-8 flex items-center gap-3">
+      <div class="h-px flex-1 bg-fuchsia-500/30"></div>
+      <span class="text-slate-400 text-sm">Equipo eGarage — Atlanta, GA, USA</span>
+      <div class="h-px flex-1 bg-fuchsia-500/30"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Features adicionales -->
+<section class="px-6 py-16 max-w-6xl mx-auto">
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12 animate-in">Todo lo que necesita tu desarmaduría</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📍</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Ubicación Bodega/Estante</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Cada pieza tiene su dirección: "Bodega B, Estante 3, Posición 2". Llegas directo, sin buscar de memoria por el patio.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📷</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Foto por pieza</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">El cliente ve exactamente qué está comprando. Menos viajes al patio, menos malentendidos, menos devoluciones.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🌐</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Kiosko público online</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Link propio para mandar por WhatsApp: <span class="text-fuchsia-300 font-mono text-xs">egarage.cl/tu-desarmaduria/yaris-2015</span>. El cliente busca, encuentra y consulta antes de llamar.</p>
+    </div>
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📊</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Valorización del patio</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">¿Cuánto vale lo que tienes hoy? Ve el valor total del inventario por vehículo, por categoría y por período. Decide qué comprar con datos.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📋</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Documentos de venta</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Boletas y facturas con IVA calculado por país (CL 19%, AR 21%, MX 16%, PE 18%, CO 19%). Sin papel carbón.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🔍</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Búsqueda en 5 segundos</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Cliente pide "foco V16 2012" — tecleas desde el celular y en 5 segundos sabes si lo tienes, dónde está y a cuánto venderlo.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Diferenciador -->
+<section class="px-6 py-12 max-w-3xl mx-auto text-center animate-in delay-2">
+  <div class="bg-fuchsia-950/40 border border-fuchsia-500/30 rounded-2xl p-8">
+    <h2 class="font-orbitron text-fuchsia-300 text-lg font-bold mb-3">Sin competencia directa en LATAM.</h2>
+    <p class="text-slate-300 text-sm leading-relaxed">
+      Mientras los SaaS genéricos pelean por el mercado de talleres, el rubro de desarmaduría lleva años sin software nativo. eGarage es el primero construido desde adentro — con modelo de datos propio para vehículos → piezas, semáforo de ventas y precio inteligente por coeficiente de recuperación.
+    </p>
+  </div>
+</section>
+
+<!-- CTA final -->
+<section class="px-6 py-20 text-center animate-in delay-3">
+  <h2 class="font-orbitron text-3xl font-black text-white mb-4">¿Listo para ordenar tu desarmaduria?</h2>
+  <p class="text-slate-300 mb-2">30 días gratis. Sin tarjeta de crédito. Sin cobrar por ingresar inventario.</p>
+  <p class="text-slate-400 text-sm mb-8">Soporte directo por WhatsApp. Sin formularios largos.</p>
+
+  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+    <a href="https://wa.me/56953574683?text=Hola%20quiero%20probar%20eGarage%20Desarmaduria%2030%20dias%20gratis"
+       class="wa-pulse px-10 py-5 rounded-xl bg-green-600 text-white font-black text-xl hover:bg-green-500 transition-all shadow-xl shadow-green-500/30 font-orbitron flex items-center gap-3 justify-center">
+      💬 Hablar por WhatsApp
+    </a>
+    <a href="{% url 'account_signup' %}?rubro=DESARMADURIA" class="px-10 py-5 rounded-xl bg-fuchsia-600 text-white font-black text-xl hover:bg-fuchsia-500 transition-all shadow-xl shadow-fuchsia-500/30 font-orbitron">
+      Crear cuenta gratis →
+    </a>
+  </div>
+
+  <!-- Hub de Soluciones -->
+  <p class="text-slate-600 text-xs uppercase tracking-widest mt-12 mb-6">También puede interesarte</p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto text-left">
+
+    <a href="{% url 'landing_talleres' %}"
+       class="flex items-center gap-4 px-5 py-4 rounded-xl bg-slate-800/50 border border-cyan-500/15 hover:border-cyan-500/40 hover:bg-slate-800/80 transition-all group">
+      <span class="text-2xl shrink-0" aria-hidden="true">🔧</span>
+      <div class="min-w-0">
+        <p class="text-slate-200 font-semibold text-sm group-hover:text-cyan-300 transition-colors">Taller Mecánico</p>
+        <p class="text-slate-500 text-xs truncate">Historial de vehículos y órdenes de trabajo.</p>
+      </div>
+      <span class="text-cyan-500/60 group-hover:text-cyan-400 ml-auto shrink-0 transition-colors">→</span>
+    </a>
+
+    <a href="{% url 'landing_repuestos' %}"
+       class="flex items-center gap-4 px-5 py-4 rounded-xl bg-slate-800/50 border border-lime-500/15 hover:border-lime-500/40 hover:bg-slate-800/80 transition-all group">
+      <span class="text-2xl shrink-0" aria-hidden="true">🏪</span>
+      <div class="min-w-0">
+        <p class="text-slate-200 font-semibold text-sm group-hover:text-lime-300 transition-colors">Casa de Repuestos</p>
+        <p class="text-slate-500 text-xs truncate">Stock, pedidos y proveedores unificados.</p>
+      </div>
+      <span class="text-lime-500/60 group-hover:text-lime-400 ml-auto shrink-0 transition-colors">→</span>
+    </a>
+
+  </div>
+</section>
+
+{% endblock %}

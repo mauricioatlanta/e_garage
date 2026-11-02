@@ -1,0 +1,23 @@
+{
+  "source_sha256": "199e21d082ada04580dfd1e267573f335a71aef553482f6ccde38d2f8b68fc16",
+  "geometry_edited": false,
+  "face_material_counts": {
+    "body": 48890,
+    "lamp": 316,
+    "tire": 9861,
+    "rim": 44201,
+    "glass": 10888
+  },
+  "body_alpha": {
+    "soft": 0.92,
+    "intermediate": 0.76
+  },
+  "glass_alpha": 0.34,
+  "component_count": 7,
+  "limitations": [
+    "The source has no independent glass topology; glass is delimited by conservative face predicates and may not follow every generated seam exactly.",
+    "Curves provide selected contours and are not source mesh edges.",
+    "Dithered body transparency was selected to avoid confusing far-side wheel overlap through the closed exterior shell.",
+    "The GLB contains mesh materials but glow intensity and auxiliary curve appearance depend on viewer bloom, transparency sorting, and tone mapping."
+  ]
+}

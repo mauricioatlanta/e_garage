@@ -1,0 +1,49 @@
+﻿exclude: |
+  (?x)
+  ^(node_modules/|
+    staticfiles/|
+    static/|
+    _backup/|
+    backups/|
+    _disabled_templates/|
+    backups/templates_archive/|
+    templates/_archive/|
+    revision[ ]templates/)|
+  \.html\.py$
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+        files: ^\.github/workflows/.*\.ya?ml$
+      - id: check-json
+        exclude: |
+          (^node_modules/|^staticfiles/|^static/|^_backup/|^backups/)|
+          ^reports/templates_audit\.json$
+      - id: pretty-format-json
+        args: [--autofix, --indent, "2"]
+        exclude: |
+          (^node_modules/|^staticfiles/|^static/|^_backup/|^backups/)|
+          ^reports/templates_audit\.json$
+      - id: debug-statements
+      - id: check-docstring-first
+        exclude: |
+          ^taller/reportes/exporters\.py$|
+          ^taller/analytics/funcionalidades_adicionales\.py$|
+          ^taller/vehiculos/api_helpers\.py$|
+          ^taller/viewsautocomplete/views_main\.py$|
+          ^wsgi_production\.py$|
+          ^deploy_pythonanywhere/wsgi_production\.py$
+
+  - repo: https://github.com/adamchainz/django-upgrade
+    rev: 1.29.1
+    hooks:
+      - id: django-upgrade
+        args: [--target-version, "4.2"]
+
+  - repo: https://github.com/psf/black
+    rev: 25.9.0
+    hooks:
+      - id: black
+        files: \.py$

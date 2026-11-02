@@ -1,0 +1,15 @@
+# Comandos para reiniciar servicios y probar Brasil
+
+# 1. Reiniciar servicios
+sudo systemctl restart egarage-gunicorn
+sudo systemctl reload nginx
+
+# 2. Pruebas finales (estas tienen que funcionar)
+curl -I http://127.0.0.1:8001/br/pt/bienvenida/ -H "Host: egarage.cl"
+curl -I https://egarage.cl/br/
+curl -I https://egarage.cl/br/pt/bienvenida/
+
+# Resultados esperados:
+# /br/ → 302/301 → /br/pt/bienvenida/
+# /br/pt/bienvenida/ → 200 OK
+# Página en portugués solamente

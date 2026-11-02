@@ -1,0 +1,47 @@
+/* force_black_text.css */
+
+html,
+body,
+form label,
+form input,
+form select,
+form textarea,
+form option,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+legend,
+.form-control,
+.form-input,
+.input {
+  color: black !important;
+}
+
+input,
+select,
+textarea {
+  background-color: white !important;
+  color: black !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #555 !important;
+}
+
+/* Excepción: navbar y enlaces de navegación siempre en blanco */
+header nav,
+header nav *,
+.navbar,
+.navbar *,
+.header,
+.header *,
+.bg-black,
+.bg-black *,
+.bg-gray-950,
+.bg-gray-950 * {
+  color: white !important;
+}

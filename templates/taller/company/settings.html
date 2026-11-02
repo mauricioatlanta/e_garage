@@ -1,0 +1,2181 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}⚙️ {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Centro de Configuración{% else %}Settings Center{% endif %} - eGarage{% endblock %}
+
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+    
+    :root {
+        --neon-cyan: #00ffff;
+        --neon-purple: #b026ff;
+        --neon-pink: #ff00ff;
+        --dark-bg: #0a0e27;
+        --dark-card: #151932;
+        --dark-border: #1e2447;
+        --text-primary: #ffffff;
+        --text-secondary: #a0aec0;
+        --accent-glow: rgba(0, 255, 255, 0.3);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%);
+        background-attachment: fixed;
+        font-family: 'Rajdhani', sans-serif;
+        color: var(--text-primary);
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    /* Animated background grid */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+        pointer-events: none;
+        z-index: 0;
+        animation: gridMove 20s linear infinite;
+    }
+
+    @keyframes gridMove {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(50px, 50px); }
+    }
+
+    /* Floating particles effect */
+    .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+        overflow: hidden;
+    }
+
+    .particle {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: var(--neon-cyan);
+        border-radius: 50%;
+        box-shadow: 0 0 6px var(--neon-cyan);
+        animation: float 15s infinite;
+        opacity: 0.6;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+        10% { opacity: 0.6; }
+        90% { opacity: 0.6; }
+        100% { transform: translateY(-100vh) translateX(100vw); opacity: 0; }
+    }
+
+    .settings-container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 2rem;
+        position: relative;
+        z-index: 10;
+    }
+
+    /* Futuristic Header */
+    .settings-header {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(176, 38, 255, 0.1) 100%);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 20px;
+        padding: 3rem 15rem 3rem 3rem;
+        margin-bottom: 2rem;
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            0 0 40px rgba(0, 255, 255, 0.1),
+            inset 0 0 60px rgba(176, 38, 255, 0.05);
+        position: relative;
+        overflow: hidden;
+        animation: pulseGlow 3s ease-in-out infinite;
+    }
+
+    .settings-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulseGlow {
+        0%, 100% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 255, 255, 0.1), inset 0 0 60px rgba(176, 38, 255, 0.05); }
+        50% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 60px rgba(0, 255, 255, 0.2), inset 0 0 80px rgba(176, 38, 255, 0.1); }
+    }
+
+    .settings-header h1 {
+        margin: 0;
+        font-size: 3rem;
+        font-weight: 900;
+        font-family: 'Orbitron', sans-serif;
+        background: linear-gradient(135deg, #00ffff 0%, #b026ff 50%, #ff00ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        position: relative;
+        z-index: 2;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .settings-header p {
+        margin: 1rem 0 0 0;
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+        font-weight: 400;
+        position: relative;
+        z-index: 2;
+    }
+
+    .settings-subscription-note {
+        align-items: center;
+        background: rgba(10, 14, 39, 0.42);
+        border: 1px solid rgba(0, 255, 255, 0.14);
+        border-radius: 999px;
+        color: rgba(255, 255, 255, 0.68);
+        display: inline-flex;
+        font-size: 0.76rem;
+        font-weight: 600;
+        gap: 0.35rem;
+        line-height: 1;
+        padding: 0.35rem 0.62rem;
+        position: absolute;
+        right: 1.35rem;
+        top: 1.2rem;
+        white-space: nowrap;
+        z-index: 2;
+    }
+
+    .settings-subscription-note i {
+        color: var(--neon-cyan);
+        font-size: 0.78rem;
+        opacity: 0.82;
+    }
+
+    .settings-subscription-note strong {
+        color: var(--text-primary);
+        font-weight: 700;
+    }
+
+    /* Navigation Tabs - Futuristic Style */
+    .settings-nav {
+        background: rgba(21, 25, 50, 0.6);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .settings-nav .nav-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        border: none;
+    }
+
+    .settings-nav .nav-link {
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 1rem;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        transition: all 0.3s ease;
+        margin: 0;
+        border: 1px solid transparent;
+        background: rgba(0, 255, 255, 0.05);
+        position: relative;
+        overflow: hidden;
+        font-family: 'Rajdhani', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .settings-nav .nav-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .settings-nav .nav-link:hover::before {
+        left: 100%;
+    }
+
+    .settings-nav .nav-link:hover {
+        background: rgba(0, 255, 255, 0.1);
+        border-color: rgba(0, 255, 255, 0.3);
+        color: var(--neon-cyan);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+    }
+
+    .settings-nav .nav-link.active {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(176, 38, 255, 0.2) 100%);
+        border: 1px solid var(--neon-cyan);
+        color: var(--text-primary);
+        box-shadow: 
+            0 0 20px rgba(0, 255, 255, 0.4),
+            inset 0 0 20px rgba(176, 38, 255, 0.2);
+    }
+
+    .settings-nav .nav-link i {
+        margin-right: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    /* Form Sections - Glassmorphism */
+    .form-section {
+        background: rgba(21, 25, 50, 0.7);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            0 0 0 1px rgba(0, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+        opacity: 0.6;
+    }
+
+    .form-section:hover {
+        border-color: rgba(0, 255, 255, 0.4);
+        box-shadow: 
+            0 12px 40px rgba(0, 0, 0, 0.4),
+            0 0 30px rgba(0, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .form-section h4 {
+        color: var(--neon-cyan);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-weight: 700;
+        font-size: 1.5rem;
+        font-family: 'Orbitron', sans-serif;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid rgba(0, 255, 255, 0.2);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .form-section h4 i {
+        font-size: 1.8rem;
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+    }
+
+    /* Form Controls - Futuristic Inputs */
+    .form-label {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: 'Rajdhani', sans-serif;
+    }
+
+    .form-control,
+    .form-select {
+        background: rgba(10, 14, 39, 0.6);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 10px;
+        padding: 0.875rem 1.25rem;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: 'Rajdhani', sans-serif;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        background: rgba(10, 14, 39, 0.8);
+        border-color: var(--neon-cyan);
+        box-shadow: 
+            0 0 0 0.2rem rgba(0, 255, 255, 0.25),
+            0 0 20px rgba(0, 255, 255, 0.3);
+        outline: none;
+        color: var(--text-primary);
+    }
+
+    .form-control::placeholder {
+        color: rgba(160, 174, 192, 0.5);
+    }
+
+    .form-control-color {
+        width: 100%;
+        height: 60px;
+        border-radius: 10px;
+        cursor: pointer;
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .form-control-color:hover {
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        transform: scale(1.05);
+    }
+
+    /* Logo Preview - Futuristic */
+    .logo-preview {
+        max-width: 400px;
+        max-height: 200px;
+        border: 2px dashed rgba(0, 255, 255, 0.4);
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: rgba(10, 14, 39, 0.4);
+        margin-bottom: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .logo-preview::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+        animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .logo-preview:hover {
+        border-color: var(--neon-cyan);
+        background: rgba(0, 255, 255, 0.1);
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        transform: scale(1.02);
+    }
+
+    .logo-preview img {
+        max-width: 100%;
+        max-height: 150px;
+        object-fit: contain;
+        filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+    }
+
+    /* Buttons - Neon Style */
+    .btn-save,
+    .btn-primary {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(176, 38, 255, 0.2) 100%);
+        border: 2px solid var(--neon-cyan);
+        color: var(--text-primary);
+        padding: 1rem 2.5rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-family: 'Rajdhani', sans-serif;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    }
+
+    .btn-save::before,
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-save:hover::before,
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-save:hover,
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 
+            0 8px 30px rgba(0, 255, 255, 0.5),
+            0 0 40px rgba(176, 38, 255, 0.4);
+        border-color: var(--neon-purple);
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.3) 0%, rgba(176, 38, 255, 0.3) 100%);
+    }
+
+    .btn-secondary {
+        background: rgba(160, 174, 192, 0.1);
+        border: 2px solid rgba(160, 174, 192, 0.3);
+        color: var(--text-secondary);
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(160, 174, 192, 0.2);
+        border-color: rgba(160, 174, 192, 0.5);
+        color: var(--text-primary);
+        transform: translateY(-2px);
+    }
+
+    /* Employees Section */
+    .tecnicos-section {
+        background: rgba(21, 25, 50, 0.7);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-tecnico {
+        background: rgba(10, 14, 39, 0.5);
+        border: 2px dashed rgba(0, 255, 255, 0.3);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-tecnico:hover {
+        border-color: var(--neon-cyan);
+        background: rgba(0, 255, 255, 0.05);
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+    }
+
+    .form-tecnico h5 {
+        color: var(--neon-cyan);
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        font-family: 'Orbitron', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .tecnico-card {
+        background: rgba(10, 14, 39, 0.6);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 15px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .tecnico-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, var(--neon-cyan), var(--neon-purple));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .tecnico-card:hover::before {
+        opacity: 1;
+    }
+
+    .tecnico-card:hover {
+        border-color: rgba(0, 255, 255, 0.5);
+        box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+        transform: translateX(5px);
+        background: rgba(10, 14, 39, 0.8);
+    }
+
+    .tecnico-card.inactive {
+        opacity: 0.5;
+        background: rgba(10, 14, 39, 0.3);
+    }
+
+    .tecnico-info h5 {
+        margin: 0;
+        color: var(--text-primary);
+        font-weight: 700;
+        font-size: 1.2rem;
+        font-family: 'Rajdhani', sans-serif;
+    }
+
+    .tecnico-info p {
+        margin: 0.5rem 0 0 0;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+
+    .tecnico-info i {
+        color: var(--neon-cyan);
+        margin-right: 0.5rem;
+    }
+
+    .badge-status {
+        padding: 0.5rem 1.25rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: 'Rajdhani', sans-serif;
+    }
+
+    .badge-active {
+        background: rgba(0, 255, 255, 0.2);
+        color: var(--neon-cyan);
+        border: 1px solid var(--neon-cyan);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+
+    .badge-inactive {
+        background: rgba(160, 174, 192, 0.2);
+        color: var(--text-secondary);
+        border: 1px solid rgba(160, 174, 192, 0.3);
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-warning {
+        background: rgba(255, 193, 7, 0.2);
+        border: 1px solid rgba(255, 193, 7, 0.5);
+        color: #ffc107;
+    }
+
+    .btn-warning:hover {
+        background: rgba(255, 193, 7, 0.3);
+        border-color: #ffc107;
+        box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+    }
+
+    .btn-success {
+        background: rgba(40, 167, 69, 0.2);
+        border: 1px solid rgba(40, 167, 69, 0.5);
+        color: #28a745;
+    }
+
+    .btn-success:hover {
+        background: rgba(40, 167, 69, 0.3);
+        border-color: #28a745;
+        box-shadow: 0 0 20px rgba(40, 167, 69, 0.4);
+    }
+
+    /* Alerts */
+    .alert-settings {
+        border-radius: 15px;
+        border: 1px solid;
+        padding: 1.25rem 1.5rem;
+        backdrop-filter: blur(10px);
+        font-weight: 600;
+    }
+
+    .alert-success {
+        background: rgba(40, 167, 69, 0.2);
+        border-color: rgba(40, 167, 69, 0.5);
+        color: #28a745;
+        box-shadow: 0 0 20px rgba(40, 167, 69, 0.2);
+    }
+
+    .alert-error,
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.2);
+        border-color: rgba(220, 53, 69, 0.5);
+        color: #dc3545;
+        box-shadow: 0 0 20px rgba(220, 53, 69, 0.2);
+    }
+
+    .alert-info {
+        background: rgba(0, 255, 255, 0.1);
+        border-color: rgba(0, 255, 255, 0.3);
+        color: var(--neon-cyan);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    }
+
+    /* Form Check */
+    .form-check-input {
+        width: 1.5rem;
+        height: 1.5rem;
+        background: rgba(10, 14, 39, 0.6);
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .form-check-input:checked {
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    }
+
+    .form-check-label {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-left: 0.5rem;
+        font-family: 'Rajdhani', sans-serif;
+    }
+
+    /* Stats Display */
+    .stats-display {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-card {
+        flex: 1;
+        min-width: 200px;
+        background: rgba(21, 25, 50, 0.6);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+        transform: translateY(-5px);
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 900;
+        font-family: 'Orbitron', sans-serif;
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+    }
+
+    .subscription-panel {
+        display: grid;
+        grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1.2fr);
+        gap: 1.25rem;
+        align-items: stretch;
+    }
+
+    .subscription-status-card,
+    .subscription-action-card {
+        background: linear-gradient(145deg, rgba(10, 14, 39, 0.92), rgba(21, 25, 50, 0.74));
+        border: 1px solid rgba(0, 255, 255, 0.22);
+        border-radius: 14px;
+        padding: 1.35rem;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+    }
+
+    .subscription-kicker {
+        color: var(--text-secondary);
+        font-size: 0.76rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.35rem;
+    }
+
+    .subscription-plan {
+        color: var(--text-primary);
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.55rem;
+        font-weight: 800;
+        line-height: 1.15;
+        margin: 0;
+    }
+
+    .subscription-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .subscription-meta-item {
+        background: rgba(255, 255, 255, 0.045);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 0.75rem;
+    }
+
+    .subscription-meta-label {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    .subscription-meta-value {
+        color: var(--text-primary);
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin-top: 0.15rem;
+    }
+
+    .subscription-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        border-radius: 999px;
+        padding: 0.45rem 0.7rem;
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 1rem;
+    }
+
+    .subscription-action-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 100%;
+    }
+
+    .subscription-action-title {
+        color: var(--neon-cyan);
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin-bottom: 0.55rem;
+    }
+
+    .subscription-flow-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.6rem;
+        margin: 1rem 0 1.2rem;
+    }
+
+    .subscription-flow-step {
+        background: rgba(0, 255, 255, 0.055);
+        border: 1px solid rgba(0, 255, 255, 0.15);
+        border-radius: 10px;
+        padding: 0.7rem;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        line-height: 1.25;
+    }
+
+    .subscription-flow-step strong {
+        display: block;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        margin-bottom: 0.15rem;
+    }
+
+    .subscription-modal-card {
+        background: rgba(10, 14, 39, 0.76);
+        border: 1px solid rgba(0, 255, 255, 0.18);
+        border-radius: 12px;
+        padding: 1rem;
+    }
+
+    .subscription-period-card,
+    .subscription-pay-card {
+        background: linear-gradient(145deg, rgba(255,255,255,0.055), rgba(0,255,255,0.035));
+        border: 1px solid rgba(0, 255, 255, 0.18);
+        border-radius: 12px;
+        color: var(--text-primary);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        font: inherit;
+        gap: 0.35rem;
+        min-height: 128px;
+        padding: 1rem;
+        text-align: left;
+        width: 100%;
+        transition: all 0.18s ease;
+    }
+
+    .subscription-period-card:hover,
+    .subscription-pay-card:hover,
+    .subscription-period-card.is-selected,
+    .subscription-pay-card.is-selected {
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 22px rgba(0, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .subscription-period-card strong,
+    .subscription-pay-card strong {
+        display: block;
+        color: var(--text-primary);
+        font-size: 1.05rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .subscription-period-card span,
+    .subscription-pay-card span {
+        color: var(--text-secondary);
+        font-size: 0.88rem;
+    }
+
+    .subscription-method-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin: 0 0 1.25rem;
+    }
+
+    .subscription-payment-form {
+        margin: 0;
+        min-width: 0;
+    }
+
+    .subscription-pay-card {
+        min-height: 148px;
+    }
+
+    .subscription-pay-card .subscription-pay-cta {
+        align-items: center;
+        color: var(--neon-cyan);
+        display: inline-flex;
+        font-size: 0.78rem;
+        font-weight: 800;
+        gap: 0.35rem;
+        margin-top: auto;
+        text-transform: uppercase;
+    }
+
+    #bankTransferSection {
+        margin-top: 1rem;
+    }
+
+    .bank-detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .bank-detail {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 0.7rem;
+    }
+
+    .bank-detail small {
+        color: var(--text-secondary);
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .bank-detail strong {
+        color: var(--text-primary);
+        overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 992px) {
+        .subscription-panel,
+        .subscription-flow-list,
+        .bank-detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .settings-container {
+            padding: 1rem 0.75rem;
+        }
+
+        .settings-header h1 {
+            font-size: 1.75rem;
+        }
+
+        .settings-header p {
+            font-size: 0.9rem;
+        }
+
+        .settings-subscription-note {
+            font-size: 0.72rem;
+            margin-top: 0.9rem;
+            max-width: 100%;
+            position: relative;
+            right: auto;
+            top: auto;
+        }
+
+        .settings-nav {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .settings-nav .nav-link {
+            font-size: 0.85rem;
+            padding: 0.75rem 0.875rem;
+            min-width: auto;
+            white-space: nowrap;
+        }
+
+        .form-section {
+            padding: 1.25rem 1rem;
+        }
+
+        .form-section h4 {
+            font-size: 1.1rem;
+        }
+
+        .form-control,
+        .form-select,
+        textarea.form-control {
+            padding: 0.875rem;
+            min-height: 44px;
+            font-size: 16px; /* Evita zoom en iOS */
+        }
+
+        .tecnico-card {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 1rem;
+            min-height: 44px;
+        }
+
+        .logo-preview {
+            min-height: 150px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .settings-container {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .settings-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .settings-nav .nav-link {
+            font-size: 0.8rem;
+            padding: 0.75rem 0.5rem;
+        }
+
+        .form-section {
+            padding: 1rem 0.75rem;
+        }
+
+        .form-section h4 {
+            font-size: 1rem;
+        }
+
+        .row {
+            margin: 0;
+        }
+
+        .col-md-6,
+        .col-md-8,
+        .col-md-4 {
+            padding: 0;
+            margin-bottom: 1rem;
+        }
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: rgba(10, 14, 39, 0.5);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--neon-cyan), var(--neon-purple));
+        border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, var(--neon-purple), var(--neon-pink));
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Floating Particles -->
+<div class="particles" id="particles"></div>
+
+<div class="settings-container">
+    <!-- Futuristic Header -->
+    <div class="settings-header">
+        <h1>
+            <i class="fas fa-cog"></i>
+            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Centro de Configuración{% else %}Settings Center{% endif %}
+        </h1>
+        <p>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Panel de control avanzado para personalizar tu empresa{% else %}Advanced control panel to customize your company{% endif %}</p>
+        <div class="settings-subscription-note">
+            <i class="fas fa-calendar-check"></i>
+            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                <span>Vence</span>
+                <strong>{{ empresa.fecha_expiracion|date:"d/m/Y" }}</strong>
+                <span>· {{ empresa_dias_restantes|default:"0" }} días</span>
+            {% else %}
+                <span>Expires</span>
+                <strong>{{ empresa.fecha_expiracion|date:"m/d/Y" }}</strong>
+                <span>· {{ empresa_dias_restantes|default:"0" }} days</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Messages removidos: no mostrar allauth/system messages en settings header #}
+    <!-- Navigation Tabs -->
+    <div class="settings-nav">
+        <ul class="nav nav-pills" id="settingsTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="profile-tab" data-bs-toggle="pill" data-bs-target="#profile" type="button" role="tab">
+                    <i class="fas fa-building"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Información de la Empresa{% else %}Company Information{% endif %}
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tax-tab" data-bs-toggle="pill" data-bs-target="#tax" type="button" role="tab">
+                    <i class="fas fa-receipt"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Impuestos y Finanzas{% else %}Taxes & Finance{% endif %}
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="theme-tab" data-bs-toggle="pill" data-bs-target="#theme" type="button" role="tab">
+                    <i class="fas fa-palette"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Tema y Colores{% else %}Theme & Colors{% endif %}
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="subscription-tab" data-bs-toggle="pill" data-bs-target="#subscription" type="button" role="tab">
+                    <i class="fas fa-credit-card"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Suscripción{% else %}Subscription{% endif %}
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tecnicos-tab" data-bs-toggle="pill" data-bs-target="#tecnicos" type="button" role="tab">
+                    <i class="fas fa-users"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}<i class="fas fa-wrench"></i> Técnicos{% else %}Employee Management{% endif %}
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="usuarios-tab" data-bs-toggle="pill" data-bs-target="#usuarios-sistema" type="button" role="tab">
+                    <i class="fas fa-users-cog"></i> Usuarios del Sistema
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="dominio-tab" data-bs-toggle="pill" data-bs-target="#dominio" type="button" role="tab">
+                    <i class="fas fa-globe"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Dominio Personalizado{% else %}Custom Domain{% endif %}
+                    {% if dominio_activo %}<span class="badge bg-success ms-1" style="font-size:0.65rem;">✓</span>{% endif %}
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="settingsForm">
+        {% csrf_token %}
+        <input type="hidden" name="section" id="sectionInput" value="profile">
+
+        <div class="tab-content" id="settingsTabsContent">
+            <!-- Tab: Company Information -->
+            <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                <!-- Name and Tagline -->
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-tag"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Identidad de la Empresa{% else %}Company Identity{% endif %}
+                    </h4>
+
+                    <div class="row">
+                        <div class="col-md-8 mb-4">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Nombre de la Empresa *{% else %}Company Name *{% endif %}</label>
+                            <input type="text" name="company_name" id="id_company_name" class="form-control" value="{{ config.company_name|default:'' }}" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ingrese el nombre de su empresa{% else %}Enter your company name{% endif %}" required>
+                            <small class="form-text text-muted" style="color: var(--text-secondary);">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Este nombre aparecerá en lugar de "eGarage" en toda la plataforma{% else %}This name will appear instead of "eGarage" throughout the platform{% endif %}</small>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Eslogan / Lema{% else %}Tagline / Slogan{% endif %}</label>
+                            <input type="text" name="tagline" id="id_tagline" class="form-control" value="{{ config.tagline|default:'' }}" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Su eslogan aquí{% else %}Your tagline here{% endif %}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logo -->
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-image"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Logo de la Empresa{% else %}Company Logo{% endif %}
+                    </h4>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Logo{% else %}Logo{% endif %}</label>
+                            <div class="logo-preview" id="logoPreviewBox" onclick="document.getElementById('id_logo').click()" style="cursor:pointer; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                                
+                                <img
+                                    id="logoPreviewImg"
+                                    src="{% if config.logo %}{{ config.logo.url }}{% endif %}"
+                                    alt="Logo preview"
+                                    style="{% if not config.logo %}display:none;{% endif %} width:100%; height:100%; object-fit:contain;"
+                                >
+
+                                <div id="logoPreviewPlaceholder" style="{% if config.logo %}display:none;{% endif %} text-align:center;">
+                                    <i class="fas fa-upload fa-3x" style="color: var(--neon-cyan); margin-bottom: 1rem;"></i>
+
+                                    <p style="color: var(--text-secondary); margin: 0;">
+                                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                                            Haga clic para subir logo
+                                        {% else %}
+                                            Click to upload logo
+                                        {% endif %}
+                                    </p>
+                                </div>
+
+                            </div>
+                            <input type="file" name="logo" id="id_logo" accept="image/*" style="display: none;" onchange="previewLogo(this)">
+                            <small class="form-text text-muted" style="color: var(--text-secondary);">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Formatos: PNG, JPG, JPEG, SVG, WEBP (máx. 2MB){% else %}Formats: PNG, JPG, JPEG, SVG, WEBP (max. 2MB){% endif %}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-phone"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Información de Contacto{% else %}Contact Information{% endif %}
+                    </h4>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Teléfono{% else %}Phone{% endif %}</label>
+                            <input type="text" name="phone" id="id_phone" class="form-control" value="{{ config.phone|default:'' }}" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}+56 9 1234 5678{% else %}+1 555 123 4567{% endif %}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Correo Electrónico{% else %}Email{% endif %}</label>
+                            <input type="email" name="email" id="id_email" class="form-control" value="{{ config.email|default:'' }}" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}contacto@suempresa.com{% else %}contact@yourcompany.com{% endif %}">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Sitio Web{% else %}Website{% endif %}</label>
+                            <input type="url" name="website" id="id_website" class="form-control" value="{{ config.website|default:'' }}" placeholder="https://www.suempresa.com">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-map-marker-alt"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Dirección{% else %}Address{% endif %}
+                    </h4>
+
+                    <div class="mb-3">
+                        <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Dirección Completa{% else %}Full Address{% endif %}</label>
+                        <textarea name="address" id="id_address" class="form-control" rows="3" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ingrese la dirección completa de su taller{% else %}Enter the complete address of your shop{% endif %}">{{ config.address|default:'' }}</textarea>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Tab: Taxes & Finance -->
+            <div class="tab-pane fade" id="tax" role="tabpanel">
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-receipt"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Configuración de Impuestos{% else %}Tax Configuration{% endif %}
+                    </h4>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Moneda{% else %}Currency{% endif %}</label>
+                            <select name="currency" id="id_currency" class="form-select">
+                                <option value="CLP" {% if config.currency == 'CLP' %}selected{% endif %}>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Peso Chileno (CLP){% else %}Chilean Peso (CLP){% endif %}</option>
+                                <option value="USD" {% if config.currency == 'USD' %}selected{% endif %}>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Dólar Estadounidense (USD){% else %}US Dollar (USD){% endif %}</option>
+                                <option value="EUR" {% if config.currency == 'EUR' %}selected{% endif %}>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Euro (EUR){% else %}Euro (EUR){% endif %}</option>
+                                <option value="MXN" {% if config.currency == 'MXN' %}selected{% endif %}>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Peso Mexicano (MXN){% else %}Mexican Peso (MXN){% endif %}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Tasa de Impuesto (%){% else %}Tax Rate (%){% endif %}</label>
+                            <input type="number" name="tax_rate" id="id_tax_rate" class="form-control" step="0.01" min="0" max="100" value="{{ config.tax_rate|default:19.00 }}" placeholder="19.00">
+                            <small class="form-text text-muted" style="color: var(--text-secondary);">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ej: 19.00 para Chile, 0.00 para USA{% else %}E.g: 19.00 for Chile, 0.00 for USA{% endif %}</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check mt-4">
+                                <input type="checkbox" name="apply_tax_by_default" id="id_apply_tax_by_default" class="form-check-input" {% if config.apply_tax_by_default %}checked{% endif %}>
+                                <label class="form-check-label" for="id_apply_tax_by_default">
+                                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Aplicar impuesto por defecto{% else %}Apply tax by default{% endif %}
+                                </label>
+                            </div>
+                            <small class="form-text text-muted" style="color: var(--text-secondary);">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Aplicar automáticamente el impuesto a nuevos documentos{% else %}Automatically apply tax to new documents{% endif %}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Theme & Colors -->
+            <div class="tab-pane fade" id="theme" role="tabpanel">
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-palette"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Personalización de Colores{% else %}Color Customization{% endif %}
+                    </h4>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Color Principal{% else %}Primary Color{% endif %}</label>
+                            <input type="color" name="primary_color" id="id_primary_color" class="form-control form-control-color" value="{{ config.primary_color|default:'#0d6efd' }}">
+                            <small class="form-text text-muted" style="color: var(--text-secondary);">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Color principal del tema{% else %}Main theme color{% endif %}</small>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Color Secundario{% else %}Secondary Color{% endif %}</label>
+                            <input type="color" name="secondary_color" id="id_secondary_color" class="form-control form-control-color" value="{{ config.secondary_color|default:'#6c757d' }}">
+                            <small class="form-text text-muted" style="color: var(--text-secondary);">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Color secundario del tema{% else %}Secondary theme color{% endif %}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-cog"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Configuración Adicional{% else %}Additional Settings{% endif %}
+                    </h4>
+
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="separate_by_technician" id="id_separate_by_technician" class="form-check-input" {% if config.separate_by_technician %}checked{% endif %}>
+                        <label class="form-check-label" for="id_separate_by_technician">
+                            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Separar reportes por técnico{% else %}Separate reports by technician{% endif %}
+                        </label>
+                        <small class="form-text text-muted d-block" style="color: var(--text-secondary);">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Mostrar reportes separados por técnico{% else %}Show reports separated by technician{% endif %}</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Subscription -->
+            <div class="tab-pane fade" id="subscription" role="tabpanel">
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-credit-card"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Suscripción{% else %}Subscription{% endif %}
+                    </h4>
+
+                    <div class="subscription-panel">
+                        <div class="subscription-status-card">
+                            <div class="subscription-kicker">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Estado actual{% else %}Current status{% endif %}</div>
+                            <h5 class="subscription-plan">{{ empresa_plan|default:'basic'|upper }}</h5>
+                            <span class="subscription-status-pill" style="background: {{ empresa_color_estado|default:'#0d6efd' }};">
+                                <i class="fas fa-circle"></i>
+                                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                                    {% if empresa_estado_suscripcion == 'vencida' %}Vencida{% elif empresa_estado_suscripcion == 'critico' %}Crítico{% elif empresa_estado_suscripcion == 'advertencia' %}Advertencia{% else %}Activa{% endif %}
+                                {% else %}
+                                    {% if empresa_estado_suscripcion == 'vencida' %}Expired{% elif empresa_estado_suscripcion == 'critico' %}Critical{% elif empresa_estado_suscripcion == 'advertencia' %}Warning{% else %}Active{% endif %}
+                                {% endif %}
+                            </span>
+                            <div class="subscription-meta-grid">
+                                <div class="subscription-meta-item">
+                                    <div class="subscription-meta-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Vencimiento{% else %}Expiration{% endif %}</div>
+                                    <div class="subscription-meta-value">
+                                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}{{ empresa.fecha_expiracion|date:"d/m/Y" }}{% else %}{{ empresa.fecha_expiracion|date:"m/d/Y" }}{% endif %}
+                                    </div>
+                                </div>
+                                <div class="subscription-meta-item">
+                                    <div class="subscription-meta-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Días restantes{% else %}Days left{% endif %}</div>
+                                    <div class="subscription-meta-value">{{ empresa_dias_restantes|default:"0" }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="subscription-action-card">
+                            <div>
+                                <div class="subscription-action-title">
+                                    <i class="fas fa-rocket me-2"></i>
+                                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Renovar suscripción{% else %}Renew subscription{% endif %}
+                                </div>
+                                <p style="color: var(--text-secondary); margin-bottom: 0;">
+                                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                                        Elige mensual o anual, paga con pasarela o sube tu comprobante de transferencia para revisión manual.
+                                    {% else %}
+                                        Choose monthly or annual renewal, pay through the gateway, or upload a bank transfer receipt for manual review.
+                                    {% endif %}
+                                </p>
+                                
+                                <div class="subscription-flow-list" style="display:grid; gap:.65rem; margin:1rem 0;">
+                                    <div style="display:flex; justify-content:space-between; gap:1rem; padding:.75rem 1rem; border:1px solid rgba(0,255,255,.16); border-radius:14px; background:rgba(255,255,255,.035);">
+                                        <span style="color:rgba(255,255,255,.62);">{% if empresa_pais|default:'CL' == 'US' %}Period{% else %}Periodo{% endif %}</span>
+                                        <strong style="color:rgba(255,255,255,.9);">{% if empresa_pais|default:'CL' == 'US' %}Monthly or annual{% else %}Mensual o anual{% endif %}</strong>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; gap:1rem; padding:.75rem 1rem; border:1px solid rgba(0,255,255,.16); border-radius:14px; background:rgba(255,255,255,.035);">
+                                        <span style="color:rgba(255,255,255,.62);">{% if empresa_pais|default:'CL' == 'US' %}Payment{% else %}Pago{% endif %}</span>
+                                        <strong style="color:rgba(255,255,255,.9);">{% if empresa_pais|default:'CL' == 'US' %}Credit / Debit Card · Bank Transfer{% else %}Tarjeta de Crédito / Débito · Transferencia{% endif %}</strong>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; gap:1rem; padding:.75rem 1rem; border:1px solid rgba(0,255,255,.16); border-radius:14px; background:rgba(255,255,255,.035);">
+                                        <span style="color:rgba(255,255,255,.62);">{% if empresa_pais|default:'CL' == 'US' %}Validation{% else %}Validación{% endif %}</span>
+                                        <strong style="color:rgba(255,255,255,.9);">{% if empresa_pais|default:'CL' == 'US' %}Automatic or administrative{% else %}Automática o administrativa{% endif %}</strong>
+                                    </div>
+                                </div>
+
+                            </div>
+                            {% if empresa.pais == 'CL' or empresa.pais == 'US' %}
+                                <button type="button" class="btn btn-save w-100" data-open-subscription-modal>
+                                    <i class="fas fa-credit-card me-2"></i>
+                                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Renovar ahora{% else %}Renew now{% endif %}
+                                </button>
+                                <div style="margin-top:.9rem; text-align:center;">
+                                    <button type="button"
+                                            class="btn btn-link btn-sm"
+                                            style="color:rgba(255,255,255,.48); text-decoration:none;"
+                                            data-bs-toggle="modal"
+                                            onclick="openCancelSubscriptionModal(event)">
+                                        Solicitar cancelación de suscripción
+                                    </button>
+                                </div>
+
+                            {% else %}
+                                <div class="alert alert-info mt-3 mb-0">
+                                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                                        Su país no tiene una pasarela de pago activa en este momento. Contacte a soporte para renovar su suscripción.
+                                    {% else %}
+                                        Your country does not currently have an active payment gateway. Contact support to renew your subscription.
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Employees -->
+            <div class="tab-pane fade" id="tecnicos" class="tab-pane fade" role="tabpanel">
+                <div class="tecnicos-section">
+                    <h4>
+                        <i class="fas fa-users"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}<i class="fas fa-wrench"></i> Técnicos{% else %}Employee Management{% endif %}
+                    </h4>
+
+                    <!-- Stats -->
+                    {% if tecnicos %}
+                    <div class="stats-display mb-4">
+                        <div class="stat-card">
+                            <div class="stat-value">{{ tecnicos|length }}</div>
+                            <div class="stat-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Total Empleados{% else %}Total Employees{% endif %}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">{{ tecnicos|length|add:"-1"|add:"1" }}</div>
+                            <div class="stat-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Empleados Activos{% else %}Active Employees{% endif %}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Form to create employee -->
+                    <div class="form-tecnico">
+                        <h5>
+                            <i class="fas fa-user-plus me-2"></i>
+                            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Agregar Nuevo Empleado{% else %}Add New Employee{% endif %}
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Nombre Completo *{% else %}Full Name *{% endif %}</label>
+                                <input type="text" name="nombre" id="id_tecnico_nombre" class="form-control" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Nombre del empleado{% else %}Employee name{% endif %}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Teléfono{% else %}Phone{% endif %}</label>
+                                <input type="text" name="telefono" id="id_tecnico_telefono" class="form-control" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}+56 9 1234 5678{% else %}+1 555 123 4567{% endif %}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Dirección{% else %}Address{% endif %}</label>
+                                <input type="text" name="direccion" id="id_tecnico_direccion" class="form-control" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Dirección del empleado{% else %}Employee address{% endif %}">
+                            </div>
+                        </div>
+                        <button type="submit" name="crear_tecnico" class="btn btn-save">
+                            <i class="fas fa-plus me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Agregar Empleado{% else %}Add Employee{% endif %}
+                        </button>
+                    </div>
+
+                    <!-- Employee List -->
+                    {% if tecnicos %}
+                        <h5 class="mb-3" style="color: var(--neon-cyan); font-family: 'Orbitron', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                            <i class="fas fa-list me-2"></i>
+                            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Empleados Registrados ({{ tecnicos|length }}){% else %}Registered Employees ({{ tecnicos|length }}){% endif %}
+                        </h5>
+                        {% for tecnico in tecnicos %}
+                            <div class="tecnico-card {% if not tecnico.activo %}inactive{% endif %}">
+                                <div class="tecnico-info">
+                                    <h5>{{ tecnico.nombre }}</h5>
+                                    {% if tecnico.telefono %}
+                                        <p><i class="fas fa-phone"></i>{{ tecnico.telefono }}</p>
+                                    {% endif %}
+                                    {% if tecnico.direccion %}
+                                        <p><i class="fas fa-map-marker-alt"></i>{{ tecnico.direccion }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="tecnico-status">
+                                    <span class="badge-status {% if tecnico.activo %}badge-active{% else %}badge-inactive{% endif %}">
+                                        {% if tecnico.activo %}
+                                            <i class="fas fa-check-circle me-1"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Activo{% else %}Active{% endif %}
+                                        {% else %}
+                                            <i class="fas fa-times-circle me-1"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Inactivo{% else %}Inactive{% endif %}
+                                        {% endif %}
+                                    </span>
+                                        <button type="submit" name="toggle_tecnico" value="{{ tecnico.id }}" class="btn btn-sm {% if tecnico.activo %}btn-warning{% else %}btn-success{% endif %}">
+                                            {% if tecnico.activo %}
+                                                <i class="fas fa-ban me-1"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Desactivar{% else %}Deactivate{% endif %}
+                                            {% else %}
+                                                <i class="fas fa-check me-1"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Activar{% else %}Activate{% endif %}
+                                            {% endif %}
+                                        </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}No hay empleados registrados. Agregue uno usando el formulario de arriba.{% else %}No employees registered. Add one using the form above.{% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Tab: Dominio Personalizado -->
+            
+            <!-- Panel Usuarios del Sistema -->
+            <div class="tab-pane fade" id="usuarios-sistema" role="tabpanel">
+                <div class="form-section">
+                    <h4><i class="fas fa-user-plus"></i> {% if empresa_pais|default:'CL' == 'US' %}Register User with Login Access{% else %}Registrar Usuario con Acceso (Login){% endif %}</h4>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">{% if empresa_pais|default:'CL' == 'US' %}Username (Email){% else %}Nombre de Usuario (Email){% endif %}</label>
+                            <input type="email" name="username" class="form-control" placeholder="{% if empresa_pais|default:'CL' == 'US' %}e.g. employee@egarage.com{% else %}ej: empleado@egarage.com{% endif %}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">{% if empresa_pais|default:'CL' == 'US' %}Email Address{% else %}Correo Electrónico{% endif %}</label>
+                            <input type="email" name="email" class="form-control" placeholder="{% if empresa_pais|default:'CL' == 'US' %}e.g. admin@egarage.com{% else %}ej: admin@egarage.com{% endif %}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">{% if empresa_pais|default:'CL' == 'US' %}Password{% else %}Contraseña{% endif %}</label>
+                            <input type="password" name="password" class="form-control" placeholder="••••••••">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">{% if empresa_pais|default:'CL' == 'US' %}Role / Privileges{% else %}Rol / Privilegios{% endif %}</label>
+                            <select name="rol" class="form-select">
+                                <option value="ADMIN">{% if empresa_pais|default:'CL' == 'US' %}ADMINISTRATOR{% else %}ADMINISTRADOR{% endif %}</option>
+                                <option value="VENDEDOR">{% if empresa_pais|default:'CL' == 'US' %}SALES{% else %}VENDEDOR{% endif %}</option>
+                            </select>
+                        </div>
+                        <div class="col-12 text-end mt-3">
+                            <button type="submit" name="crear_usuario_sistema" value="1" class="btn btn-save btn-primary">
+                                <i class="fas fa-save"></i> {% if empresa_pais|default:'CL' == 'US' %}Enable Account{% else %}Habilitar Cuenta{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section mt-4">
+                    <h4><i class="fas fa-users"></i> Colaboradores con Login</h4>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover" style="background: rgba(10, 14, 39, 0.6); border: 1px solid rgba(0, 255, 255, 0.2); color: #fff;">
+                            <thead>
+                                <tr style="color: #00ffff; font-family: 'Orbitron', sans-serif;">
+                                    <th class="p-3">Usuario/Email</th>
+                                    <th class="p-3">Rol</th>
+                                    <th class="p-3 text-center">Permiso de Ingreso</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in usuarios_sistema %}
+                                <tr style="border-bottom: 1px solid rgba(0, 255, 255, 0.1);">
+                                    <td class="p-3 align-middle">{{ u.user.username }}</td>
+                                    <td class="p-3 align-middle"><span class="badge bg-info text-dark">{{ u.rol }}</span></td>
+                                    <td class="p-3 align-middle text-center">
+                                        {% if u.is_active %}
+                                            <button type="submit" name="toggle_usuario_sistema" value="{{ u.id }}" class="btn btn-sm btn-success">
+                                                ACTIVO (Haga clic para suspender)
+                                            </button>
+                                        {% else %}
+                                            <button type="submit" name="toggle_usuario_sistema" value="{{ u.id }}" class="btn btn-sm btn-danger">
+                                                SUSPENDIDO (Haga clic para habilitar)
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center p-4 text-muted">{% if empresa_pais|default:'CL' == 'US' %}No other users with access have been created under your subscription.{% else %}No posees otros usuarios con acceso creados bajo tu suscripción.{% endif %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="dominio" role="tabpanel">
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-globe"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Dominio Personalizado{% else %}Custom Domain{% endif %}
+                    </h4>
+
+                    {% if dominio_activo %}
+                    <div class="alert alert-success mb-4" style="border-radius:8px;">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>{% if request.path|slice:':3' == '/cl' %}Dominio activo{% else %}Active domain{% endif %}:</strong>
+                        <code class="ms-1">{{ dominio_activo.dominio }}</code>
+                    </div>
+                    {% endif %}
+
+                    {% for dom in dominios %}
+                    <div class="mb-3 p-3" style="background:rgba(0,255,255,0.04);border-radius:8px;border:1px solid rgba(0,255,255,0.12);">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap" style="gap:10px;">
+                            <div>
+                                <code style="color:var(--neon-cyan);font-size:1rem;">{{ dom.dominio }}</code>
+                                <span class="badge ms-2"
+                                    style="background:{% if dom.estado == 'ACTIVO' %}#10b981{% elif dom.estado == 'PENDIENTE' %}#f59e0b{% elif dom.estado == 'VERIFICANDO' %}#3b82f6{% elif dom.estado == 'ERROR_DNS' %}#ef4444{% else %}#6b7280{% endif %};">
+                                    {{ dom.get_estado_display }}
+                                </span>
+                            </div>
+                            {% if dom.puede_verificarse %}
+                            <button type="submit" name="solicitar_verificacion" value="{{ dom.pk }}"
+                                class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-search me-1"></i>
+                                {% if request.path|slice:':3' == '/cl' %}Solicitar verificación{% else %}Request verification{% endif %}
+                            </button>
+                            {% endif %}
+                        </div>
+                        {% if dom.estado == 'PENDIENTE' or dom.estado == 'VERIFICANDO' or dom.estado == 'ERROR_DNS' %}
+                        {% with dns=dom.get_dns_instructions %}
+                        <div class="mt-3 p-3" style="background:rgba(0,0,0,0.3);border-radius:6px;font-size:0.82rem;">
+                            <strong style="color:var(--neon-cyan);">
+                                {% if request.path|slice:':3' == '/cl' %}Instrucciones DNS{% else %}DNS Instructions{% endif %}
+                            </strong>
+                            <p class="mb-1 mt-2">
+                                {% if request.path|slice:':3' == '/cl' %}Crea estos registros en tu proveedor de DNS:{% else %}Create these records in your DNS provider:{% endif %}
+                            </p>
+                            <div class="mb-1">
+                                <span class="badge bg-secondary me-1">{{ dns.apex.type }}</span>
+                                <code>{{ dns.apex.name }}</code>
+                                <span class="text-muted mx-1">→</span>
+                                <code>{{ dns.apex.value }}</code>
+                            </div>
+                            {% if dns.www.enabled %}
+                            <div class="mb-1">
+                                <span class="badge bg-secondary me-1">{{ dns.www.type }}</span>
+                                <code>{{ dns.www.name }}</code>
+                                <span class="text-muted mx-1">→</span>
+                                <code>{{ dns.www.value }}</code>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <span class="badge bg-secondary me-1">{{ dns.txt.type }}</span>
+                                <code>{{ dns.txt.name }}</code>
+                                <span class="text-muted mx-1">→</span>
+                                <code>{{ dns.txt.value }}</code>
+                            </div>
+                        </div>
+                        {% endwith %}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    {% if not dominio_activo %}
+                    <h5 class="mt-4 mb-3" style="color:var(--neon-cyan);font-family:'Orbitron',sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        {% if request.path|slice:':3' == '/cl' %}Registrar nuevo dominio{% else %}Register new domain{% endif %}
+                    </h5>
+                    <div class="row align-items-end">
+                        <div class="col-md-8 mb-3">
+                            {{ form_dominio.dominio }}
+                            <small class="text-muted">{{ form_dominio.dominio.help_text }}</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button type="submit" name="registrar_dominio" value="1" class="btn btn-save w-100">
+                                <i class="fas fa-globe me-2"></i>
+                                {% if request.path|slice:':3' == '/cl' %}Registrar{% else %}Register{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-section">
+            <div class="d-flex align-items-center flex-wrap" style="gap: 24px;">
+                <div style="display:flex; align-items:center; gap:22px;">
+                    <button type="submit" form="settingsForm" class="btn btn-save" id="saveBtn" style="min-width:280px;">
+                        <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar Configuración{% else %}Save Settings{% endif %}
+                    </button>
+                    <a href="{% url 'taller:dashboard' %}" class="btn btn-secondary" style="margin-left: 22px; min-width:180px;">
+                        <i class="fas fa-times me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Cancelar{% else %}Cancel{% endif %}
+                    </a>
+                </div>
+                <div style="color: var(--text-secondary);">
+                    <small>
+                        <i class="fas fa-clock me-1"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Última actualización:{% else %}Last updated:{% endif %} {{ config.updated_at|date:"m/d/Y H:i" }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </form>
+
+        <!-- Subscription Modal -->
+        
+        <div class="modal fade" id="cancelSubscriptionModal" tabindex="-1" aria-labelledby="cancelSubscriptionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content subscription-modal-card">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title" id="cancelSubscriptionModalLabel">
+                            Solicitar cancelación
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="color:rgba(255,255,255,.68);">
+                            Antes de cerrar la cuenta enviaremos un respaldo de la información al correo registrado.
+                        </p>
+                        <p style="color:rgba(255,255,255,.45); font-size:.85rem;">
+                            Esta acción puede ser revisada por administración antes de aplicar el cierre definitivo.
+                        </p>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Volver</button>
+                        <button type="button" class="btn btn-danger">
+                            Confirmar solicitud
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="subscriptionModal" tabindex="-1" aria-labelledby="subscriptionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content bg-dark text-white" style="border: 1px solid rgba(0,255,255,0.24); border-radius: 18px; overflow: hidden;">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title" id="subscriptionModalLabel">
+                            <i class="fas fa-bolt me-2" style="color: var(--neon-cyan);"></i>
+                            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Renovación de suscripción{% else %}Subscription renewal{% endif %}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="subscriptionModalStep1" class="subscription-modal-card">
+                            <div class="subscription-kicker">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Paso 1{% else %}Step 1{% endif %}</div>
+                            <h6 class="text-neon mb-3">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Selecciona el periodo{% else %}Select the period{% endif %}</h6>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <button type="button" class="subscription-period-card" data-subscription-period="mensual">
+                                        <strong>30 {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}días{% else %}days{% endif %}</strong>
+                                        <span>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Renovación mensual. Ideal para continuidad operativa.{% else %}Monthly renewal for operational continuity.{% endif %}</span>
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="button" class="subscription-period-card" data-subscription-period="anual">
+                                        <strong>365 {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}días{% else %}days{% endif %}</strong>
+                                        <span>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Renovación anual. Menos gestión durante el año.{% else %}Annual renewal with fewer interruptions.{% endif %}</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="alert alert-secondary text-white mb-0" role="alert">
+                                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Selecciona el plazo que quieres renovar y luego elige el medio de pago.{% else %}Select the renewal period and then choose the payment method.{% endif %}
+                            </div>
+                        </div>
+
+                        <div id="subscriptionModalStep2" class="subscription-modal-card" style="display: none;">
+                            <div class="subscription-kicker">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Paso 2{% else %}Step 2{% endif %}</div>
+                            <h6 class="text-neon mb-3">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Elige el medio de pago{% else %}Choose payment method{% endif %}</h6>
+                            <div class="subscription-method-grid">
+                                {% if empresa.pais == 'CL' %}
+                                    <form method="post" action="{% url 'start_flow_payment' %}" class="subscription-payment-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="plan" value="mensual" data-payment-plan-input>
+                                        <button type="submit" class="subscription-pay-card subscription-method-btn" data-method="flow">
+                                            <strong><i class="fas fa-credit-card me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Tarjeta de Crédito / Débito{% else %}Credit / Debit Card{% endif %}</strong>
+                                            <span>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Pago seguro con tarjeta mediante pasarela chilena.{% else %}Secure card payment via Chilean gateway.{% endif %}</span>
+                                            <span class="subscription-pay-cta">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Pagar con tarjeta{% else %}Pay with card{% endif %}<i class="fas fa-arrow-right"></i></span>
+                                        </button>
+                                    </form>
+                                {% elif empresa.pais == 'US' %}
+                                    {% url 'payment_usa' as paypal_payment_url %}
+                                    <a href="{{ paypal_payment_url|default:'#' }}?plan=mensual" class="subscription-pay-card subscription-method-btn text-decoration-none" data-method="paypal">
+                                        <strong><i class="fab fa-cc-paypal me-2"></i>PayPal</strong>
+                                        <span>Automatic payment for US subscriptions.</span>
+                                        <span class="subscription-pay-cta">Go to PayPal<i class="fas fa-arrow-right"></i></span>
+                                    </a>
+                                {% endif %}
+                                <button type="button" class="subscription-pay-card subscription-method-btn" data-method="transferencia">
+                                    <strong><i class="fas fa-university me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Transferencia bancaria{% else %}Bank transfer{% endif %}</strong>
+                                    <span>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Muestra los datos bancarios y permite subir el comprobante para revisión.{% else %}Shows bank details and lets you upload the receipt for review.{% endif %}</span>
+                                    <span class="subscription-pay-cta">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ver datos bancarios{% else %}View bank details{% endif %}<i class="fas fa-chevron-down"></i></span>
+                                </button>
+                            </div>
+
+                            <div id="bankTransferSection" style="display: none;" class="subscription-modal-card">
+                                <h6 class="mb-3">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Datos bancarios{% else %}Bank transfer details{% endif %}</h6>
+                                <div class="bank-detail-grid">
+                                    <div class="bank-detail"><small>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Banco{% else %}Bank{% endif %}</small><strong>{{ datos_transferencia.banco|default:"Por configurar" }}</strong></div>
+                                    <div class="bank-detail"><small>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Tipo de cuenta{% else %}Account type{% endif %}</small><strong>{{ datos_transferencia.tipo_cuenta|default:"Por configurar" }}</strong></div>
+                                    <div class="bank-detail"><small>{{ datos_transferencia.account_number_label|default:"Número de cuenta" }}</small><strong>{{ datos_transferencia.numero_cuenta|default:"Por configurar" }}</strong></div>
+                                    <div class="bank-detail"><small>{{ datos_transferencia.tax_id_label|default:"RUT" }}</small><strong>{{ datos_transferencia.rut|default:"Por configurar" }}</strong></div>
+                                    <div class="bank-detail"><small>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Titular{% else %}Holder{% endif %}</small><strong>{{ datos_transferencia.titular|default:"Por configurar" }}</strong></div>
+                                    <div class="bank-detail"><small>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Correo de confirmación{% else %}Confirmation email{% endif %}</small><strong>{{ datos_transferencia.email_confirmacion|default:"Por configurar" }}</strong></div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-white">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Monto pagado{% else %}Amount paid{% endif %}</label>
+                                    <input type="number" id="transferAmount" class="form-control" placeholder="{{ subscription_prices.monthly|default:'20000' }}" min="1000" step="1000">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-white">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Número de operación{% else %}Transaction number{% endif %}</label>
+                                    <input type="text" id="transferReference" class="form-control" placeholder="1234567890">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-white">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Comprobante{% else %}Receipt{% endif %}</label>
+                                    <input type="file" id="transferReceipt" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-white">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Notas (opcional){% else %}Notes (optional){% endif %}</label>
+                                    <textarea id="transferNotes" class="form-control" rows="3" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ej: depósito realizado en sucursal X{% else %}E.g. deposit made at branch X{% endif %}"></textarea>
+                                </div>
+                            </div>
+
+                            <input type="hidden" id="subscriptionModalPeriod" value="mensual">
+                            <input type="hidden" id="subscriptionModalPlan" value="{{ empresa_plan|default:'basic' }}">
+                            <input type="hidden" id="subscriptionMonthlyAmount" value="{{ subscription_prices.monthly|default:'0' }}">
+                            <input type="hidden" id="subscriptionAnnualAmount" value="{{ subscription_prices.annual|default:'0' }}">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Cerrar{% else %}Close{% endif %}</button>
+                        <button type="button" id="subscriptionTransferSubmit" class="btn btn-save" style="display: none;">
+                            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Enviar comprobante{% else %}Send receipt{% endif %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update section input when tab changes
+    const tabs = document.querySelectorAll('[data-bs-toggle="pill"]');
+    const sectionMapping = {
+        'profile': 'profile',
+        'tax': 'financial',
+        'theme': 'theme',
+        'subscription': 'subscription',
+        'tecnicos': 'profile',
+        'usuarios-sistema': 'profile',
+        'dominio': 'dominio'
+    };
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function(e) {
+            const targetId = e.target.getAttribute('data-bs-target').replace('#', '');
+            const section = sectionMapping[targetId] || 'profile';
+            const sectionInput = document.getElementById('sectionInput');
+            if (sectionInput) {
+                sectionInput.value = section;
+            }
+        });
+    });
+
+    const subscriptionStep1 = document.getElementById('subscriptionModalStep1');
+    const subscriptionStep2 = document.getElementById('subscriptionModalStep2');
+    const bankTransferSection = document.getElementById('bankTransferSection');
+    const transferSubmitBtn = document.getElementById('subscriptionTransferSubmit');
+    const subscriptionModalPeriod = document.getElementById('subscriptionModalPeriod');
+    const subscriptionModalPlan = document.getElementById('subscriptionModalPlan');
+    const transferReceiptInput = document.getElementById('transferReceipt');
+    const transferAmountInput = document.getElementById('transferAmount');
+    const transferReferenceInput = document.getElementById('transferReference');
+    const transferNotesInput = document.getElementById('transferNotes');
+    const paymentMethodButtons = document.querySelectorAll('#subscriptionModal .subscription-method-btn');
+    const paymentPlanInputs = document.querySelectorAll('#subscriptionModal [data-payment-plan-input]');
+    const subscriptionMonthlyAmount = document.getElementById('subscriptionMonthlyAmount');
+    const subscriptionAnnualAmount = document.getElementById('subscriptionAnnualAmount');
+    {% url 'payment_usa' as paypal_js_url %}
+    const paypalUrl = '{{ paypal_js_url|default:"" }}';
+
+    function getAmountForPeriod(period) {
+        const source = period === 'anual' ? subscriptionAnnualAmount : subscriptionMonthlyAmount;
+        return source?.value || '';
+    }
+
+    function updatePaymentLinks(period) {
+        paymentPlanInputs.forEach(input => {
+            input.value = period;
+        });
+        if (transferAmountInput && !transferAmountInput.value) {
+            transferAmountInput.value = getAmountForPeriod(period);
+        }
+        paymentMethodButtons.forEach(button => {
+            const method = button.dataset.method;
+            if (!method) return;
+            if (method === 'paypal') {
+                button.setAttribute('href', `${paypalUrl}?plan=${period}`);
+            }
+        });
+    }
+
+    function showBankTransferSection() {
+        transferAmountInput.value = transferAmountInput.value || getAmountForPeriod(subscriptionModalPeriod.value);
+        bankTransferSection.style.display = 'block';
+        transferSubmitBtn.style.display = 'inline-block';
+        paymentMethodButtons.forEach(button => button.classList.toggle('is-selected', button.dataset.method === 'transferencia'));
+        bankTransferSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    const subscriptionModalElement = document.getElementById('subscriptionModal');
+    if (subscriptionModalElement) {
+        subscriptionModalElement.addEventListener('hidden.bs.modal', function() {
+            subscriptionStep1.style.display = 'block';
+            subscriptionStep2.style.display = 'none';
+            bankTransferSection.style.display = 'none';
+            transferSubmitBtn.style.display = 'none';
+            paymentMethodButtons.forEach(button => button.classList.remove('is-selected'));
+        });
+    }
+
+    subscriptionModalPeriod.value = 'mensual';
+    updatePaymentLinks(subscriptionModalPeriod.value);
+
+    document.querySelectorAll('[data-subscription-period]').forEach(button => {
+        button.addEventListener('click', function() {
+            const period = this.dataset.subscriptionPeriod;
+            subscriptionModalPeriod.value = period;
+            document.querySelectorAll('[data-subscription-period]').forEach(periodButton => {
+                periodButton.classList.toggle('is-selected', periodButton === this);
+            });
+            updatePaymentLinks(period);
+            subscriptionStep1.style.display = 'none';
+            subscriptionStep2.style.display = 'block';
+            bankTransferSection.style.display = 'none';
+            transferSubmitBtn.style.display = 'none';
+            transferAmountInput.value = getAmountForPeriod(period);
+            paymentMethodButtons.forEach(button => button.classList.remove('is-selected'));
+        });
+    });
+
+    paymentMethodButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            const method = this.dataset.method;
+            if (method === 'transferencia') {
+                event.preventDefault();
+                showBankTransferSection();
+                return;
+            }
+            paymentMethodButtons.forEach(item => item.classList.remove('is-selected'));
+            this.classList.add('is-selected');
+        });
+    });
+
+    function getCsrfToken() {
+        return document.querySelector('input[name="csrfmiddlewaretoken"]')?.value || '';
+    }
+
+    async function submitBankTransferReceipt() {
+        if (!transferAmountInput.value || Number(transferAmountInput.value) <= 0) {
+            alert(`{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ingresa el monto pagado antes de enviar.{% else %}Enter the paid amount before submitting.{% endif %}`);
+            transferAmountInput.focus();
+            return;
+        }
+
+        if (!transferReceiptInput.files.length) {
+            alert(`{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Debes adjuntar el comprobante antes de enviar.{% else %}Please attach the receipt before submitting.{% endif %}`);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('monto', transferAmountInput.value);
+        formData.append('referencia', transferReferenceInput.value);
+        formData.append('periodo', subscriptionModalPeriod.value);
+        formData.append('renewal_period', subscriptionModalPeriod.value);
+        formData.append('plan', subscriptionModalPlan.value);
+        formData.append('comprobante', transferReceiptInput.files[0]);
+        formData.append('notas', transferNotesInput.value);
+        formData.append('csrfmiddlewaretoken', getCsrfToken());
+
+        transferSubmitBtn.disabled = true;
+        transferSubmitBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Enviando...{% else %}Submitting...{% endif %}`;
+
+        try {
+            const response = await fetch('{% url "registrar_transferencia_ajax" %}', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert(result.message || `{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Comprobante enviado exitosamente. Espera la confirmación del equipo.{% else %}Receipt uploaded successfully. Please wait for approval.{% endif %}`);
+                const modalClose = document.querySelector('#subscriptionModal button[data-bs-dismiss="modal"]');
+                modalClose?.click();
+            } else {
+                alert(result.error || `{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Error al enviar el comprobante, inténtalo de nuevo.{% else %}Error submitting receipt, please try again.{% endif %}`);
+            }
+        } catch (error) {
+            console.error(error);
+            alert(`{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Error del servidor. Intenta nuevamente más tarde.{% else %}Server error. Please try again later.{% endif %}`);
+        } finally {
+            transferSubmitBtn.disabled = false;
+            transferSubmitBtn.innerHTML = `{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Enviar comprobante{% else %}Send receipt{% endif %}`;
+        }
+    }
+
+    if (transferSubmitBtn) {
+        transferSubmitBtn.addEventListener('click', submitBankTransferReceipt);
+    }
+
+    // Logo preview
+    function previewLogo(input) {
+
+        if (!input.files || !input.files[0]) return;
+
+        const file = input.files[0];
+
+        if (!file.type.startsWith('image/')) {
+            alert('Selecciona una imagen válida');
+            return;
+        }
+
+        const img = document.getElementById('logoPreviewImg');
+        const placeholder = document.getElementById('logoPreviewPlaceholder');
+
+        const objectUrl = URL.createObjectURL(file);
+
+        img.src = objectUrl;
+        img.style.display = 'block';
+
+        if (placeholder) {
+            placeholder.style.display = 'none';
+        }
+    }
+
+    // Make previewLogo global
+    window.previewLogo = previewLogo;
+
+    // Real-time color updates
+    const primaryColor = document.getElementById('id_primary_color');
+    const secondaryColor = document.getElementById('id_secondary_color');
+    
+    if (primaryColor) {
+        primaryColor.addEventListener('change', function() {
+            document.documentElement.style.setProperty('--bs-primary', this.value);
+        });
+    }
+    
+    if (secondaryColor) {
+        secondaryColor.addEventListener('change', function() {
+            document.documentElement.style.setProperty('--bs-secondary', this.value);
+        });
+    }
+
+    // Update section before form submit
+    const form = document.getElementById('settingsForm');
+    const saveBtn = document.getElementById('saveBtn');
+
+    form.addEventListener('submit', function(e) {
+        console.log('SETTINGS FORM SUBMIT DISPARADO');
+
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.style.opacity = '0.7';
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
+        }
+        if (e.submitter && (e.submitter.name === 'crear_tecnico' || e.submitter.name === 'toggle_tecnico')) {
+            return;
+        }
+        
+        const activeTab = document.querySelector('.nav-link.active');
+        if (activeTab) {
+            const targetId = activeTab.getAttribute('data-bs-target').replace('#', '');
+            const section = sectionMapping[targetId] || 'profile';
+            const sectionInput = document.getElementById('sectionInput');
+            if (sectionInput) {
+                sectionInput.value = section;
+            }
+        }
+    });
+
+    // Add smooth scroll behavior
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+
+    document.querySelectorAll('[data-open-subscription-modal]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const modalEl = document.getElementById('subscriptionModal');
+            if (!modalEl) {
+                console.error('No existe #subscriptionModal');
+                return;
+            }
+
+            if (window.bootstrap && bootstrap.Modal) {
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            } else {
+                modalEl.classList.add('show');
+                modalEl.style.display = 'block';
+                modalEl.removeAttribute('aria-hidden');
+                modalEl.setAttribute('aria-modal', 'true');
+                document.body.classList.add('modal-open');
+            }
+        });
+    });
+
+    document.querySelectorAll('[onclick="openCancelSubscriptionModal(event)"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const modalEl = document.getElementById('cancelSubscriptionModal');
+            if (!modalEl) {
+                console.error('No existe #cancelSubscriptionModal');
+                return;
+            }
+
+            if (window.bootstrap && bootstrap.Modal) {
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            } else {
+                modalEl.classList.add('show');
+                modalEl.style.display = 'block';
+                modalEl.removeAttribute('aria-hidden');
+                modalEl.setAttribute('aria-modal', 'true');
+                document.body.classList.add('modal-open');
+            }
+        });
+    });
+
+
+    window.openSubscriptionModal = function(event) {
+        if (event) event.preventDefault();
+
+        const modalEl = document.getElementById('subscriptionModal');
+        if (!modalEl) {
+            alert('No se encontró el modal de renovación.');
+            return false;
+        }
+
+        if (window.bootstrap && bootstrap.Modal) {
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        } else {
+            modalEl.style.display = 'block';
+            modalEl.classList.add('show');
+            modalEl.removeAttribute('aria-hidden');
+            modalEl.setAttribute('aria-modal', 'true');
+            document.body.classList.add('modal-open');
+        }
+
+        return false;
+    };
+
+    window.openCancelSubscriptionModal = function(event) {
+        if (event) event.preventDefault();
+
+        const modalEl = document.getElementById('cancelSubscriptionModal');
+        if (!modalEl) {
+            alert('No se encontró el modal de cancelación.');
+            return false;
+        }
+
+        if (window.bootstrap && bootstrap.Modal) {
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        } else {
+            modalEl.style.display = 'block';
+            modalEl.classList.add('show');
+            modalEl.removeAttribute('aria-hidden');
+            modalEl.setAttribute('aria-modal', 'true');
+            document.body.classList.add('modal-open');
+        }
+
+        return false;
+    };
+
+</script>
+{% endblock %}

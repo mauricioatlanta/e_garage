@@ -1,0 +1,286 @@
+import logging
+from allauth.account.views import LoginView
+from django.conf import settings
+from django.utils.translation import get_language
+
+_log = logging.getLogger(__name__)
+
+
+class CountryAwareLoginView(LoginView):
+    """
+    Implementación de LoginView que detecta el país/idioma antes de delegar en allauth.
+    """
+
+    template_name = "cl/es/account/login.html"
+
+    def form_valid(self, form):
+        _log.warning(
+            "[LOGIN_DEBUG] form_valid called user=%s is_auth=%s",
+            getattr(form, 'user', None),
+            self.request.user.is_authenticated,
+        )
+        resp = super().form_valid(form)
+        _log.warning(
+            "[LOGIN_DEBUG] form_valid response status=%s location=%s",
+            resp.status_code,
+            resp.get('Location', '-'),
+        )
+        return resp
+
+    def form_invalid(self, form):
+        _log.warning(
+            "[LOGIN_DEBUG] form_invalid errors=%s non_field=%s",
+            form.errors,
+            form.non_field_errors(),
+        )
+        return super().form_invalid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        self._apply_country_context(request)
+        # En allauth 65+, si el usuario ya está autenticado el padre redirige
+        # a LOGIN_REDIRECT_URL. Lo evitamos para mostrar siempre el formulario.
+        if request.user.is_authenticated:
+            from django.shortcuts import redirect
+            next_url = request.GET.get('next', '')
+            if next_url:
+                return redirect(next_url)
+            return super(type(self).__mro__[2], self).get(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
+
+    # ------------------------------------------------------------------ #
+    # Helpers
+    # ------------------------------------------------------------------ #
+    def _apply_country_context(self, request):
+        country = self._detect_country(request)
+        request.country = country
+        request.country_code = country
+        request.session["preferred_country"] = country
+
+    def _detect_country(self, request):
+        # Regla: país en path ✅, no depender de country= en GET.
+        path_raw = (request.path or "").rstrip("/")
+        if path_raw == "/accounts/login":
+            request.session.pop("preferred_country", None)
+
+        # 1. Detectar desde path primero (/us/accounts/login/ -> US)
+        path = (request.path or "").lower()
+        if path.startswith("/us/") or path == "/us":
+            return "US"
+        if path.startswith("/mx/") or path == "/mx":
+            return "MX"
+        if path.startswith("/cl/") or path == "/cl":
+            return "CL"
+        if path.startswith("/co/") or path == "/co":
+            return "CO"
+        if path.startswith("/ec/") or path == "/ec":
+            return "EC"
+        if path.startswith("/pe/") or path == "/pe":
+            return "PE"
+        if path.startswith("/ve/") or path == "/ve":
+            return "VE"
+        if path.startswith("/br/") or path == "/br":
+            return "BR"
+        if path.startswith("/uy/") or path == "/uy":
+            return "UY"
+        if path.startswith("/ar/") or path == "/ar":
+            return "AR"
+
+        next_url = (request.GET.get("next", "") or request.POST.get("next", "") or "").strip()
+        country_param = (
+            request.GET.get("country", "") or request.POST.get("country", "") or ""
+        ).upper()
+        from_param = (request.GET.get("from", "") or request.POST.get("from", "") or "").upper()
+
+        # 2. Detectar desde parámetro ?from= (ej. /accounts/login/?from=co)
+        if from_param in ["US", "USA"]:
+            return "US"
+        if from_param in ["UY", "URUGUAY"]:
+            return "UY"
+        if from_param in ["AR", "ARGENTINA"]:
+            return "AR"
+        if from_param in ["CO", "COLOMBIA"]:
+            return "CO"
+        if from_param in ["EC", "ECUADOR"]:
+            return "EC"
+        if from_param in ["PE", "PERU", "PERÚ"]:
+            return "PE"
+        if from_param in ["VE", "VENEZUELA"]:
+            return "VE"
+        if from_param in ["BR", "BRASIL", "BRAZIL"]:
+            return "BR"
+        if from_param in ["MX", "MEXICO"]:
+            return "MX"
+
+        # Detectar desde next URL
+        if next_url.startswith("/us/"):
+            return "US"
+        if next_url.startswith("/cl/"):
+            return "CL"
+        if next_url.startswith("/uy/"):
+            return "UY"
+        if next_url.startswith("/ar/"):
+            return "AR"
+        if next_url.startswith("/mx/"):
+            return "MX"
+        if next_url.startswith("/co/"):
+            return "CO"
+        if next_url.startswith("/ec/"):
+            return "EC"
+        if next_url.startswith("/pe/"):
+            return "PE"
+        if next_url.startswith("/ve/"):
+            return "VE"
+        if next_url.startswith("/br/"):
+            return "BR"
+
+        # 3. Detectar desde parámetro country (solo fallback; preferir path)
+        if country_param in ["US", "USA"]:
+            return "US"
+        if country_param in ["CL", "CHILE"]:
+            return "CL"
+        if country_param in ["MX", "MEXICO"]:
+            return "MX"
+        if country_param in ["CO", "COLOMBIA"]:
+            return "CO"
+        if country_param in ["EC", "ECUADOR"]:
+            return "EC"
+        if country_param in ["PE", "PERU", "PERÚ"]:
+            return "PE"
+        if country_param in ["VE", "VENEZUELA"]:
+            return "VE"
+        if country_param in ["BR", "BRASIL", "BRAZIL"]:
+            return "BR"
+        if country_param in ["UY", "URUGUAY"]:
+            return "UY"
+        if country_param in ["AR", "ARGENTINA"]:
+            return "AR"
+
+        # 4. Detectar desde sesión guardada
+        saved = (request.session.get("preferred_country") or "").upper()
+        if saved in ["US", "USA"]:
+            return "US"
+        if saved in ["CL", "CHILE"]:
+            return "CL"
+        if saved in ["MX", "MEXICO"]:
+            return "MX"
+        if saved in ["CO", "COLOMBIA"]:
+            return "CO"
+        if saved in ["EC", "ECUADOR"]:
+            return "EC"
+        if saved in ["PE", "PERU", "PERÚ"]:
+            return "PE"
+        if saved in ["VE", "VENEZUELA"]:
+            return "VE"
+        if saved in ["BR", "BRASIL", "BRAZIL"]:
+            return "BR"
+        if saved in ["UY", "URUGUAY"]:
+            return "UY"
+        if saved in ["AR", "ARGENTINA"]:
+            return "AR"
+
+        # 5. Detectar desde referer
+        referer = request.headers.get("referer", "")
+        if "/us/" in referer or "/usa/" in referer:
+            return "US"
+        if "/cl/" in referer or "/chile/" in referer:
+            return "CL"
+        if "/mx/" in referer or "/mexico/" in referer:
+            return "MX"
+        if "/co/" in referer or "/colombia/" in referer:
+            return "CO"
+        if "/ec/" in referer or "/ecuador/" in referer:
+            return "EC"
+        if "/pe/" in referer or "/peru/" in referer or "/perú/" in referer:
+            return "PE"
+        if "/ve/" in referer or "/venezuela/" in referer:
+            return "VE"
+        if "/br/" in referer or "/brasil/" in referer or "/brazil/" in referer:
+            return "BR"
+        if "/uy/" in referer or "/uruguay/" in referer:
+            return "UY"
+        if "/ar/" in referer or "/argentina/" in referer:
+            return "AR"
+
+        # 6. Detectar desde usuario autenticado
+        if request.user.is_authenticated:
+            empresa_country = getattr(getattr(request.user, "empresa", None), "pais", None)
+            if empresa_country:
+                return empresa_country.upper()
+            perfil_country = getattr(getattr(request.user, "perfil", None), "pais", None)
+            if perfil_country:
+                return perfil_country.upper()
+
+        # 7. Fallback: país por defecto de settings (Chile, no Uruguay)
+        return getattr(settings, "EGARAGE_DEFAULT_COUNTRY", "cl").upper()
+
+    # ------------------------------------------------------------------ #
+    # Overrides de LoginView
+    # ------------------------------------------------------------------ #
+    def get_template_names(self):
+        country = getattr(self.request, "country", "CL")
+        lang = get_language() or "es"
+
+        country_templates = {
+            "CL": "cl/es/account/login.html",
+            "AR": "ar/es/account/login.html",
+            "MX": "mx/es/account/login.html",
+            "PE": "pe/es/account/login.html",
+            "CO": "co/es/account/login.html",
+            "EC": "ec/es/account/login.html",
+            "UY": "uy/es/account/login.html",
+            "VE": "ve/es/account/login.html",
+            "BR": "br/pt/account/login.html",
+            "US": "us/en/account/login.html" if lang == "en" else "us/es/account/login.html",
+        }
+
+        if country in country_templates:
+            return [country_templates[country]]
+
+        if lang == "en":
+            return ["us/en/account/login.html"]
+        return ["account/login.html"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["country"] = getattr(self.request, "country", "CL")
+        context["LANGUAGE_CODE"] = get_language() or "es"
+        context["debug"] = True
+        # Ocultar starfield del base; el login usa su propio fondo (Vanta/grid)
+        context["enable_space_bg"] = 0
+        return context
+
+    def get_success_url(self):
+        next_url = self.request.GET.get("next") or self.request.POST.get("next")
+        if next_url:
+            return next_url
+
+        # Después de autenticar, la empresa del usuario es la fuente de verdad.
+        # El path del formulario puede ser /cl/es/accounts/login/ aunque la
+        # empresa pertenezca a USA; no debemos heredar ese país incorrecto.
+        country = None
+        user = getattr(self.request, "user", None)
+
+        if user is not None and getattr(user, "is_authenticated", False):
+            try:
+                empresa = getattr(user, "empresa", None)
+                empresa_country = getattr(empresa, "pais", None) if empresa else None
+                if empresa_country:
+                    country = str(empresa_country).strip().upper()
+            except Exception:
+                country = None
+
+        if not country:
+            country = str(getattr(self.request, "country", "CL") or "CL").upper()
+
+        if country == "US":
+            return "/us/en/workspace/"
+        if country == "BR":
+            return "/br/pt/workspace/"
+        return f"/{country.lower()}/es/workspace/"
+
+
+# Vista funcional como alternativa
+def country_aware_login(request, *args, **kwargs):
+    """Wrapper funcional para mantener compatibilidad con las URLs actuales."""
+    view = CountryAwareLoginView.as_view()
+    return view(request, *args, **kwargs)

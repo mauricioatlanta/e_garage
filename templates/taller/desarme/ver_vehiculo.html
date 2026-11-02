@@ -1,0 +1,811 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n %}
+{% load country_url %}
+{% load humanize %}
+{% load eg_money %}
+
+{% block page_title %}{{ vehiculo.anio|default:"" }} {{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}{% endblock %}
+{% block page_subtitle %}{% trans "Ficha de vehículo en desarme" %}{% endblock %}
+{% block page_icon %}🔧{% endblock %}
+
+{% block page_extra_css %}
+<style>
+:root {
+  --ds-radius: 16px;
+  --ds-radius-sm: 12px;
+}
+/* Centro de Operaciones */
+.ops-state-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.07); overflow: hidden; }
+.ops-state-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+.ops-step { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ops-step-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid; flex-shrink: 0; }
+.ops-step-done .ops-step-dot { background: #06b6d4; border-color: #06b6d4; }
+.ops-step-pending .ops-step-dot { background: transparent; border-color: rgba(148,163,184,0.35); }
+.ops-kpi { padding: 12px 16px; border-radius: var(--ds-radius-sm); border: 1px solid rgba(6,182,212,0.15); background: rgba(0,0,0,0.22); }
+.ops-kpi-val { font-size: 1.1rem; font-weight: 700; }
+.ops-kpi-lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8 !important; margin-top: 2px; }
+.ops-next-action { border-radius: var(--ds-radius); padding: 18px 20px; }
+.ops-next-action-cyan { background: rgba(6,182,212,0.10); border: 1px solid rgba(6,182,212,0.35); }
+.ops-next-action-amber { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.35); }
+.ops-next-action-red { background: rgba(239,68,68,0.10); border: 1px solid rgba(239,68,68,0.35); }
+.ops-next-action-emerald { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.35); }
+.ops-next-action-slate { background: rgba(100,116,139,0.08); border: 1px solid rgba(100,116,139,0.25); }
+.ops-alert { display: flex; align-items: start; gap: 10px; padding: 10px 14px; border-radius: 10px; border: 1px solid; font-size: 0.82rem; }
+.ops-alert-amber { background: rgba(251,191,36,0.07); border-color: rgba(251,191,36,0.3); color: #fbbf24 !important; }
+.ops-alert-red { background: rgba(239,68,68,0.07); border-color: rgba(239,68,68,0.3); color: #f87171 !important; }
+.ops-alert-cyan { background: rgba(6,182,212,0.07); border-color: rgba(6,182,212,0.3); color: #67e8f9 !important; }
+.ops-timeline-item { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(6,182,212,0.05); }
+.ops-timeline-item:last-child { border-bottom: none; }
+.ops-timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(6,182,212,0.5); flex-shrink: 0; margin-top: 5px; }
+.ops-timeline-mig { background: rgba(100,116,139,0.4); }
+.ops-qa-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 9px; font-size: 0.8rem; font-weight: 600; transition: all 0.18s; }
+.ops-qa-cyan { background: rgba(6,182,212,0.14); color: #67e8f9 !important; border: 1px solid rgba(6,182,212,0.4); }
+.ops-qa-cyan:hover { background: rgba(6,182,212,0.26); }
+.ops-qa-slate { background: rgba(100,116,139,0.12); color: #94a3b8 !important; border: 1px solid rgba(100,116,139,0.3); }
+.ops-qa-slate:hover { background: rgba(100,116,139,0.22); }
+/* Tone helpers */
+.tone-cyan   { color: #67e8f9 !important; }
+.tone-emerald{ color: #34d399 !important; }
+.tone-amber  { color: #fbbf24 !important; }
+.tone-red    { color: #f87171 !important; }
+.tone-blue   { color: #60a5fa !important; }
+.tone-slate  { color: #94a3b8 !important; }
+.ds-panel {
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(6,182,212,0.28);
+  border-radius: var(--ds-radius);
+  box-shadow: 0 0 20px rgba(6,182,212,0.10);
+}
+.ds-panel-baja {
+  background: rgba(240,149,149,0.06) !important;
+  border-color: rgba(240,149,149,0.40) !important;
+  box-shadow: 0 0 20px rgba(240,149,149,0.10) !important;
+}
+.ds-label { font-size: 0.7rem; color: #94a3b8 !important; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2px; }
+.ds-value { font-size: 0.92rem; color: #e2e8f0 !important; }
+.ds-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 9999px; font-size: 0.72rem; font-weight: 600; }
+.ds-badge-activo { background: rgba(16,185,129,0.12); color: #10b981 !important; border: 1px solid rgba(16,185,129,0.4); }
+.ds-badge-baja { background: rgba(240,149,149,0.15); color: #f09595 !important; border: 1px solid rgba(240,149,149,0.5); }
+.ds-badge-admin { background: rgba(139,92,246,0.12); color: #a78bfa !important; border: 1px solid rgba(139,92,246,0.4); }
+.ds-badge-pieza { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 0.68rem; font-weight: 600; }
+.ds-badge-disponible { background: rgba(16,185,129,0.10); color: #10b981 !important; border: 1px solid rgba(16,185,129,0.35); }
+.ds-badge-vendida    { background: rgba(59,130,246,0.10); color: #60a5fa !important; border: 1px solid rgba(59,130,246,0.35); }
+.ds-badge-danada     { background: rgba(244,63,94,0.10); color: #f43f5e !important; border: 1px solid rgba(244,63,94,0.35); }
+.ds-badge-faltante   { background: rgba(100,116,139,0.10); color: #94a3b8 !important; border: 1px solid rgba(100,116,139,0.35); }
+.btn-ds { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: var(--ds-radius-sm); font-weight: 600; font-size: 13px; transition: all 0.18s; }
+.btn-ds-outline { background: transparent; color: #94a3b8 !important; border: 1px solid rgba(148,163,184,0.38); }
+.btn-ds-outline:hover { background: rgba(148,163,184,0.12); color: #e2e8f0 !important; }
+.btn-ds-cyan { background: rgba(6,182,212,0.18); color: #67e8f9 !important; border: 1px solid rgba(6,182,212,0.45); }
+.btn-ds-cyan:hover { background: rgba(6,182,212,0.32); color: #a5f3fc !important; }
+.btn-ds-red { background: rgba(239,68,68,0.18); color: #fca5a5 !important; border: 1px solid rgba(239,68,68,0.45); }
+.btn-ds-red:hover { background: rgba(239,68,68,0.32); color: #fecaca !important; }
+.metric-card { padding: 16px 20px; border-radius: var(--ds-radius-sm); border: 1px solid rgba(6,182,212,0.18); background: rgba(0,0,0,0.28); }
+.metric-val { font-size: 1.25rem; font-weight: 700; }
+.metric-lbl { font-size: 0.68rem; color: #94a3b8 !important; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 3px; }
+.prog-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.07); overflow: hidden; margin-top: 6px; }
+.prog-fill { height: 100%; border-radius: 3px; }
+[x-cloak] { display: none !important; }
+.modal-overlay { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal-box { background: #0f172a; border: 1px solid rgba(240,149,149,0.4); border-radius: 18px; padding: 28px 28px 24px; max-width: 420px; width: 100%; box-shadow: 0 0 60px rgba(240,149,149,0.18); }
+.input-modal { width: 100%; background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(148,163,184,0.25); border-radius: 10px; padding: 10px 14px; color: #e2e8f0 !important; font-size: 0.95rem; outline: none; transition: border-color 0.18s; }
+.input-modal:focus { border-color: rgba(240,149,149,0.55); }
+.pieza-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(6,182,212,0.06); }
+.pieza-row:last-child { border-bottom: none; }
+
+/* Gemelo digital / mapa visual */
+.visual-map-shell { overflow: hidden; border-color: rgba(6,182,212,.24); }
+.visual-map-pulse { width: 9px; height: 9px; border-radius: 999px; background: #22d3ee; box-shadow: 0 0 0 5px rgba(34,211,238,.08), 0 0 18px #06b6d4; animation: visualPulse 2s ease-in-out infinite; }
+.visual-map-status { border: 1px solid rgba(100,116,139,.25); border-radius: 999px; padding: 5px 10px; color: #64748b !important; font-size: .68rem; letter-spacing: .06em; text-transform: uppercase; }
+.visual-map-status.is-ready { border-color: rgba(34,211,238,.25); color: #67e8f9 !important; }
+.visual-map-status.is-error { border-color: rgba(239,68,68,.35); color: #fca5a5 !important; }
+.visual-legend-chip { display: grid; grid-template-columns: 9px 1fr auto; align-items: center; gap: 8px; min-height: 36px; border: 1px solid rgba(148,163,184,.12); border-radius: 10px; background: rgba(15,23,42,.54); padding: 7px 10px; color: #94a3b8 !important; font-size: .68rem; }
+.visual-legend-chip strong { color: #e2e8f0 !important; font-size: .78rem; }
+.legend-dot { width: 8px; height: 8px; border-radius: 999px; box-shadow: 0 0 10px currentColor; }
+.legend-mounted { color: #06b6d4; background: #06b6d4; }
+.legend-warehouse { color: #f59e0b; background: #f59e0b; }
+.legend-sold { color: #ef4444; background: #ef4444; }
+.legend-external { color: #a855f7; background: #a855f7; }
+.visual-viewport { position: relative; min-height: 330px; overflow: hidden; padding: 24px; background-color: rgba(2,6,23,.92); background-image: linear-gradient(rgba(6,182,212,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,.055) 1px, transparent 1px), radial-gradient(circle at 50% 45%, rgba(8,145,178,.15), transparent 48%); background-size: 28px 28px, 28px 28px, auto; }
+.visual-viewport::before { content: ""; position: absolute; inset: 12px; border: 1px solid rgba(6,182,212,.08); border-radius: 14px; pointer-events: none; }
+.vehicle-wireframe { position: relative; z-index: 2; display: block; width: 100%; height: auto; min-height: 280px; filter: drop-shadow(0 0 14px rgba(6,182,212,.12)); }
+.wireframe-shell path, .wireframe-detail { fill: none; stroke: rgba(103,232,249,.25); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 7 5; }
+.interactive-slot { --slot-color: #334155; --slot-fill: rgba(51,65,85,.08); outline: none; }
+.interactive-slot > * { fill: var(--slot-fill); stroke: var(--slot-color); stroke-width: 2.5; vector-effect: non-scaling-stroke; transition: fill .2s ease, stroke .2s ease, filter .2s ease, opacity .2s ease; }
+.interactive-slot:not(.has-parts) > * { stroke-dasharray: 5 7; opacity: .38; }
+.interactive-slot.has-parts:hover > *, .interactive-slot.has-parts:focus > *, .interactive-slot.is-selected > * { fill-opacity: .42; stroke-width: 4; filter: drop-shadow(0 0 7px var(--slot-color)); }
+.interactive-slot.slot-mounted { --slot-color: #06b6d4; --slot-fill: rgba(6,182,212,.14); }
+.interactive-slot.slot-warehouse { --slot-color: #f59e0b; --slot-fill: rgba(245,158,11,.14); }
+.interactive-slot.slot-sold { --slot-color: #ef4444; --slot-fill: rgba(239,68,68,.14); }
+.interactive-slot.slot-external { --slot-color: #a855f7; --slot-fill: rgba(168,85,247,.16); }
+.interactive-slot.slot-unavailable { --slot-color: #64748b; --slot-fill: rgba(100,116,139,.08); }
+.interactive-slot.slot-unavailable > * { stroke-dasharray: 4 6; }
+.doors-2 .cab-4p { display: none; }
+.doors-4 .cab-2p, .doors-5 .cab-2p { display: none; }
+.visual-scan-line { position: absolute; z-index: 3; left: 4%; right: 4%; top: 14%; height: 1px; pointer-events: none; background: linear-gradient(90deg, transparent, rgba(34,211,238,.6), transparent); box-shadow: 0 0 14px rgba(34,211,238,.8); animation: visualScan 5s linear infinite; }
+.visual-axis { position: absolute; z-index: 1; pointer-events: none; background: rgba(34,211,238,.11); }
+.visual-axis-x { left: 4%; right: 4%; top: 50%; height: 1px; }
+.visual-axis-y { top: 8%; bottom: 8%; left: 50%; width: 1px; }
+.visual-map-empty { position: absolute; z-index: 4; inset: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; background: rgba(2,6,23,.7); color: #94a3b8 !important; font-size: .82rem; text-align: center; }
+.visual-map-empty:not(.hidden) { display: flex; }
+.visual-map-empty small { color: #475569 !important; }
+.visual-piece-drawer { position: absolute; z-index: 10; top: 12px; right: 12px; bottom: 12px; width: min(360px, calc(100% - 24px)); overflow-y: auto; transform: translateX(calc(100% + 24px)); opacity: 0; pointer-events: none; border: 1px solid rgba(34,211,238,.28); border-radius: 16px; background: rgba(2,6,23,.96); padding: 20px; box-shadow: -18px 0 60px rgba(0,0,0,.55), 0 0 28px rgba(6,182,212,.1); backdrop-filter: blur(16px); transition: transform .25s ease, opacity .2s ease; }
+.visual-piece-drawer.is-open { transform: translateX(0); opacity: 1; pointer-events: auto; }
+.visual-drawer-kicker, .visual-drawer-label { color: #64748b !important; font-size: .62rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.visual-drawer-close { width: 34px; height: 34px; border: 1px solid rgba(148,163,184,.2); border-radius: 9px; color: #94a3b8 !important; font-size: 1.35rem; line-height: 1; }
+.visual-drawer-close:hover { border-color: rgba(34,211,238,.4); color: #67e8f9 !important; }
+.visual-detail-badge { display: inline-flex; margin-top: 5px; border: 1px solid rgba(148,163,184,.2); border-radius: 999px; padding: 4px 8px; color: #cbd5e1 !important; font-size: .7rem; }
+.visual-slot-choice { width: 100%; border: 1px solid rgba(148,163,184,.13); border-radius: 8px; padding: 7px 9px; color: #94a3b8 !important; font-size: .68rem; text-align: left; }
+.visual-slot-choice + .visual-slot-choice { margin-top: 5px; }
+.visual-slot-choice:hover, .visual-slot-choice.is-active { border-color: rgba(34,211,238,.35); background: rgba(6,182,212,.08); color: #cffafe !important; }
+@keyframes visualPulse { 50% { opacity: .55; transform: scale(.85); } }
+@keyframes visualScan { from { top: 12%; } to { top: 88%; } }
+@media (max-width: 640px) {
+  .visual-viewport { min-height: 250px; padding: 8px; }
+  .vehicle-wireframe { min-height: 220px; }
+  .visual-piece-drawer { position: fixed; top: auto; left: 10px; right: 10px; bottom: 10px; width: auto; max-height: 78vh; transform: translateY(calc(100% + 20px)); }
+  .visual-piece-drawer.is-open { transform: translateY(0); }
+}
+
+/* Override force_black_text.css para elementos dentro de paneles */
+.ds-panel h1, .ds-panel h2, .ds-panel h3,
+.ds-panel h4, .ds-panel h5, .ds-panel h6 { color: #94a3b8 !important; }
+.modal-box h1, .modal-box h2, .modal-box h3 { color: #fca5a5 !important; }
+
+/* Clases Tailwind de color que force_black_text.css rompe */
+.text-white { color: #ffffff !important; }
+.text-slate-300 { color: #cbd5e1 !important; }
+.text-slate-400 { color: #94a3b8 !important; }
+.text-slate-500 { color: #64748b !important; }
+.text-cyan-300  { color: #67e8f9 !important; }
+.text-blue-400  { color: #60a5fa !important; }
+.text-emerald-400 { color: #34d399 !important; }
+.text-rose-400  { color: #fb7185 !important; }
+.text-amber-400 { color: #fbbf24 !important; }
+.text-lime-400  { color: #a3e635 !important; }
+.text-red-300   { color: #fca5a5 !important; }
+</style>
+{% endblock %}
+
+{% block main_actions %}
+<div class="flex flex-wrap gap-2" x-data="{ modalBaja: false }">
+  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="btn-ds btn-ds-outline">
+    &larr; {% trans "Listado" %}
+  </a>
+  {% if not es_dado_de_baja %}
+  <a href="{% country_url 'desarme:editar_vehiculo' vehiculo.pk %}" class="btn-ds btn-ds-cyan">
+    &#9999;&#65039; {% trans "Editar vehículo" %}
+  </a>
+  <button @click="modalBaja = true" type="button" class="btn-ds btn-ds-red">
+    {% trans "Dar de baja" %}
+  </button>
+  {% endif %}
+
+  <div x-cloak x-show="modalBaja" class="modal-overlay" @click.self="modalBaja = false">
+    <div class="modal-box" @click.stop>
+      <h3 class="text-base font-semibold text-red-300 mb-1">{% trans "Dar de baja el vehículo" %}</h3>
+      <p class="text-slate-400 text-xs mb-5">{% trans "Esta acción marca el vehículo como inactivo. No se puede deshacer desde la UI." %}</p>
+      <form method="post" action="{% country_url 'desarme:dar_de_baja_vehiculo' vehiculo.pk %}" id="form-baja">
+        {% csrf_token %}
+        <div class="mb-4">
+          <label class="ds-label block mb-1.5">
+            {% trans "Monto venta chatarra" %} <span class="text-slate-400 normal-case">({% trans "opcional" %})</span>
+          </label>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400 text-sm font-medium">{{ empresa_moneda.simbolo }}</span>
+            <input type="text" name="monto_chatarra" id="id_monto_chatarra_modal"
+              class="input-modal" inputmode="numeric" placeholder="0" autocomplete="off"
+              oninput="fmtMoneyInput(this)">
+          </div>
+          <p class="text-slate-400 text-xs mt-1">{% trans "Dejar en 0 si se desecha sin recuperar valor." %}</p>
+        </div>
+        <div class="mb-5">
+          <label class="ds-label block mb-1.5">
+            {% trans "Observaciones" %} <span class="text-slate-400 normal-case">({% trans "opcional" %})</span>
+          </label>
+          <textarea name="observaciones_baja" rows="2" class="input-modal"
+            placeholder="{% trans 'Motivo de baja, destino del vehículo...' %}"></textarea>
+        </div>
+        <div class="flex gap-3">
+          <button type="button" @click="modalBaja = false" class="btn-ds btn-ds-outline flex-1 justify-center">{% trans "Cancelar" %}</button>
+          <button type="submit" class="btn-ds btn-ds-red flex-1 justify-center">{% trans "Confirmar baja" %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block panel_content %}
+
+{% with h=ops.header p=ops.progress na=ops.next_action %}
+
+{# ── ESTADO + BARRA DE PROGRESO ─────────────────────────────────────────────── #}
+{% if not es_dado_de_baja %}
+<div class="ds-panel p-4 mb-4">
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Estado operativo</span>
+      {% if h.estado_tone == 'amber' %}
+      <span class="ds-badge" style="background:rgba(251,191,36,0.12);color:#fbbf24!important;border:1px solid rgba(251,191,36,0.4)">{{ h.estado_label }}</span>
+      {% elif h.estado_tone == 'blue' %}
+      <span class="ds-badge" style="background:rgba(59,130,246,0.12);color:#60a5fa!important;border:1px solid rgba(59,130,246,0.4)">{{ h.estado_label }}</span>
+      {% elif h.estado_tone == 'slate' %}
+      <span class="ds-badge" style="background:rgba(100,116,139,0.12);color:#94a3b8!important;border:1px solid rgba(100,116,139,0.4)">{{ h.estado_label }}</span>
+      {% else %}
+      <span class="ds-badge ds-badge-activo">{{ h.estado_label }}</span>
+      {% endif %}
+    </div>
+    <span class="text-xs text-slate-500">{{ h.dias_en_estado }} día{{ h.dias_en_estado|pluralize }} en esta etapa</span>
+  </div>
+
+  {# Steps #}
+  <div class="relative flex justify-between mb-1">
+    {% for step in p.steps %}
+    <div class="ops-step {% if step.done %}ops-step-done{% else %}ops-step-pending{% endif %} flex-1">
+      <div class="ops-step-dot"></div>
+      <span class="text-center" style="font-size:0.6rem;color:{% if step.done %}#67e8f9{% else %}#475569{% endif %};line-height:1.2">{{ step.label }}</span>
+    </div>
+    {% endfor %}
+    {# connector line #}
+    <div class="absolute top-[4px] left-[5%] right-[5%] ops-state-bar" style="z-index:0">
+      <div class="ops-state-fill bg-cyan-400" style="width:{{ p.pct }}%"></div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{# ── SIGUIENTE ACCIÓN ────────────────────────────────────────────────────────── #}
+{% if na.title %}
+<div class="ops-next-action ops-next-action-{{ na.tone }} mb-4 flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <div class="text-sm font-semibold tone-{{ na.tone }}">{{ na.title }}</div>
+    {% if na.description %}
+    <div class="text-xs text-slate-400 mt-0.5">{{ na.description }}</div>
+    {% endif %}
+  </div>
+  {% if na.button_label and na.url %}
+  <a href="{{ na.url }}" class="ops-qa-btn ops-qa-cyan whitespace-nowrap">{{ na.button_label }} →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+{# ── KPIs ADAPTATIVOS ────────────────────────────────────────────────────────── #}
+{% if ops.kpis %}
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+  {% for kpi in ops.kpis %}
+  <div class="ops-kpi">
+    <div class="ops-kpi-val tone-{{ kpi.tone }}">
+      {% if kpi.type == 'money' %}{{ kpi.value|money_fmt:empresa_moneda }}
+      {% else %}{{ kpi.value }}{% endif %}
+    </div>
+    <div class="ops-kpi-lbl">{{ kpi.label }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{# ── ALERTAS ACCIONABLES ─────────────────────────────────────────────────────── #}
+{% if ops.alerts %}
+<div class="space-y-2 mb-4">
+  {% for alert in ops.alerts %}
+  <div class="ops-alert ops-alert-{{ alert.tone }}">
+    <span class="mt-0.5">⚠</span>
+    <div class="flex-1">
+      {{ alert.text }}
+      {% if alert.url and alert.url_label %}
+      <a href="{{ alert.url }}" class="underline ml-1 opacity-80">{{ alert.url_label }}</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{# ── ACCESOS RÁPIDOS ─────────────────────────────────────────────────────────── #}
+{% if ops.quick_actions %}
+<div class="flex flex-wrap gap-2 mb-5">
+  {% for qa in ops.quick_actions %}
+  <a href="{{ qa.url }}" class="ops-qa-btn ops-qa-{{ qa.tone }}">{{ qa.label }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endwith %}
+
+{% if es_dado_de_baja %}
+<div class="mb-5 flex items-start gap-3 p-4 rounded-xl border border-red-400/40 bg-red-900/20">
+  <div>
+    <p class="text-red-300 font-semibold text-sm">{% trans "Vehículo dado de baja" %}</p>
+    <p class="text-slate-400 text-xs mt-0.5">
+      {% trans "Fecha de baja:" %} {{ vehiculo.fecha_baja_desarme|date:"d/m/Y" }}.
+      {% if monto_chatarra %}
+        {% trans "Chatarra:" %} <span class="text-red-300 font-medium">{{ monto_chatarra|money_fmt:empresa_moneda }}</span>.
+      {% endif %}
+      {% trans "Vista de solo lectura." %}
+    </p>
+  </div>
+</div>
+{% endif %}
+
+<!-- CABECERA -->
+<div class="ds-panel {% if es_dado_de_baja %}ds-panel-baja{% endif %} p-5 mb-5">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div>
+      <h2 class="text-xl font-bold {% if es_dado_de_baja %}line-through text-slate-500{% else %}text-white{% endif %}">
+        {{ vehiculo.anio|default:"" }} {{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}
+      </h2>
+      <div class="flex flex-wrap items-center gap-2 mt-2 text-sm text-slate-400">
+        {% if vehiculo.color %}
+        <span class="flex items-center gap-1.5">
+          <span class="inline-block w-3 h-3 rounded-full border border-white/20 flex-shrink-0"
+            style="background-color: {{ vehiculo.color.hex|default:'#64748b' }}"></span>
+          {{ vehiculo.color.nombre }}
+        </span>
+        <span class="text-slate-400">&middot;</span>
+        {% endif %}
+        {% if vehiculo.tipo_carroceria %}
+        <span>{{ vehiculo.tipo_carroceria|capfirst }}</span>
+        <span class="text-slate-400">&middot;</span>
+        {% endif %}
+        {% if vehiculo.vin %}
+        <span class="font-mono text-xs text-slate-500">{{ vehiculo.vin }}</span>
+        {% elif vehiculo.patente %}
+        <span class="font-mono text-xs text-slate-500">{{ vehiculo.patente }}</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      {% if es_dado_de_baja %}
+      <span class="ds-badge ds-badge-baja">{% trans "Dado de baja" %}</span>
+      {% else %}
+      <span class="ds-badge ds-badge-activo">{% trans "Activo" %}</span>
+      {% endif %}
+      {% if es_superusuario %}
+      <span class="ds-badge ds-badge-admin">{% trans "Solo superusuario" %}</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- GRILLA 2 COLUMNAS -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+
+  <!-- TARJETA INFORMACIÓN DE COMPRA -->
+  <div class="ds-panel {% if es_dado_de_baja %}ds-panel-baja{% endif %} p-5">
+    <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">{% trans "Información de compra" %}</h3>
+    <div class="space-y-3">
+      <div>
+        <div class="ds-label">{% trans "Proveedor" %}</div>
+        <div class="ds-value">{{ vehiculo.vendedor_desarme.nombre|default:"—" }}</div>
+      </div>
+      <div>
+        <div class="ds-label">{% trans "Fecha de compra" %}</div>
+        <div class="ds-value">{{ vehiculo.fecha_ingreso_desarme|date:"d/m/Y"|default:"—" }}</div>
+      </div>
+      <div>
+        <div class="ds-label">{% trans "Costo total del vehículo" %}</div>
+        <div class="ds-value text-lg font-bold text-cyan-300">{{ costo_total|money_fmt:empresa_moneda }}</div>
+        {% if costo_transporte or costo_otros %}
+        <div class="mt-1 space-y-0.5 text-xs text-slate-500">
+          <div>{% trans "Compra:" %} {{ costo_compra|money_fmt:empresa_moneda }}</div>
+          {% if costo_transporte %}<div>{% trans "Transporte/Grúa:" %} {{ costo_transporte|money_fmt:empresa_moneda }}</div>{% endif %}
+          {% if costo_otros %}<div>{% trans "Otros gastos:" %} {{ costo_otros|money_fmt:empresa_moneda }}</div>{% endif %}
+        </div>
+        {% endif %}
+      </div>
+      <div>
+        <div class="ds-label">{% trans "Ubicación" %}</div>
+        <div class="ds-value">{{ vehiculo.ubicacion_fisica|default:"—" }}</div>
+      </div>
+      {% if es_dado_de_baja %}
+      <div class="pt-2 border-t border-red-400/20">
+        <div class="ds-label" style="color:#f09595">{% trans "Fecha de baja" %}</div>
+        <div class="ds-value" style="color:#f09595">{{ vehiculo.fecha_baja_desarme|date:"d/m/Y" }}</div>
+        {% if monto_chatarra %}
+        <div class="ds-label mt-2" style="color:#f09595">{% trans "Monto chatarra" %}</div>
+        <div class="ds-value font-semibold" style="color:#f09595">{{ monto_chatarra|money_fmt:empresa_moneda }}</div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    {% if not es_dado_de_baja %}
+    <div class="flex gap-2 mt-5 pt-4 border-t border-cyan-400/10">
+      <a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ vehiculo.pk }}"
+        class="btn-ds btn-ds-outline text-xs py-2 px-3">
+        {% trans "Ver documentos" %}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- TARJETA RESUMEN DE REPUESTOS -->
+  <div class="ds-panel {% if es_dado_de_baja %}ds-panel-baja{% endif %} p-5">
+    <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">{% trans "Resumen de repuestos" %}</h3>
+    {% if total_piezas_count > 0 %}
+    <div class="space-y-4">
+      <div>
+        <div class="flex justify-between items-baseline">
+          <span class="text-sm text-slate-300">{% trans "En stock" %}</span>
+          <span class="text-base font-bold text-emerald-400">{{ disponibles }}</span>
+        </div>
+        <div class="prog-bar">
+          <div class="prog-fill bg-emerald-400" style="width:{% widthratio disponibles total_piezas_count 100 %}%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline">
+          <span class="text-sm text-slate-300">{% trans "Vendidos" %}</span>
+          <span class="text-base font-bold text-blue-400">{{ vendidas }}</span>
+        </div>
+        <div class="prog-bar">
+          <div class="prog-fill bg-blue-400" style="width:{% widthratio vendidas total_piezas_count 100 %}%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline">
+          <span class="text-sm text-slate-300">{% trans "Dañados" %}</span>
+          <span class="text-base font-bold text-rose-400">{{ danadas }}</span>
+        </div>
+        <div class="prog-bar">
+          <div class="prog-fill bg-rose-400" style="width:{% widthratio danadas total_piezas_count 100 %}%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline">
+          <span class="text-sm text-slate-300">{% trans "Faltantes" %}</span>
+          <span class="text-base font-bold text-slate-400">{{ faltantes }}</span>
+        </div>
+        <div class="prog-bar">
+          <div class="prog-fill bg-slate-400" style="width:{% widthratio faltantes total_piezas_count 100 %}%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 pt-4 border-t border-cyan-400/10 text-xs text-slate-500">
+      {% trans "Total registrados:" %} <span class="text-slate-400 font-medium">{{ total_piezas_count }}</span>
+    </div>
+    {% else %}
+    <div class="text-center text-slate-500 py-8 text-sm">{% trans "Sin repuestos registrados." %}</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- SECCIÓN P&L -->
+<div class="ds-panel {% if es_dado_de_baja %}ds-panel-baja{% endif %} p-5 mb-5">
+  <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">{% trans "Cierre financiero" %}</h3>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="metric-card">
+      <div class="metric-val text-slate-300">{{ costo_total|money_fmt:empresa_moneda }}</div>
+      <div class="metric-lbl">{% trans "Costo total" %}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val text-blue-400">{{ total_recaudado|money_fmt:empresa_moneda }}</div>
+      <div class="metric-lbl">{% trans "Total recaudado" %}</div>
+    </div>
+    <div class="metric-card">
+      {% if ganancia_final >= 0 %}
+      <div class="metric-val text-emerald-400">{{ ganancia_final|money_fmt:empresa_moneda }}</div>
+      {% else %}
+      <div class="metric-val text-rose-400">{{ ganancia_final|money_fmt:empresa_moneda }}</div>
+      {% endif %}
+      <div class="metric-lbl">{% if es_dado_de_baja %}{% trans "Ganancia final" %}{% else %}{% trans "Ganancia neta" %}{% endif %}</div>
+    </div>
+    {% if not es_dado_de_baja %}
+    <div class="metric-card">
+      {% if proyeccion_total >= 0 %}
+      <div class="metric-val text-lime-400">{{ proyeccion_total|money_fmt:empresa_moneda }}</div>
+      {% else %}
+      <div class="metric-val text-amber-400">{{ proyeccion_total|money_fmt:empresa_moneda }}</div>
+      {% endif %}
+      <div class="metric-lbl">{% trans "Proyección total" %}</div>
+    </div>
+    {% else %}
+    <div class="metric-card">
+      <div class="metric-val text-red-300">{{ monto_chatarra|money_fmt:empresa_moneda }}</div>
+      <div class="metric-lbl">{% trans "Valor chatarra" %}</div>
+    </div>
+    {% endif %}
+  </div>
+  {% if not es_dado_de_baja %}
+  <p class="mt-3 text-xs text-slate-400">{% trans "Proyección: si se vende todo el stock disponible al precio sugerido." %}</p>
+  {% endif %}
+</div>
+
+<!-- REPUESTOS RECIENTES -->
+<div class="ds-panel {% if es_dado_de_baja %}ds-panel-baja{% endif %} p-5">
+  <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">{% trans "Repuestos recientes" %}</h3>
+  {% if repuestos_recientes %}
+  <div>
+    {% for p in repuestos_recientes %}
+    <div class="pieza-row">
+      <div class="flex-1 min-w-0">
+        <div class="text-sm text-white truncate">{{ p.display_nombre|default:p.nombre }}</div>
+        <div class="text-xs text-slate-500 font-mono">{{ p.codigo }}</div>
+      </div>
+      <div class="text-sm font-semibold text-cyan-300 whitespace-nowrap">
+        {{ p.precio_venta_sugerido|money_fmt:empresa_moneda|default:"—" }}
+      </div>
+      <span class="ds-badge-pieza
+        {% if p.estado_pieza == 'DISPONIBLE' %}ds-badge-disponible
+        {% elif p.estado_pieza == 'VENDIDA' %}ds-badge-vendida
+        {% elif p.estado_pieza == 'DANADA' %}ds-badge-danada
+        {% else %}ds-badge-faltante{% endif %}">
+        {{ p.get_estado_pieza_display|default:p.estado_pieza }}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center text-slate-500 py-6 text-sm">{% trans "Sin repuestos registrados aún." %}</div>
+  {% endif %}
+  <div class="mt-5 pt-4 border-t border-cyan-400/10">
+    <a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ vehiculo.pk }}"
+      class="btn-ds btn-ds-cyan w-full justify-center">
+      {% trans "Ir a repuestos completos" %}
+    </a>
+  </div>
+</div>
+
+{# ── HISTORIAL OPERACIONAL ───────────────────────────────────────────────────── #}
+{% if ops.activity %}
+<div class="ds-panel p-5 mt-5">
+  <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">Historial operacional</h3>
+  <div>
+    {% for ev in ops.activity %}
+    <div class="ops-timeline-item">
+      <div class="ops-timeline-dot {% if ev.is_migration %}ops-timeline-mig{% endif %}"></div>
+      <div class="flex-1 min-w-0">
+        <div class="text-sm {% if ev.is_migration %}text-slate-500{% else %}text-slate-300{% endif %}">
+          {{ ev.label }}
+        </div>
+        <div class="text-xs text-slate-600 mt-0.5">{{ ev.occurred_at|date:"d/m/Y H:i" }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{# El gemelo digital se muestra al pie, después de la información operacional. #}
+<section class="mt-6" aria-label="Gemelo digital del vehículo">
+  {% include "taller/desarme/partials/_vehiculo_mapa_visual.html" %}
+</section>
+
+{% endblock %}
+
+{% block page_extra_js %}
+<script>
+function fmtMoneyInput(el) {
+  var raw = el.value.replace(/\D/g, '');
+  if (!raw) { el.value = ''; return; }
+  var n = parseInt(raw, 10);
+  {% if empresa_moneda.codigo == 'CLP' %}
+  el.value = n.toLocaleString('es-CL');
+  {% elif empresa_moneda.decimales == 0 %}
+  el.value = n.toLocaleString('es');
+  {% else %}
+  el.value = n.toLocaleString('en-US');
+  {% endif %}
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var form = document.getElementById('form-baja');
+  if (form) {
+    form.addEventListener('submit', function() {
+      var inp = document.getElementById('id_monto_chatarra_modal');
+      if (inp) inp.value = inp.value.replace(/[^0-9]/g, '');
+    });
+  }
+  initVehicleVisualMap();
+});
+
+function initVehicleVisualMap() {
+  const root = document.getElementById('vehiculo-mapa-visual');
+  if (!root) return;
+
+  const viewport = document.getElementById('vehiculo-visual-viewport');
+  const drawer = document.getElementById('visual-piece-drawer');
+  const closeButton = document.getElementById('visual-drawer-close');
+  const statusNode = document.getElementById('visual-map-status');
+  const emptyNode = document.getElementById('visual-map-empty');
+  const slots = Array.from(root.querySelectorAll('.interactive-slot[data-visual-slot]'));
+  const partsBySlot = new Map();
+  let selectedSlot = null;
+
+  const nodes = {
+    title: document.getElementById('visual-drawer-title'),
+    code: document.getElementById('visual-drawer-code'),
+    status: document.getElementById('visual-drawer-status'),
+    location: document.getElementById('visual-drawer-location'),
+    origin: document.getElementById('visual-drawer-origin'),
+    externalNote: document.getElementById('visual-drawer-external-note'),
+    price: document.getElementById('visual-drawer-price'),
+    matches: document.getElementById('visual-drawer-matches'),
+    edit: document.getElementById('visual-action-edit'),
+    state: document.getElementById('visual-action-state'),
+    sell: document.getElementById('visual-action-sell')
+  };
+
+  const labels = {
+    status: {
+      DISPONIBLE: '{% trans "Disponible" %}',
+      RESERVADA: '{% trans "Reservada" %}',
+      VENDIDA: '{% trans "Vendida / Facturada" %}',
+      DANADA: '{% trans "Dañada" %}',
+      FALTANTE: '{% trans "Faltante" %}',
+      SCRAP: '{% trans "Sin stock / Scrap" %}'
+    },
+    location: {
+      VEHICULO: '{% trans "En Patio - Montada" %}',
+      BODEGA: '{% trans "En Bodega / Estante" %}',
+      TRANSITO: '{% trans "En tránsito" %}',
+      TERCERO: '{% trans "En instalación externa" %}'
+    },
+    origin: {
+      DESARME_PROPIO: '{% trans "Desarme original" %}',
+      COMPRA_EXTERNA: '{% trans "Compra externa / Tercero" %}',
+      LOTE_YARDA: '{% trans "Compra externa de yarda" %}',
+      RECOMPRA: '{% trans "Recompra / Devolución" %}'
+    }
+  };
+
+  function urlFor(template, id) {
+    return template.replace('/0/', '/' + encodeURIComponent(id) + '/');
+  }
+
+  function visualClass(part) {
+    if (['DANADA', 'FALTANTE', 'SCRAP'].includes(part.status)) return 'slot-unavailable';
+    if (part.origin !== 'DESARME_PROPIO') return 'slot-external';
+    if (part.status === 'VENDIDA') return 'slot-sold';
+    if (part.location_type === 'BODEGA') return 'slot-warehouse';
+    return 'slot-mounted';
+  }
+
+  function classPriority(className) {
+    return {
+      'slot-unavailable': 5,
+      'slot-external': 4,
+      'slot-sold': 3,
+      'slot-warehouse': 2,
+      'slot-mounted': 1
+    }[className] || 0;
+  }
+
+  function priceLabel(part) {
+    if (part.price === null || part.price === undefined) return '—';
+    try {
+      return new Intl.NumberFormat(document.documentElement.lang || 'es-CL', {
+        style: 'currency',
+        currency: part.currency || root.dataset.currency || 'CLP',
+        maximumFractionDigits: Number(part.price) % 1 === 0 ? 0 : 2
+      }).format(Number(part.price));
+    } catch (error) {
+      return String(part.price) + ' ' + (part.currency || root.dataset.currency || '');
+    }
+  }
+
+  function selectPart(part, slotParts) {
+    nodes.title.textContent = part.name || '{% trans "Pieza sin nombre" %}';
+    nodes.code.textContent = part.code || '—';
+    nodes.status.textContent = labels.status[part.status] || part.status || '—';
+    nodes.location.textContent = [
+      labels.location[part.location_type] || part.location_type || '',
+      part.location_detail || ''
+    ].filter(Boolean).join(' · ');
+    nodes.origin.textContent = labels.origin[part.origin] || part.origin || '—';
+    nodes.externalNote.classList.toggle('hidden', part.origin === 'DESARME_PROPIO');
+    nodes.price.textContent = priceLabel(part);
+    nodes.edit.href = urlFor(root.dataset.editUrlTemplate, part.id);
+    nodes.state.href = nodes.edit.href;
+    nodes.state.textContent = part.location_type === 'VEHICULO'
+      ? '{% trans "Cambiar estado / Marcar extraída" %}'
+      : '{% trans "Cambiar estado" %}';
+    nodes.sell.href = root.dataset.sellUrl + '&pieza=' + encodeURIComponent(part.id);
+
+    nodes.matches.replaceChildren();
+    nodes.matches.classList.toggle('hidden', slotParts.length < 2);
+    slotParts.forEach(function(candidate) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'visual-slot-choice' + (candidate.id === part.id ? ' is-active' : '');
+      button.textContent = (candidate.name || candidate.code) + ' · ' +
+        (labels.status[candidate.status] || candidate.status);
+      button.addEventListener('click', function() {
+        selectPart(candidate, slotParts);
+      });
+      nodes.matches.appendChild(button);
+    });
+  }
+
+  function openDrawer(slot, slotParts) {
+    if (!slotParts.length) return;
+    if (selectedSlot) selectedSlot.classList.remove('is-selected');
+    selectedSlot = slot;
+    selectedSlot.classList.add('is-selected');
+    selectPart(slotParts[0], slotParts);
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    closeButton.focus({preventScroll: true});
+  }
+
+  function closeDrawer() {
+    drawer.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    if (selectedSlot) {
+      selectedSlot.classList.remove('is-selected');
+      selectedSlot.focus({preventScroll: true});
+      selectedSlot = null;
+    }
+  }
+
+  slots.forEach(function(slot) {
+    slot.setAttribute('role', 'button');
+    slot.setAttribute('tabindex', '-1');
+    const activate = function() {
+      openDrawer(slot, partsBySlot.get(slot.dataset.visualSlot) || []);
+    };
+    slot.addEventListener('click', activate);
+    slot.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        activate();
+      }
+    });
+  });
+  closeButton.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer();
+  });
+  viewport.addEventListener('click', function(event) {
+    if (event.target === viewport && drawer.classList.contains('is-open')) closeDrawer();
+  });
+
+  fetch(root.dataset.apiUrl, {
+    headers: {'Accept': 'application/json'},
+    credentials: 'same-origin'
+  })
+    .then(function(response) {
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      return response.json();
+    })
+    .then(function(payload) {
+      const parts = Array.isArray(payload.parts) ? payload.parts : [];
+      parts.forEach(function(part) {
+        if (!part.visual_slot) return;
+        if (!partsBySlot.has(part.visual_slot)) partsBySlot.set(part.visual_slot, []);
+        partsBySlot.get(part.visual_slot).push(part);
+      });
+
+      slots.forEach(function(slot) {
+        const slotParts = partsBySlot.get(slot.dataset.visualSlot) || [];
+        if (!slotParts.length) return;
+        const dominantClass = slotParts
+          .map(visualClass)
+          .sort(function(a, b) { return classPriority(b) - classPriority(a); })[0];
+        slot.classList.add('has-parts', dominantClass);
+        slot.setAttribute('tabindex', '0');
+        slot.setAttribute('aria-label', slotParts.map(function(part) {
+          return part.name || part.code;
+        }).join(', '));
+      });
+
+      const summary = payload.summary || {};
+      document.getElementById('visual-count-mounted').textContent = summary.mounted || 0;
+      document.getElementById('visual-count-warehouse').textContent = summary.warehouse || 0;
+      document.getElementById('visual-count-sold').textContent = summary.sold || 0;
+      document.getElementById('visual-count-external').textContent = parts.filter(function(part) {
+        return part.origin !== 'DESARME_PROPIO';
+      }).length;
+      emptyNode.classList.toggle('hidden', partsBySlot.size > 0);
+      statusNode.textContent = parts.length + ' {% trans "piezas sincronizadas" %}';
+      statusNode.classList.add('is-ready');
+    })
+    .catch(function(error) {
+      statusNode.textContent = '{% trans "No se pudo cargar el mapa" %}';
+      statusNode.classList.add('is-error');
+      emptyNode.classList.remove('hidden');
+      console.error('Error cargando mapa visual:', error);
+    });
+}
+</script>
+{% endblock %}

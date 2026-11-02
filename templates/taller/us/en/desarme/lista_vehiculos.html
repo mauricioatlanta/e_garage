@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "Dismantling - Vehicles List" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+
+    <!-- Subnavigation Header -->
+    {% include 'taller/desarme/includes/subnav_desarme.html' with active_subnav='vehiculos' %}
+
+    <!-- Page Header & Action Buttons -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h3 mb-1">{% trans "Vehicles for Dismantling" %}</h2>
+            <p class="text-muted mb-0">{% trans "Manage vehicles in stock, in dismantling process, and extracted parts." %}</p>
+        </div>
+        <div>
+            <a href="{% url 'taller:desarme_ingreso_vehiculo' %}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> {% trans "New Vehicle Entry" %}
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters and Search Form -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="q" class="form-label">{% trans "Search" %}</label>
+                    <input type="text" class="form-control" id="q" name="q" value="{{ request.GET.q|default:'' }}" 
+                           placeholder="{% trans 'VIN, License Plate, Make, Model...' %}">
+                </div>
+                <div class="col-md-3">
+                    <label for="estado" class="form-label">{% trans "Status" %}</label>
+                    <select class="form-select" id="estado" name="estado">
+                        <option value="">{% trans "All Statuses" %}</option>
+                        <option value="recibido" {% if request.GET.estado == 'recibido' %}selected{% endif %}>{% trans "Received" %}</option>
+                        <option value="en_proceso" {% if request.GET.estado == 'en_proceso' %}selected{% endif %}>{% trans "In Process" %}</option>
+                        <option value="desarmado" {% if request.GET.estado == 'desarmado' %}selected{% endif %}>{% trans "Fully Dismantled" %}</option>
+                        <option value="baja" {% if request.GET.estado == 'baja' %}selected{% endif %}>{% trans "Scrapped / Discarded" %}</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="anio" class="form-label">{% trans "Year" %}</label>
+                    <input type="number" class="form-control" id="anio" name="anio" value="{{ request.GET.anio|default:'' }}" placeholder="YYYY">
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-secondary w-100">
+                        <i class="bi bi-search me-1"></i> {% trans "Filter" %}
+                    </button>
+                    <a href="{% url 'taller:desarme_lista_vehiculos' %}" class="btn btn-outline-secondary" title="{% trans 'Clear' %}">
+                        <i class="bi bi-x-circle"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Vehicles Table List -->
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">{% trans "Vehicle" %}</th>
+                        <th scope="col">{% trans "License Plate / VIN" %}</th>
+                        <th scope="col">{% trans "Entry Date" %}</th>
+                        <th scope="col">{% trans "Status" %}</th>
+                        <th scope="col">{% trans "Parts Extracted" %}</th>
+                        <th scope="col" class="text-end">{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vehiculo in vehiculos %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <strong>{{ vehiculo.marca }} {{ vehiculo.modelo }}</strong>
+                            <div class="text-muted small">{% trans "Year" %}: {{ vehiculo.anio|default:"N/A" }}</div>
+                        </td>
+                        <td>
+                            <div>{{ vehiculo.patente|default:"—" }}</div>
+                            <small class="text-muted font-monospace">{{ vehiculo.vin|default:"—" }}</small>
+                        </td>
+                        <td>{{ vehiculo.fecha_ingreso|date:"Y-m-d" }}</td>
+                        <td>
+                            <span class="badge bg-{% if vehiculo.estado == 'desarmado' %}success{% elif vehiculo.estado == 'en_proceso' %}warning text-dark{% else %}secondary{% endif %}">
+                                {{ vehiculo.get_estado_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge rounded-pill bg-info text-dark">
+                                {{ vehiculo.repuestos.count|default:0 }} {% trans "parts" %}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'taller:desarme_detalle_vehiculo' vehiculo.id %}" class="btn btn-outline-primary" title="{% trans 'View details' %}">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'taller:desarme_extraer_repuesto' vehiculo.id %}" class="btn btn-outline-success" title="{% trans 'Extract parts' %}">
+                                    <i class="bi bi-wrench"></i>
+                                </a>
+                                <a href="{% url 'taller:desarme_editar_vehiculo' vehiculo.id %}" class="btn btn-outline-secondary" title="{% trans 'Edit' %}">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                            {% trans "No vehicles found for dismantling." %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="card-footer bg-white py-3">
+            <nav aria-label="{% trans 'Vehicles pagination' %}">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                            {% trans "Previous" %}
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
+                            {% trans "Next" %}
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

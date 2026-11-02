@@ -1,0 +1,1891 @@
+﻿{% extends 'base.html' %}
+{% load custom_filters %}
+{% load country_url %}
+
+{% block extra_head %}
+<link href="/static/css/estilo_futurista.css" rel="stylesheet">
+<link href="/static/css/galaxy_theme.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+
+<style>
+
+
+.cuadro {
+  position: relative;
+  z-index: 2;
+}
+.cuadro, .cuadro *, .form-card, .form-card * {
+  color: #fff !important;
+}
+.vehiculo-shell {
+  max-width: 1360px;
+  padding: 0 18px 28px;
+}
+.form-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(10, 24, 45, 0.95), rgba(4, 13, 28, 0.94)) !important;
+  color: #fff !important;
+  padding: 24px 24px 18px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  border: 1px solid rgba(0,230,208,0.2);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.form-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(0,230,208,0), rgba(0,230,208,0.65), rgba(0,230,208,0));
+  opacity: 0.9;
+}
+.form-card::after {
+  content: "";
+  position: absolute;
+  top: -90px;
+  right: -70px;
+  width: 260px;
+  height: 260px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(0,230,208,0.12), rgba(0,230,208,0));
+  pointer-events: none;
+}
+.form-group {
+  margin-bottom: 0;
+  min-width: 0;
+}
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #00e6d0 !important;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.65px;
+  margin-bottom: 7px;
+  opacity: 0.95;
+}
+.form-control, select, input:not([type=hidden]) {
+  width: 100%;
+  height: 46px;
+  min-height: 46px;
+  padding: 10px 14px;
+  background: linear-gradient(180deg, rgba(15, 33, 60, 0.92), rgba(10, 24, 45, 0.92)) !important;
+  border: 1px solid rgba(0,230,208,0.22) !important;
+  border-radius: 10px;
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 500;
+  box-sizing: border-box;
+}
+select {
+  color-scheme: dark;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #00e6d0 50%),
+    linear-gradient(135deg, #00e6d0 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 12px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 34px;
+}
+select option,
+select optgroup {
+  background: #0b1730 !important;
+  color: #eaf7ff !important;
+}
+.form-control::placeholder, select::placeholder, input:not([type=hidden])::placeholder {
+  color: rgba(225, 241, 255, 0.48) !important;
+}
+.form-control:focus, select:focus, input:not([type=hidden]):focus {
+  outline: none;
+  border-color: #00e6d0 !important;
+  background: linear-gradient(180deg, rgba(17, 38, 67, 0.96), rgba(12, 28, 52, 0.96)) !important;
+  box-shadow: 0 0 0 2px rgba(0,230,208,0.14), 0 0 18px rgba(0,230,208,0.08);
+}
+
+/* Estilos para campos con autocomplete (Select2/DAL) */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+  height: 46px !important;
+  min-height: 46px !important;
+  background: linear-gradient(180deg, rgba(15, 33, 60, 0.92), rgba(10, 24, 45, 0.92)) !important;
+  border: 1px solid rgba(0,230,208,0.22) !important;
+  border-radius: 10px !important;
+  color: #fff !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: #fff !important;
+  line-height: 44px !important;
+  padding-left: 14px !important;
+  padding-right: 30px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 44px !important;
+  right: 8px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+  border-color: #00e6d0 transparent transparent transparent !important;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+  border-color: #00e6d0 !important;
+  background: linear-gradient(180deg, rgba(17, 38, 67, 0.96), rgba(12, 28, 52, 0.96)) !important;
+  box-shadow: 0 0 0 2px rgba(0,230,208,0.14), 0 0 18px rgba(0,230,208,0.08) !important;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+  background: rgba(0,230,208,0.1) !important;
+  border: 1px solid rgba(0,230,208,0.3) !important;
+  color: #fff !important;
+  border-radius: 6px !important;
+}
+
+.select2-dropdown {
+  background: rgba(0,0,0,0.9) !important;
+  border: 1px solid rgba(0,230,208,0.3) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.42) !important;
+  overflow: hidden !important;
+}
+
+.select2-results,
+.select2-results__options {
+  background: linear-gradient(180deg, rgba(12, 28, 52, 0.99), rgba(7, 18, 35, 0.99)) !important;
+}
+
+.select2-container--default .select2-results__option {
+  background: transparent !important;
+  color: #eaf7ff !important;
+  padding: 10px 12px !important;
+  border-bottom: 1px solid rgba(0,230,208,0.08) !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background: linear-gradient(180deg, rgba(0,230,208,0.2), rgba(0,179,160,0.15)) !important;
+  color: #7ff8ec !important;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+  background: rgba(0,230,208,0.14) !important;
+  color: #7ff8ec !important;
+}
+
+/* Placeholder para Select2 */
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+  color: rgba(255,255,255,0.6) !important;
+}
+
+/* Para campos mÃºltiples */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background: rgba(0,230,208,0.2) !important;
+  border: 1px solid rgba(0,230,208,0.4) !important;
+  color: #fff !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+  color: #00e6d0 !important;
+  margin-right: 6px !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+  padding: 6px 12px !important;
+  min-height: 46px !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
+  background: transparent !important;
+  border: none !important;
+  color: #fff !important;
+  margin-top: 4px !important;
+  padding: 0 !important;
+}
+.cliente-fallback-search {
+  position: relative;
+  width: 100%;
+}
+.cliente-fallback-results {
+  position: absolute;
+  z-index: 1200;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  background: linear-gradient(180deg, rgba(12, 28, 52, 0.99), rgba(7, 18, 35, 0.99));
+  border: 1px solid rgba(0,230,208,0.3);
+  border-radius: 8px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.42);
+}
+.cliente-fallback-item,
+.cliente-fallback-empty {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 1px solid rgba(0,230,208,0.08);
+  background: transparent;
+  color: #eaf7ff !important;
+  text-align: left;
+  font-size: 14px;
+}
+.cliente-fallback-item:hover,
+.cliente-fallback-item:focus {
+  background: linear-gradient(180deg, rgba(0,230,208,0.2), rgba(0,179,160,0.15));
+  color: #7ff8ec !important;
+  outline: none;
+}
+.cliente-fallback-empty {
+  color: rgba(225, 241, 255, 0.68) !important;
+}
+.vehicle-form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px 18px;
+}
+.field-span-2 {
+  grid-column: span 1;
+}
+.field-span-3 {
+  grid-column: span 1;
+}
+.field-span-4 {
+  grid-column: span 1;
+}
+.field-tight {
+  grid-column: span 1;
+}
+.field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.field-header label {
+  margin-bottom: 0;
+}
+.field-control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.field-control-row > input:not([type=hidden]),
+.field-control-row > select,
+.field-control-row > .select2-container {
+  width: 100%;
+}
+.field-control-row > *:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.field-control-row .select2-container {
+  width: 100% !important;
+}
+.field-control-row > select,
+.field-control-row > .select2-container .select2-selection--single,
+.field-control-row > .select2-container .select2-selection--multiple,
+.field-control-row > input:not([type=hidden]) {
+  min-height: 46px !important;
+  height: 46px !important;
+}
+.btn-add-record {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid rgba(0,230,208,0.45);
+  background: linear-gradient(180deg, rgba(0,230,208,0.16), rgba(0,179,160,0.08));
+  color: #67e8f9;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-add-record:hover {
+  background: rgba(0,230,208,0.22);
+  box-shadow: 0 0 0 1px rgba(0,230,208,0.12);
+}
+.btn-add-record:disabled {
+  opacity: 0.45;
+  cursor: wait;
+}
+.btn-futuristic {
+  background: linear-gradient(45deg, #00e6d0, #00b3a0);
+  border: none;
+  color: white;
+  min-height: 46px;
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-futuristic:hover {
+  background: linear-gradient(45deg, #00b3a0, #008a7a);
+  color: white;
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,230,208,0.3);
+}
+.btn-secondary {
+  background: linear-gradient(45deg, #6c757d, #545b62);
+}
+.btn-secondary:hover {
+  background: linear-gradient(45deg, #545b62, #495057);
+}
+.font-orbitron {
+  font-family: 'Orbitron', 'Arial', sans-serif;
+}
+@media (min-width: 760px) {
+  .vehicle-form-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .field-span-2 {
+    grid-column: span 2;
+  }
+  .field-span-3 {
+    grid-column: span 2;
+  }
+  .field-span-4 {
+    grid-column: span 4;
+  }
+}
+@media (min-width: 1120px) {
+  .vehicle-form-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .field-span-2 {
+    grid-column: span 2;
+  }
+  .field-span-3 {
+    grid-column: span 3;
+  }
+  .field-span-4 {
+    grid-column: span 4;
+  }
+}
+@media (min-width: 1280px) {
+  .vehicle-form-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 20px 18px;
+  }
+  .field-span-2 {
+    grid-column: span 2;
+  }
+  .field-span-3 {
+    grid-column: span 3;
+  }
+  .field-span-4 {
+    grid-column: span 4;
+  }
+}
+</style>
+{% endblock %}
+
+{% block fondo_extra %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="vehiculo-shell mx-auto cuadro">
+  {% country_url 'vehiculos:lista_vehiculos' as url_lista_vehiculos %}
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold font-orbitron">
+        </h1>
+    <a href="{% if return_to %}{{ return_to }}{% elif url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}{% endif %}"
+       class="btn-futuristic btn-secondary">Volver</a>
+  </div>
+
+  <div class="form-card">
+    <form method="post">
+      {% csrf_token %}
+      {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+      {% endif %}
+      {% if return_to %}
+      <input type="hidden" name="return_to" value="{{ return_to }}">
+      {% endif %}
+
+      <div class="vehicle-form-grid">
+
+        <div class="form-group field-span-4">
+
+          <div class="field-header">
+            <label for="{{ form.cliente.id_for_label }}">
+              Cliente
+            </label>
+
+            <button
+              type="button"
+              class="btn-add-record"
+              id="btn-crear-cliente"
+              title="Crear nuevo cliente">
+              +
+            </button>
+          </div>
+
+          <div class="field-control-row">
+            {{ form.cliente }}
+          </div>
+
+          {% if form.cliente.errors %}
+            <div class="text-red-400 text-sm mt-1">
+              {{ form.cliente.errors.0 }}
+            </div>
+          {% endif %}
+
+        </div>
+
+        <div class="form-group field-span-2">
+          <label for="{{ form.patente.id_for_label }}">Patente</label>
+          {{ form.patente }}
+          {% if form.patente.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.patente.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group field-span-2">
+          <label for="{{ form.vin.id_for_label }}">VIN</label>
+          {{ form.vin }}
+          {% if form.vin.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.vin.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group field-span-2">
+          <label for="{{ form.anio.id_for_label }}">A?o</label>
+          {{ form.anio }}
+          {% if form.anio.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.anio.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group field-span-2">
+          <label for="{{ form.millas.id_for_label }}" style="{% if request.path|slice:':4' == '/us/' %}visibility: visible;{% else %}visibility: hidden;{% endif %}">
+            {% if request.path|slice:":4" == "/us/" %}Miles{% else %}Kilometraje{% endif %}
+          </label>
+          {{ form.millas }}
+          {% if form.millas.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.millas.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group field-span-2">
+          <div class="field-header">
+            <label for="{{ form.marca.id_for_label }}">Marca</label>
+            <button type="button" class="btn-add-record" data-add="marca" title="Agregar marca">+</button>
+          </div>
+          <div class="field-control-row">
+            {{ form.marca }}
+          </div>
+          {% if form.marca.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.marca.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group field-span-2">
+          <div class="field-header">
+            <label for="{{ form.modelo.id_for_label }}">Modelo</label>
+            <button type="button" class="btn-add-record" data-add="modelo" title="Agregar modelo">+</button>
+          </div>
+          <div class="field-control-row">
+            {{ form.modelo }}
+          </div>
+          {% if form.modelo.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.modelo.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group field-span-2">
+          <div class="field-header">
+            <label for="{{ form.color.id_for_label }}">Color</label>
+            <button type="button" class="btn-add-record" data-add="color" title="Agregar color">+</button>
+          </div>
+          <div class="field-control-row">
+            {{ form.color }}
+          </div>
+          {% if form.color.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.color.errors.0 }}</div>
+          {% endif %}
+          <!-- Campo para nuevo color (oculto por defecto) -->
+          <div id="color-nuevo-container" style="display: none;" class="mt-2">
+            <input type="text"
+                   name="color_nuevo"
+                   id="color_nuevo"
+                   placeholder="Ingresa el nombre del nuevo color"
+                   class="form-control"
+                   style="background: rgba(0,230,208,0.1) !important; border: 1px solid rgba(0,230,208,0.3) !important; color: #fff !important;">
+          </div>
+        </div>
+
+        <div class="form-group field-span-3">
+          <div class="field-header">
+            <label for="{{ form.motor.id_for_label }}">Motor</label>
+            <button type="button" class="btn-add-record" data-add="motor" title="Agregar motor">+</button>
+          </div>
+          <div class="field-control-row">
+            {{ form.motor }}
+          </div>
+          {% if form.motor.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.motor.errors.0 }}</div>
+          {% endif %}
+          <!-- Campo para nuevo motor (oculto por defecto) -->
+          <div id="motor-nuevo-container" style="display: none;" class="mt-2">
+            <input type="text"
+                   name="motor_nuevo"
+                   id="motor_nuevo"
+                   placeholder="Ingresa el nombre del nuevo motor"
+                   class="form-control"
+                   style="background: rgba(0,230,208,0.1) !important; border: 1px solid rgba(0,230,208,0.3) !important; color: #fff !important;">
+          </div>
+        </div>
+
+        <div class="form-group field-span-3">
+          <div class="field-header">
+            <label for="{{ form.caja.id_for_label }}">Caja/Transmisi?n</label>
+            <button type="button" class="btn-add-record" data-add="caja" title="Agregar caja">+</button>
+          </div>
+          <div class="field-control-row">
+            {{ form.caja }}
+          </div>
+          {% if form.caja.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.caja.errors.0 }}</div>
+          {% endif %}
+          <!-- Campo para nueva caja (oculto por defecto) -->
+          <div id="caja-nueva-container" style="display: none;" class="mt-2">
+            <input type="text"
+                   name="caja_nuevo"
+                   id="caja_nuevo"
+                   placeholder="Ingresa el nombre de la nueva caja/transmisi&oacute;n"
+                   class="form-control"
+                   style="background: rgba(0,230,208,0.1) !important; border: 1px solid rgba(0,230,208,0.3) !important; color: #fff !important;">
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="flex gap-3 mt-8 pt-6 border-t border-gray-600">
+        <button type="submit" class="btn-futuristic">
+          {% if vehiculo %}Guardar cambios{% else %}Guardar veh?culo{% endif %}
+        </button>
+
+        <a href="{% if return_to %}{{ return_to }}{% elif url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}{% endif %}"
+           class="btn-futuristic btn-secondary">
+          Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Definir countryPrefix globalmente para que estÃ© disponible en todo el scope
+const countryPrefix = (function() {
+    const path = window.location.pathname;
+    if (path.startsWith('/us/')) return '/us/';
+    if (path.startsWith('/cl/')) return '/cl/';
+    if (path.startsWith('/mx/')) return '/mx/';
+    return '/cl/'; // Default
+})();
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    const btnCrearCliente = document.getElementById('btn-crear-cliente');
+
+    if (btnCrearCliente) {
+
+        btnCrearCliente.addEventListener('click', function() {
+
+            const currentUrl = window.location.pathname + window.location.search;
+
+            const createUrl =
+                "/cl/es/clientes/crear/" +
+                "?return_to=" +
+                encodeURIComponent(currentUrl);
+
+            window.location.href = createUrl;
+        });
+    }
+
+
+
+    // URLs para endpoints AJAX
+    const urlAgregarMarca = "{% country_url 'vehiculos:ajax_agregar_marca' %}";
+    const urlAgregarModelo = "{% country_url 'vehiculos:ajax_agregar_modelo' %}";
+    const urlAgregarMotor = "{% country_url 'vehiculos:ajax_agregar_motor' %}";
+    const urlAgregarCaja = "{% country_url 'vehiculos:ajax_agregar_caja' %}";
+    const urlAgregarColor = "{% country_url 'vehiculos:ajax_agregar_color' %}";
+    const urlModelosPorMarca = "{% country_url 'vehiculos:ajax_modelos_por_marca' %}";
+    const urlModelosPorMarcaApi = "{% country_url 'vehiculos:modelos_por_marca_api' %}";
+    const urlMotoresPorModelo = "{% country_url 'vehiculos:ajax_motores_por_modelo' %}";
+    const urlCajasPorModelo = "{% country_url 'vehiculos:ajax_cajas_por_modelo' %}";
+    const urlMarcas = "{% country_url 'vehiculos:api_marcas' %}";
+
+    const marcaSelect = document.getElementById('id_marca');
+    const modeloSelect = document.getElementById('id_modelo');
+    const anioSelect = document.getElementById('id_anio');
+    const colorSelectBase = document.getElementById('id_color');
+
+    function syncSelectUi(select) {
+        if (!select) return;
+        if (window.jQuery && window.jQuery(select).hasClass('select2-hidden-accessible')) {
+            window.jQuery(select).trigger('change.select2');
+        }
+    }
+
+    function initEnhancedSelect(select, config) {
+        if (!select || !window.jQuery || !window.jQuery.fn || !window.jQuery.fn.select2) {
+            return;
+        }
+
+        const $select = window.jQuery(select);
+        if ($select.hasClass('django-autocomplete-light-widget') || $select.hasClass('select2-hidden-accessible')) {
+            return;
+        }
+
+        const selectConfig = Object.assign({
+            width: '100%',
+            dropdownAutoWidth: true,
+            allowClear: true
+        }, config || {});
+        selectConfig.placeholder = selectConfig.placeholder
+            || select.getAttribute('data-placeholder')
+            || (select.options[0] ? select.options[0].textContent : '')
+            || '';
+
+        select.__egSelect2Config = selectConfig;
+        $select.select2(selectConfig);
+    }
+
+    function refreshEnhancedSelect(select) {
+        if (!select || !window.jQuery || !window.jQuery.fn || !window.jQuery.fn.select2) {
+            return;
+        }
+
+        const $select = window.jQuery(select);
+        if ($select.hasClass('django-autocomplete-light-widget')) {
+            return;
+        }
+
+        const selectConfig = select.__egSelect2Config;
+        if (!selectConfig) {
+            return;
+        }
+
+        const currentValue = $select.val();
+        if ($select.hasClass('select2-hidden-accessible')) {
+            $select.select2('destroy');
+        }
+
+        $select.select2(selectConfig);
+
+        if (currentValue !== undefined && currentValue !== null && currentValue !== '') {
+            $select.val(currentValue);
+        }
+        $select.trigger('change.select2');
+    }
+
+    function normalizeOptionsPayload(data) {
+        if (Array.isArray(data)) {
+            return data;
+        }
+        if (data && Array.isArray(data.results)) {
+            return data.results;
+        }
+        if (data && Array.isArray(data.modelos)) {
+            return data.modelos;
+        }
+        return [];
+    }
+
+    initEnhancedSelect(marcaSelect, {
+        placeholder: 'Selecciona marca...',
+        minimumResultsForSearch: 0
+    });
+    initEnhancedSelect(modeloSelect, {
+        placeholder: 'Selecciona modelo...',
+        minimumResultsForSearch: 0
+    });
+    initEnhancedSelect(colorSelectBase, {
+        placeholder: 'Selecciona color...',
+        minimumResultsForSearch: 0
+    });
+    initEnhancedSelect(anioSelect, {
+        placeholder: 'Selecciona año...',
+        minimumResultsForSearch: 10
+    });
+
+    function restorePendingFreeText(select) {
+        if (!select) return;
+        const pending = String((select.dataset && select.dataset.pendingFreeText) || '').trim();
+        if (!pending) return;
+        const currentValue = String(select.value || '').trim();
+        if (currentValue) return;
+
+        let option = Array.from(select.options).find(function(item) {
+            return String(item.value) === pending;
+        });
+
+        if (!option) {
+            option = document.createElement('option');
+            option.value = pending;
+            option.textContent = pending;
+            select.appendChild(option);
+        }
+
+        option.selected = true;
+        select.value = pending;
+        syncSelectUi(select);
+    }
+
+    function setSelectValue(select, value) {
+        if (!select) return;
+        select.value = String(value);
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        syncSelectUi(select);
+    }
+
+    function insertOrSelectOption(select, value, text) {
+        if (!select) return;
+        const normalizedValue = String(value);
+        let option = Array.from(select.options).find(function(item) {
+            return String(item.value) === normalizedValue;
+        });
+
+        if (!option) {
+            option = document.createElement('option');
+            option.value = normalizedValue;
+            option.textContent = text;
+            const sentinel = select.querySelector('option[value="__nuevo__"]');
+            if (sentinel) {
+                select.insertBefore(option, sentinel);
+            } else {
+                select.appendChild(option);
+            }
+        } else {
+            option.textContent = text;
+        }
+
+        option.selected = true;
+    }
+
+    function setDependentsEnabled(enabled) {
+        const motorField = document.getElementById('id_motor');
+        const cajaField = document.getElementById('id_caja');
+        [motorField, cajaField].forEach(function(field) {
+            if (!field) return;
+            field.disabled = !enabled;
+            syncSelectUi(field);
+        });
+    }
+
+    function postJson(url, payload) {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        return fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+                headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(payload)
+        }).then(function(response) {
+            return response.json();
+        });
+    }
+
+    // FunciÃ³n para cargar marcas vÃ­a AJAX (siempre ejecuta, incluso si hay opciones)
+    function cargarMarcas(forceReload = false) {
+        if (!marcaSelect) {
+            console.error('âŒ Campo marca (id_marca) no encontrado en el DOM');
+            return;
+        }
+        
+        // Verificar si ya tiene opciones vÃ¡lidas (mÃ¡s que solo la opciÃ³n vacÃ­a)
+        const hasValidOptions = marcaSelect.options.length > 1 || 
+                               (marcaSelect.options.length === 1 && marcaSelect.options[0].value !== '');
+        
+        // Si ya tiene opciones vÃ¡lidas y no se fuerza la recarga, no hacer nada
+        if (hasValidOptions && !forceReload) {
+            console.log('â„¹ï¸ Campo marca ya tiene opciones, omitiendo carga:', {
+                optionsCount: marcaSelect.options.length,
+                firstOption: marcaSelect.options[0] ? marcaSelect.options[0].text : 'N/A'
+            });
+            return;
+        }
+        
+        console.log('ðŸ”„ Cargando marcas desde:', urlMarcas);
+        console.log('ðŸ“‹ Estado actual del campo marca:', {
+            optionsCount: marcaSelect.options.length,
+            hasValue: marcaSelect.value,
+            options: Array.from(marcaSelect.options).map(opt => ({value: opt.value, text: opt.text}))
+        });
+        
+        // Guardar el valor actual si existe
+        const valorActual = marcaSelect.value;
+        
+        // Mostrar loading
+        marcaSelect.innerHTML = '<option value="">Cargando marcas...</option>';
+        marcaSelect.disabled = true;
+        
+        fetch(urlMarcas, {
+            credentials: 'same-origin'
+        })
+            .then(response => {
+                console.log('ðŸ“¡ Respuesta del servidor:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok,
+                    url: urlMarcas
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('âœ… Datos recibidos:', data);
+                
+                // Limpiar opciones
+                marcaSelect.innerHTML = '<option value="">---------</option>';
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(marca => {
+                        const option = document.createElement('option');
+                        option.value = marca.id;
+                        option.textContent = marca.nombre;
+                        marcaSelect.appendChild(option);
+                    });
+                    
+                    // Restaurar el valor anterior si existÃ­a
+                    if (valorActual) {
+                        marcaSelect.value = valorActual;
+                    }
+                    
+                    console.log(`âœ… Marcas cargadas exitosamente: ${data.length} marcas`);
+                } else {
+                    console.warn('âš ï¸ No se encontraron marcas en la respuesta. Verificar que existan marcas en la base de datos para el paÃ­s correspondiente.');
+                    marcaSelect.innerHTML = '<option value="">No hay marcas disponibles</option>';
+                }
+                
+                marcaSelect.disabled = false;
+                refreshEnhancedSelect(marcaSelect);
+            })
+            .catch(error => {
+                console.error('âŒ Error al cargar marcas:', error);
+                marcaSelect.innerHTML = '<option value="">Error al cargar marcas</option>';
+                marcaSelect.disabled = false;
+                refreshEnhancedSelect(marcaSelect);
+                
+                // Mostrar mensaje de error mÃ¡s detallado
+                console.error('Detalles del error:', {
+                    message: error.message,
+                    url: urlMarcas,
+                    stack: error.stack
+                });
+            });
+    }
+
+    if (marcaSelect && modeloSelect) {
+        let modelosRequestToken = 0;
+
+        // FunciÃ³n para cargar modelos por marca y aÃ±o
+        function cargarModelos(marcaId, anio = null, modeloSeleccionado = null) {
+            const requestToken = ++modelosRequestToken;
+
+            // Limpiar opciones del modelo
+            modeloSelect.innerHTML = '<option value="">---------</option>';
+            modeloSelect.disabled = !marcaId;
+            refreshEnhancedSelect(modeloSelect);
+            syncSelectUi(modeloSelect);
+            setDependentsEnabled(false);
+
+            if (marcaId) {
+                // Mostrar loading
+                modeloSelect.innerHTML = '<option value="">Cargando modelos...</option>';
+                modeloSelect.disabled = true;
+                refreshEnhancedSelect(modeloSelect);
+                syncSelectUi(modeloSelect);
+
+                // Construir URL con parÃ¡metros
+                let url = `${urlModelosPorMarcaApi}?marca_id=${encodeURIComponent(marcaId)}`;
+                if (anio) {
+                    url += `&anio=${encodeURIComponent(anio)}`;
+                }
+
+                // Hacer peticiÃ³n AJAX para obtener modelos de la marca (y aÃ±o si estÃ¡ disponible)
+                return fetch(url, {
+            credentials: 'same-origin'
+        })
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Modelos data:', data);
+                        if (requestToken !== modelosRequestToken) {
+                            return;
+                        }
+
+                        // Limpiar opciones
+                        modeloSelect.innerHTML = '<option value="">---------</option>';
+                        modeloSelect.disabled = false;
+
+                        const modelos = normalizeOptionsPayload(data).map(function(modelo) {
+                            return {
+                                id: modelo.id,
+                                nombre: modelo.nombre || modelo.text || ''
+                            };
+                        });
+
+                        if (modelos.length === 0) {
+                            modeloSelect.innerHTML = '<option value="">No hay modelos disponibles</option>';
+                        } else {
+                            modelos.forEach(modelo => {
+                                const option = document.createElement('option');
+                                option.value = String(modelo.id);
+                                option.textContent = modelo.nombre;
+
+                                if (modeloSeleccionado && String(modelo.id) === String(modeloSeleccionado)) {
+                                    option.selected = true;
+                                }
+
+                                modeloSelect.appendChild(option);
+                            });
+                        }
+
+                        refreshEnhancedSelect(modeloSelect);
+                        syncSelectUi(modeloSelect);
+
+                        if (window.jQuery) {
+                            window.jQuery(modeloSelect).prop('disabled', false);
+                            window.jQuery(modeloSelect).trigger('change.select2');
+                        }
+
+                        // Si hay un modelo seleccionado, cargar sus motores y cajas
+                        if (modeloSeleccionado && String(modeloSelect.value || '') === String(modeloSeleccionado)) {
+                            const motorSelect = document.getElementById('id_motor');
+                            const cajaSelect = document.getElementById('id_caja');
+                            const motorActual = motorSelect ? motorSelect.value : null;
+                            const cajaActual = cajaSelect ? cajaSelect.value : null;
+                            cargarMotoresYCajas(modeloSeleccionado, motorActual, cajaActual);
+                        }
+                    })
+                    .catch(error => {
+                        if (requestToken !== modelosRequestToken) {
+                            return;
+                        }
+                        console.error('Error al cargar modelos:', error);
+                        modeloSelect.innerHTML = '<option value="">Error al cargar</option>';
+                        modeloSelect.disabled = false;
+                        refreshEnhancedSelect(modeloSelect);
+                        syncSelectUi(modeloSelect);
+                    });
+            }
+
+            refreshEnhancedSelect(modeloSelect);
+            syncSelectUi(modeloSelect);
+            return Promise.resolve();
+        }
+
+        // FunciÃ³n para cargar motores y cajas por modelo
+        function cargarMotoresYCajas(modeloId, motorSeleccionado = null, cajaSeleccionada = null) {
+            const motorSelect = document.getElementById('id_motor');
+            const cajaSelect = document.getElementById('id_caja');
+
+            if (!motorSelect || !cajaSelect) return;
+
+            // Obtener valores actuales si no se proporcionan
+            if (!motorSeleccionado) motorSeleccionado = motorSelect.value;
+            if (!cajaSeleccionada) cajaSeleccionada = cajaSelect.value;
+
+            // Limpiar y mostrar loading en motores
+            motorSelect.innerHTML = '<option value="">Cargando motores...</option>';
+            cajaSelect.innerHTML = '<option value="">Cargando cajas...</option>';
+            setDependentsEnabled(false);
+
+            // Cargar motores
+            fetch(`${urlMotoresPorModelo}?modelo_id=${modeloId}`, {
+                credentials: 'same-origin'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    motorSelect.innerHTML = '<option value="">---------</option>';
+                    
+                    // Usar data.motores directamente
+                    if (data.motores && Array.isArray(data.motores)) {
+                        data.motores.forEach(motor => {
+                            const option = document.createElement('option');
+                            option.value = motor.id;
+                            option.textContent = motor.nombre;
+
+                            // Seleccionar el motor si coincide
+                            if (motorSeleccionado && motor.id == motorSeleccionado) {
+                                option.selected = true;
+                            }
+
+                            motorSelect.appendChild(option);
+                        });
+                    }
+                    restorePendingFreeText(motorSelect);
+                    syncSelectUi(motorSelect);
+                })
+                .catch(error => {
+                    console.error('Error al cargar motores:', error);
+                    motorSelect.innerHTML = '<option value="">Error al cargar motores</option>';
+                    syncSelectUi(motorSelect);
+                });
+
+            // Cargar cajas
+            fetch(`${urlCajasPorModelo}?modelo_id=${modeloId}`, {
+                credentials: 'same-origin'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    cajaSelect.innerHTML = '<option value="">---------</option>';
+                    
+                    // Usar data.cajas directamente
+                    if (data.cajas && Array.isArray(data.cajas)) {
+                        data.cajas.forEach(caja => {
+                            const option = document.createElement('option');
+                            option.value = caja.id;
+                            option.textContent = caja.nombre;
+
+                            // Seleccionar la caja si coincide
+                            if (cajaSeleccionada && caja.id == cajaSeleccionada) {
+                                option.selected = true;
+                            }
+
+                            cajaSelect.appendChild(option);
+                        });
+                    }
+                    restorePendingFreeText(cajaSelect);
+                    setDependentsEnabled(true);
+                    syncSelectUi(cajaSelect);
+                })
+                .catch(error => {
+                    console.error('Error al cargar cajas:', error);
+                    cajaSelect.innerHTML = '<option value="">Error al cargar cajas</option>';
+                    setDependentsEnabled(true);
+                    syncSelectUi(cajaSelect);
+                });
+        }
+
+        // FunciÃ³n para obtener aÃ±o actual
+        function obtenerAnio() {
+            if (anioSelect && anioSelect.value) {
+                return anioSelect.value;
+            }
+            return null;
+        }
+
+        // FunciÃ³n para recargar modelos cuando cambia marca o aÃ±o
+        function recargarModelos() {
+            const marcaId = String(marcaSelect.value || '').trim();
+            const anio = obtenerAnio();
+            const modeloActual = String(modeloSelect.value || '').trim();
+            cargarModelos(marcaId, anio, modeloActual);
+            
+            // Limpiar motores y cajas cuando cambia la marca o aÃ±o
+            const motorSelect = document.getElementById('id_motor');
+            const cajaSelect = document.getElementById('id_caja');
+            if (motorSelect) motorSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+            if (cajaSelect) cajaSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+            setDependentsEnabled(false);
+        }
+
+        // Event listener para cambio de marca
+        marcaSelect.addEventListener('change', function() {
+            console.log('[VehiculoForm] Marca change nativo:', marcaSelect.value);
+            recargarModelos();
+        });
+
+        // Select2 no siempre dispara el change nativo en este template
+        if (window.jQuery) {
+            window.jQuery(marcaSelect).on('change select2:select', function() {
+                console.log('[VehiculoForm] Marca change/select2:', marcaSelect.value);
+                recargarModelos();
+            });
+        }
+
+        // Event listener para cambio de aÃ±o
+        if (anioSelect) {
+            anioSelect.addEventListener('change', function() {
+                if (marcaSelect.value) {
+                    recargarModelos();
+                }
+            });
+        }
+
+        // Event listener para cambio de modelo
+        modeloSelect.addEventListener('change', function() {
+            console.log('[VehiculoForm] MODELO CHANGE NATIVO:', this.value);
+
+            if (this.value) {
+                cargarMotoresYCajas(this.value);
+            } else {
+                // Limpiar motores y cajas si no hay modelo seleccionado
+                const motorSelect = document.getElementById('id_motor');
+                const cajaSelect = document.getElementById('id_caja');
+                if (motorSelect) motorSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+                if (cajaSelect) cajaSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+                setDependentsEnabled(false);
+            }
+        });
+
+        // SIEMPRE cargar marcas al inicio (fuerza recarga si el campo estÃ¡ vacÃ­o o solo tiene opciÃ³n por defecto)
+        console.log('ðŸš€ Iniciando carga de marcas...');
+        // Forzar recarga si el campo tiene menos de 2 opciones (solo la opciÃ³n vacÃ­a)
+        const shouldForceReload = marcaSelect.options.length <= 1;
+        cargarMarcas(shouldForceReload);
+
+        // Cargar modelos iniciales si ya hay una marca seleccionada
+        if (marcaSelect.value) {
+            const anio = obtenerAnio();
+            cargarModelos(marcaSelect.value, anio, modeloSelect.value);
+        }
+
+
+
+        // FIX DEFINITIVO SELECT2 MODELO
+        if (window.jQuery) {
+            window.jQuery(modeloSelect).on('change select2:select', function() {
+
+                console.log('[VehiculoForm] MODELO SELECT2:', modeloSelect.value);
+
+                if (modeloSelect.value) {
+                    cargarMotoresYCajas(modeloSelect.value);
+                }
+            });
+        }
+
+
+        // Cargar motores y cajas iniciales si ya hay un modelo seleccionado
+        if (modeloSelect.value) {
+            cargarMotoresYCajas(modeloSelect.value);
+        } else {
+            setDependentsEnabled(false);
+        }
+    } else {
+        // Si no se encontraron los campos, intentar cargar marcas de todos modos
+        console.log('âš ï¸ Campos marca/modelo no encontrados, intentando cargar marcas de todos modos...');
+        cargarMarcas();
+    }
+    
+    // Fallback: intentar cargar marcas despuÃ©s de un pequeÃ±o delay por si el campo se carga dinÃ¡micamente
+    setTimeout(function() {
+        const marcaSelectDelayed = document.getElementById('id_marca');
+        if (marcaSelectDelayed && (marcaSelectDelayed.options.length <= 1 || marcaSelectDelayed.options[0].value === '')) {
+            console.log('ðŸ”„ Reintentando carga de marcas (fallback)...');
+            cargarMarcas();
+        }
+    }, 500);
+
+    document.querySelectorAll('.btn-add-record[data-add]').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const tipo = button.getAttribute('data-add');
+            const urls = {
+                marca: urlAgregarMarca,
+                modelo: urlAgregarModelo,
+                color: urlAgregarColor,
+                motor: urlAgregarMotor,
+                caja: urlAgregarCaja
+            };
+
+            let promptText = '';
+            const payload = {};
+
+            if (tipo === 'marca') {
+                promptText = 'Nombre de la nueva marca:';
+            } else if (tipo === 'modelo') {
+                if (!marcaSelect || !marcaSelect.value) {
+                    alert('Selecciona una marca primero.');
+                    return;
+                }
+                payload.marca_id = marcaSelect.value;
+                promptText = 'Nombre del nuevo modelo:';
+            } else if (tipo === 'color') {
+                promptText = 'Nombre del nuevo color:';
+            } else if (tipo === 'motor') {
+                if (!modeloSelect || !modeloSelect.value) {
+                    alert('Selecciona un modelo primero.');
+                    return;
+                }
+                payload.modelo_id = modeloSelect.value;
+                promptText = 'Nombre del nuevo motor:';
+            } else if (tipo === 'caja') {
+                if (!modeloSelect || !modeloSelect.value) {
+                    alert('Selecciona un modelo primero.');
+                    return;
+                }
+                payload.modelo_id = modeloSelect.value;
+                promptText = 'Nombre de la nueva caja:';
+            } else {
+                return;
+            }
+
+            const nombre = window.prompt(promptText);
+            if (!nombre || !nombre.trim()) {
+                return;
+            }
+
+            payload.nombre = nombre.trim();
+            button.disabled = true;
+
+            postJson(urls[tipo], payload)
+                .then(function(data) {
+                    if (!data.success) {
+                        alert(data.error || 'No fue posible agregar el registro.');
+                        return;
+                    }
+
+                    if (tipo === 'marca' && data.marca) {
+                        insertOrSelectOption(marcaSelect, data.marca.id, data.marca.nombre);
+                        setSelectValue(marcaSelect, data.marca.id);
+                    }
+
+                    if (tipo === 'modelo' && data.modelo) {
+                        cargarModelos(marcaSelect.value, obtenerAnio(), data.modelo.id)
+                            .then(function() {
+                                setSelectValue(modeloSelect, data.modelo.id);
+                            });
+                    }
+
+                    if (tipo === 'color' && data.color) {
+                        const colorSelectField = document.getElementById('id_color');
+                        insertOrSelectOption(colorSelectField, data.color.id, data.color.nombre);
+                        setSelectValue(colorSelectField, data.color.id);
+                    }
+
+                    if (tipo === 'motor' && data.motor) {
+                        cargarMotoresYCajas(modeloSelect.value, data.motor.id, null);
+                    }
+
+                    if (tipo === 'caja' && data.caja) {
+                        cargarMotoresYCajas(modeloSelect.value, null, data.caja.id);
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error agregando registro:', error);
+                    alert('No fue posible guardar el nuevo registro.');
+                })
+                .finally(function() {
+                    button.disabled = false;
+                });
+        });
+    });
+
+    // Manejar campo de color
+    const colorSelect = document.getElementById('id_color');
+    const colorNuevoContainer = document.getElementById('color-nuevo-container');
+    const colorNuevoInput = document.getElementById('color_nuevo');
+
+    if (colorSelect && colorNuevoContainer && colorNuevoInput) {
+        const legacyColorOption = colorSelect.querySelector('option[value="__nuevo__"]');
+        if (legacyColorOption) {
+            legacyColorOption.remove();
+        }
+
+        colorSelect.addEventListener('change', function() {
+            if (this.value === '__nuevo__') {
+                colorNuevoContainer.style.display = 'block';
+                colorNuevoInput.required = true;
+                colorNuevoInput.focus();
+            } else {
+                colorNuevoContainer.style.display = 'none';
+                colorNuevoInput.required = false;
+                colorNuevoInput.value = '';
+            }
+        });
+
+        // Verificar estado inicial
+        if (colorSelect.value === '__nuevo__') {
+            colorNuevoContainer.style.display = 'block';
+            colorNuevoInput.required = true;
+        }
+    }
+
+    // Manejar campo de motor
+    const motorSelect = document.getElementById('id_motor');
+    const motorNuevoContainer = document.getElementById('motor-nuevo-container');
+    const motorNuevoInput = document.getElementById('motor_nuevo');
+
+    if (motorSelect && motorNuevoContainer && motorNuevoInput) {
+        restorePendingFreeText(motorSelect);
+        motorSelect.addEventListener('change', function() {
+            if (this.value === '__nuevo__') {
+                motorNuevoContainer.style.display = 'block';
+                motorNuevoInput.required = true;
+                motorNuevoInput.focus();
+            } else {
+                motorNuevoContainer.style.display = 'none';
+                motorNuevoInput.required = false;
+                motorNuevoInput.value = '';
+            }
+        });
+
+        // FunciÃ³n para crear nuevo motor vÃ­a AJAX
+        function crearNuevoMotor(nombreMotor) {
+            const modeloId = modeloSelect.value;
+            if (!modeloId) {
+                alert('Por favor selecciona un modelo primero');
+                return;
+            }
+
+            if (!nombreMotor || nombreMotor.trim() === '') {
+                alert('Por favor ingresa un nombre para el motor');
+                return;
+            }
+
+            // Mostrar loading
+            motorNuevoInput.disabled = true;
+            motorNuevoInput.placeholder = 'Creando motor...';
+
+            // Obtener CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Crear motor vÃ­a AJAX
+            fetch(urlAgregarMotor, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    nombre: nombreMotor.trim(),
+                    modelo_id: modeloId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                motorNuevoInput.disabled = false;
+                motorNuevoInput.placeholder = 'Ingresa el nombre del nuevo motor';
+
+                if (data.success) {
+                    // Agregar el nuevo motor al dropdown
+                    const option = document.createElement('option');
+                    option.value = data.motor.id;
+                    option.textContent = data.motor.nombre;
+                    option.selected = true;
+
+                    // Remover la opciÃ³n "__nuevo__" y agregar el nuevo motor antes de ella
+                    const nuevoOption = motorSelect.querySelector('option[value="__nuevo__"]');
+                    if (nuevoOption) {
+                        motorSelect.insertBefore(option, nuevoOption);
+                    } else {
+                        motorSelect.appendChild(option);
+                    }
+
+                    // Ocultar el campo de texto y limpiarlo
+                    motorNuevoContainer.style.display = 'none';
+                    motorNuevoInput.value = '';
+                    motorNuevoInput.required = false;
+
+                    // Seleccionar el nuevo motor
+                    motorSelect.value = data.motor.id;
+                } else {
+                    alert('Error al crear el motor: ' + (data.error || 'Error desconocido'));
+                }
+            })
+            .catch(error => {
+                console.error('Error al crear motor:', error);
+                motorNuevoInput.disabled = false;
+                motorNuevoInput.placeholder = 'Ingresa el nombre del nuevo motor';
+                alert('Error al crear el motor. Por favor intenta nuevamente.');
+            });
+        }
+
+        // Crear motor cuando el usuario presiona Enter o pierde el foco
+        motorNuevoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                crearNuevoMotor(this.value);
+            }
+        });
+
+        motorNuevoInput.addEventListener('blur', function() {
+            if (this.value.trim() !== '') {
+                crearNuevoMotor(this.value);
+            }
+        });
+
+        // Verificar estado inicial
+        if (motorSelect.value === '__nuevo__') {
+            motorNuevoContainer.style.display = 'block';
+            motorNuevoInput.required = true;
+        }
+    }
+
+    // Manejar campo de caja
+    const cajaSelect = document.getElementById('id_caja');
+    const cajaNuevaContainer = document.getElementById('caja-nueva-container');
+    const cajaNuevoInput = document.getElementById('caja_nuevo');
+
+    if (cajaSelect && cajaNuevaContainer && cajaNuevoInput) {
+        restorePendingFreeText(cajaSelect);
+        cajaSelect.addEventListener('change', function() {
+            if (this.value === '__nuevo__') {
+                cajaNuevaContainer.style.display = 'block';
+                cajaNuevoInput.required = true;
+                cajaNuevoInput.focus();
+            } else {
+                cajaNuevaContainer.style.display = 'none';
+                cajaNuevoInput.required = false;
+                cajaNuevoInput.value = '';
+            }
+        });
+
+        // FunciÃ³n para crear nueva caja vÃ­a AJAX
+        function crearNuevaCaja(nombreCaja) {
+            const modeloId = modeloSelect.value;
+            if (!modeloId) {
+                alert('Por favor selecciona un modelo primero');
+                return;
+            }
+
+            if (!nombreCaja || nombreCaja.trim() === '') {
+                alert('Por favor ingresa un nombre para la caja');
+                return;
+            }
+
+            // Mostrar loading
+            cajaNuevoInput.disabled = true;
+            cajaNuevoInput.placeholder = 'Creando caja...';
+
+            // Obtener CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Crear caja vÃ­a AJAX
+            fetch(urlAgregarCaja, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    nombre: nombreCaja.trim(),
+                    modelo_id: modeloId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                cajaNuevoInput.disabled = false;
+                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva caja/transmision';
+
+                if (data.success) {
+                    // Agregar la nueva caja al dropdown
+                    const option = document.createElement('option');
+                    option.value = data.caja.id;
+                    option.textContent = data.caja.nombre;
+                    option.selected = true;
+
+                    // Remover la opciÃ³n "__nuevo__" y agregar la nueva caja antes de ella
+                    const nuevoOption = cajaSelect.querySelector('option[value="__nuevo__"]');
+                    if (nuevoOption) {
+                        cajaSelect.insertBefore(option, nuevoOption);
+                    } else {
+                        cajaSelect.appendChild(option);
+                    }
+
+                    // Ocultar el campo de texto y limpiarlo
+                    cajaNuevaContainer.style.display = 'none';
+                    cajaNuevoInput.value = '';
+                    cajaNuevoInput.required = false;
+
+                    // Seleccionar la nueva caja
+                    cajaSelect.value = data.caja.id;
+                } else {
+                    alert('Error al crear la caja: ' + (data.error || 'Error desconocido'));
+                }
+            })
+            .catch(error => {
+                console.error('Error al crear caja:', error);
+                cajaNuevoInput.disabled = false;
+                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva caja/transmision';
+                alert('Error al crear la caja. Por favor intenta nuevamente.');
+            });
+        }
+
+        // Crear caja cuando el usuario presiona Enter o pierde el foco
+        cajaNuevoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                crearNuevaCaja(this.value);
+            }
+        });
+
+        cajaNuevoInput.addEventListener('blur', function() {
+            if (this.value.trim() !== '') {
+                crearNuevaCaja(this.value);
+            }
+        });
+
+        // Verificar estado inicial
+        if (cajaSelect.value === '__nuevo__') {
+            cajaNuevaContainer.style.display = 'block';
+            cajaNuevoInput.required = true;
+        }
+    }
+
+    // âœ… Establecer valores iniciales de motor y caja despuÃ©s de que Select2 se inicialice
+    // Esto es necesario cuando se estÃ¡ editando un vehÃ­culo y los campos usan Select2
+    {% if vehiculo %}
+    (function() {
+        var intentos = 0;
+        var maxIntentos = 30; // Intentar durante 3 segundos (30 * 100ms)
+        
+        function establecerValoresIniciales() {
+            intentos++;
+            
+            // Verificar que jQuery estÃ© disponible
+            if (typeof $ === 'undefined') {
+                if (intentos < maxIntentos) {
+                    setTimeout(establecerValoresIniciales, 100);
+                }
+                return;
+            }
+            
+            var motorSelect = $('#id_motor');
+            var cajaSelect = $('#id_caja');
+            var motorListo = false;
+            var cajaLista = false;
+            
+            // Motor inicial
+            {% if vehiculo.motor_empresa_id and vehiculo.motor_empresa %}
+            var motorId = 'empresa:{{ vehiculo.motor_empresa_id }}';
+            var motorNombre = '{{ vehiculo.motor_empresa.nombre|escapejs }}';
+            {% elif vehiculo.motor_id and vehiculo.motor %}
+            var motorId = '{{ vehiculo.motor_id }}';
+            var motorNombre = '{{ vehiculo.motor.nombre|escapejs }}';
+            {% endif %}
+            {% if vehiculo.motor_display %}
+            if (motorSelect.length && motorId) {
+                // Siempre agregar la opciÃ³n si no existe (importante para Select2 autocomplete)
+                if (motorSelect.find('option[value="' + motorId + '"]').length === 0) {
+                    var newOption = new Option(motorNombre, motorId, true, true);
+                    motorSelect.append(newOption);
+                }
+                
+                // Establecer el valor primero
+                motorSelect.val(motorId);
+                
+                // Verificar si Select2 estÃ¡ inicializado
+                if (motorSelect.hasClass('select2-hidden-accessible')) {
+                    // Establecer usando Select2 API
+                    motorSelect.trigger('change.select2');
+                    // Verificar despuÃ©s de un pequeÃ±o delay
+                    setTimeout(function() {
+                        var currentVal = motorSelect.val();
+                        if (currentVal == motorId || motorSelect.find('option[value="' + motorId + '"]:selected').length > 0) {
+                            console.log('âœ… Motor inicial establecido (Select2):', motorId, motorNombre);
+                            motorListo = true;
+                        } else {
+                            // Reintentar
+                            motorSelect.val(motorId).trigger('change.select2');
+                            motorListo = true;
+                        }
+                    }, 100);
+                } else {
+                    // Si no es Select2 aÃºn, el valor ya estÃ¡ establecido
+                    console.log('âœ… Motor inicial establecido (sin Select2 aÃºn):', motorId);
+                    motorListo = true;
+                }
+            } else {
+                motorListo = true; // No hay motor que establecer
+            }
+            {% else %}
+            motorListo = true; // No hay motor que establecer
+            {% endif %}
+            
+            // Caja inicial
+            {% if vehiculo.caja_empresa_id and vehiculo.caja_empresa %}
+            var cajaId = 'empresa:{{ vehiculo.caja_empresa_id }}';
+            var cajaNombre = '{{ vehiculo.caja_empresa.nombre|escapejs }}';
+            {% elif vehiculo.caja_id and vehiculo.caja %}
+            var cajaId = '{{ vehiculo.caja_id }}';
+            var cajaNombre = '{{ vehiculo.caja.nombre|escapejs }}';
+            {% endif %}
+            {% if vehiculo.caja_display %}
+            if (cajaSelect.length && cajaId) {
+                // Siempre agregar la opciÃ³n si no existe (importante para Select2 autocomplete)
+                if (cajaSelect.find('option[value="' + cajaId + '"]').length === 0) {
+                    var newOption = new Option(cajaNombre, cajaId, true, true);
+                    cajaSelect.append(newOption);
+                }
+                
+                // Establecer el valor primero
+                cajaSelect.val(cajaId);
+                
+                // Verificar si Select2 estÃ¡ inicializado
+                if (cajaSelect.hasClass('select2-hidden-accessible')) {
+                    // Establecer usando Select2 API
+                    cajaSelect.trigger('change.select2');
+                    // Verificar despuÃ©s de un pequeÃ±o delay
+                    setTimeout(function() {
+                        var currentVal = cajaSelect.val();
+                        if (currentVal == cajaId || cajaSelect.find('option[value="' + cajaId + '"]:selected').length > 0) {
+                            console.log('âœ… Caja inicial establecida (Select2):', cajaId, cajaNombre);
+                            cajaLista = true;
+                        } else {
+                            // Reintentar
+                            cajaSelect.val(cajaId).trigger('change.select2');
+                            cajaLista = true;
+                        }
+                    }, 100);
+                } else {
+                    // Si no es Select2 aÃºn, el valor ya estÃ¡ establecido
+                    console.log('âœ… Caja inicial establecida (sin Select2 aÃºn):', cajaId);
+                    cajaLista = true;
+                }
+            } else {
+                cajaLista = true; // No hay caja que establecer
+            }
+            {% else %}
+            cajaLista = true; // No hay caja que establecer
+            {% endif %}
+            
+            // Si ambos estÃ¡n listos o hemos alcanzado el mÃ¡ximo de intentos, detener
+            if (motorListo && cajaLista) {
+                console.log('âœ… Valores iniciales de motor y caja establecidos correctamente');
+                return;
+            }
+            
+            // Si aÃºn no estÃ¡n listos y no hemos alcanzado el mÃ¡ximo, intentar de nuevo
+            if (intentos < maxIntentos) {
+                setTimeout(establecerValoresIniciales, 100);
+            } else {
+                console.warn('âš ï¸ No se pudieron establecer todos los valores iniciales despuÃ©s de ' + maxIntentos + ' intentos');
+            }
+        }
+        
+        // Iniciar despuÃ©s de un delay para permitir que form.media y Select2 se carguen
+        setTimeout(establecerValoresIniciales, 800);
+        
+        // TambiÃ©n intentar despuÃ©s de que la pÃ¡gina estÃ© completamente cargada
+        if (document.readyState === 'complete') {
+            setTimeout(establecerValoresIniciales, 1200);
+        } else {
+            window.addEventListener('load', function() {
+                setTimeout(establecerValoresIniciales, 1200);
+            });
+        }
+    })();
+    {% endif %}
+
+    // Forzar Title Case en campos de texto libre
+    (function initTextCaseFormatting() {
+        var titleCaseFields = ['id_color_nuevo', 'id_tipo_carroceria'];
+        titleCaseFields.forEach(function(fieldId) {
+            var el = document.getElementById(fieldId);
+            if (!el) return;
+            el.addEventListener('input', function() {
+                var pos = this.selectionStart;
+                this.value = this.value.replace(/\w/g, function(c) { return c.toUpperCase(); });
+                this.setSelectionRange(pos, pos);
+            });
+        });
+    })();
+
+    (function initClienteNativeFallback() {
+        const clienteSelect = document.getElementById('id_cliente');
+        if (!clienteSelect) return;
+
+        function hasWorkingSelect2() {
+            return Boolean(
+                window.jQuery &&
+                window.jQuery.fn &&
+                window.jQuery.fn.select2 &&
+                window.jQuery(clienteSelect).hasClass('select2-hidden-accessible')
+            );
+        }
+
+        function endpointUrl() {
+            return clienteSelect.getAttribute('data-autocomplete-light-url') ||
+                   clienteSelect.getAttribute('data-ajax--url') ||
+                   '';
+        }
+
+        function selectedText() {
+            const option = clienteSelect.options[clienteSelect.selectedIndex];
+            if (!option || !option.value) return '';
+            return option.textContent.trim();
+        }
+
+        function buildFallback() {
+            if (hasWorkingSelect2() || clienteSelect.dataset.egClienteFallback === '1') {
+                return;
+            }
+
+            const url = endpointUrl();
+            if (!url) return;
+
+            clienteSelect.dataset.egClienteFallback = '1';
+            clienteSelect.style.display = 'none';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'cliente-fallback-search';
+
+            const input = document.createElement('input');
+            input.type = 'search';
+            input.autocomplete = 'off';
+            input.className = 'form-control';
+            input.placeholder = clienteSelect.getAttribute('data-placeholder') || 'Buscar cliente...';
+            input.value = selectedText();
+
+            const results = document.createElement('div');
+            results.className = 'cliente-fallback-results';
+            results.hidden = true;
+
+            clienteSelect.parentNode.insertBefore(wrapper, clienteSelect);
+            wrapper.appendChild(input);
+            wrapper.appendChild(results);
+            wrapper.appendChild(clienteSelect);
+
+            let timer = null;
+            let controller = null;
+
+            function closeResults() {
+                results.hidden = true;
+                results.innerHTML = '';
+            }
+
+            function setClient(id, text) {
+                let option = Array.from(clienteSelect.options).find(function(opt) {
+                    return opt.value === String(id);
+                });
+                if (!option) {
+                    option = new Option(text, id, true, true);
+                    clienteSelect.appendChild(option);
+                }
+                option.selected = true;
+                clienteSelect.value = String(id);
+                input.value = text;
+                clienteSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                closeResults();
+            }
+
+            function renderItems(items) {
+                results.innerHTML = '';
+                if (!items.length) {
+                    const empty = document.createElement('div');
+                    empty.className = 'cliente-fallback-empty';
+                    empty.textContent = 'No se encontraron clientes';
+                    results.appendChild(empty);
+                    results.hidden = false;
+                    return;
+                }
+
+                items.forEach(function(item) {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'cliente-fallback-item';
+                    button.textContent = item.text || item.nombre || '';
+                    button.addEventListener('click', function() {
+                        setClient(item.id, button.textContent);
+                    });
+                    results.appendChild(button);
+                });
+                results.hidden = false;
+            }
+
+            function search(term) {
+                const q = term.trim();
+                if (q.length < 1) {
+                    closeResults();
+                    return;
+                }
+
+                if (controller) controller.abort();
+                controller = new AbortController();
+
+                const separator = url.indexOf('?') === -1 ? '?' : '&';
+                fetch(url + separator + 'q=' + encodeURIComponent(q), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    signal: controller.signal
+                })
+                .then(function(response) {
+                    if (!response.ok) throw new Error('Error buscando clientes');
+                    return response.json();
+                })
+                .then(function(payload) {
+                    renderItems(Array.isArray(payload) ? payload : (payload.results || []));
+                })
+                .catch(function(error) {
+                    if (error.name !== 'AbortError') {
+                        results.innerHTML = '<div class="cliente-fallback-empty">Error al buscar clientes</div>';
+                        results.hidden = false;
+                    }
+                });
+            }
+
+            input.addEventListener('input', function() {
+                clienteSelect.value = '';
+                window.clearTimeout(timer);
+                timer = window.setTimeout(function() {
+                    search(input.value);
+                }, 220);
+            });
+
+            input.addEventListener('focus', function() {
+                if (input.value.trim()) search(input.value);
+            });
+
+            document.addEventListener('click', function(event) {
+                if (!wrapper.contains(event.target)) closeResults();
+            });
+        }
+
+        window.setTimeout(buildFallback, 1200);
+        window.setTimeout(buildFallback, 2500);
+    })();
+});
+</script>
+{# form.media (DAL/Select2) se carga UNA SOLA VEZ en base.html (CSS en head, JS al final). NO duplicar aquÃ­. #}
+
+{% endblock %}

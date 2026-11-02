@@ -1,0 +1,111 @@
+{% load humanize %}
+<div class="page-shell">
+  <header class="doc-header">
+    <div class="doc-header__left">
+      {% if logo_url %}
+        <img src="{{ logo_url }}" alt="Logo" class="doc-logo">
+      {% else %}
+        <div class="doc-logo doc-logo--placeholder">{{ company_name|default:empresa.nombre_taller|default:empresa.empresa|default:"eGarage" }}</div>
+      {% endif %}
+      <div class="doc-brand">
+        <div class="doc-eyebrow">{{ document_label }}</div>
+        <h1 class="doc-title">{{ documento.numero_documento|default:documento.id }}</h1>
+        <div class="doc-company">{{ company_name|default:empresa.nombre_taller|default:empresa.empresa|default:"" }}</div>
+        {% if company_tagline %}<div class="doc-tagline">{{ company_tagline }}</div>{% endif %}
+        {% if company_address or company_phone or company_email or company_website %}
+          <div class="doc-contact">
+            {% if company_address %}<div class="doc-contact__line">{{ company_address }}</div>{% endif %}
+            <div class="doc-contact__line">
+              {% if company_phone %}<span>{{ company_phone }}</span>{% endif %}
+              {% if company_email %}{% if company_phone %}<span class="doc-contact__sep">·</span>{% endif %}<span>{{ company_email }}</span>{% endif %}
+              {% if company_website %}{% if company_phone or company_email %}<span class="doc-contact__sep">·</span>{% endif %}<span>{{ company_website }}</span>{% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="doc-header__right">
+      <div class="meta-card">
+        <div class="meta-row"><span class="meta-label">Fecha</span><span class="meta-value">{% if documento.fecha_emision %}{{ documento.fecha_emision|date:"d/m/Y" }}{% else %}{{ generated_at|date:"d/m/Y" }}{% endif %}</span></div>
+        <div class="meta-row"><span class="meta-label">Tipo</span><span class="meta-value">{{ document_label }}</span></div>
+        <div class="meta-row"><span class="meta-label">ID interno</span><span class="meta-value">#{{ documento.id }}</span></div>
+      </div>
+    </div>
+  </header>
+  <section class="hero-band">
+    <div class="hero-band__title">{{ document_label }} generado correctamente</div>
+    <div class="hero-band__subtitle">Documento comercial emitido por el taller.</div>
+  </section>
+  <section class="info-grid">
+    <div class="info-card">
+      <div class="info-card__title">Cliente</div>
+      <div class="info-main">
+        {% if cliente %}
+          {{ cliente.nombre|default:"" }} {{ cliente.apellido|default:"" }}
+        {% else %}
+          Sin cliente
+        {% endif %}
+      </div>
+      {% if cliente.tax_id %}<div class="info-line"><span>ID:</span> {{ cliente.tax_id }}</div>{% elif cliente.rut %}<div class="info-line"><span>ID:</span> {{ cliente.rut }}</div>{% endif %}
+      {% if cliente.email %}<div class="info-line"><span>Email:</span> {{ cliente.email }}</div>{% endif %}
+      {% if cliente.telefono %}<div class="info-line"><span>Teléfono:</span> {{ cliente.telefono }}</div>{% elif cliente.contacto %}<div class="info-line"><span>Contacto:</span> {{ cliente.contacto }}</div>{% endif %}
+      {% if cliente.direccion %}<div class="info-line"><span>Dirección:</span> {{ cliente.direccion }}</div>{% elif cliente.domicilio %}<div class="info-line"><span>Dirección:</span> {{ cliente.domicilio }}</div>{% endif %}
+    </div>
+    <div class="info-card">
+      <div class="info-card__title">Vehículo</div>
+      {% if vehiculo %}
+        <div class="info-main">{{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}</div>
+      {% else %}
+        <div class="info-main">Sin vehículo asociado</div>
+      {% endif %}
+    </div>
+  </section>
+  <section class="section-block">
+    <div class="section-title">Detalle del documento</div>
+    <table class="lines-table">
+      <thead><tr><th class="col-name">Descripción</th><th class="col-qty">Cant.</th><th class="col-price">Precio</th><th class="col-subtotal">Subtotal</th></tr></thead>
+      <tbody>
+        {% for linea in line_items %}
+        <tr>
+          <td class="col-name"><div class="cell-title">{{ linea.nombre }}</div><div class="cell-subtitle">{{ linea.tipo }}</div>{% if linea.codigo %}<div class="cell-subtitle">Código: {{ linea.codigo }}</div>{% endif %}</td>
+          <td class="col-qty">{{ linea.cantidad }}</td>
+          <td class="col-price">${{ linea.precio_unitario|default_if_none:0|floatformat:0|intcomma }}</td>
+          <td class="col-subtotal">${{ linea.subtotal|default_if_none:0|floatformat:0|intcomma }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="empty-cell">Sin líneas registradas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  <section class="totals-wrap">
+    <div class="totals-card">
+      <div class="totals-row"><span>Subtotal</span><strong>${{ subtotal|default_if_none:0|floatformat:0|intcomma }}</strong></div>
+      {% if descuento %}<div class="totals-row"><span>Descuento</span><strong>-${{ descuento|default_if_none:0|floatformat:0|intcomma }}</strong></div>{% endif %}
+      {% if tax_amount %}<div class="totals-row" data-tax-row><span>Impuesto</span><strong>${{ tax_amount|default_if_none:0|floatformat:0|intcomma }}</strong></div>{% endif %}
+      <div class="totals-row totals-row--grand" id="grand-total-row" data-con-tax="{{ total|default_if_none:0|floatformat:0 }}" data-sin-tax="{{ total_sin_tax|default_if_none:0|floatformat:0 }}"><span>Total</span><strong id="grand-total-value">${{ total|default_if_none:0|floatformat:0|intcomma }}</strong></div>
+    </div>
+  </section>
+  {% if documento.observaciones %}
+  <section class="section-block">
+    <div class="section-title">Observaciones</div>
+    <div class="notes-box">{{ documento.observaciones|linebreaksbr }}</div>
+  </section>
+  {% endif %}
+  {% if qr_data_uri and public_url %}
+  <section class="section-block">
+    <div class="section-title">Acceso digital</div>
+    <div class="qr-box">
+      <div class="qr-box__left"><img src="{{ qr_data_uri }}" alt="QR" class="qr-img"></div>
+      <div class="qr-box__right">
+        <div class="qr-title">Ver documento online</div>
+        <div class="qr-link">{{ public_url }}</div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+  <footer class="doc-footer">
+    <div>Emitido por {{ company_name|default:empresa.nombre_taller|default:empresa.empresa|default:"eGarage" }}</div>
+    <div>{{ generated_at|date:"d/m/Y H:i" }}</div>
+  </footer>
+</div>

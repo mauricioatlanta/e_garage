@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "egarage/contracts/schemas/catalog.product.tombstone.schema.json",
+  "title": "catalog.product.tombstone — Payload Schema",
+  "description": "Deletion signal emitted by erp.catalog when a product is permanently removed from ERP Core. Consumers must remove this product from every index and storefront listing. Consumers must not interpret the absence of a tombstone as a guarantee that the product still exists — reconciliation via catalog.product.snapshot should be the authoritative source for index completeness.",
+  "type": "object",
+  "required": ["product_id", "product_version", "occurred_at"],
+  "additionalProperties": false,
+  "properties": {
+
+    "product_id": {
+      "type": "string",
+      "description": "Identifier of the deleted product. This ID will never be reused by ERP Core after a tombstone is emitted."
+    },
+
+    "product_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Version counter at the time of deletion. Consumers holding a tombstone with an equal or higher product_version for this product_id must discard the incoming message (idempotency). A tombstone always has a higher product_version than any previous catalog.product.changed message for the same product_id."
+    },
+
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the deletion was committed in ERP Core."
+    }
+  }
+}

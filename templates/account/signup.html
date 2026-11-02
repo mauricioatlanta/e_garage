@@ -1,0 +1,774 @@
+{% load i18n %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crea tu cuenta - eGarage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background:
+                radial-gradient(circle at 12% 0%, rgba(14, 165, 233, 0.28), transparent 32%),
+                radial-gradient(circle at 88% 10%, rgba(56, 189, 248, 0.16), transparent 30%),
+                linear-gradient(180deg, #071527 0%, #0b2542 48%, #06111f 100%);
+            color: #eaf6ff;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            min-height: 100vh;
+        }
+
+        body::before {
+            background-image:
+                linear-gradient(rgba(186, 230, 253, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(186, 230, 253, 0.06) 1px, transparent 1px);
+            background-size: 56px 56px;
+            content: "";
+            inset: 0;
+            pointer-events: none;
+            position: fixed;
+        }
+
+        .signup-shell {
+            margin: 0 auto;
+            max-width: 1080px;
+            padding: 28px 16px 44px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .signup-panel {
+            background: rgba(8, 28, 52, 0.92);
+            border: 1px solid rgba(125, 211, 252, 0.28);
+            border-radius: 14px;
+            box-shadow: 0 24px 70px rgba(2, 6, 23, 0.42);
+            backdrop-filter: blur(14px);
+            padding: 24px;
+        }
+
+        .field label {
+            color: #dbeafe;
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .field input,
+        .field select {
+            background: #f8fcff;
+            border: 1px solid #7dd3fc;
+            border-radius: 10px;
+            box-sizing: border-box;
+            color: #0f172a;
+            min-height: 46px;
+            padding: 10px 12px;
+            width: 100%;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.16);
+            outline: none;
+        }
+
+        .form-error {
+            color: #b91c1c;
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            gap: 14px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .plan-card {
+            background: linear-gradient(180deg, rgba(15, 45, 78, 0.96) 0%, rgba(9, 31, 56, 0.96) 100%);
+            border: 1px solid rgba(125, 211, 252, 0.30);
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+            padding: 18px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .plan-card:hover,
+        .plan-card.active {
+            border-color: #7dd3fc;
+            box-shadow: 0 16px 38px rgba(14, 165, 233, 0.24);
+            transform: translateY(-2px);
+        }
+
+        .plan-card.recommended {
+            border-color: #38bdf8;
+            background: linear-gradient(180deg, rgba(12, 74, 110, 0.98) 0%, rgba(8, 47, 73, 0.98) 100%);
+            position: relative;
+        }
+
+        .plan-card.recommended::before {
+            background: #0ea5e9;
+            border-radius: 999px;
+            color: #ffffff;
+            content: "Más popular";
+            font-size: 0.75rem;
+            font-weight: 800;
+            left: 16px;
+            padding: 5px 9px;
+            position: absolute;
+            top: -12px;
+        }
+
+        .plan-badge {
+            align-self: flex-start;
+            background: #dcfce7;
+            border-radius: 999px;
+            color: #166534;
+            font-size: 0.75rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            padding: 6px 10px;
+        }
+
+        .plan-badge.gold {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .plan-name {
+            color: #f8fafc;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .plan-price {
+            color: #e0f2fe;
+            font-size: 1.15rem;
+            font-weight: 800;
+            line-height: 1.3;
+            min-height: 48px;
+        }
+
+        .plan-period {
+            color: #bae6fd;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            margin-top: 8px;
+        }
+
+        .plan-features {
+            color: #dbeafe;
+            display: grid;
+            gap: 8px;
+            list-style: none;
+            margin: 14px 0 0;
+            padding: 0;
+        }
+
+        .plan-features li {
+            line-height: 1.4;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .plan-features li::before {
+            color: #059669;
+            content: "✓";
+            font-weight: 900;
+            left: 0;
+            position: absolute;
+        }
+
+        .signup-lead,
+        .section-hint,
+        .field-help {
+            color: #bae6fd;
+        }
+
+        .trial-chip {
+            background: rgba(125, 211, 252, 0.16);
+            border: 1px solid rgba(125, 211, 252, 0.28);
+            color: #e0f2fe;
+        }
+
+        .submit-button {
+            background: #0284c7;
+            color: #ffffff;
+        }
+
+        .submit-button:hover {
+            background: #0369a1;
+        }
+
+        /* — Rubro cards — */
+        @media (max-width: 640px) { .signup-panel { padding: 18px; } }
+
+        .rubro-grid {
+            display: grid;
+            gap: 8px;
+            grid-template-columns: repeat(4, 1fr);
+        }
+        @media (max-width: 700px) { .rubro-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .rubro-card {
+            background: rgba(12, 36, 64, 0.7);
+            border: 2px solid rgba(125, 211, 252, 0.18);
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 10px 12px;
+            position: relative;
+            transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+            user-select: none;
+        }
+        .rubro-card:hover:not(.rubro-disabled) {
+            border-color: rgba(125, 211, 252, 0.5);
+            background: rgba(14, 45, 80, 0.85);
+        }
+        .rubro-card.rubro-principal-selected {
+            border-color: #38bdf8;
+            background: rgba(14, 90, 130, 0.45);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+        }
+        .rubro-card.rubro-adicional-selected {
+            border-color: #a3e635;
+            background: rgba(20, 60, 20, 0.4);
+            box-shadow: 0 0 0 2px rgba(163, 230, 53, 0.15);
+        }
+        .rubro-card.rubro-disabled {
+            cursor: default;
+            opacity: 0.45;
+        }
+        .rubro-badge {
+            background: #0ea5e9;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.6rem;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            padding: 1px 5px;
+            position: absolute;
+            right: 6px;
+            text-transform: uppercase;
+            top: 6px;
+        }
+        .rubro-badge.badge-adicional { background: #65a30d; }
+        .rubro-card-icon { font-size: 1.25rem; line-height: 1; }
+        .rubro-card-label { color: #e0f2fe; font-size: 0.78rem; font-weight: 800; line-height: 1.25; margin-top: 2px; }
+        .rubro-card-desc  { color: #7dd3fc; font-size: 0.68rem; line-height: 1.3; }
+        .rubro-error { color: #b91c1c; font-size: 0.85rem; margin-top: 6px; display: none; }
+    </style>
+</head>
+<body>
+    <main class="signup-shell">
+        <div class="mb-8 text-center">
+            <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage" class="mx-auto mb-4 h-16 w-auto">
+            <h1 class="text-3xl font-extrabold tracking-tight md:text-5xl" id="signup-headline">Crea tu cuenta</h1>
+            <p class="signup-lead mx-auto mt-3 max-w-2xl" id="signup-lead">
+                Empieza con 30 días gratis, sin tarjeta. Elige mensual o anual cuando tu negocio esté listo.
+            </p>
+        </div>
+        <script>
+        (function() {
+            var rubro = new URLSearchParams(window.location.search).get('rubro') || '';
+            var headlines = {
+                'TALLER_MECANICO':  'Estás a un paso de registrar tu primer vehículo.',
+                'DESARMADURIA':     'Estás a un paso de publicar tus primeras piezas.',
+                'CASA_REPUESTOS':   'Estás a un paso de poner tu catálogo en línea.',
+                'RECICLAJE':        'Estás a un paso de publicar tu catálogo de precios.',
+            };
+            var leads = {
+                'TALLER_MECANICO':  'Crea tu cuenta y el primer vehículo puede estar registrado en menos de un minuto.',
+                'DESARMADURIA':     'Crea tu cuenta y las primeras piezas pueden estar publicadas en menos de un minuto.',
+                'CASA_REPUESTOS':   'Crea tu cuenta y el catálogo empieza a trabajar por ti desde hoy.',
+                'RECICLAJE':        'Crea tu cuenta y tu catálogo de catalíticos y chatarra queda publicado hoy.',
+            };
+            if (rubro && headlines[rubro]) {
+                document.getElementById('signup-headline').textContent = headlines[rubro];
+                document.getElementById('signup-lead').textContent = leads[rubro];
+            }
+        })();
+        </script>
+
+        <form method="post" action="." class="signup-panel space-y-8">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {# Campos de cuenta — excluir plan y rubros_seleccionados (se renderizan por separado) #}
+            {% if current_country %}
+                <input type="hidden" name="country" value="{{ current_country }}">
+            {% endif %}
+            <section class="grid gap-4 md:grid-cols-2">
+                {% for field in form.visible_fields %}
+                    {% if field.name == "first_name" or field.name == "nombre_taller" or field.name == "telefono" or field.name == "email" or field.name == "password1" or field.name == "country" and not current_country %}
+                    <div class="field">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p class="field-help mt-1 text-xs">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <p class="form-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                <input type="hidden" name="password2" id="id_password2_shadow">
+            </section>
+
+            {# --- Selector de rubro (dos pasos) --- #}
+            <section id="rubro-section">
+                {# Campos ocultos que Django valida — JS los actualiza al hacer clic en las cards #}
+                {{ form.rubro_principal_signup }}
+                <div style="display:none" aria-hidden="true">{{ form.rubros_adicionales }}</div>
+
+                {# Paso 1: actividad principal #}
+                <div class="mb-2">
+                    <h2 class="text-xl font-extrabold">¿Cuál es la actividad principal de tu negocio?</h2>
+                    <p class="section-hint text-sm">Elige una — determina el entorno y color de tu cuenta.</p>
+                </div>
+                {% if form.rubro_principal_signup.errors %}
+                    {% for e in form.rubro_principal_signup.errors %}<p class="form-error">{{ e }}</p>{% endfor %}
+                {% endif %}
+                <p class="rubro-error" id="rubro-principal-error">Debes seleccionar la actividad principal.</p>
+
+                <div class="rubro-grid" id="principal-grid">
+                    <div class="rubro-card" data-rubro="TALLER_MECANICO" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">🔧</span>
+                        <span class="rubro-card-label">{{ ui_labels.workshop }}</span>
+                        <span class="rubro-card-desc">Autos, motos, camiones</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="CASA_REPUESTOS" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">📦</span>
+                        <span class="rubro-card-label">{{ ui_labels.parts_store }}</span>
+                        <span class="rubro-card-desc">Partes y repuestos</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="DESARMADURIA" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">🔩</span>
+                        <span class="rubro-card-label">{{ ui_labels.salvage_yard }}</span>
+                        <span class="rubro-card-desc">Despiece, piezas usadas</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="NEUMATICOS" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">⭕</span>
+                        <span class="rubro-card-label">Neumáticos / Vulca</span>
+                        <span class="rubro-card-desc">Neumáticos y llantas</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="CARROCERIA_DETAILING" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">🎨</span>
+                        <span class="rubro-card-label">Carrocería / Detailing</span>
+                        <span class="rubro-card-desc">Pintura, lavado, estética</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="ESPECIALISTA" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">⚡</span>
+                        <span class="rubro-card-label">Especialista</span>
+                        <span class="rubro-card-desc">Electricidad, escapes…</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="RECICLAJE" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">♻️</span>
+                        <span class="rubro-card-label">Reciclaje</span>
+                        <span class="rubro-card-desc">Catalíticos, chatarra</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="OTRO" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">⊞</span>
+                        <span class="rubro-card-label">Otro / Mixto</span>
+                        <span class="rubro-card-desc">No listado o multi-giro</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="GRUAS" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">🚛</span>
+                        <span class="rubro-card-label">Grúas y asistencia vial</span>
+                        <span class="rubro-card-desc">Traslado y rescate vehicular</span>
+                    </div>
+                </div>
+
+                {# Paso 2: actividades adicionales (aparece tras elegir principal) #}
+                <div id="adicionales-section" style="display:none; margin-top:18px;" aria-hidden="true">
+                    <h3 class="text-base font-extrabold mb-1">¿También realizas otras actividades?</h3>
+                    <p class="section-hint text-sm mb-2">Opcional — máximo 2. Tu actividad principal ya está incluida.</p>
+                    {% if form.rubros_adicionales.errors %}
+                        {% for e in form.rubros_adicionales.errors %}<p class="form-error">{{ e }}</p>{% endfor %}
+                    {% endif %}
+                    <p class="rubro-error" id="rubro-adicional-error">Máximo 2 actividades adicionales.</p>
+                    <div class="rubro-grid" id="adicionales-grid">
+                        <div class="rubro-card" data-rubro="TALLER_MECANICO" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">🔧</span>
+                            <span class="rubro-card-label">{{ ui_labels.workshop }}</span>
+                            <span class="rubro-card-desc">Autos, motos, camiones</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="CASA_REPUESTOS" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">📦</span>
+                            <span class="rubro-card-label">{{ ui_labels.parts_store }}</span>
+                            <span class="rubro-card-desc">Partes y repuestos</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="DESARMADURIA" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">🔩</span>
+                            <span class="rubro-card-label">{{ ui_labels.salvage_yard }}</span>
+                            <span class="rubro-card-desc">Despiece, piezas usadas</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="NEUMATICOS" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">⭕</span>
+                            <span class="rubro-card-label">Neumáticos / Vulca</span>
+                            <span class="rubro-card-desc">Neumáticos y llantas</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="CARROCERIA_DETAILING" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">🎨</span>
+                            <span class="rubro-card-label">Carrocería / Detailing</span>
+                            <span class="rubro-card-desc">Pintura, lavado, estética</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="ESPECIALISTA" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">⚡</span>
+                            <span class="rubro-card-label">Especialista</span>
+                            <span class="rubro-card-desc">Electricidad, escapes…</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="RECICLAJE" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">♻️</span>
+                            <span class="rubro-card-label">Reciclaje</span>
+                            <span class="rubro-card-desc">Catalíticos, chatarra</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="OTRO" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">⊞</span>
+                            <span class="rubro-card-label">Otro / Mixto</span>
+                            <span class="rubro-card-desc">No listado o multi-giro</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="GRUAS" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">🚛</span>
+                            <span class="rubro-card-label">Grúas y asistencia vial</span>
+                            <span class="rubro-card-desc">Traslado y rescate vehicular</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <input type="hidden" name="plan" id="id_plan" value="trial">
+
+            <button type="submit" class="submit-button w-full rounded-xl px-5 py-4 text-base font-extrabold transition">
+                Crear cuenta
+            </button>
+        </form>
+    </main>
+
+    <script>
+        /* ---- Rubro card picker (dos pasos: principal + adicionales) ---- */
+        (function () {
+            var MAX_ADICIONALES = 2;
+            var principalInput = document.querySelector('input[name="rubro_principal_signup"]');
+
+            function getAdicionalCb(key) {
+                return document.querySelector('input[name="rubros_adicionales"][value="' + key + '"]');
+            }
+
+            function countAdicionales() {
+                return document.querySelectorAll('input[name="rubros_adicionales"]:checked').length;
+            }
+
+            function syncAdicionalesGridDisabled(principalKey) {
+                document.querySelectorAll('#adicionales-grid .rubro-card').forEach(function (c) {
+                    if (c.dataset.rubro === principalKey) {
+                        c.classList.add('rubro-disabled');
+                        var cb = getAdicionalCb(principalKey);
+                        if (cb) cb.checked = false;
+                        c.classList.remove('rubro-adicional-selected');
+                        var badge = c.querySelector('.badge-adicional');
+                        if (badge) badge.style.display = 'none';
+                    } else {
+                        c.classList.remove('rubro-disabled');
+                    }
+                });
+            }
+
+            function selectPrincipalCard(key) {
+                if (!principalInput) return;
+                principalInput.value = key;
+
+                document.querySelectorAll('#principal-grid .rubro-card').forEach(function (c) {
+                    var badge = c.querySelector('.rubro-badge');
+                    if (c.dataset.rubro === key) {
+                        c.classList.add('rubro-principal-selected');
+                        if (badge) badge.style.display = '';
+                    } else {
+                        c.classList.remove('rubro-principal-selected');
+                        if (badge) badge.style.display = 'none';
+                    }
+                });
+
+                var sec = document.getElementById('adicionales-section');
+                if (sec) sec.style.display = 'none';
+
+                syncAdicionalesGridDisabled(key);
+
+                var err = document.getElementById('rubro-principal-error');
+                if (err) err.style.display = 'none';
+            }
+
+            function toggleAdicionalCard(card) {
+                var key = card.dataset.rubro;
+                if (card.classList.contains('rubro-disabled')) return;
+
+                var cb = getAdicionalCb(key);
+                if (!cb) return;
+                var badge = card.querySelector('.badge-adicional');
+
+                if (cb.checked) {
+                    cb.checked = false;
+                    card.classList.remove('rubro-adicional-selected');
+                    if (badge) badge.style.display = 'none';
+                } else {
+                    if (countAdicionales() >= MAX_ADICIONALES) {
+                        var errAd = document.getElementById('rubro-adicional-error');
+                        if (errAd) {
+                            errAd.style.display = 'block';
+                            setTimeout(function () { errAd.style.display = 'none'; }, 3000);
+                        }
+                        return;
+                    }
+                    cb.checked = true;
+                    card.classList.add('rubro-adicional-selected');
+                    if (badge) badge.style.display = '';
+                    var errAd2 = document.getElementById('rubro-adicional-error');
+                    if (errAd2) errAd2.style.display = 'none';
+                }
+            }
+
+            function restoreState() {
+                if (!principalInput || !principalInput.value) return;
+                selectPrincipalCard(principalInput.value);
+                document.querySelectorAll('input[name="rubros_adicionales"]:checked').forEach(function (cb) {
+                    var card = document.querySelector('#adicionales-grid .rubro-card[data-rubro="' + cb.value + '"]');
+                    if (card && !card.classList.contains('rubro-disabled')) {
+                        card.classList.add('rubro-adicional-selected');
+                        var badge = card.querySelector('.badge-adicional');
+                        if (badge) badge.style.display = '';
+                    }
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('#principal-grid .rubro-card').forEach(function (card) {
+                    function activate() { selectPrincipalCard(card.dataset.rubro); }
+                    card.addEventListener('click', activate);
+                    card.addEventListener('keydown', function (e) {
+                        if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); activate(); }
+                    });
+                });
+
+                document.querySelectorAll('#adicionales-grid .rubro-card').forEach(function (card) {
+                    function toggle() { toggleAdicionalCard(card); }
+                    card.addEventListener('click', toggle);
+                    card.addEventListener('keydown', function (e) {
+                        if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); }
+                    });
+                });
+
+                var form = document.querySelector('form[method="post"]');
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        var password1 = document.querySelector('input[name="password1"]');
+                        var password2 = document.getElementById('id_password2_shadow');
+                        if (password1 && password2) {
+                            password2.value = password1.value;
+                        }
+                        if (!principalInput || !principalInput.value) {
+						if (principalInput) principalInput.value = 'TALLER_MECANICO';
+					});
+                            }
+                        }
+                    });
+                }
+
+                restoreState();
+
+                // Prefill desde la landing: reutiliza el mismo flujo de selección manual.
+                var rubroFromUrl = (new URLSearchParams(window.location.search).get('rubro') || '').trim();
+                var rubroAliases = {
+                    'taller': 'TALLER_MECANICO',
+                    'talleres': 'TALLER_MECANICO',
+                    'workshop': 'TALLER_MECANICO',
+                    'desarmaduria': 'DESARMADURIA',
+                    'desarmadurias': 'DESARMADURIA',
+                    'salvage': 'DESARMADURIA',
+                    'repuestos': 'CASA_REPUESTOS',
+                    'repuesto': 'CASA_REPUESTOS',
+                    'parts': 'CASA_REPUESTOS',
+                    'casa_repuestos': 'CASA_REPUESTOS',
+                    'reciclaje': 'RECICLAJE',
+                    'recycling': 'RECICLAJE',
+                    'vulcanizacion': 'NEUMATICOS',
+                    'vulcanizaciones': 'NEUMATICOS',
+                    'neumaticos': 'NEUMATICOS',
+                    'neumatico': 'NEUMATICOS',
+                    'llantera': 'NEUMATICOS',
+                    'llantas': 'NEUMATICOS',
+                    'gomeria': 'NEUMATICOS',
+                    'tire': 'NEUMATICOS',
+                    'tires': 'NEUMATICOS',
+                    'carwash': 'CARROCERIA_DETAILING',
+                    'lavado': 'CARROCERIA_DETAILING',
+                    'gruas': 'GRUAS',
+                    'towing': 'GRUAS'
+                };
+                var rubroKey = rubroAliases[rubroFromUrl.toLowerCase()] || rubroFromUrl.toUpperCase();
+                var allowedRubros = ['TALLER_MECANICO', 'DESARMADURIA', 'CASA_REPUESTOS', 'RECICLAJE', 'NEUMATICOS', 'CARROCERIA_DETAILING', 'GRUAS'];
+
+                if (allowedRubros.indexOf(rubroKey) !== -1) {
+                    selectPrincipalCard(rubroKey);
+                    var rubroSection = document.getElementById('rubro-section');
+                    if (rubroSection) rubroSection.style.display = 'none';
+                } else if (!principalInput.value) {
+					selectPrincipalCard('TALLER_MECANICO');
+				}
+            });
+        })();
+
+        (function () {
+            var lastPayload = "";
+
+            function getCookie(name) {
+                var value = "; " + document.cookie;
+                var parts = value.split("; " + name + "=");
+                if (parts.length === 2) return parts.pop().split(";").shift();
+                return "";
+            }
+
+            function field(name) {
+                return document.querySelector('[name="' + name + '"]');
+            }
+
+            function captureLead() {
+                var email = field('email');
+                var telefono = field('telefono');
+                if ((!email || !email.value.trim()) && (!telefono || !telefono.value.trim())) return;
+
+                var firstName = field('first_name');
+                var nombreTaller = field('nombre_taller');
+                var rubro = field('rubro_principal_signup');
+                var country = field('country');
+                var payload = {
+                    nombre: ((firstName && firstName.value) || (nombreTaller && nombreTaller.value) || '').trim(),
+                    email: email ? email.value.trim() : '',
+                    whatsapp: telefono ? telefono.value.trim() : '',
+                    rubro: rubro ? rubro.value.trim() : '',
+                    pais: country ? country.value.trim() : ''
+                };
+                var serialized = JSON.stringify(payload);
+                if (serialized === lastPayload) return;
+                lastPayload = serialized;
+
+                fetch('/analytics/public/lead/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    credentials: 'same-origin',
+                    body: serialized,
+                    keepalive: true
+                }).catch(function () {});
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                ['email', 'telefono', 'first_name', 'nombre_taller'].forEach(function (name) {
+                    var el = field(name);
+                    if (!el) return;
+                    el.addEventListener('blur', captureLead);
+                    el.addEventListener('change', captureLead);
+                });
+                document.querySelectorAll('.rubro-card').forEach(function (card) {
+                    card.addEventListener('click', function () {
+                        window.setTimeout(captureLead, 50);
+                    });
+                });
+            });
+        })();
+
+        function selectPlan(planCode) {
+            document.getElementById('id_plan').value = planCode;
+            document.querySelectorAll('.plan-card').forEach(function(card) {
+                card.classList.remove('active');
+            });
+            var selectedCard = document.querySelector('[data-plan="' + planCode + '"]');
+            if (selectedCard) selectedCard.classList.add('active');
+        }
+        selectPlan('trial');
+
+        (function () {
+            var hint = null;
+
+            function getHint() {
+                if (hint) return hint;
+                hint = document.createElement('p');
+                hint.style.cssText = 'font-size:.85rem;margin-top:6px;display:none;';
+                var pw2 = document.getElementById('id_password2');
+                if (pw2 && pw2.closest('.field')) {
+                    pw2.closest('.field').appendChild(hint);
+                }
+                return hint;
+            }
+
+            function checkMatch() {
+                var p1 = document.getElementById('id_password1');
+                var p2 = document.getElementById('id_password2');
+                if (!p1 || !p2 || !p2.value) { if (hint) hint.style.display = 'none'; return; }
+                var h = getHint();
+                h.style.display = 'block';
+                if (p1.value === p2.value) {
+                    h.textContent = '✓ Las contraseñas coinciden';
+                    h.style.color = '#059669';
+                } else {
+                    h.textContent = '✗ Las contraseñas no coinciden';
+                    h.style.color = '#b91c1c';
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                var p1 = document.getElementById('id_password1');
+                var p2 = document.getElementById('id_password2');
+                if (p1) p1.addEventListener('input', checkMatch);
+                if (p2) p2.addEventListener('input', checkMatch);
+
+                var form = document.querySelector('form[method="post"]');
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        if (!p1 || !p2) return;
+                        if (p1.value && p2.value && p1.value !== p2.value) {
+                            e.preventDefault();
+                            checkMatch();
+                            p2.focus();
+                        }
+                    });
+                }
+            });
+        })();
+    </script>
+    <script src="{% static 'js/password-toggle.js' %}"></script>
+</body>
+</html>

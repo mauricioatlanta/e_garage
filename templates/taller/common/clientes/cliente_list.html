@@ -1,0 +1,295 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load country_url %}
+{% load i18n %}
+
+{% block page_title %}{% trans "Clientes" %}{% endblock %}
+{% block page_subtitle %}{% trans "Gestión de clientes" %}{% endblock %}
+{% block page_icon %}👥{% endblock %}
+
+{% block main_actions %}
+<a href="{% country_url 'clientes:crear_cliente' %}"
+   class="cliente-list-primary-btn inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-lime-500 to-fuchsia-500 text-white font-bold shadow-lg hover:shadow-cyan-500/40 text-sm md:text-base tracking-wide hover:scale-[1.03] transition active:scale-95">
+  <span>➕</span>
+  <span>Nuevo Cliente</span>
+</a>
+{% endblock %}
+
+{% block search_bar %}
+<div class="cliente-list-toolbar">
+  <form method="get" class="cliente-list-search flex-1 relative" id="search-form">
+    <input type="text" name="q" id="search-input"
+           value="{{ search_query|default:'' }}"
+           placeholder="Buscar por nombre, apellido, email o teléfono..."
+           autocomplete="off"
+           class="w-full rounded-xl px-5 py-3 text-white placeholder-gray-400 shadow-lg transition outline-none font-mono" />
+    <button type="submit" id="search-btn" class="absolute top-1/2 -translate-y-1/2 right-3 text-cyan-300 hover:text-lime-300 transition">
+      <i class="fas fa-search"></i>
+    </button>
+    <div id="search-results" class="hidden absolute z-50 w-full mt-2 rounded-xl shadow-2xl max-h-96 overflow-y-auto"></div>
+  </form>
+</div>
+{% endblock %}
+
+{% block page_extra_css %}
+<style>
+.cliente-list-toolbar {
+  display: flex;
+  width: 100%;
+}
+.cliente-list-search input,
+#search-results {
+  background-color: #0f172a;
+  border: 1px solid rgba(6, 182, 212, 0.4);
+}
+.cliente-list-search input:focus {
+  border-color: rgba(34, 211, 238, 0.7);
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.25);
+}
+.cliente-list-primary-btn {
+  color: #fff;
+}
+.cliente-table-wrapper {
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  background: linear-gradient(to bottom right, #0d1117, #0f172a, #111827);
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+}
+.cliente-table-wrapper thead th {
+  color: #00f3ff;
+  text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
+}
+.cliente-table-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.cliente-table-action i {
+  font-size: 1rem;
+  line-height: 1;
+}
+.cliente-table-action-label {
+  display: inline;
+  visibility: visible;
+  opacity: 1;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+@media (max-width: 768px) {
+  .cliente-table-action {
+    min-height: 56px;
+    min-width: 94px;
+    flex-direction: column;
+    gap: 0.35rem;
+    border: 1px solid rgba(34, 211, 238, 0.45);
+    background: rgba(5, 15, 30, 0.75);
+  }
+  .cliente-table-action i {
+    font-size: 1.2rem;
+  }
+  .cliente-table-action-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.6px;
+  }
+}
+</style>
+{% endblock %}
+
+{% block panel_content %}
+<div class="cliente-table-wrapper">
+  <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-cyan-700/50 scrollbar-track-transparent">
+    <table class="w-full text-left text-sm md:text-base">
+      <thead class="bg-[#0e1a2b] uppercase text-xs tracking-wider font-semibold">
+        <tr>
+          <th class="px-5 py-4">ID</th>
+          <th class="px-5 py-4">Nombre</th>
+          <th class="px-5 py-4 hidden md:table-cell">Email</th>
+          <th class="px-5 py-4 hidden md:table-cell">Teléfono</th>
+          <th class="px-5 py-4 hidden xl:table-cell">Ciudad</th>
+          <th class="px-5 py-4">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-cyan-900/40">
+        {% for cliente in cliente_list %}
+        <tr class="hover:bg-cyan-500/10 transition group">
+          <td class="px-5 py-4 font-mono text-cyan-300">#{{ cliente.pk }}</td>
+          <td class="px-5 py-4">
+            <div class="flex flex-col">
+              <span class="font-semibold text-cyan-100 group-hover:text-lime-200 transition">
+                {{ cliente.nombre }}{% if cliente.apellido and cliente.apellido != "None" %} {{ cliente.apellido }}{% endif %}
+              </span>
+              {% if cliente.email and cliente.email != "None" %}
+              <span class="md:hidden text-xs text-gray-400">{{ cliente.email }}</span>
+              {% endif %}
+            </div>
+          </td>
+          <td class="px-5 py-4 hidden md:table-cell text-gray-300">
+            {% if cliente.email and cliente.email != "None" %}{{ cliente.email }}{% else %}—{% endif %}
+          </td>
+          <td class="px-5 py-4 hidden md:table-cell text-gray-300">
+            {% if cliente.telefono and cliente.telefono != "None" %}{{ cliente.telefono }}{% else %}—{% endif %}
+          </td>
+          <td class="px-5 py-4 hidden xl:table-cell text-gray-300">{% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% else %}—{% endif %}</td>
+          <td class="px-5 py-4">
+            <div class="flex items-center gap-2 md:gap-3 flex-wrap">
+              <a href="{% country_url 'clientes:ver_cliente' cliente.pk %}" class="cliente-table-action text-cyan-300 hover:text-lime-300 transition hover:bg-cyan-500/20" title="Ver">
+                <i class="fas fa-eye"></i>
+                <span class="cliente-table-action-label">Ver</span>
+              </a>
+              <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="cliente-table-action text-cyan-300 hover:text-lime-300 transition hover:bg-cyan-500/20" title="Editar">
+                <i class="fas fa-edit"></i>
+                <span class="cliente-table-action-label">Editar</span>
+              </a>
+              <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" class="cliente-table-action text-red-400 hover:text-red-300 transition hover:bg-red-500/20" title="Eliminar">
+                <i class="fas fa-trash"></i>
+                <span class="cliente-table-action-label">Eliminar</span>
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="px-5 py-12 text-center text-gray-400">No hay clientes registrados.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if is_paginated %}
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-6 py-5 bg-[#0e1a2b]/60 border-t border-cyan-900/40">
+    <div class="text-xs text-gray-400 font-mono">
+      Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros
+    </div>
+    <div class="flex items-center gap-2">
+      {% if page_obj.has_previous %}
+      <a href="?q={{ search_query|default:'' }}&page=1" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">««</a>
+      <a href="?q={{ search_query|default:'' }}&page={{ page_obj.previous_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">«</a>
+      {% else %}
+      <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">««</span>
+      <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">«</span>
+      {% endif %}
+
+      <span class="px-4 py-1 rounded-lg bg-cyan-600/20 text-cyan-200 font-semibold tracking-wider text-xs">
+        {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+      </span>
+
+      {% if page_obj.has_next %}
+      <a href="?q={{ search_query|default:'' }}&page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»</a>
+      <a href="?q={{ search_query|default:'' }}&page={{ page_obj.paginator.num_pages }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»»</a>
+      {% else %}
+      <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">»</span>
+      <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">»»</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block page_extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+  const searchBtn = document.getElementById('search-btn');
+  let searchTimeout;
+
+  if (!searchInput || !searchResults || !searchBtn) return;
+
+  searchInput.addEventListener('input', function() {
+    const query = this.value.trim();
+    clearTimeout(searchTimeout);
+    if (query.length < 2) {
+      searchResults.classList.add('hidden');
+      searchResults.innerHTML = '';
+      return;
+    }
+    searchTimeout = setTimeout(() => performSearch(query), 300);
+  });
+
+  searchBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    const query = searchInput.value.trim();
+    if (query) window.location.href = '?q=' + encodeURIComponent(query);
+  });
+
+  searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const query = this.value.trim();
+      if (query) window.location.href = '?q=' + encodeURIComponent(query);
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target) && !searchBtn.contains(e.target)) {
+      searchResults.classList.add('hidden');
+    }
+  });
+
+  function performSearch(query) {
+    searchResults.classList.remove('hidden');
+    searchResults.innerHTML = '<div class="p-4 text-center text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando...</div>';
+
+    const currentPath = window.location.pathname;
+    const basePath = currentPath.replace(/\/$/, '');
+    const searchUrl = basePath + '/ajax/buscar/?q=' + encodeURIComponent(query);
+
+    fetch(searchUrl, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json'
+      },
+      credentials: 'same-origin'
+    })
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        return response.json();
+      })
+      .then(data => displaySearchResults(data))
+      .catch(() => {
+        searchResults.innerHTML = '<div class="p-4 text-center text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>Error al buscar clientes.</div>';
+      });
+  }
+
+  function displaySearchResults(clientes) {
+    if (!clientes || clientes.length === 0) {
+      searchResults.innerHTML = '<div class="p-4 text-center text-gray-400">No se encontraron clientes</div>';
+      return;
+    }
+
+    const baseUrl = '{% country_url "clientes:ver_cliente" 999999 %}'.replace('999999', '');
+    let html = '';
+    clientes.forEach(function(cliente) {
+      const nombreCompleto = (cliente.nombre || '') + ' ' + (cliente.apellido || '');
+      const email = cliente.email || '';
+      const telefono = cliente.telefono || '';
+      const clienteUrl = baseUrl + cliente.id + '/';
+
+      html += `
+        <a href="${clienteUrl}" class="block px-4 py-3 hover:bg-cyan-500/10 transition border-b border-cyan-900/40 last:border-b-0">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <div class="font-semibold text-cyan-100">${nombreCompleto.trim() || 'Sin nombre'}</div>
+              ${email ? '<div class="text-sm text-gray-400 mt-1">' + email + '</div>' : ''}
+              ${telefono ? '<div class="text-xs text-gray-500 mt-1">' + telefono + '</div>' : ''}
+            </div>
+            <i class="fas fa-chevron-right text-cyan-400/50 ml-2"></i>
+          </div>
+        </a>
+      `;
+    });
+
+    searchResults.innerHTML = html;
+  }
+});
+</script>
+{% endblock %}

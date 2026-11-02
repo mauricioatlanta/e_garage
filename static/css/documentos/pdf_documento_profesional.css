@@ -1,0 +1,380 @@
+@page {
+  size: A4;
+  margin: 18mm 14mm 16mm 14mm;
+}
+
+body {
+  font-family: DejaVu Sans, Arial, sans-serif;
+  color: #dbeafe;
+  background: #020617;
+  font-size: 10.5pt;
+  line-height: 1.45;
+}
+
+.page-shell {
+  background:
+    radial-gradient(circle at top right, rgba(34, 211, 238, 0.10), transparent 26%),
+    linear-gradient(180deg, #07101c 0%, #020617 100%);
+  border: 1px solid rgba(34, 211, 238, 0.18);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.doc-header {
+  display: table;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.doc-header__left,
+.doc-header__right {
+  display: table-cell;
+  vertical-align: top;
+}
+
+.doc-header__right {
+  width: 220px;
+  padding-left: 16px;
+}
+
+.doc-logo {
+  width: 78px;
+  height: 78px;
+  object-fit: contain;
+  border-radius: 14px;
+  border: 1px solid rgba(34, 211, 238, 0.18);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.doc-logo--placeholder {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  font-size: 9pt;
+  font-weight: 700;
+  color: #67e8f9;
+}
+
+.doc-brand {
+  margin-top: 10px;
+}
+
+.doc-eyebrow {
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: #67e8f9;
+  margin-bottom: 4px;
+}
+
+.doc-title {
+  margin: 0 0 4px 0;
+  font-size: 22pt;
+  line-height: 1.1;
+  color: #f8fafc;
+}
+
+.doc-company {
+  font-size: 11pt;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.doc-tagline {
+  margin-top: 2px;
+  font-size: 9pt;
+  color: #94a3b8;
+}
+
+.doc-contact {
+  margin-top: 6px;
+  font-size: 8.6pt;
+  color: #94a3b8;
+}
+
+.doc-contact__line {
+  margin-top: 2px;
+}
+
+.doc-contact__sep {
+  padding: 0 6px;
+  color: rgba(148, 163, 184, 0.9);
+}
+
+.meta-card {
+  border: 1px solid rgba(34, 211, 238, 0.16);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.72);
+  padding: 12px 14px;
+}
+
+.meta-row {
+  margin-bottom: 8px;
+}
+
+.meta-row:last-child {
+  margin-bottom: 0;
+}
+
+.meta-label {
+  display: block;
+  font-size: 7.8pt;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+
+.meta-value {
+  display: block;
+  font-size: 10pt;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.hero-band {
+  border: 1px solid rgba(34, 211, 238, 0.16);
+  background: linear-gradient(90deg, rgba(34, 211, 238, 0.14), rgba(59, 130, 246, 0.08));
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.hero-band__title {
+  font-size: 11pt;
+  font-weight: 700;
+  color: #ecfeff;
+  margin-bottom: 2px;
+}
+
+.hero-band__subtitle {
+  font-size: 9pt;
+  color: #cbd5e1;
+}
+
+.info-grid {
+  display: table;
+  width: 100%;
+  border-spacing: 0 10px;
+  margin-bottom: 16px;
+}
+
+.info-card {
+  display: table-cell;
+  width: 50%;
+  vertical-align: top;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(15, 23, 42, 0.72);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.info-card:first-child {
+  margin-right: 10px;
+}
+
+.info-card__title {
+  font-size: 8pt;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: #67e8f9;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.info-main {
+  font-size: 11pt;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 8px;
+}
+
+.info-line {
+  font-size: 9pt;
+  color: #cbd5e1;
+  margin-bottom: 4px;
+}
+
+.info-line span {
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.section-block {
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 8.6pt;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #67e8f9;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.lines-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.lines-table thead th {
+  background: rgba(34, 211, 238, 0.10);
+  color: #e0f2fe;
+  font-size: 8pt;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.lines-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+  vertical-align: middle;
+  color: #e2e8f0;
+}
+
+.lines-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.col-name {
+  width: 52%;
+}
+
+.col-qty {
+  width: 12%;
+  text-align: center;
+}
+
+.col-price,
+.col-subtotal {
+  width: 18%;
+  text-align: right;
+}
+
+.cell-title {
+  font-size: 9.8pt;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.cell-subtitle {
+  margin-top: 3px;
+  font-size: 8.5pt;
+  color: #94a3b8;
+}
+
+.empty-cell {
+  text-align: center;
+  color: #94a3b8;
+  padding: 18px 12px;
+}
+
+.totals-wrap {
+  display: table;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.totals-card {
+  display: table-cell;
+  width: 240px;
+  margin-left: auto;
+  border: 1px solid rgba(34, 211, 238, 0.16);
+  background: rgba(8, 47, 73, 0.22);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.totals-row {
+  display: table;
+  width: 100%;
+  margin-bottom: 8px;
+  font-size: 10pt;
+  color: #cbd5e1;
+}
+
+.totals-row span,
+.totals-row strong {
+  display: table-cell;
+}
+
+.totals-row strong {
+  text-align: right;
+  color: #f8fafc;
+}
+
+.totals-row--grand {
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  padding-top: 8px;
+  margin-top: 10px;
+  font-size: 11.5pt;
+}
+
+.totals-row--grand strong {
+  color: #67e8f9;
+}
+
+.notes-box {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(15, 23, 42, 0.72);
+  border-radius: 14px;
+  padding: 14px;
+  color: #dbeafe;
+}
+
+.doc-footer {
+  margin-top: 16px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  font-size: 8.5pt;
+  color: #94a3b8;
+}
+
+.doc-footer div {
+  margin-bottom: 3px;
+}
+
+.qr-box {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(15, 23, 42, 0.72);
+  border-radius: 14px;
+  padding: 14px;
+  display: table;
+  width: 100%;
+}
+.qr-box__left,
+.qr-box__right {
+  display: table-cell;
+  vertical-align: middle;
+}
+.qr-box__left {
+  width: 90px;
+}
+.qr-img {
+  width: 74px;
+  height: 74px;
+  background: white;
+  padding: 4px;
+  border-radius: 10px;
+}
+.qr-title {
+  font-size: 10pt;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 4px;
+}
+.qr-link {
+  font-size: 8.5pt;
+  color: #94a3b8;
+  word-break: break-all;
+}

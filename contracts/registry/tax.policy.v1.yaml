@@ -1,0 +1,42 @@
+id: tax.policy.v1
+display_name: Tax Policy Contract
+category: Truth
+
+owner: erp.tax-engine
+publisher: erp.tax-engine
+write_authority: erp.tax-engine
+
+message_types:
+
+  - id: tax.policy.snapshot
+    description: >-
+      Full snapshot of all active tax policies. Published by erp.tax-engine
+      whenever any policy changes and on a scheduled basis for initial consumer
+      bootstrap. Exports policy definitions only — not calculations. Consumers
+      apply the policy locally to estimate tax at checkout time. Per ADR-005,
+      ERP produces the authoritative fiscal document after payment confirmation
+      and may correct Commerce estimates within a 1% discrepancy tolerance.
+    version: "1.0.0"
+    schema_ref: schemas/tax.policy.snapshot.schema.json
+    interaction: snapshot
+    transport: queue
+    frequency: batch
+    guarantees:
+      idempotent: true
+      ordered: false
+      consistency: strong
+      completeness: full-snapshot
+      max_staleness: "24h"
+
+consumers:
+  - subsystem: commerce.engine
+    message_types:
+      - tax.policy.snapshot
+
+version: "1.0.0"
+status: draft
+breaking_change_policy: semver-major
+min_consumer_version: null
+
+pending_decisions:
+  - ADR-005  # Tax computation authority: Commerce estimates; ERP produces authoritative fiscal document

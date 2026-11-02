@@ -1,0 +1,25 @@
+
+.select2-container--open {
+  z-index: 999999 !important;
+  position: relative;
+}
+
+.select2-dropdown {
+  z-index: 999999 !important;
+  background-color: white;
+  color: black;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Opcional: mejorar opciones visuales */
+.select2-results__option {
+  padding: 0.5rem;
+}
+
+.select2-results__option--highlighted {
+  background-color: #0ea5e9 !important;
+  color: white;
+}

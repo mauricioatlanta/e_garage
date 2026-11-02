@@ -1,0 +1,96 @@
+{
+  "background_color": "{{ background_color }}",
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ],
+  "description": "{{ description }}",
+  "dir": "ltr",
+  "display": "standalone",
+  "icons": [
+    {
+      "purpose": "any maskable",
+      "sizes": "192x192",
+      "src": "/static/pwa/icons/icon-192x192.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any maskable",
+      "sizes": "512x512",
+      "src": "/static/pwa/icons/icon-512x512.png",
+      "type": "image/png"
+    }
+  ],
+  "id": "/egarage-pwa",
+  "lang": "{{ lang }}",
+  "name": "{{ name }}",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "scope": "/",
+  "screenshots": [
+    {
+      "form_factor": "narrow",
+      "sizes": "540x720",
+      "src": "/static/images/screenshot-mobile.png",
+      "type": "image/png"
+    },
+    {
+      "form_factor": "wide",
+      "sizes": "1280x720",
+      "src": "/static/images/screenshot-desktop.png",
+      "type": "image/png"
+    }
+  ],
+  "share_target": {
+    "action": "/share/",
+    "enctype": "multipart/form-data",
+    "method": "POST",
+    "params": {
+      "text": "text",
+      "title": "title",
+      "url": "url"
+    }
+  },
+  "short_name": "{{ short_name }}",
+  "shortcuts": [
+    {
+      "description": "Acceso r\u00e1pido al panel principal",
+      "icons": [
+        {
+          "sizes": "96x96",
+          "src": "/static/pwa/icons/icon-96x96.png"
+        }
+      ],
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "{{ start_url }}"
+    },
+    {
+      "description": "Gestionar documentos",
+      "icons": [
+        {
+          "sizes": "96x96",
+          "src": "/static/pwa/icons/icon-96x96.png"
+        }
+      ],
+      "name": "Documentos",
+      "short_name": "Docs",
+      "url": "{{ start_url }}documentos/"
+    },
+    {
+      "description": "Gestionar clientes",
+      "icons": [
+        {
+          "sizes": "96x96",
+          "src": "/static/pwa/icons/icon-96x96.png"
+        }
+      ],
+      "name": "Clientes",
+      "short_name": "Clientes",
+      "url": "{{ start_url }}clientes/"
+    }
+  ],
+  "start_url": "{{ start_url }}",
+  "theme_color": "{{ theme_color }}"
+}

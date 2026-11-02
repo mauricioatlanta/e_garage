@@ -1,0 +1,194 @@
+// Service Worker para eGarage PWA (Dinámico para {{ pais }}/{{ idioma }})
+// Versión: {{ version }}
+const APP_VERSION = '{{ version }}';
+const CACHE_VERSION_TOKEN = 'v' + APP_VERSION;
+const CACHE_NAME = 'egarage-' + CACHE_VERSION_TOKEN;
+const RUNTIME_CACHE = 'egarage-runtime-' + CACHE_VERSION_TOKEN;
+
+// Archivos estáticos locales para precache (solo recursos de tu dominio)
+const STATIC_CACHE_URLS = [
+  '/static/css/dashboard.css',
+  '/static/css/output.css',
+  '/static/css/starfield.css',
+  '/static/css/pwa-install-prompt.css',
+  '/static/js/starfield.js',
+  '/static/js/pwa-install-prompt.js',
+  '/static/js/ios-password-fix.js',
+  '/static/images/egarage_default_logo.png',
+  '/static/images/egarage_default_logo.svg',
+  '/static/images/egarage_icon_192x192.png',
+  '/static/images/egarage_icon_512x512.png',
+  '{{ start_url }}manifest.json'
+];
+
+// Estrategia de caché: Cache First para estáticos, Network First para dinámicos
+const CACHE_FIRST_PATTERNS = [
+  /\/static\//,
+  /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
+  /\.(?:css|js|woff|woff2|ttf|eot)$/,
+  /cdnjs\.cloudflare\.com/,
+  /code\.jquery\.com/
+];
+
+// Instalación del Service Worker
+self.addEventListener('install', (event) => {
+  console.log('[Service Worker] install - forzando actualizacion', APP_VERSION);
+  
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        console.log('[Service Worker] Cacheando archivos estáticos');
+        // Cachear archivos críticos, pero no fallar si algunos no están disponibles
+        return cache.addAll(STATIC_CACHE_URLS).catch((error) => {
+          console.warn('[Service Worker] Algunos archivos no se pudieron cachear:', error);
+          // Continuar aunque algunos archivos fallen
+          return Promise.resolve();
+        });
+      })
+      .then(() => {
+        // Forzar activación inmediata del nuevo service worker
+        return self.skipWaiting();
+      })
+  );
+});
+
+// Activación del Service Worker
+self.addEventListener('activate', (event) => {
+  console.log('[Service Worker] activate - tomando control', APP_VERSION);
+  
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          // Eliminar caches de versiones antiguas
+          if (cacheName.indexOf(CACHE_VERSION_TOKEN) === -1) {
+            console.log('[Service Worker] Eliminando cache viejo:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+    .then(() => {
+      // Tomar control de todas las páginas inmediatamente
+      return self.clients.claim();
+    })
+  );
+});
+
+// Interceptar peticiones
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Ignorar peticiones que no son GET
+  if (request.method !== 'GET') {
+    return;
+  }
+
+  // Las páginas HTML autenticadas deben venir siempre de red.
+  // Cachearlas puede dejar navegación, permisos o contenido de sesión obsoleto.
+  if (request.mode === 'navigate' || request.destination === 'document') {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // Nunca cachear endpoints AJAX — siempre pasar directo a la red
+  if (url.pathname.includes('/ajax/')) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // Ignorar peticiones a APIs que requieren autenticación en tiempo real
+  if (url.pathname.includes('/api/') && url.pathname.includes('/auth/')) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // Determinar estrategia de caché
+  const useCacheFirst = CACHE_FIRST_PATTERNS.some(pattern => pattern.test(url.href));
+
+  if (useCacheFirst) {
+    // Cache First: Buscar en caché primero, luego en red
+    event.respondWith(
+      caches.match(request)
+        .then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          
+          return fetch(request).then((response) => {
+            // Solo cachear respuestas exitosas
+              const requestUrl = new URL(request.url);
+              const isHttpRequest = requestUrl.protocol === 'http:' || requestUrl.protocol === 'https:';
+
+              if (response.status === 200 && isHttpRequest) {
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(request, responseToCache);
+              });
+            }
+            return response;
+          }).catch(() => {
+            // Si falla la red y no hay caché, devolver una respuesta offline básica
+            if (request.destination === 'document') {
+              return caches.match('{{ start_url }}');
+            }
+            // Fallbacks específicos para recursos no-documento
+            if (request.destination === 'image') {
+              // Intenta devolver un logo por defecto cacheado
+              return caches.match('/static/images/egarage_default_logo.png');
+            }
+            if (request.destination === 'script' || request.destination === 'style') {
+              // Para scripts/estilos críticos, intentar devolver una versión cacheada genérica
+              return caches.match('/static/js/pwa-install-prompt.js')
+                .then(resp => resp || caches.match('/static/css/output.css'));
+            }
+          });
+        })
+    );
+  } else {
+    // Network First: Intentar red primero, luego caché
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          // Si la respuesta es exitosa, cachearla
+              const requestUrl = new URL(request.url);
+              const isHttpRequest = requestUrl.protocol === 'http:' || requestUrl.protocol === 'https:';
+
+              if (response.status === 200 && isHttpRequest) {
+            const responseToCache = response.clone();
+            caches.open(RUNTIME_CACHE).then((cache) => {
+              cache.put(request, responseToCache);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Si falla la red, buscar en caché
+          return caches.match(request).then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+            return undefined;
+          });
+        })
+    );
+  }
+});
+
+// Manejar mensajes del cliente (para actualizaciones, etc.)
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
+    event.waitUntil(
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => caches.delete(cacheName))
+        );
+      })
+    );
+  }
+});

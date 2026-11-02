@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "egarage/contracts/schemas/inventory.reservation.confirmed.schema.json",
+  "title": "inventory.reservation.confirmed — Payload Schema",
+  "description": "Emitted by erp.inventory when a reservation is converted into a dispatched fulfillment following confirmed payment. After this event, the reserved units are no longer part of quantity_reserved — they are decremented from quantity_on_hand and the reservation is closed. erp.inventory also emits a corresponding inventory.stock.updated reflecting the updated aggregate_available.",
+  "type": "object",
+  "required": ["reservation_id", "order_id", "product_id", "location_id", "quantity", "occurred_at"],
+  "additionalProperties": false,
+  "properties": {
+
+    "reservation_id": {
+      "type": "string",
+      "description": "Identifier of the reservation being confirmed. Matches the reservation_id from the corresponding inventory.reservation.created message."
+    },
+
+    "order_id": {
+      "type": "string",
+      "description": "Identifier of the Commerce order associated with this reservation."
+    },
+
+    "product_id": {
+      "type": "string",
+      "description": "Stable product identifier from ERP Core."
+    },
+
+    "location_id": {
+      "type": "string",
+      "description": "Location from which the units were dispatched."
+    },
+
+    "quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of units confirmed and dispatched."
+    },
+
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the reservation was confirmed in ERP Core."
+    }
+  }
+}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load country_url %}
+{% load i18n static %}
+{% block title %}{% if language == 'en' %}Add New Service{% else %}Agregar Nuevo Servicio{% endif %} - eGarage{% endblock %}
+
+{% block content %}
+<style>
+.cs-page { max-width: 640px; margin: 0 auto; padding: 2rem 1rem; }
+.cs-back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #94a3b8; text-decoration: none; margin-bottom: 1.5rem; padding: 6px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); transition: background .2s; }
+.cs-back:hover { background: rgba(255,255,255,0.1); color: #e2e8f0; }
+.cs-header { margin-bottom: 2rem; }
+.cs-header h1 { font-size: 26px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; letter-spacing: -0.3px; }
+.cs-header p { font-size: 14px; color: #64748b; }
+.cs-card { background: #1e293b; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 2rem; }
+.cs-section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: #475569; margin-bottom: 1.25rem; }
+.cs-field { margin-bottom: 1.25rem; }
+.cs-field label { display: block; font-size: 13px; font-weight: 500; color: #94a3b8; margin-bottom: 6px; }
+.cs-field label .req { color: #f87171; margin-left: 2px; }
+.cs-field input, .cs-field select { width: 100%; padding: 10px 14px; font-size: 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; background: #0f172a; color: #f1f5f9; outline: none; transition: border-color .2s, box-shadow .2s; }
+.cs-field input:focus, .cs-field select:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56,189,248,0.15); }
+.cs-field input::placeholder { color: #334155; }
+.cs-field .cs-hint { font-size: 12px; color: #475569; margin-top: 5px; }
+.cs-field .cs-error { font-size: 12px; color: #f87171; margin-top: 5px; }
+.cs-price-wrap { position: relative; }
+.cs-price-wrap .cs-sym { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; color: #475569; pointer-events: none; }
+.cs-price-wrap input { padding-left: 26px; }
+.cs-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 1.5rem 0; }
+.cs-actions { display: flex; align-items: center; justify-content: space-between; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 1.25rem; }
+.cs-btn-cancel { padding: 9px 20px; font-size: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #64748b; cursor: pointer; text-decoration: none; transition: all .2s; }
+.cs-btn-cancel:hover { background: rgba(255,255,255,0.05); color: #94a3b8; }
+.cs-btn-submit { display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px; font-size: 14px; font-weight: 600; border-radius: 10px; border: none; background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #fff; cursor: pointer; transition: opacity .2s, transform .1s; }
+.cs-btn-submit:hover { opacity: .9; }
+.cs-btn-submit:active { transform: scale(.98); }
+.cs-icon-wrap { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, rgba(14,165,233,.2), rgba(99,102,241,.2)); border: 1px solid rgba(99,102,241,.3); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
+.cs-icon-wrap i { font-size: 22px; color: #818cf8; }
+</style>
+
+<div class="cs-page">
+  <a href="{% if return_to %}{{ return_to }}{% else %}{% country_url 'servicios:servicios_menu' %}{% endif %}" class="cs-back">
+    <i class="fa fa-arrow-left" style="font-size:11px"></i>
+    {% if language == 'en' %}Back{% else %}Volver{% endif %}
+  </a>
+
+  <div class="cs-header">
+    <div class="cs-icon-wrap"><i class="fa fa-wrench"></i></div>
+    <h1>{% if language == 'en' %}Add service{% else %}Agregar servicio{% endif %}</h1>
+    <p>{% if language == 'en' %}Add a custom service to your catalog{% else %}Agrega un servicio personalizado a tu catálogo{% endif %}</p>
+  </div>
+
+  <div class="cs-card">
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="return_to" value="{% firstof return_to request.GET.return_to request.GET.next '' %}">
+      <input type="hidden" name="target_row" value="{% firstof request.GET.target_row request.POST.target_row '' %}">
+
+      {% if form.non_field_errors %}
+      <div style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:10px;padding:12px 16px;margin-bottom:1rem">
+        {% for error in form.non_field_errors %}<p style="color:#f87171;font-size:13px;margin:0">{{ error }}</p>{% endfor %}
+      </div>
+      {% endif %}
+
+      <p class="cs-section-label">{% if language == 'en' %}Service info{% else %}Información del servicio{% endif %}</p>
+
+      <div class="cs-field">
+        <label for="{{ form.nombre.id_for_label }}">{% if language == 'en' %}Service name{% else %}Nombre del servicio{% endif %} <span class="req">*</span></label>
+        <input type="text" name="{{ form.nombre.name }}" id="{{ form.nombre.id_for_label }}" value="{{ form.nombre.value|default:'' }}" required placeholder="{% if language == 'en' %}e.g., Custom Engine Tune-up{% else %}Ej: Afinamiento personalizado{% endif %}" {% if form.nombre.errors %}style="border-color:#f87171"{% endif %}>
+        {% if form.nombre.errors %}<p class="cs-error">{{ form.nombre.errors.0 }}</p>{% endif %}
+      </div>
+
+      <div class="cs-field">
+        <label for="{{ form.subcategoria.id_for_label }}">{% if language == 'en' %}Subcategory{% else %}Subcategoría{% endif %} <span class="req">*</span></label>
+        <select name="{{ form.subcategoria.name }}" id="{{ form.subcategoria.id_for_label }}" required {% if form.subcategoria.errors %}style="border-color:#f87171"{% endif %}>
+          <option value="">{% if language == 'en' %}Select a subcategory...{% else %}Selecciona una subcategoría...{% endif %}</option>
+          {% for subcat in form.subcategoria.field.queryset %}
+          <option value="{{ subcat.id }}" {% if form.subcategoria.value == subcat.id %}selected{% endif %} data-categoria="{{ subcat.categoria.code }}">{{ subcat.get_label|default:subcat.code }}</option>
+          {% endfor %}
+        </select>
+        {% if form.subcategoria.errors %}<p class="cs-error">{{ form.subcategoria.errors.0 }}</p>{% endif %}
+      </div>
+
+
+        {% if form.precio_base.errors %}<p class="cs-error">{{ form.precio_base.errors.0 }}</p>{% endif %}
+      </div>
+
+
+
+      <div class="cs-actions">
+        <a href="{% if return_to %}{{ return_to }}{% else %}{% country_url 'servicios:servicios_menu' %}{% endif %}" class="cs-btn-cancel">
+          {% if language == 'en' %}Cancel{% else %}Cancelar{% endif %}
+        </a>
+        <button type="submit" class="cs-btn-submit">
+          <i class="fa fa-check"></i>
+          {% if language == 'en' %}Create service{% else %}Crear servicio{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var nombre = document.getElementById('{{ form.nombre.id_for_label }}');
+  var nombreEs = document.getElementById('{{ form.nombre_es.id_for_label }}');
+  var nombreEn = document.getElementById('{{ form.nombre_en.id_for_label }}');
+  if (nombre) {
+    nombre.addEventListener('blur', function() {
+      if (nombre.value) {
+        if (nombreEs && !nombreEs.value) nombreEs.value = nombre.value;
+        if (nombreEn && !nombreEn.value) nombreEn.value = nombre.value;
+      }
+    });
+  }
+});
+</script>
+{% endblock %}
