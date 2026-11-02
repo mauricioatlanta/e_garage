@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.db import models
 
+from taller.config.rubros import RUBROS_TALLER
 from taller.configuracion.rubros_responsables import (
     DEFAULT_RESPONSABLE_LABEL,
     RESPONSABLE_LABEL_POR_RUBRO,
@@ -139,32 +140,8 @@ class ConfiguracionEmpresa(models.Model):
     )
 
     # —— RUBRO PRINCIPAL ——
-    RUBRO_CHOICES = [
-        ("WORKSHOP", "Taller mecánico integral"),
-        ("WORKSHOP_MOTO", "Taller de motos"),
-        ("WORKSHOP_HEAVY", "Taller de camiones/buses"),
-        ("EXHAUST", "Escapes y mufflers"),
-        ("DESARMADURIA", "Desarmaduría / Salvage"),
-        ("PARTS", "Casa de repuestos / Autopartes"),
-        ("TIRE", "Vulcanización / Neumáticos y llantas"),
-        ("BODYSHOP", "Carrocería / Pintura"),
-        ("DETAILING", "Lavado, detailing y estética"),
-        ("ELECTRIC", "Electricidad / electrónica automotriz"),
-        ("GLASS_AUDIO", "Parabrisas, vidrios y audio / accesorios"),
-        ("FLEET", "Mantención de flotas empresariales"),
-        ("SUSPENSION_STEERING", "Taller de Suspensión y Dirección"),
-        ("BRAKES", "Taller de Frenos"),
-        ("OBD_DIAGNOSTIC", "Taller de Diagnóstico Computarizado (OBD-II)"),
-        ("CLASSIC_CARS", "Taller de Reparación de Vehículos Clásicos"),
-        ("AUDIO_ENTERTAINMENT", "Taller de Sistemas de Audio y Entretenimiento Automotriz"),
-        ("GAS_CONVERSION", "Taller de Conversiones a Gas"),
-        ("FLEET_REPAIR", "Taller de Reparación de Flotas Corporativas"),
-        ("BODY_GLASS", "Taller de Carrocería y Reparación de Vidrios"),
-        ("TUNING", "Taller de Tuning / Personalización"),
-        ("RECYCLING", "Reciclaje / Chatarra electrónica y catalíticos"),
-        ("MIXED", "Mixto (multi-rubro — varios giros)"),
-        ("TOWING", "Grúas y asistencia vial"),
-    ]
+    # Fuente única de verdad: taller/config/rubros.py (taxonomía canónica).
+    RUBRO_CHOICES = list(RUBROS_TALLER)
 
     rubro_principal = models.CharField(
         max_length=30,
@@ -344,14 +321,8 @@ class ConfiguracionEmpresa(models.Model):
             secciones["servicios"] = True
             secciones["otros_servicios"] = False
             secciones["kilometraje"] = True
-        elif self.rubro_principal == "EXHAUST":
-            # Escapes: servicios y repuestos
-            secciones["repuestos"] = True
-            secciones["servicios"] = True
-            secciones["otros_servicios"] = False
-            secciones["kilometraje"] = True
-        elif self.rubro_principal == "GLASS_AUDIO":
-            # Parabrisas/audio: servicios y repuestos
+        elif self.rubro_principal == "GLASS":
+            # Vidrios/parabrisas: servicios y repuestos
             secciones["repuestos"] = True
             secciones["servicios"] = True
             secciones["otros_servicios"] = False

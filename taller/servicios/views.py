@@ -172,7 +172,7 @@ def _scope_services_by_rubro(queryset, empresa, request=None):
     if not rubros or "WORKSHOP" in rubros:
         return queryset
 
-    supported = rubros.intersection({"DETAILING", "TIRE", "BODYSHOP", "EXHAUST", "ELECTRIC", "GLASS_AUDIO"})
+    supported = rubros.intersection({"DETAILING", "TIRE", "BODYSHOP", "ELECTRIC", "GLASS"})
     if not supported:
         return queryset.none()
 

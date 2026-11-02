@@ -36,7 +36,7 @@ class QAAuthorizedUserTests(TestCase):
         self.assertEqual(get_document_module_label("PARTS", "es"), "Ventas")
         self.assertEqual(get_document_module_label("DESARMADURIA", "en"), "Sales")
         self.assertEqual(get_document_module_label("DETAILING", "es"), "Trabajos")
-        self.assertEqual(get_document_module_label("EXHAUST", "en"), "Work")
+        self.assertEqual(get_document_module_label("ELECTRIC", "en"), "Work")
 
     def test_only_mauricio_with_superuser_is_authorized(self):
         mauricio = UserFactory(email="mauricioatlanta@gmail.com", is_superuser=True)
@@ -288,7 +288,6 @@ class QAAuditedMatrixTests(TestCase):
         ("CL", "PARTS"): 50,
         ("CL", "DETAILING"): 53,
         ("CL", "TIRE"): 54,
-        ("CL", "EXHAUST"): 55,
         ("CL", "FLEET"): 56,
         ("CL", "MIXED"): 57,
         ("CL", "RECYCLING"): 63,

@@ -163,32 +163,10 @@ from decimal import Decimal
 
 from core.models import TenantScoped
 
-# Definir RUBRO_CHOICES aquí para evitar dependencia circular
-# Estos deben coincidir con RUBRO_CHOICES
-RUBRO_CHOICES = [
-    ("WORKSHOP", "Taller mecánico integral"),
-    ("WORKSHOP_MOTO", "Taller de motos"),
-    ("WORKSHOP_HEAVY", "Taller de camiones/buses"),
-    ("EXHAUST", "Escapes y mufflers"),
-    ("PARTS", "Casa de repuestos / Autopartes"),
-    ("TIRE", "Vulcanización / Neumáticos y llantas"),
-    ("BODYSHOP", "Carrocería / Pintura"),
-    ("DETAILING", "Lavado, detailing y estética"),
-    ("ELECTRIC", "Electricidad / electrónica automotriz"),
-    ("GLASS_AUDIO", "Parabrisas, vidrios y audio / accesorios"),
-    ("FLEET", "Mantención de flotas empresariales"),
-    ("SUSPENSION_STEERING", "Taller de Suspensión y Dirección"),
-    ("BRAKES", "Taller de Frenos"),
-    ("OBD_DIAGNOSTIC", "Taller de Diagnóstico Computarizado (OBD-II)"),
-    ("CLASSIC_CARS", "Taller de Reparación de Vehículos Clásicos"),
-    ("AUDIO_ENTERTAINMENT", "Taller de Sistemas de Audio y Entretenimiento Automotriz"),
-    ("GAS_CONVERSION", "Taller de Conversiones a Gas"),
-    ("FLEET_REPAIR", "Taller de Reparación de Flotas Corporativas"),
-    ("BODY_GLASS", "Taller de Carrocería y Reparación de Vidrios"),
-    ("TUNING", "Taller de Tuning / Personalización"),
-    ("RECYCLING", "Reciclaje / Chatarra electrónica y catalíticos"),
-    ("MIXED", "Mixto (varios rubros)"),
-]
+from taller.config.rubros import RUBROS_TALLER
+
+# Fuente única de verdad: taller/config/rubros.py (taxonomía canónica).
+RUBRO_CHOICES = list(RUBROS_TALLER)
 
 
 class ServicioBase(models.Model):
