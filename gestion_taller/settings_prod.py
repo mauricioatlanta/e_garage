@@ -389,7 +389,7 @@ RESEND_API_KEY = env_str("RESEND_API_KEY", "")
 # Normaliza tambien aqui: esta reasignacion pisaba el valor saneado de arriba
 # y reintroducia no-reply@/dominios legacy desde el .env (rebotes 550).
 DEFAULT_FROM_EMAIL = _sane_egarage_email(env_str("DEFAULT_FROM_EMAIL", DEFAULT_FROM_EMAIL))
-ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 
 # WebPay Plus — Commerce Engine
 TBK_COMMERCE_CODE = env_str("TBK_COMMERCE_CODE", "597055555532")
