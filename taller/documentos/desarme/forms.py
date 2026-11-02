@@ -52,6 +52,8 @@ class VehiculoDesarmeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.empresa = kwargs.pop("empresa", None)
         super().__init__(*args, **kwargs)
+        if self.empresa and getattr(self.empresa, "pais", None):
+            self.fields["marca"].queryset = self.fields["marca"].queryset.filter(country=self.empresa.pais).order_by("nombre")
         self.fields["vin"].required = False
         self.fields["precio_compra"].required = False
         self.fields["fecha_ingreso_desarme"].required = False
