@@ -75,6 +75,10 @@ class SimpleCountryRedirectMiddleware(MiddlewareMixin):
         if not getattr(request.user, "is_authenticated", False):
             return None
 
+        # Bypass para superuser (puede saltar entre países/rubros para mantenimiento)
+        if getattr(request.user, "is_superuser", False):
+            return None
+
         # 0) Preferir empresa activa en sesión
         empresa = None
         empresa_id = None
