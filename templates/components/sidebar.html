@@ -25,7 +25,7 @@
       {% ifchanged item.section_label %}{% if item.section_label %}<div class="eg-nav-section">{{ item.section_label }}</div>{% endif %}{% endifchanged %}
       <a href="{{ item.url }}"{% if item.is_active %} class="is-active"{% endif %}>
         <i class="{{ item.icon }}"></i>
-        {{ item.label }}
+        {% if item.label == "workspace.desarm.nav.home" %}Inicio{% elif item.label == "workspace.desarm.nav.vehicles" %}Vehículos{% elif item.label == "workspace.desarm.nav.parts" %}Repuestos{% elif item.label == "workspace.desarm.nav.documents" %}Ventas{% elif item.label == "workspace.desarm.nav.clients" %}Clientes{% elif item.label == "workspace.desarm.nav.reports" %}Reportes{% elif item.label == "workspace.desarm.nav.settings" %}Configuración{% else %}{{ item.label }}{% endif %}
       </a>
       {% endfor %}
     {% else %}

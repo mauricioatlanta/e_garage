@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-22 09:30+0000\n"
+"POT-Creation-Date: 2026-11-02 09:28-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,1001 +17,5632 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "Configuración"
-msgstr "Configuración"
-
-msgid "Cerrar sesión"
-msgstr "Cerrar sesión"
-
-msgid "Iniciar sesión o registrarse"
-msgstr "Iniciar sesión o registrarse"
-
-msgid "o"
-msgstr "o"
-
-msgid "Iniciar sesión"
-msgstr "Iniciar sesión"
-
-msgid "Gestión inteligente para talleres"
-msgstr "Gestión inteligente para talleres"
-
-msgid "Welcome to eGarage USA"
-msgstr "Bienvenido a eGarage USA"
-
-msgid "Sectors We Empower"
-msgstr "Sectores que potenciamos"
-
-msgid "Auto Repair Shop"
-msgstr "Taller Mecánico"
-
-msgid "Tire & Vulcanization"
-msgstr "Vulcanización y Neumáticos"
-
-msgid "Paint & Body Shop"
-msgstr "Pintura y Hojalatería"
-
-msgid "Parts Store"
-msgstr "Casa de Repuestos"
-
-msgid "Simple Plans, No Fine Print"
-msgstr "Planes simples y sin letra chica"
-
-msgid "Monthly"
-msgstr "Mensual"
-
-msgid "Semi-Annual"
-msgstr "Semestral"
-
-msgid "Annual"
-msgstr "Anual"
-
-msgid "Real Stories from Real Shops"
-msgstr "Historias reales de talleres reales"
-
-msgid "Higher average revenue"
-msgstr "Mayor facturación promedio"
-
-msgid "Less time in reception"
-msgstr "Menos tiempo en recepción"
-
-msgid "Customer satisfaction"
-msgstr "Satisfacción de clientes"
-
-msgid "Language"
-msgstr "Idioma"
-
-msgid "Agregar nuevo color..."
-msgstr "Agregar nuevo color..."
-
-msgid "Add new body type..."
-msgstr "Agregar nuevo tipo de carrocería..."
-
-msgid "Start Now"
-msgstr "Comenzar Ahora"
-
-msgid "Start Free Trial"
-msgstr "Comenzar Prueba Gratuita"
-
-msgid "See Pricing"
-msgstr "Ver Precios"
-
-msgid "Recommended"
-msgstr "Recomendado"
-
-msgid "Choose Semi-Annual"
-msgstr "Elegir Semestral"
-
-msgid "Choose Annual"
-msgstr "Elegir Anual"
-
-msgid "per month"
-msgstr "por mes"
-
-msgid "every 6 months"
-msgstr "cada 6 meses"
-
-msgid "per year"
-msgstr "por año"
-
-msgid "Unlimited users"
-msgstr "Usuarios ilimitados"
-
-msgid "Digital documents"
-msgstr "Documentos digitales"
-
-msgid "Bilingual support"
-msgstr "Soporte bilingüe"
-
-msgid "Everything from Monthly plan"
-msgstr "Todo del plan Mensual"
-
-msgid "Automatic reminders"
-msgstr "Recordatorios automáticos"
-
-msgid "Profit reports"
-msgstr "Reportes de utilidad"
-
-msgid "Everything from Semi-Annual plan"
-msgstr "Todo del plan Semestral"
-
-msgid "Volume discounts"
-msgstr "Descuentos por volumen"
-
-msgid "Priority support"
-msgstr "Soporte priorizado"
-
-msgid "Work orders, reception checklists, technician times and performance tracking."
-msgstr "Órdenes de trabajo, checklist de recepción, tiempos y desempeño por técnico."
-
-msgid "Rotation, balancing, tire set history, stock alerts and quick quotes."
-msgstr "Rotación, balanceo, historial por juego, alertas de stock y cotizaciones rápidas."
-
-msgid "Process stages, materials per job, before/after photos and estimates."
-msgstr "Etapas del proceso, materiales por trabajo, fotos antes/después y presupuestos."
-
-msgid "Catalog, part numbers, margins, sales and digital document integration."
-msgstr "Catálogo, part number, márgenes, ventas e integración con documentos digitales."
-
-msgid "This software changed how we work; now everything is tracked and we get paid faster."
-msgstr "Este software cambió cómo trabajamos; ahora todo queda trazado y cobramos más rápido."
-
-msgid "Bilingual support and quick migration. Perfect for growing shops."
-msgstr "Soporte bilingüe y migración rápida. Ideal para talleres que crecen."
-
-msgid "The free trial convinced us. Now everything is digital and customers notice."
-msgstr "La prueba gratis nos convenció. Hoy todo es digital y los clientes lo notan."
-
-msgid "Command Center"
-msgstr "Centro de Comando"
-
-msgid "TACTICAL INTELLIGENCE"
-msgstr "INTELIGENCIA TÁCTICA"
-
-msgid "COMMAND CENTER"
-msgstr "CENTRO DE COMANDO"
-
-msgid "REPORTS"
-msgstr "REPORTES"
-
-msgid "ADVANCED AI"
-msgstr "IA AVANZADA"
-
-msgid "BUSINESS INTEL"
-msgstr "INTELIGENCIA DE NEGOCIOS"
-
-msgid "Unified strategic analysis"
-msgstr "Análisis estratégico unificado"
-
-msgid "Predictive operational AI"
-msgstr "IA operativa predictiva"
-
-msgid "Total strategic control"
-msgstr "Control estratégico total"
-
-msgid "TECHNICAL PERSONNEL"
-msgstr "PERSONAL TÉCNICO"
-
-msgid "Individual analysis"
-msgstr "Análisis individual"
-
-msgid "DOC ENGINE"
-msgstr "MOTOR DE DOCUMENTOS"
-
-msgid "Digital Workflow"
-msgstr "Flujo de Trabajo Digital"
-
-msgid "AI document management"
-msgstr "Gestión de documentos con IA"
-
-msgid "CLIENT MATRIX"
-msgstr "MATRIZ DE CLIENTES"
-
-msgid "360° Database"
-msgstr "Base de Datos 360°"
-
-msgid "Relational ecosystem"
-msgstr "Ecosistema relacional"
-
-msgid "FLEET CMD"
-msgstr "COMANDO DE FLOTA"
-
-msgid "Vehicle Control"
-msgstr "Control de Vehículos"
-
-msgid "Smart vehicle system"
-msgstr "Sistema inteligente de vehículos"
-
-msgid "PARTS"
-msgstr "REPUESTOS"
-
-msgid "Parts Management"
-msgstr "Gestión de Repuestos"
-
-msgid "Parts inventory"
-msgstr "Inventario de repuestos"
-
-msgid "SERVICE CORE"
-msgstr "NÚCLEO DE SERVICIOS"
-
-msgid "Service Center"
-msgstr "Centro de Servicios"
-
-msgid "Service management"
-msgstr "Gestión de servicios"
-
-msgid "SYSTEM CORE"
-msgstr "NÚCLEO DEL SISTEMA"
-
-msgid "Settings Center"
-msgstr "Centro de Configuración"
-
-msgid "Advanced configuration"
-msgstr "Configuración avanzada"
-
-msgid "USA TEMPLATE - FIXED URL"
-msgstr "PLANTILLA USA - URL CORREGIDA"
-
-msgid "SMART MOSAIC - WINDOWS STYLE"
-msgstr "MOSAICO INTELIGENTE - ESTILO WINDOWS"
-
-msgid "OPERATIONAL INCOME"
-msgstr "INGRESOS OPERACIONALES"
-
-msgid "TOP SERVICES"
-msgstr "SERVICIOS PRINCIPALES"
-
-msgid "DOCS TODAY"
-msgstr "DOCUMENTOS HOY"
-
-msgid "Today's documents"
-msgstr "Documentos de hoy"
-
-msgid "CUSTOMERS"
-msgstr "CLIENTES"
-
-msgid "Current week"
-msgstr "Semana actual"
-
-msgid "TECHNICIAN PRODUCTIVITY"
-msgstr "PRODUCTIVIDAD DE TÉCNICOS"
-
-msgid "OPERATIONAL METRICS"
-msgstr "MÉTRICAS OPERACIONALES"
-
-msgid "Today's revenue"
-msgstr "Ingresos de hoy"
-
-msgid "Orders in Process"
-msgstr "Órdenes en Proceso"
-
-msgid "EFFICIENCY METRICS"
-msgstr "MÉTRICAS DE EFICIENCIA"
-
-msgid "Projected Revenue"
-msgstr "Ingresos Proyectados"
-
-msgid "SERVICES"
-msgstr "SERVICIOS"
-
-msgid "VEHICLES"
-msgstr "VEHÍCULOS"
-
-msgid "SETTINGS"
-msgstr "CONFIGURACIÓN"
-
-msgid "CENTER"
-msgstr "CENTRO"
-
+#: backup_20251204.html:6
+#: templates/taller/common/clientes/lista_clientes.html:6
 msgid "CLIENTS"
 msgstr "CLIENTES"
 
-msgid "DOCUMENTS"
-msgstr "DOCUMENTOS"
-
-msgid "LOGOUT"
-msgstr "CERRAR SESIÓN"
-
-msgid "AJUSTES"
-msgstr "CONFIGURACIÓN"
-
-msgid "SALIR"
-msgstr "CERRAR SESIÓN"
-
-msgid "EXTRA"
-msgstr "EXTRA"
-
-# Nav bar (respects language switch)
-msgid "Settings"
-msgstr "Ajustes"
-
-msgid "Center"
-msgstr "Centro"
-
-msgid "Clients"
-msgstr "Clientes"
-
-msgid "Documents"
-msgstr "Documentos"
-
-msgid "Extra"
-msgstr "Extra"
-
-msgid "Parts"
-msgstr "Repuestos"
-
-msgid "Reports"
-msgstr "Reportes"
-
-msgid "Services"
-msgstr "Servicios"
-
-msgid "Disassembly"
-msgstr "Desarme"
-
-msgid "Vehicles"
-msgstr "Vehículos"
-
-msgid "Logout"
-msgstr "Salir"
-
-msgid "Used Parts"
-msgstr "Piezas Usadas"
-
-msgid "from disassembly yard"
-msgstr "de yarda de desarme"
-
-msgid "Search by code or name..."
-msgstr "Buscar por código o nombre..."
-
-msgid "No used parts found"
-msgstr "No se encontraron piezas usadas"
-
-msgid "Stock"
-msgstr "Stock"
-
-msgid "MISSION COMMAND PANEL"
-msgstr "PANEL DE COMANDO DE MISIÓN"
-
-msgid "EFFICIENCY"
-msgstr "EFICIENCIA"
-
-msgid "SYSTEM"
-msgstr "SISTEMA"
-
-msgid "ONLINE"
-msgstr "EN LÍNEA"
-
-msgid "All modules"
-msgstr "Todos los módulos"
-
-msgid "Conversion Rate"
-msgstr "Tasa de Conversión"
-
-msgid "DOCS WEEK"
-msgstr "DOCS SEMANA"
-
-msgid "Last 7 days"
-msgstr "Últimos 7 días"
-
-msgid "SALES TODAY"
-msgstr "VENTAS HOY"
-
-msgid "MONTH SALES"
-msgstr "VENTAS DEL MES"
-
-msgid "This month"
-msgstr "Este mes"
-
-msgid "ACTIVE CLIENTS"
-msgstr "CLIENTES ACTIVOS"
-
-msgid "Total clients"
-msgstr "Total de clientes"
-
-msgid "NEW CLIENTS"
-msgstr "NUEVOS CLIENTES"
-
-msgid "TECHNICIANS"
-msgstr "TÉCNICOS"
-
-msgid "Active"
-msgstr "Activos"
-
-msgid "DOCUMENT STATUS"
-msgstr "ESTADO DE DOCUMENTOS"
-
-msgid "Pending Quotes"
-msgstr "Presupuestos Pendientes"
-
-msgid "Month Invoices"
-msgstr "Facturas del Mes"
-
-msgid "Average Ticket"
-msgstr "Ticket Promedio"
-
-msgid "Brands Served"
-msgstr "Marcas Atendidas"
-
-msgid "AI PROJECTIONS"
-msgstr "PROYECCIONES IA"
-
-msgid "Projected Docs/Month"
-msgstr "Docs Proyectados/Mes"
-
-msgid "No service data"
-msgstr "Sin datos de servicios"
-
-msgid "TOP TECHNICIANS"
-msgstr "TOP TÉCNICOS"
-
-msgid "No technician data"
-msgstr "Sin datos de técnicos"
-
-msgid "ALERTS & OPPORTUNITIES"
-msgstr "ALERTAS Y OPORTUNIDADES"
-
-msgid "Salesperson"
-msgstr "Vendedor"
-
-msgid "Part Sale"
-msgstr "Venta de Repuestos"
-
-msgid "Advanced vehicle management system"
+#: backup_20251204.html:7
+#: templates/taller/common/clientes/lista_clientes.html:7
+#, fuzzy
+#| msgid "Advanced vehicle management system"
+msgid "Client management system"
 msgstr "Sistema avanzado de gestión de vehículos"
 
-# Document form - formulario de documentos
-msgid "CREATE DOCUMENT"
-msgstr "CREAR DOCUMENTO"
+#: backup_20251204.html:14
+#: templates/taller/common/clientes/lista_clientes.html:14
+#, fuzzy
+#| msgid "NEW CLIENTS"
+msgid "NEW ENTRY"
+msgstr "NUEVOS CLIENTES"
 
-msgid "EDIT DOCUMENT"
-msgstr "EDITAR DOCUMENTO"
+#: backup_20251204.html:26
+#: templates/taller/common/clientes/lista_clientes.html:26
+#, fuzzy
+#| msgid "Search client"
+msgid "Search clients..."
+msgstr "Buscar cliente"
 
-msgid "Save Document"
+#: backup_20251204.html:215
+#: templates/taller/common/clientes/lista_clientes.html:600
+msgid "Entity Profile"
+msgstr ""
+
+#: backup_20251204.html:216
+#: templates/taller/common/clientes/lista_clientes.html:601
+msgid "Contact Node"
+msgstr ""
+
+#: backup_20251204.html:217
+#: templates/taller/common/clientes/lista_clientes.html:602
+msgid "Comm. Link"
+msgstr ""
+
+#: backup_20251204.html:218
+#: templates/taller/common/clientes/lista_clientes.html:603
+msgid "Location"
+msgstr ""
+
+#: backup_20251204.html:219
+#: templates/taller/common/clientes/lista_clientes.html:604
+#, fuzzy
+#| msgid "Operation"
+msgid "Operations"
+msgstr "Operación"
+
+#: backup_20251204.html:250
+#: templates/taller/common/clientes/lista_clientes.html:635
+msgid "Inspect"
+msgstr ""
+
+#: backup_20251204.html:253
+#: templates/taller/common/clientes/lista_clientes.html:638
+msgid "Modify"
+msgstr ""
+
+#: backup_20251204.html:258
+#: templates/taller/common/clientes/lista_clientes.html:643
+msgid "Purge"
+msgstr ""
+
+#: backup_20251204.html:271 backup_20251204.html:363
+#: templates/taller/common/clientes/lista_clientes.html:655
+#: templates/taller/common/clientes/lista_clientes.html:748
+#, fuzzy
+#| msgid "No used parts found"
+msgid "No clients found"
+msgstr "No se encontraron piezas usadas"
+
+#: backup_20251204.html:274 backup_20251204.html:366
+#: templates/taller/common/clientes/lista_clientes.html:658
+#: templates/taller/common/clientes/lista_clientes.html:751
+msgid "Create your first client to start managing your customer database."
+msgstr ""
+
+#: backup_20251204.html:278 backup_20251204.html:370
+#: templates/taller/common/clientes/lista_clientes.html:662
+#: templates/taller/common/clientes/lista_clientes.html:755
+msgid "Create First Client"
+msgstr ""
+
+#: backup_20251204.html:291
+#: templates/taller/common/clientes/lista_clientes.html:675
+#, python-format
+msgid "DISPLAYING %(start)s-%(end)s / %(total)s UNITS"
+msgstr ""
+
+#: backup_20251204.html:345
+#: templates/taller/common/clientes/lista_clientes.html:731
+#: templates/taller/common/vehiculos/_table.html:44
+msgid "View"
+msgstr ""
+
+#: backup_20251204.html:349
+#: templates/taller/common/clientes/lista_clientes.html:735
+#: templates/taller/common/vehiculos/_table.html:51
+#: templates/taller/us/en/desarme/lista_vehiculos.html:106
+#: templates/taller/us/es/vehiculos/vehiculo_list.html:90
+#: templates/us/en/vehiculos/detalle.html:36
+msgid "Edit"
+msgstr ""
+
+#: backup_20251204.html:355
+#: templates/taller/common/clientes/lista_clientes.html:740
+#: templates/taller/common/vehiculos/_table.html:58
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:323
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:198
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:198
+msgid "Delete"
+msgstr ""
+
+#: backup_20251204.html:380
+msgid "SYSTEM ALERT: PURGE PROTOCOL"
+msgstr ""
+
+#: backup_20251204.html:380
+msgid "Target"
+msgstr ""
+
+#: backup_20251204.html:380
+msgid "Confirm permanent deletion?"
+msgstr ""
+
+#: backup_20251204.html:420
+#: templates/taller/common/clientes/lista_clientes.html:801
+#, fuzzy
+#| msgid "No used parts found"
+msgid "No records found"
+msgstr "No se encontraron piezas usadas"
+
+#: backup_20251204.html:449
+#: templates/taller/common/clientes/lista_clientes.html:830
+msgid "SEARCHING DATABASE..."
+msgstr ""
+
+#: templates/account/_login_form.html:57
+msgid "Email or Username"
+msgstr ""
+
+#: templates/account/_login_form.html:68 templates/account/login.html:56
+#: templates/auth/signup.html:452 templates/taller/us/en/auth/login.html:63
+#: templates/taller/us/es/auth/signup.html:270
+msgid "Password"
+msgstr ""
+
+#: templates/account/_login_form.html:81
+msgid "Keep me signed in"
+msgstr ""
+
+#: templates/account/_login_form.html:88
+msgid "Access System"
+msgstr ""
+
+#: templates/account/_login_form.html:96
+#: templates/registration/password_reset_form.html:6
+msgid "Reset password"
+msgstr ""
+
+#: templates/account/_login_form.html:101
+#, fuzzy
+#| msgid "Welcome to eGarage USA"
+msgid "New to eGarage?"
+msgstr "Bienvenido a eGarage USA"
+
+#: templates/account/_login_form.html:102
+msgid "Create your account"
+msgstr ""
+
+#: templates/account/confirm_email_invalid.html:7
+msgid "Enlace invalido"
+msgstr ""
+
+#: templates/account/confirm_email_invalid.html:105
+msgid "Este enlace ya no es valido"
+msgstr ""
+
+#: templates/account/confirm_email_invalid.html:108
+msgid ""
+"El enlace puede haber expirado o ya fue usado. Puedes reenviar un nuevo "
+"correo de confirmacion."
+msgstr ""
+
+#: templates/account/confirm_email_invalid.html:113
+#: templates/account/confirm_email_pending.html:113
+msgid "Correo:"
+msgstr ""
+
+#: templates/account/confirm_email_invalid.html:124
+#: templates/account/confirm_email_pending.html:124
+msgid "Reenviar correo"
+msgstr ""
+
+#: templates/account/confirm_email_invalid.html:129
+msgid "Cambiar correo"
+msgstr ""
+
+#: templates/account/confirm_email_invalid.html:133
+#: templates/account/confirm_email_pending.html:133
+#, fuzzy
+#| msgid "Iniciar sesión"
+msgid "Volver a iniciar sesion"
+msgstr "Iniciar sesión"
+
+#: templates/account/confirm_email_pending.html:7
+#: templates/account/confirm_email_pending.html:105
+#: templates/taller/auth/registro_exitoso.html:29
+msgid "Revisa tu correo"
+msgstr ""
+
+#: templates/account/confirm_email_pending.html:108
+msgid ""
+"Te enviamos un enlace para activar tu cuenta. Haz click en el enlace del "
+"correo para continuar."
+msgstr ""
+
+#: templates/account/confirm_email_pending.html:129
+msgid "Usar otro correo"
+msgstr ""
+
+#: templates/account/email/email_confirmation_message.html:7
+msgid "Confirma tu email"
+msgstr ""
+
+#: templates/account/email/email_confirmation_message.html:24
+msgid "¡Bienvenido a eGarage!"
+msgstr ""
+
+#: templates/account/email/email_confirmation_message.html:31
+msgid "Hola"
+msgstr ""
+
+#: templates/account/email/email_confirmation_message.html:33
+msgid ""
+"¡Gracias por registrarte en eGarage! Estamos emocionados de que te unas a "
+"nuestra plataforma."
+msgstr ""
+
+#: templates/account/email/email_confirmation_message.html:35
+msgid ""
+"Para completar tu registro y activar tu cuenta, por favor confirma tu "
+"dirección de email haciendo clic en el botón de abajo:"
+msgstr ""
+
+#: templates/account/email/email_confirmation_message.html:43
+msgid "Confirmar Mi Email"
+msgstr ""
+
+#: templates/account/email/email_confirmation_message.html:51
+msgid "O copia y pega este enlace en tu navegador:"
+msgstr ""
+
+#: templates/account/email/email_confirmation_message.html:54
+msgid "Este enlace expira en"
+msgstr ""
+
+#: templates/account/email/email_confirmation_message.html:54
+msgid "días"
+msgstr ""
+
+#: templates/account/email/email_confirmation_message.html:56
+msgid ""
+"Si no solicitaste este registro, simplemente ignora este email y tu "
+"dirección no será activada."
+msgstr ""
+
+#: templates/account/email/email_confirmation_message.html:63
+msgid "Saludos,"
+msgstr ""
+
+#: templates/account/email/email_confirmation_message.html:64
+msgid "Equipo eGarage"
+msgstr ""
+
+#: templates/account/email_change.html:5 templates/account/email_change.html:9
+msgid "Email Address"
+msgstr ""
+
+#: templates/account/email_change.html:21
+#: templates/account/email_change.html:29
+#, fuzzy
+#| msgid "Current week"
+msgid "Current email"
+msgstr "Semana actual"
+
+#: templates/account/email_change.html:31
+msgid "Changing to"
+msgstr ""
+
+#: templates/account/email_change.html:35
+msgid "Your email address is still pending verification."
+msgstr ""
+
+#: templates/account/email_change.html:37
+#: templates/account/phone_change.html:24
+msgid "Re-send Verification"
+msgstr ""
+
+#: templates/account/email_change.html:41
+msgid "Cancel Change"
+msgstr ""
+
+#: templates/account/email_change.html:49
+#: templates/account/phone_change.html:32
+msgid "Change to"
+msgstr ""
+
+#: templates/account/email_change.html:55
+#: templates/allauth/layouts/base.html:195
+msgid "Change Email"
+msgstr ""
+
+#: templates/account/email_confirm.html:5
+#: templates/account/email_confirm_done.html:11
+msgid "Confirm your email"
+msgstr ""
+
+#: templates/account/email_confirm.html:7
+msgid "Your email has been confirmed successfully! You can now sign in."
+msgstr ""
+
+#: templates/account/email_confirm.html:8
+msgid "Go to login"
+msgstr ""
+
+#: templates/account/email_confirm.html:10
+msgid "The confirmation link is invalid or has already been used."
+msgstr ""
+
+#: templates/account/email_confirm.html:11
+#: templates/account/resend_email.html:8
+msgid "Resend confirmation email"
+msgstr ""
+
+#: templates/account/email_confirm_done.html:14
+msgid "A confirmation link has been sent to your email address."
+msgstr ""
+
+#: templates/account/email_confirm_done.html:14
+msgid ""
+"Please check your inbox and follow the instructions to activate your account."
+msgstr ""
+
+#: templates/account/email_confirm_done.html:16
+#: templates/account/email_confirm_empty.html:8
+#: templates/account/signup_success.html:21
+msgid "Go to sign in"
+msgstr ""
+
+#: templates/account/email_confirm_empty.html:5
+#, fuzzy
+#| msgid "Advanced configuration"
+msgid "Invalid confirmation link"
+msgstr "Configuración avanzada"
+
+#: templates/account/email_confirm_empty.html:6
+msgid "No email confirmation token found."
+msgstr ""
+
+#: templates/account/email_confirm_empty.html:7
+msgid ""
+"Please check the link you received in your email or request a new activation "
+"email."
+msgstr ""
+
+#: templates/account/email_verification_sent.html:3
+#: templates/account/signup_success.html:3
+#: templates/taller/auth/registro_exitoso.html:3
+#: templates/taller/registro_exitoso.html:4
+msgid "Registro exitoso"
+msgstr ""
+
+#: templates/account/login.html:38
+msgid "Usuario o email"
+msgstr ""
+
+#: templates/account/login.html:70
+msgid "Ingresar"
+msgstr ""
+
+#: templates/account/password_change.html:4
+#: templates/account/password_change.html:8
+#: templates/account/password_change.html:20
+#: templates/account/password_reset_from_key.html:5
+#: templates/account/password_reset_from_key.html:53
+#: templates/allauth/layouts/base.html:199
+msgid "Change Password"
+msgstr ""
+
+#: templates/account/password_change.html:22
+msgid "Forgot Password?"
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:14
+msgid "Invalid or Expired Link"
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:20
+msgid ""
+"This password reset link is no longer valid, likely because it has already "
+"been used. Please request a new reset link."
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:25
+msgid "Set a New Password"
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:28
+msgid "Use a strong password you have not used before."
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:36
+msgid "Request another reset link"
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:39
+#: templates/account/password_reset_from_key.html:56
+#, fuzzy
+#| msgid "Back to List"
+msgid "Back to sign in"
+msgstr "Volver a la Lista"
+
+#: templates/account/password_set.html:5 templates/account/password_set.html:9
+#: templates/account/password_set.html:21
+msgid "Set Password"
+msgstr ""
+
+#: templates/account/phone_change.html:5 templates/account/phone_change.html:9
+#: templates/account/phone_change.html:38
+msgid "Change Phone"
+msgstr ""
+
+#: templates/account/phone_change.html:18
+#, fuzzy
+#| msgid "Current week"
+msgid "Current phone"
+msgstr "Semana actual"
+
+#: templates/account/phone_change.html:22
+msgid "Your phone number is still pending verification."
+msgstr ""
+
+#: templates/account/resend_email.html:24
+#, fuzzy
+#| msgid "Advanced configuration"
+msgid "Resend confirmation"
+msgstr "Configuración avanzada"
+
+#: templates/account/resend_email.html:27
+msgid ""
+"If your email was not yet verified, a confirmation email has been resent to "
+"your primary address."
+msgstr ""
+
+#: templates/account/resend_email.html:29
+#, fuzzy
+#| msgid "Back to List"
+msgid "Back to login"
+msgstr "Volver a la Lista"
+
+#: templates/account/signup_country_select.html:4
+msgid "Select your country"
+msgstr ""
+
+#: templates/account/signup_country_select.html:12
+msgid "Where do you want to sign up?"
+msgstr ""
+
+#: templates/account/signup_country_select.html:13
+msgid "Select your country to customize your experience and required data."
+msgstr ""
+
+#: templates/account/signup_country_select.html:16
+#: templates/account/signup_country_select.html:19
+#: templates/account/signup_country_select.html:22
+#: templates/account/signup_country_select.html:25
+msgid "Sign up in"
+msgstr ""
+
+#: templates/account/signup_email_pending.html:4
+msgid "Confirma tu correo"
+msgstr ""
+
+#: templates/account/signup_email_pending.html:10
+msgid "Te enviamos un correo de confirmacion"
+msgstr ""
+
+#: templates/account/signup_email_pending.html:13
+msgid ""
+"Revisa tu bandeja de entrada para activar tu cuenta y continuar en eGarage."
+msgstr ""
+
+#: templates/account/signup_email_pending.html:18
+msgid "Correo de registro:"
+msgstr ""
+
+#: templates/account/signup_email_pending.html:29
+#, fuzzy
+#| msgid "Advanced configuration"
+msgid "Reenviar correo de confirmacion"
+msgstr "Configuración avanzada"
+
+#: templates/account/signup_email_pending.html:34
+#, fuzzy
+#| msgid "Iniciar sesión"
+msgid "Ir a iniciar sesion"
+msgstr "Iniciar sesión"
+
+#: templates/account/signup_email_pending.html:38
+msgid "Corregir correo electronico"
+msgstr ""
+
+#: templates/account/signup_success.html:13
+msgid "Registration successful!"
+msgstr ""
+
+#: templates/account/signup_success.html:18
+msgid ""
+"Please check your email to activate your account. If you don't see the "
+"email, check your spam folder or request a new confirmation link."
+msgstr ""
+
+#: templates/account/verification_sent.html:4
+#: templates/account/verification_sent.html:21
+msgid "Verifique su dirección de correo electrónico"
+msgstr ""
+
+#: templates/account/verification_sent.html:25
+msgid "Le hemos enviado un correo electrónico para su verificación."
+msgstr ""
+
+#: templates/account/verification_sent.html:29
+msgid "Revise su bandeja de entrada o spam."
+msgstr ""
+
+#: templates/account/verification_sent.html:33
+#, fuzzy
+#| msgid "Iniciar sesión"
+msgid "Ir a iniciar sesión"
+msgstr "Iniciar sesión"
+
+#: templates/account/verified_email_required.html:5
+#: templates/account/verified_email_required.html:9
+msgid "Verify Your Email Address"
+msgstr ""
+
+#: templates/account/verified_email_required.html:13
+msgid ""
+"This part of the site requires us to verify that\n"
+"you are who you claim to be. For this purpose, we require that you\n"
+"verify ownership of your email address. "
+msgstr ""
+
+#: templates/account/verified_email_required.html:18
+msgid ""
+"We have sent an email to you for\n"
+"verification. Please click on the link inside that email. If you do not see "
+"the verification email in your main inbox, check your spam folder. "
+"Otherwise\n"
+"contact us if you do not receive it within a few minutes."
+msgstr ""
+
+#: templates/account/verified_email_required.html:23
+#, python-format
+msgid ""
+"<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change your "
+"email address</a>."
+msgstr ""
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr ""
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr ""
+
+#: templates/allauth/layouts/base.html:5
+msgid "Account"
+msgstr ""
+
+#: templates/allauth/layouts/base.html:190
+msgid "Menu:"
+msgstr ""
+
+#: templates/allauth/layouts/base.html:203
+msgid "Account Connections"
+msgstr ""
+
+#: templates/allauth/layouts/base.html:207
+msgid "Two-Factor Authentication"
+msgstr ""
+
+#: templates/allauth/layouts/base.html:211
+msgid "Sessions"
+msgstr ""
+
+#: templates/allauth/layouts/base.html:215
+msgid "Sign Out"
+msgstr ""
+
+#: templates/allauth/layouts/base.html:220 templates/auth/login.html:6
+#: templates/auth/login.html:410 templates/base_login.html:8
+msgid "Sign In"
+msgstr ""
+
+#: templates/allauth/layouts/base.html:224
+msgid "Sign Up"
+msgstr ""
+
+#: templates/ar/es/clientes/editar_cliente.html:6
+msgid "Editar cliente Chile"
+msgstr ""
+
+#: templates/ar/es/clientes/lista_clientes.html:6
+#, fuzzy
+#| msgid "Total clients"
+msgid "Lista de Clientes"
+msgstr "Total de clientes"
+
+#: templates/ar/es/documentos/crear_documento.html:8
+#, fuzzy
+#| msgid "Save Document"
+msgid "Nuevo documento"
 msgstr "Guardar Documento"
 
+#: templates/ar/es/documentos/lista_documentos.html:8
+#, fuzzy
+#| msgid "Documentos hoy"
+msgid "Documentos (Chile)"
+msgstr "Documentos hoy"
+
+#: templates/auth/login.html:400
+msgid "Professional Automotive Management"
+msgstr ""
+
+#: templates/auth/login.html:424 templates/taller/us/en/auth/login.html:80
+msgid "Forgot your password?"
+msgstr ""
+
+#: templates/auth/login.html:430 templates/taller/us/en/auth/login.html:87
+msgid "Don't have an account?"
+msgstr ""
+
+#: templates/auth/login.html:432
+msgid "Sign up"
+msgstr ""
+
+#: templates/auth/signup.html:5
+msgid "Create Account"
+msgstr ""
+
+#: templates/auth/signup.html:358 templates/taller/us/es/auth/signup.html:80
+msgid "Create Your Account"
+msgstr ""
+
+#: templates/auth/signup.html:374
+#, fuzzy
+#| msgid "Document Information"
+msgid "Personal Information"
+msgstr "Información del Documento"
+
+#: templates/auth/signup.html:378 templates/clientes/crear_cliente.html:380
+msgid "First Name"
+msgstr ""
+
+#: templates/auth/signup.html:386 templates/clientes/crear_cliente.html:391
+#, fuzzy
+#| msgid "Last 7 days"
+msgid "Last Name"
+msgstr "Últimos 7 días"
+
+#: templates/auth/signup.html:395 templates/clientes/crear_cliente.html:402
+#: templates/taller/configuracion/empresa_simple.html:198
+#: templates/taller/desarme/vehiculo_form.html:241
+#: templates/taller/reportes/orden_trabajo.html:202
+#: templates/taller/reportes/orden_trabajo.html:350
+#: templates/taller/us/en/auth/login.html:57
+#: templates/us/en/vehiculos/detalle.html:201
+msgid "Email"
+msgstr ""
+
+#: templates/auth/signup.html:403 templates/clientes/crear_cliente.html:413
+#: templates/taller/configuracion/empresa_simple.html:192
+#: templates/us/en/vehiculos/detalle.html:208
+msgid "Phone"
+msgstr ""
+
+#: templates/auth/signup.html:411
+msgid "Country"
+msgstr ""
+
+#: templates/auth/signup.html:421 templates/taller/us/es/auth/signup.html:284
+msgid "Select Your Plan"
+msgstr ""
+
+#: templates/auth/signup.html:448
+msgid "Security"
+msgstr ""
+
+#: templates/auth/signup.html:461 templates/taller/us/es/auth/signup.html:277
+msgid "Confirm Password"
+msgstr ""
+
+# Document form - formulario de documentos
+#: templates/auth/signup.html:493 templates/taller/us/es/auth/signup.html:332
+#, fuzzy
+#| msgid "CREATE DOCUMENT"
+msgid "CREATE ACCOUNT"
+msgstr "CREAR DOCUMENTO"
+
+#: templates/auth/signup.html:499 templates/taller/us/es/auth/signup.html:336
+msgid "Already have an account?"
+msgstr ""
+
+#: templates/auth/signup.html:500 templates/taller/us/en/auth/login.html:6
+#: templates/taller/us/en/auth/login.html:42
+#: templates/taller/us/en/auth/login.html:83
+#: templates/taller/us/es/auth/signup.html:337
+msgid "Sign in"
+msgstr ""
+
+#: templates/base.html:796
+msgid "the best in town"
+msgstr ""
+
+#: templates/base_login.html:23 templates/us/en/vehiculos/detalle.html:41
+#: templates/us/en/vehiculos/editar.html:35
 msgid "Back"
 msgstr "Volver"
 
-msgid "Back to List"
+#: templates/br/es/clientes/crear_cliente.html:6
+#: templates/br/pt/clientes/crear_cliente.html:6
+#, fuzzy
+#| msgid "Search client"
+msgid "Crear cliente Brasil"
+msgstr "Buscar cliente"
+
+#: templates/br/es/clientes/editar_cliente.html:6
+#: templates/br/pt/clientes/editar_cliente.html:6
+msgid "Editar cliente Brasil"
+msgstr ""
+
+#: templates/br/es/clientes/lista_clientes.html:7
+#: templates/br/pt/clientes/lista_clientes.html:6
+#, fuzzy
+#| msgid "Clients"
+msgid "Clientes Brasil"
+msgstr "Clientes"
+
+#: templates/br/es/documentos/crear_documento.html:8
+#: templates/br/pt/documentos/crear_documento.html:8
+#: templates/co/es/documentos/crear_documento.html:8
+#: templates/ec/es/documentos/crear_documento.html:8
+#: templates/mx/es/documentos/crear_documento.html:8
+#: templates/pe/es/documentos/crear_documento.html:8
+#: templates/uy/es/documentos/crear_documento.html:8
+#: templates/ve/es/documentos/crear_documento.html:8
+#, fuzzy
+#| msgid "Save Document"
+msgid "Crear Documento"
+msgstr "Guardar Documento"
+
+#: templates/br/es/documentos/lista_documentos.html:6
+#: templates/br/pt/documentos/lista_documentos.html:6
+#: templates/co/es/documentos/lista_documentos.html:6
+#: templates/ec/es/documentos/lista_documentos.html:6
+#: templates/mx/es/documentos/lista_documentos.html:6
+#: templates/pe/es/documentos/lista_documentos.html:6
+#: templates/us/es/documentos/lista_documentos.html:6
+#: templates/uy/es/documentos/lista_documentos.html:6
+#: templates/ve/es/documentos/lista_documentos.html:6
+#, fuzzy
+#| msgid "Digital documents"
+msgid "Lista de Documentos"
+msgstr "Documentos digitales"
+
+#: templates/br/es/vehiculos/crear_vehiculo.html:6
+#: templates/br/pt/vehiculos/crear_vehiculo.html:6
+msgid "Crear vehículo Brasil"
+msgstr ""
+
+#: templates/br/es/vehiculos/detalle_vehiculo.html:6
+#: templates/br/pt/vehiculos/detalle_vehiculo.html:6
+msgid "Detalle vehículo Brasil"
+msgstr ""
+
+#: templates/br/es/vehiculos/editar_vehiculo.html:6
+#: templates/br/pt/vehiculos/editar_vehiculo.html:6
+msgid "Editar vehículo Brasil"
+msgstr ""
+
+#: templates/br/es/vehiculos/lista_vehiculos.html:8
+#: templates/br/pt/vehiculos/lista_vehiculos.html:8
+#, fuzzy
+#| msgid "Vehículos agotados"
+msgid "Vehículos Brasil"
+msgstr "Vehículos agotados"
+
+#: templates/cl/es/clientes/editar_cliente.html:6
+msgid "Editar Cliente - Chile"
+msgstr ""
+
+#: templates/cl/es/clientes/lista_clientes.html:6
+msgid "Lista de Clientes - Chile"
+msgstr ""
+
+#: templates/cl/es/documentos/crear_documento.html:8
+msgid "Crear Documento (Chile)"
+msgstr ""
+
+#: templates/cl/es/documentos/editar_documento.html:8
+#: templates/uy/es/documentos/editar_documento.html:8
+msgid "Editar documento (Chile)"
+msgstr ""
+
+#: templates/cl/es/documentos/lista_documentos.html:6
+msgid "Lista de Documentos (Chile)"
+msgstr ""
+
+#: templates/cl/es/vehiculos/crear.html:5
+#: templates/co/es/vehiculos/crear.html:5
+#: templates/us/en/vehiculos/crear.html:5
+#, fuzzy
+#| msgid "Vehículos disponibles"
+msgid "Crear Vehículo Chile"
+msgstr "Vehículos disponibles"
+
+#: templates/cl/es/vehiculos/detalle_vehiculo.html:6
+#: templates/uy/es/vehiculos/detalle_vehiculo.html:6
+msgid "Detalle vehículo Chile"
+msgstr ""
+
+#: templates/cl/es/vehiculos/editar_vehiculo.html:6
+#: templates/uy/es/vehiculos/editar_vehiculo.html:6
+msgid "Editar vehículo Chile"
+msgstr ""
+
+#: templates/cl/es/vehiculos/lista_vehiculos.html:8
+#: templates/uy/es/vehiculos/lista_vehiculos.html:8
+#, fuzzy
+#| msgid "Vehículos disponibles"
+msgid "Vehículos Chile"
+msgstr "Vehículos disponibles"
+
+#: templates/clientes/crear_cliente.html:348
+#: templates/clientes/crear_cliente.html:497
+#: templates/ejemplos/cliente_form_unified.html:4
+#: templates/taller/common/clientes/cliente_form.html:10
+#, fuzzy
+#| msgid "Search client"
+msgid "Create Client"
+msgstr "Buscar cliente"
+
+#: templates/clientes/crear_cliente.html:349
+#: templates/us/en/vehiculos/crear_vehiculo.html:15
+#, fuzzy
+#| msgid "Back to List"
+msgid "Back to list"
 msgstr "Volver a la Lista"
 
+#: templates/clientes/crear_cliente.html:366
+msgid "Form Errors:"
+msgstr ""
+
+#: templates/clientes/crear_cliente.html:424
+#: templates/taller/common/documentos/fragments/_address.html:9
+#: templates/taller/common/documentos/fragments/_address.html:62
+#: templates/taller/configuracion/empresa_simple.html:204
+msgid "Address"
+msgstr ""
+
+#: templates/clientes/crear_cliente.html:436
+#: templates/taller/common/documentos/fragments/_address.html:42
+msgid "State"
+msgstr ""
+
+#: templates/clientes/crear_cliente.html:447
+#: templates/clientes/crear_cliente.html:483
+#: templates/taller/common/documentos/fragments/_address.html:13
+#: templates/taller/common/documentos/fragments/_address.html:38
+msgid "City"
+msgstr ""
+
+#: templates/clientes/crear_cliente.html:456
+#: templates/clientes/crear_cliente.html:519
+#: templates/clientes/crear_cliente.html:584
+#: templates/taller/common/clientes/cliente_form.html:502
+msgid "Loading cities..."
+msgstr ""
+
+#: templates/clientes/crear_cliente.html:461
+#: templates/taller/common/documentos/fragments/_address.html:55
+#, fuzzy
+#| msgid "Code"
+msgid "ZIP Code"
+msgstr "Código"
+
+#: templates/clientes/crear_cliente.html:472
+#: templates/taller/common/documentos/fragments/_address.html:17
+msgid "Region"
+msgstr ""
+
+#: templates/clientes/crear_cliente.html:500
+#: templates/ejemplos/cliente_form_unified.html:169
+#: templates/settings/company_settings_common.html:199
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:319
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:195
+#: templates/us/en/vehiculos/editar.html:230
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:195
+msgid "Cancel"
+msgstr ""
+
+#: templates/clientes/crear_cliente.html:539
+#: templates/clientes/crear_cliente.html:602
+#: templates/taller/common/clientes/cliente_form.html:518
+#, fuzzy
+#| msgid "Select client..."
+msgid "Select City"
+msgstr "Seleccionar cliente..."
+
+#: templates/clientes/crear_cliente.html:553
+#: templates/clientes/crear_cliente.html:615
+msgid "No cities available"
+msgstr ""
+
+#: templates/clientes/crear_cliente.html:558
+#: templates/clientes/crear_cliente.html:620
+msgid "Error loading cities"
+msgstr ""
+
+#: templates/clientes/crear_cliente.html:563
+#: templates/taller/common/clientes/cliente_form.html:497
+msgid "Select State first"
+msgstr ""
+
+#: templates/clientes/crear_cliente.html:624
+msgid "Select Region first"
+msgstr ""
+
+#: templates/co/es/clientes/crear_cliente.html:6
+msgid "Crear cliente Colombia"
+msgstr ""
+
+#: templates/co/es/clientes/editar_cliente.html:6
+msgid "Editar cliente Colombia"
+msgstr ""
+
+#: templates/co/es/clientes/lista_clientes.html:7
+msgid "Clientes Colombia"
+msgstr ""
+
+#: templates/co/es/vehiculos/crear_vehiculo.html:6
+msgid "Crear vehículo Colombia"
+msgstr ""
+
+#: templates/co/es/vehiculos/detalle_vehiculo.html:6
+msgid "Detalle vehículo Colombia"
+msgstr ""
+
+#: templates/co/es/vehiculos/editar_vehiculo.html:6
+msgid "Editar vehículo Colombia"
+msgstr ""
+
+#: templates/co/es/vehiculos/lista_vehiculos.html:8
+#, fuzzy
+#| msgid "Vehículos agotados"
+msgid "Vehículos Colombia"
+msgstr "Vehículos agotados"
+
+#: templates/ec/es/clientes/crear_cliente.html:6
+msgid "Crear cliente Ecuador"
+msgstr ""
+
+#: templates/ec/es/clientes/editar_cliente.html:6
+msgid "Editar cliente Ecuador"
+msgstr ""
+
+#: templates/ec/es/clientes/lista_clientes.html:7
+#, fuzzy
+#| msgid "Clients"
+msgid "Clientes Ecuador"
+msgstr "Clientes"
+
+#: templates/ec/es/vehiculos/crear_vehiculo.html:6
+msgid "Crear vehículo Ecuador"
+msgstr ""
+
+#: templates/ec/es/vehiculos/detalle_vehiculo.html:6
+msgid "Detalle vehículo Ecuador"
+msgstr ""
+
+#: templates/ec/es/vehiculos/editar_vehiculo.html:6
+msgid "Editar vehículo Ecuador"
+msgstr ""
+
+#: templates/ec/es/vehiculos/lista_vehiculos.html:8
+#, fuzzy
+#| msgid "Vehículos agotados"
+msgid "Vehículos Ecuador"
+msgstr "Vehículos agotados"
+
+#: templates/ejemplos/cliente_form_unified.html:13
+#, fuzzy
+#| msgid "New client"
+msgid "New Client"
+msgstr "Nuevo cliente"
+
+#: templates/ejemplos/cliente_form_unified.html:22
+#, fuzzy
+#| msgid "Document Information"
+msgid "Basic Information"
+msgstr "Información del Documento"
+
+#: templates/ejemplos/cliente_form_unified.html:72
+msgid "Tax Identification"
+msgstr ""
+
+#: templates/ejemplos/cliente_form_unified.html:104
+msgid "Billing Address"
+msgstr ""
+
+#: templates/ejemplos/cliente_form_unified.html:117
+#: templates/settings/company_settings_common.html:113
+msgid "State/Department"
+msgstr ""
+
+#: templates/ejemplos/cliente_form_unified.html:159
+#, fuzzy
+#| msgid "Document Information"
+msgid "Tax Information:"
+msgstr "Información del Documento"
+
+#: templates/ejemplos/cliente_form_unified.html:173
+#, fuzzy
+#| msgid "Clients"
+msgid "Save Client"
+msgstr "Clientes"
+
+#: templates/ejemplos/cliente_form_unified.html:189
+#: templates/settings/company_settings_common.html:219
+#, fuzzy
+#| msgid "Searching..."
+msgid "Loading..."
+msgstr "Buscando..."
+
+#: templates/ejemplos/cliente_form_unified.html:190
+#: templates/settings/company_settings_common.html:220
+#: templates/taller/common/documentos/fragments/_address.html:22
+#: templates/taller/common/documentos/fragments/_address.html:47
+#, fuzzy
+#| msgid "Select client..."
+msgid "Select..."
+msgstr "Seleccionar cliente..."
+
+#: templates/ejemplos/cliente_form_unified.html:210
+msgid "Format: 12.345.678-9"
+msgstr ""
+
+#: templates/ejemplos/cliente_form_unified.html:211
+msgid "Format: 12-3456789"
+msgstr ""
+
+#: templates/ejemplos/cliente_form_unified.html:212
+msgid "Format: 123-45-6789"
+msgstr ""
+
+#: templates/ejemplos/cliente_form_unified.html:213
+msgid "Format: 123.456.789-01"
+msgstr ""
+
+#: templates/ejemplos/cliente_form_unified.html:214
+msgid "Format: 12.345.678/0001-90"
+msgstr ""
+
+#: templates/ejemplos/cliente_form_unified.html:215
+msgid "Format: 20123456789"
+msgstr ""
+
+#: templates/ejemplos/cliente_form_unified.html:216
+msgid "Format: J-12345678-9"
+msgstr ""
+
+#: templates/landing/seleccionar_pais.html:8
+msgid "eGarage"
+msgstr ""
+
+#: templates/landing/seleccionar_pais.html:8
+msgid "La plataforma para negocios automotrices"
+msgstr ""
+
+#: templates/landing/seleccionar_pais.html:9
+msgid ""
+"eGarage — Workshop, Salvage y Parts. La plataforma de gestión para talleres "
+"mecánicos, desarmadurias y casas de repuestos en Latinoamérica."
+msgstr ""
+
+#: templates/legal.html:5
+msgid "Legal"
+msgstr ""
+
+#: templates/mx/es/clientes/crear_cliente.html:6
+msgid "Crear cliente México"
+msgstr ""
+
+#: templates/mx/es/clientes/editar_cliente.html:6
+msgid "Editar cliente México"
+msgstr ""
+
+#: templates/mx/es/clientes/lista_clientes.html:7
+#, fuzzy
+#| msgid "Clients"
+msgid "Clientes México"
+msgstr "Clientes"
+
+#: templates/mx/es/vehiculos/crear_vehiculo.html:6
+msgid "Crear vehículo México"
+msgstr ""
+
+#: templates/mx/es/vehiculos/detalle_vehiculo.html:6
+msgid "Detalle vehículo México"
+msgstr ""
+
+#: templates/mx/es/vehiculos/editar_vehiculo.html:6
+msgid "Editar vehículo México"
+msgstr ""
+
+#: templates/mx/es/vehiculos/lista_vehiculos.html:8
+#, fuzzy
+#| msgid "Vehículos disponibles"
+msgid "Vehículos México"
+msgstr "Vehículos disponibles"
+
+#: templates/onboarding/base.html:5
+msgid "Onboarding"
+msgstr ""
+
+#: templates/onboarding/base.html:264
+msgid "Anterior"
+msgstr ""
+
+#: templates/onboarding/base.html:273
+msgid "Siguiente"
+msgstr ""
+
+#: templates/onboarding/base.html:277
+msgid "Comenzar a usar eGarage"
+msgstr ""
+
+#: templates/onboarding/paso_equipo.html:5
+msgid "Paso 2: Configura tu Equipo"
+msgstr ""
+
+#: templates/onboarding/paso_equipo.html:6
+msgid "Agrega al menos una persona operativa para comenzar."
+msgstr ""
+
+#: templates/onboarding/paso_equipo.html:10
+msgid "Técnicos Registrados"
+msgstr ""
+
+#: templates/onboarding/paso_equipo.html:18
+msgid "Registrado"
+msgstr ""
+
+#: templates/onboarding/paso_equipo.html:21
+msgid "Aún no has registrado técnicos."
+msgstr ""
+
+#: templates/onboarding/paso_equipo.html:28
+msgid "Agregar Técnico"
+msgstr ""
+
+#: templates/onboarding/paso_equipo.html:36
+msgid "Nombre Completo"
+msgstr ""
+
+#: templates/onboarding/paso_equipo.html:42
+msgid "Rol"
+msgstr ""
+
+#: templates/onboarding/paso_equipo.html:43
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:174
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:240
+msgid "Técnico"
+msgstr ""
+
+#: templates/onboarding/paso_equipo.html:55
+#: templates/onboarding/paso_identidad.html:38
+#: templates/taller/desarme/vehiculo_form.html:240
+#: templates/taller/reportes/orden_trabajo.html:196
+#: templates/taller/reportes/orden_trabajo.html:347
+msgid "Teléfono"
+msgstr ""
+
+#: templates/onboarding/paso_equipo.html:61
+#: templates/onboarding/paso_identidad.html:30
+#: templates/taller/desarme/vehiculo_form.html:242
+#: templates/taller/reportes/orden_trabajo.html:208 ubicacion/models.py:82
+msgid "Dirección"
+msgstr ""
+
+#: templates/onboarding/paso_equipo.html:71
+msgid "Requerido"
+msgstr ""
+
+#: templates/onboarding/paso_equipo.html:72
+msgid ""
+"Al presionar Siguiente se guardará esta persona como técnico activo de tu "
+"empresa."
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:5
+msgid "Paso 3: ¡Todo Listo!"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:6
+msgid "Revisa la configuración y comienza a usar eGarage"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:11
+msgid "Verificación Final"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:16
+msgid "Empresa Configurada"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:18
+#: templates/taller/desarme/dashboard.html:362
+#: templates/taller/desarme/dashboard_financiero.html:38
+#: templates/taller/desarme/partials/_inventario_toolbar.html:80
+#: templates/taller/desarme/vehiculo_form.html:239
+#: templates/taller/reportes/centro_contable_chile.html:813
+#: templates/taller/reportes/orden_trabajo.html:191
+msgid "Nombre"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:19
+msgid "País"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:20
+msgid "Moneda"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:21
+msgid "Impuesto"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:23
+msgid "Rubro"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:28
+msgid "Equipo Registrado"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:35
+msgid "No hay técnicos registrados"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:46
+#, fuzzy
+#| msgid "View Document"
+msgid "Preview de Documento Real"
+msgstr "Ver Documento"
+
+#: templates/onboarding/paso_finalizar.html:52
+msgid "Generando vista previa..."
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:56
+msgid "Actualizar Preview"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:62
+msgid "¡Estás listo para comenzar!"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:63
+msgid ""
+"Una vez que finalices, podrás acceder al dashboard completo y comenzar a "
+"crear tus primeros documentos."
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:78
+msgid "Cargar datos de ejemplo"
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:81
+msgid ""
+"Se crearán clientes, vehículos, documentos, repuestos, servicios y reportes "
+"demo para probar eGarage."
+msgstr ""
+
+#: templates/onboarding/paso_finalizar.html:89
+msgid "Finalizar"
+msgstr ""
+
+#: templates/onboarding/paso_identidad.html:5
+msgid "Paso 1: Identidad de tu Empresa"
+msgstr ""
+
+#: templates/onboarding/paso_identidad.html:6
+msgid "Configura la información básica de tu negocio automotriz"
+msgstr ""
+
+#: templates/onboarding/paso_identidad.html:14
+msgid "Nombre del Negocio"
+msgstr ""
+
+#: templates/onboarding/paso_identidad.html:22
+msgid "Lema"
+msgstr ""
+
+#: templates/onboarding/paso_identidad.html:46
+msgid "Email de Contacto"
+msgstr ""
+
+#: templates/onboarding/paso_identidad.html:56
+#: templates/taller/configuracion/empresa_simple.html:209
+#, fuzzy
+#| msgid "Logout"
+msgid "Logo"
+msgstr "Salir"
+
+#: templates/onboarding/paso_identidad.html:60
+msgid "Logo actual"
+msgstr ""
+
+#: templates/onboarding/paso_identidad.html:69
+msgid "¿Qué tipo de negocio tienes?"
+msgstr ""
+
+#: templates/onboarding/paso_identidad.html:71
+msgid ""
+"Selecciona el rubro que mejor describe tu operación. Esto personaliza el "
+"menú y el dashboard de eGarage."
+msgstr ""
+
+#: templates/pe/es/clientes/crear_cliente.html:6
+#, fuzzy
+#| msgid "Search client"
+msgid "Crear cliente Perú"
+msgstr "Buscar cliente"
+
+#: templates/pe/es/clientes/editar_cliente.html:6
+msgid "Editar cliente Perú"
+msgstr ""
+
+#: templates/pe/es/clientes/lista_clientes.html:7
+#, fuzzy
+#| msgid "Clients"
+msgid "Clientes Perú"
+msgstr "Clientes"
+
+#: templates/pe/es/vehiculos/crear_vehiculo.html:6
+msgid "Crear vehículo Perú"
+msgstr ""
+
+#: templates/pe/es/vehiculos/detalle_vehiculo.html:6
+msgid "Detalle vehículo Perú"
+msgstr ""
+
+#: templates/pe/es/vehiculos/editar_vehiculo.html:6
+msgid "Editar vehículo Perú"
+msgstr ""
+
+#: templates/pe/es/vehiculos/lista_vehiculos.html:8
+#, fuzzy
+#| msgid "Vehículos disponibles"
+msgid "Vehículos Perú"
+msgstr "Vehículos disponibles"
+
+#: templates/registration/password_reset_complete.html:235
+msgid "¡Contraseña Restablecida!"
+msgstr ""
+
+#: templates/registration/password_reset_complete.html:236
+msgid ""
+"Tu contraseña ha sido restablecida exitosamente. Ahora puedes iniciar sesión "
+"con tu nueva contraseña."
+msgstr ""
+
+#: templates/registration/password_reset_complete.html:239
+#, fuzzy
+#| msgid "Iniciar sesión"
+msgid "Iniciar Sesión"
+msgstr "Iniciar sesión"
+
+#: templates/registration/password_reset_confirm.html:4
+msgid "Create a new password"
+msgstr ""
+
+#: templates/registration/password_reset_confirm.html:8
+msgid "Save new password"
+msgstr ""
+
+#: templates/registration/password_reset_form.html:7
+msgid "Enter your email and we will send you a link to reset your password."
+msgstr ""
+
+#: templates/registration/password_reset_form.html:11
+msgid "Send email"
+msgstr ""
+
+#: templates/saas/suscripcion/usuario_existente.html:71
+msgid "ACCESO RESTRINGIDO"
+msgstr ""
+
+#: templates/saas/suscripcion/usuario_existente.html:73
+msgid "Esta cuenta ya tiene un usuario asignado."
+msgstr ""
+
+#: templates/saas/suscripcion/usuario_existente.html:74
+msgid "No es posible registrar otro usuario para esta suscripcion."
+msgstr ""
+
+#: templates/saas/suscripcion/usuario_existente.html:76
+msgid "Cada taller/empresa puede tener unicamente"
+msgstr ""
+
+#: templates/saas/suscripcion/usuario_existente.html:76
+msgid "UN USUARIO ACTIVO"
+msgstr ""
+
+#: templates/saas/suscripcion/usuario_existente.html:77
+msgid ""
+"Si necesitas cambiar el usuario principal, contacta al administrador del "
+"sistema."
+msgstr ""
+
+#: templates/saas/suscripcion/usuario_existente.html:80
+msgid "Volver al Registro"
+msgstr ""
+
+# Nav bar (respects language switch)
+#: templates/settings/company_settings_common.html:4
+#: templates/settings/company_settings_common.html:13
+#, fuzzy
+#| msgid "Settings"
+msgid "Company Settings"
+msgstr "Ajustes"
+
+#: templates/settings/company_settings_common.html:22
+#: templates/taller/configuracion/empresa_simple.html:174
+#, fuzzy
+#| msgid "Document Information"
+msgid "Company Information"
+msgstr "Información del Documento"
+
+#: templates/settings/company_settings_common.html:57
+msgid "Brand color for UI customization"
+msgstr ""
+
+#: templates/settings/company_settings_common.html:68
+#, fuzzy
+#| msgid "Document Information"
+msgid "Contact Information"
+msgstr "Información del Documento"
+
+#: templates/settings/company_settings_common.html:99
+msgid "Legal Address"
+msgstr ""
+
+#: templates/settings/company_settings_common.html:118
+msgid "Select country first"
+msgstr ""
+
+#: templates/settings/company_settings_common.html:157
+msgid "Address preview:"
+msgstr ""
+
+# Nav bar (respects language switch)
+#: templates/settings/company_settings_common.html:166
+#, fuzzy
+#| msgid "Settings"
+msgid "Tax Settings"
+msgstr "Ajustes"
+
+#: templates/settings/company_settings_common.html:181
+#, python-format
+msgid "Default tax rate (%%)"
+msgstr ""
+
+# Nav bar (respects language switch)
+#: templates/settings/company_settings_common.html:203
+#, fuzzy
+#| msgid "Settings"
+msgid "Save Settings"
+msgstr "Ajustes"
+
+#: templates/taller/auth/registro_exitoso.html:18
+msgid "¡Registro exitoso!"
+msgstr ""
+
+#: templates/taller/auth/registro_exitoso.html:21
+#: templates/taller/registro_exitoso.html:16
+msgid "Estás a segundos de tener el mejor centro de operaciones del mundo."
+msgstr ""
+
+#: templates/taller/auth/registro_exitoso.html:29
+msgid "para las instrucciones de acceso."
+msgstr ""
+
+#: templates/taller/auth/registro_exitoso.html:33
+msgid "No olvides revisar también tu carpeta de Spam o Correo no deseado."
+msgstr ""
+
+#: templates/taller/auth/registro_exitoso.html:40
+msgid "País:"
+msgstr ""
+
+#: templates/taller/auth/registro_exitoso.html:47
+#: templates/taller/registro_exitoso.html:30
+msgid "Volver a la landing"
+msgstr ""
+
+#: templates/taller/common/base_usa_space.html:17
+#, fuzzy
+#| msgid "Operation"
+msgid "Space Station"
+msgstr "Operación"
+
+#: templates/taller/common/base_usa_space.html:20
+#, fuzzy
+#| msgid "Advanced vehicle management system"
+msgid "Advanced Management System"
+msgstr "Sistema avanzado de gestión de vehículos"
+
+#: templates/taller/common/base_usa_space.html:27
+#, fuzzy
+#| msgid "Active"
+msgid "System Active"
+msgstr "Activos"
+
+#: templates/taller/common/clientes/cliente_form.html:8
+#, fuzzy
+#| msgid "Clients"
+msgid "Edit Client"
+msgstr "Clientes"
+
+#: templates/taller/common/clientes/cliente_form.html:13
+msgid "Standard client form inside the official eGarage panel layout."
+msgstr ""
+
+#: templates/taller/common/clientes/cliente_form.html:196
+#, fuzzy
+#| msgid "Clients"
+msgid "Client ID"
+msgstr "Clientes"
+
+#: templates/taller/common/clientes/cliente_form.html:531
+msgid "Unable to load cities"
+msgstr ""
+
+#: templates/taller/common/clientes/cliente_list.html:5
+#, fuzzy
+#| msgid "Clients"
+msgid "Clientes"
+msgstr "Clientes"
+
+#: templates/taller/common/clientes/cliente_list.html:6
+#, fuzzy
+#| msgid "Gestión inteligente para talleres"
+msgid "Gestión de clientes"
+msgstr "Gestión inteligente para talleres"
+
+#: templates/taller/common/dashboard/centro_operaciones_espacial.html:613
+#: templates/taller/desarme/dashboard.html:7
+msgid "Centro de Operaciones"
+msgstr ""
+
+#: templates/taller/common/dashboard/centro_operaciones_espacial.html:618
+msgid "Control total para tu flota estelar"
+msgstr ""
+
+#: templates/taller/common/documentos/base_documento.html:9
+#: templates/taller/documentos/base/base_documento.html:9
+#: templates/taller/documentos/base/base_documento.html:1007
+#: templates/taller/us/en/dashboard/centro_operaciones.html:360
+#: templates/taller/us/en/dashboard/centro_operaciones.html:362
 msgid "Document"
 msgstr "Documento"
 
-msgid "Document No."
-msgstr "Documento N°"
-
-msgid "Document Type"
-msgstr "Tipo de Documento"
-
-msgid "Will be generated automatically"
-msgstr "Se generará automáticamente"
-
+#: templates/taller/common/documentos/base_documento.html:1003
 msgid "Document Management"
 msgstr "Gestión de Documento"
 
+#: templates/taller/common/documentos/base_documento.html:1005
 msgid "Document Form"
 msgstr "Formulario de Documento"
 
-msgid "Document Information"
-msgstr "Información del Documento"
-
-msgid "This is the base template for documents. Specific content should be defined in the 'documento_content' block."
-msgstr "Este es el template base para documentos. El contenido específico debe ser definido en el bloque 'documento_content'."
-
-msgid "View Document"
-msgstr "Ver Documento"
-
+#: templates/taller/common/documentos/base_documento.html:1006
 msgid "User"
 msgstr "Usuario"
 
+#: templates/taller/common/documentos/base_documento.html:1024
+#: templates/taller/documentos/base/base_documento.html:1024
+msgid "Document Information"
+msgstr "Información del Documento"
+
+#: templates/taller/common/documentos/base_documento.html:1025
+#: templates/taller/documentos/base/base_documento.html:1025
+msgid ""
+"This is the base template for documents. Specific content should be defined "
+"in the 'documento_content' block."
+msgstr ""
+"Este es el template base para documentos. El contenido específico debe ser "
+"definido en el bloque 'documento_content'."
+
+#: templates/taller/common/documentos/base_documento.html:1033
+#: templates/taller/common/documentos/document_form_fixed.html:54
+#: templates/taller/documentos/base/base_documento.html:1033
+msgid "Save Document"
+msgstr "Guardar Documento"
+
+#: templates/taller/common/documentos/base_documento.html:1035
+#: templates/taller/common/documentos/document_form_fixed.html:57
+#: templates/taller/documentos/base/base_documento.html:1035
+msgid "Back to List"
+msgstr "Volver a la Lista"
+
+#: templates/taller/common/documentos/base_documento.html:1037
+#: templates/taller/documentos/base/base_documento.html:1037
+msgid "View Document"
+msgstr "Ver Documento"
+
+#: templates/taller/common/documentos/base_documento.html:1082
+#: templates/taller/documentos/base/base_documento.html:1068
 msgid "Please select a customer before continuing."
 msgstr "Por favor seleccione un cliente antes de continuar."
 
-msgid "Validation errors"
-msgstr "Errores de validación"
+#: templates/taller/common/documentos/document_form_fixed.html:8
+#, fuzzy
+#| msgid "View Document"
+msgid "Edit Document"
+msgstr "Ver Documento"
 
-msgid "Date"
-msgstr "Fecha"
+#: templates/taller/common/documentos/document_form_fixed.html:10
+#, fuzzy
+#| msgid "Save Document"
+msgid "Create Document"
+msgstr "Guardar Documento"
 
-msgid "Payment Status"
-msgstr "Estado de Pago"
+#: templates/taller/common/documentos/fragments/_address.html:34
+msgid "Street Address"
+msgstr ""
 
-msgid "Operation"
-msgstr "Operación"
+#: templates/taller/common/documentos/fragments/_tax_id.html:9
+#: templates/taller/common/documentos/fragments/_tax_id.html:19
+#: templates/taller/common/documentos/fragments/_tax_id.html:29
+#: templates/taller/common/documentos/fragments/_tax_id.html:33
+msgid "Tax ID"
+msgstr ""
 
-msgid "Part sale only"
-msgstr "Solo venta de repuestos"
+#: templates/taller/common/servicios/servicios_menu_shell.html:8
+#, fuzzy
+#| msgid "Services"
+msgid "Servicios"
+msgstr "Servicios"
 
-msgid "CLIENT"
-msgstr "CLIENTE"
+#: templates/taller/common/servicios/servicios_menu_shell.html:19
+#, fuzzy
+#| msgid "Servicios hoy"
+msgid "Servicios de Car Wash"
+msgstr "Servicios hoy"
 
-msgid "New client"
-msgstr "Nuevo cliente"
+#: templates/taller/common/servicios/servicios_menu_shell.html:21
+#, fuzzy
+#| msgid "Servicios hoy"
+msgid "Servicios Mecanicos"
+msgstr "Servicios hoy"
 
-msgid "Select client..."
-msgstr "Seleccionar cliente..."
+#: templates/taller/common/servicios/servicios_menu_shell.html:26
+msgid ""
+"catalogo operativo con carga diferida para reducir el tiempo de respuesta "
+"inicial."
+msgstr ""
 
-msgid "VEHICLE"
-msgstr "VEHÍCULO"
+#: templates/taller/common/servicios/servicios_menu_shell.html:28
+msgid ""
+"Catalogo operativo con carga diferida para reducir el tiempo de respuesta "
+"inicial."
+msgstr ""
 
-msgid "Kilometraje"
-msgstr "Kilometraje"
+#: templates/taller/common/servicios/servicios_menu_shell.html:33
+msgid "Volver al panel"
+msgstr ""
 
-msgid "Mileage"
-msgstr "Kilometraje"
+#: templates/taller/common/servicios/servicios_menu_shell.html:34
+#, fuzzy
+#| msgid "Agregar nuevo color..."
+msgid "Agregar servicio"
+msgstr "Agregar nuevo color..."
 
-msgid "USED PARTS"
-msgstr "PIEZAS USADAS"
+#: templates/taller/common/servicios/servicios_menu_shell.html:41
+msgid "Servicios disponibles en este alcance"
+msgstr ""
 
-msgid "ADD"
-msgstr "AGREGAR"
+#: templates/taller/common/servicios/servicios_menu_shell.html:45
+msgid "Categorias listas para filtrar"
+msgstr ""
 
-msgid "Used"
-msgstr "Usado"
+#: templates/taller/common/servicios/servicios_menu_shell.html:49
+msgid "Subcategorias listas para filtrar"
+msgstr ""
 
-msgid "Code"
-msgstr "Código"
+#: templates/taller/common/servicios/servicios_menu_shell.html:53
+msgid "Filtros de servicios"
+msgstr ""
 
-msgid "Part name"
-msgstr "Nombre de repuesto"
+#: templates/taller/common/servicios/servicios_menu_shell.html:55
+#: templates/taller/desarme/lista_interchange.html:134
+#: templates/taller/desarme/lista_piezas.html:188
+#: templates/taller/desarme/lista_vehiculos.html:115
+#: templates/taller/desarme/lista_vehiculos.html:122
+msgid "Buscar"
+msgstr ""
 
-msgid "Qty"
-msgstr "Cant."
+#: templates/taller/common/servicios/servicios_menu_shell.html:59
+msgid "Buscar por nombre, categoria o subcategoria..."
+msgstr ""
 
-msgid "Price"
-msgstr "Precio"
+#: templates/taller/common/servicios/servicios_menu_shell.html:64
+msgid "Categoria"
+msgstr ""
 
+#: templates/taller/common/servicios/servicios_menu_shell.html:66
+msgid "Todas las categorias"
+msgstr ""
+
+#: templates/taller/common/servicios/servicios_menu_shell.html:73
+msgid "Subcategoria"
+msgstr ""
+
+#: templates/taller/common/servicios/servicios_menu_shell.html:75
+msgid "Todas las subcategorias"
+msgstr ""
+
+#: templates/taller/common/servicios/servicios_menu_shell.html:86
+msgid "Listado de servicios"
+msgstr ""
+
+#: templates/taller/common/servicios/servicios_menu_shell.html:87
+#, python-format
+msgid "%(total)s servicios disponibles para carga inicial."
+msgstr ""
+
+#: templates/taller/common/servicios/servicios_menu_shell.html:89
+msgid "Recargar"
+msgstr ""
+
+#: templates/taller/common/servicios/servicios_menu_shell.html:92
+msgid "Cargando servicios..."
+msgstr ""
+
+#: templates/taller/common/servicios/servicios_menu_shell.html:95
+msgid "No hay servicios para mostrar"
+msgstr ""
+
+#: templates/taller/common/servicios/servicios_menu_shell.html:96
+msgid "Prueba otros filtros o registra un nuevo servicio."
+msgstr ""
+
+#: templates/taller/common/vehiculos/_add_button.html:13
+#: templates/taller/common/vehiculos/_empty_state.html:17
+#: templates/taller/common/vehiculos/vehiculo_list.html:210
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:55
+#: templates/taller/us/es/vehiculos/vehiculo_list.html:51
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:60
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:126
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:60
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:126
+#, fuzzy
+#| msgid "Vehicles"
+msgid "Add Vehicle"
+msgstr "Vehículos"
+
+#: templates/taller/common/vehiculos/_ai_badges.html:7
+msgid "AI Powered"
+msgstr ""
+
+#: templates/taller/common/vehiculos/_ai_badges.html:10
+msgid "Professional"
+msgstr ""
+
+#: templates/taller/common/vehiculos/_ai_badges.html:13
+msgid "Advanced"
+msgstr ""
+
+#: templates/taller/common/vehiculos/_empty_state.html:11
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:232
+#: templates/taller/us/es/vehiculos/vehiculo_list.html:130
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:122
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:122
+#, fuzzy
+#| msgid "No used parts found"
+msgid "No vehicles found"
+msgstr "No se encontraron piezas usadas"
+
+#: templates/taller/common/vehiculos/_empty_state.html:12
+msgid "Add your first vehicle to get started"
+msgstr ""
+
+#: templates/taller/common/vehiculos/_filters_toolbar.html:13
+msgid "Search vehicles by plate, owner, brand..."
+msgstr ""
+
+#: templates/taller/common/vehiculos/_filters_toolbar.html:23
+#: templates/taller/us/en/desarme/lista_vehiculos.html:30
+#, fuzzy
+#| msgid "Searching..."
+msgid "Search"
+msgstr "Buscando..."
+
+#: templates/taller/common/vehiculos/_footer.html:6
+#: templates/taller/common/vehiculos/vehiculo_list.html:6
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:45
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:45
+msgid "Advanced vehicle management system"
+msgstr "Sistema avanzado de gestión de vehículos"
+
+#: templates/taller/common/vehiculos/_footer.html:6
+msgid "Version"
+msgstr ""
+
+#: templates/taller/common/vehiculos/_pagination.html:11
+#: templates/taller/us/en/desarme/lista_vehiculos.html:139
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:265
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:143
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:143
+msgid "Page"
+msgstr ""
+
+#: templates/taller/common/vehiculos/_pagination.html:11
+#: templates/taller/us/en/desarme/lista_vehiculos.html:139
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:265
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:143
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:143
+#, fuzzy
+#| msgid "o"
+msgid "of"
+msgstr "o"
+
+#: templates/taller/common/vehiculos/_pagination.html:13
+#, fuzzy
+#| msgid "Vehicles"
+msgid "vehicles"
+msgstr "Vehículos"
+
+#: templates/taller/common/vehiculos/_pagination.html:23
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:275
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:154
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:154
+msgid "First"
+msgstr ""
+
+#: templates/taller/common/vehiculos/_pagination.html:30
+msgid "Prev"
+msgstr ""
+
+#: templates/taller/common/vehiculos/_pagination.html:41
+#: templates/taller/us/en/desarme/lista_vehiculos.html:146
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:287
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:166
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:166
+msgid "Next"
+msgstr ""
+
+#: templates/taller/common/vehiculos/_pagination.html:48
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:292
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:171
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:171
+msgid "Last"
+msgstr ""
+
+#: templates/taller/common/vehiculos/_table.html:25
+msgid "Owner"
+msgstr ""
+
+#: templates/taller/common/vehiculos/_table.html:30
+#: templates/taller/us/en/desarme/lista_vehiculos.html:45
+#: templates/taller/us/en/desarme/lista_vehiculos.html:81
+#: templates/us/en/vehiculos/detalle.html:82
+#: templates/us/en/vehiculos/editar.html:89
+msgid "Year"
+msgstr ""
+
+#: templates/taller/common/vehiculos/vehiculo_list.html:5
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:36
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:43
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:43
+#, fuzzy
+#| msgid "Vehicles"
+msgid "Vehicle Fleet"
+msgstr "Vehículos"
+
+#: templates/taller/common/workspace_home.html:4
+msgid "Workspace"
+msgstr ""
+
+#: templates/taller/common/workspace_home.html:13
+msgid "Workshop Workspace"
+msgstr ""
+
+#: templates/taller/common/workspace_home.html:16
+msgid ""
+"Central place to receive vehicles, review open work and jump into your daily "
+"operations."
+msgstr ""
+
+#: templates/taller/common/workspace_home.html:22
+msgid "Workshop"
+msgstr ""
+
+#: templates/taller/common/workspace_home.html:28
+msgid "Optimized for daily operations"
+msgstr ""
+
+#: templates/taller/common/workspace_home.html:37
+#, fuzzy
+#| msgid "Vehicle Control"
+msgid "Vehicles in workshop"
+msgstr "Control de Vehículos"
+
+#: templates/taller/common/workspace_home.html:39
+msgid "Review and manage all vehicles currently in process at your workshop."
+msgstr ""
+
+#: templates/taller/common/workspace_home.html:40
+#, fuzzy
+#| msgid "Vehicles"
+msgid "Go to vehicles"
+msgstr "Vehículos"
+
+#: templates/taller/common/workspace_home.html:44
+#, fuzzy
+#| msgid "Documents"
+msgid "Open documents"
+msgstr "Documentos"
+
+#: templates/taller/common/workspace_home.html:46
+msgid ""
+"Access budgets, work orders and invoices associated with vehicles in your "
+"workshop."
+msgstr ""
+
+#: templates/taller/common/workspace_home.html:47
+#, fuzzy
+#| msgid "Digital documents"
+msgid "Go to documents"
+msgstr "Documentos digitales"
+
+#: templates/taller/common/workspace_home.html:51
+#, fuzzy
+#| msgid "Disassembly"
+msgid "Disassembly yard"
+msgstr "Desarme"
+
+#: templates/taller/common/workspace_home.html:53
+msgid "Quick access to vehicles and parts in the disassembly module."
+msgstr ""
+
+#: templates/taller/common/workspace_home.html:54
+#, fuzzy
+#| msgid "Disassembly"
+msgid "Go to disassembly"
+msgstr "Desarme"
+
+#: templates/taller/configuracion/empresa_simple.html:4
+#: templates/taller/configuracion/empresa_simple.html:169
+#, fuzzy
+#| msgid "Advanced configuration"
+msgid "Company Configuration"
+msgstr "Configuración avanzada"
+
+#: templates/taller/configuracion/empresa_simple.html:170
+msgid "Manage your company information and settings"
+msgstr ""
+
+#: templates/taller/configuracion/empresa_simple.html:180
+msgid "Workshop Name"
+msgstr ""
+
+#: templates/taller/configuracion/empresa_simple.html:186
+msgid "Company Name"
+msgstr ""
+
+#: templates/taller/configuracion/empresa_simple.html:213
+#, fuzzy
+#| msgid "Current week"
+msgid "Current Logo"
+msgstr "Semana actual"
+
+#: templates/taller/configuracion/empresa_simple.html:220
+#, fuzzy
+#| msgid "Advanced configuration"
+msgid "Save Configuration"
+msgstr "Configuración avanzada"
+
+#: templates/taller/configuracion/empresa_simple.html:227
+msgid "Statistics"
+msgstr ""
+
+#: templates/taller/configuracion/empresa_simple.html:231
+#, fuzzy
+#| msgid "Total clients"
+msgid "Total Technicians"
+msgstr "Total de clientes"
+
+#: templates/taller/configuracion/empresa_simple.html:235
+msgid "Active Technicians"
+msgstr ""
+
+#: templates/taller/configuracion/empresa_simple.html:239
+msgid "Inactive Technicians"
+msgstr ""
+
+#: templates/taller/configuracion/empresa_simple.html:243
+#, fuzzy
+#| msgid "Total clients"
+msgid "Total Documents"
+msgstr "Total de clientes"
+
+#: templates/taller/configuracion/empresa_simple.html:251
+#, fuzzy
+#| msgid "Back to List"
+msgid "Back to Dashboard"
+msgstr "Volver a la Lista"
+
+#: templates/taller/desarme/configurar_catalogo.html:76
+msgid "Catálogo de repuestos"
+msgstr ""
+
+#: templates/taller/desarme/configurar_catalogo.html:79
+msgid "tipos de repuesto"
+msgstr ""
+
+#: templates/taller/desarme/configurar_catalogo.html:80
+msgid ""
+"desmarca los que no vendas y ajusta el precio de referencia — se aplica a "
+"los vehículos que crees de aquí en adelante"
+msgstr ""
+
+#: templates/taller/desarme/configurar_catalogo.html:84
+#: templates/taller/desarme/configurar_catalogo.html:122
+msgid "Guardar cambios"
+msgstr ""
+
+#: templates/taller/desarme/configurar_catalogo.html:105
+msgid "Incluir"
+msgstr ""
+
+#: templates/taller/desarme/configurar_catalogo.html:109
+msgid "Precio de referencia"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:6
+#, fuzzy
+#| msgid "Configuración"
+msgid "Confirmar"
+msgstr "Configuración"
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:7
+msgid "Elige cliente, revisa líneas y confirma"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:12
+msgid "Volver al centro de ventas"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:13
+#: templates/taller/desarme/inventario_inteligente.html:15
+#: templates/taller/desarme/partials/_lista_piezas_results.html:21
+#, fuzzy
+#| msgid "Vehículos agotados"
+msgid "Vehículo"
+msgstr "Vehículos agotados"
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:15
+msgid "Imprimir resumen"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:136
+msgid "Datos de la venta"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:151
+#, fuzzy
+#| msgid "Clientes este mes"
+msgid "Cliente existente"
+msgstr "Clientes este mes"
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:152
+msgid "Selecciona un cliente ya creado en la empresa."
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:160
+msgid "Cliente rápido"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:174
+msgid "Nuevo cliente rápido"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:175
+msgid "Completa lo mínimo y sigue con la venta."
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:238
+msgid ""
+"Al confirmar, se crearán las líneas de venta y se descontará stock "
+"automáticamente."
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:242
+msgid "Confirmar y crear venta"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:248
+msgid "Líneas seleccionadas"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:255
+msgid "Repuesto"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:256
+#, fuzzy
+#| msgid "Stock crítico"
+msgid "Stock actual"
+msgstr "Stock crítico"
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:257
+#: templates/taller/desarme/partials/_inventario_drawer.html:62
+#: templates/taller/desarme/partials/_inventario_mobile_bar.html:86
+#: templates/taller/desarme/partials/_inventario_sale_panel.html:47
+#: templates/taller/reportes/centro_contable_chile.html:814
+#: templates/taller/reportes/centro_contable_chile.html:854
+#: templates/taller/reportes/orden_trabajo.html:266
+msgid "Cantidad"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:258
+#: templates/taller/desarme/partials/_inventario_drawer.html:73
+#: templates/taller/desarme/partials/_inventario_mobile_bar.html:97
+msgid "Precio venta"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:259
+#, fuzzy
+#| msgid "Total clients"
+msgid "Total línea"
+msgstr "Total de clientes"
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:296
+msgid "Resumen"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:300
+#: templates/taller/desarme/partials/_inventario_drawer.html:107
+msgid "Items"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:304
+msgid "Unidades"
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:308
+#: templates/taller/desarme/partials/_inventario_sale_panel.html:69
+#: templates/taller/reportes/orden_trabajo.html:317
+#, fuzzy
+#| msgid "Total"
+msgid "Subtotal"
+msgstr "Total"
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:320
+msgid "El número del documento se generará automáticamente al confirmar."
+msgstr ""
+
+#: templates/taller/desarme/confirmar_venta_desde_inventario.html:324
+#, fuzzy
+#| msgid "Vehículos agotados"
+msgid "Vehículo asociado:"
+msgstr "Vehículos agotados"
+
+#: templates/taller/desarme/crear_interchange.html:5
+#: templates/taller/desarme/dashboard.html:7
+#: templates/taller/desarme/lista_interchange.html:6
+#: templates/taller/desarme/lista_piezas.html:8
+#: templates/taller/desarme/lista_vehiculos.html:6
+#: templates/taller/desarme/pieza_form.html:5
+#: templates/taller/desarme/vehiculo_form.html:5
+msgid "Desarme"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:5
+#: templates/taller/desarme/lista_interchange.html:123
+msgid "Registrar compatibilidad"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:6
+msgid "Nueva entrada de interchange manual"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:110
+#: templates/taller/desarme/dashboard.html:249
+#: templates/taller/desarme/lista_interchange.html:113
+#: templates/taller/desarme/lista_piezas.html:147
+#: templates/taller/desarme/lista_piezas.html:180
+#: templates/taller/desarme/lista_vehiculos.html:83
+#: templates/taller/desarme/lista_vehiculos.html:107
+msgid "Dashboard"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:111
+#: templates/taller/desarme/dashboard.html:250
+#: templates/taller/desarme/dashboard.html:258
+#: templates/taller/desarme/includes/subnav_desarme.html:8
+#: templates/taller/desarme/lista_interchange.html:114
+#: templates/taller/desarme/lista_piezas.html:148
+#: templates/taller/desarme/lista_piezas.html:176
+#: templates/taller/desarme/lista_vehiculos.html:6
+#: templates/taller/desarme/lista_vehiculos.html:84
+#, fuzzy
+#| msgid "Vehículos agotados"
+msgid "Vehículos"
+msgstr "Vehículos agotados"
+
+#: templates/taller/desarme/crear_interchange.html:112
+#: templates/taller/desarme/dashboard.html:251
+#: templates/taller/desarme/dashboard.html:259
+#: templates/taller/desarme/dashboard.html:275
+#: templates/taller/desarme/includes/subnav_desarme.html:15
+#: templates/taller/desarme/lista_interchange.html:115
+#: templates/taller/desarme/lista_interchange.html:127
+#: templates/taller/desarme/lista_piezas.html:8
+#: templates/taller/desarme/lista_piezas.html:149
+#: templates/taller/desarme/lista_vehiculos.html:85
+#: templates/taller/desarme/lista_vehiculos.html:102
+#: templates/taller/reportes/orden_trabajo.html:287
+msgid "Repuestos"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:135
+#: templates/taller/desarme/lista_interchange.html:149
+msgid "Pieza"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:138
+msgid "Código de pieza"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:140
+msgid "Seleccionar pieza"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:153
+msgid "Lista del catálogo operativo de la empresa"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:156
+msgid "Nombre visible"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:156
+msgid "opcional — se completa solo si se deja vacío"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:158
+msgid "Ej: Alternador 90A"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:165
+msgid "Auto de origen"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:165
+msgid "del que salió la pieza"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:168
+#: templates/taller/desarme/crear_interchange.html:197
+#: templates/taller/desarme/vehiculo_form.html:155
+#: templates/taller/reportes/orden_trabajo.html:230
+#: templates/us/es/vehiculos/crear_vehiculo.html:442
+msgid "Marca"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:170
+#: templates/taller/desarme/crear_interchange.html:199
+msgid "Ej: TOYOTA"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:173
+#: templates/taller/desarme/crear_interchange.html:202
+#: templates/taller/desarme/vehiculo_form.html:163
+#: templates/taller/reportes/orden_trabajo.html:234
+#: templates/us/es/vehiculos/crear_vehiculo.html:466
+msgid "Modelo"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:175
+msgid "Ej: COROLLA"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:178
+#: templates/taller/desarme/crear_interchange.html:207
+msgid "Año desde"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:183
+#: templates/taller/desarme/crear_interchange.html:212
+msgid "Año hasta"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:194
+#: templates/taller/desarme/lista_interchange.html:152
+msgid "Auto compatible"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:194
+msgid "donde también funciona la pieza"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:204
+msgid "Ej: YARIS"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:221
+msgid "Notas"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:221
+#: templates/taller/desarme/ver_vehiculo.html:193
+#: templates/taller/desarme/ver_vehiculo.html:205
+msgid "opcional"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:224
+msgid "Ej: mismo conector, verificar largo del cable..."
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:229
+#: templates/taller/desarme/pieza_form.html:233
+#: templates/taller/desarme/pieza_form.html:238
+#: templates/taller/desarme/vehiculo_form.html:247
+#: templates/taller/desarme/vehiculo_form.html:454
+#: templates/taller/desarme/ver_vehiculo.html:211
+#: templates/us/es/vehiculos/crear_vehiculo.html:496
+msgid "Cancelar"
+msgstr ""
+
+#: templates/taller/desarme/crear_interchange.html:230
+msgid "Guardar compatibilidad"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:8
+msgid "Yarda de desarmaduría · Gestión de vehículos y repuestos"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:237
+msgid "Nuevo vehículo"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:241
+#: templates/taller/desarme/lista_piezas.html:167
+#: templates/taller/desarme/lista_vehiculos.html:167
+#: templates/taller/desarme/lista_vehiculos_partial.html:34
+msgid "Nueva repuesto"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:253
+#: templates/taller/desarme/lista_piezas.html:151
+#: templates/taller/desarme/lista_vehiculos.html:87
+msgid "Ventas"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:254
+#: templates/taller/desarme/lista_piezas.html:152
+#: templates/taller/desarme/lista_vehiculos.html:88
+#, fuzzy
+#| msgid "Reports"
+msgid "Reportes"
+msgstr "Reportes"
+
+#: templates/taller/desarme/dashboard.html:255
+msgid "Catálogo"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:260
+#: templates/taller/desarme/dashboard.html:290
+#, fuzzy
+#| msgid "Active"
+msgid "Activas"
+msgstr "Activos"
+
+#: templates/taller/desarme/dashboard.html:267
+#, fuzzy
+#| msgid "Valor inventario"
+msgid "Inventario"
+msgstr "Valor inventario"
+
+#: templates/taller/desarme/dashboard.html:281
+msgid "Sin datos"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:286
+#: templates/taller/desarme/partials/_inventario_toolbar.html:28
+#: templates/taller/reportes/orden_trabajo.html:268
 msgid "Total"
 msgstr "Total"
 
-msgid "OTHER SERVICES"
-msgstr "OTROS SERVICIOS"
+#: templates/taller/desarme/dashboard.html:295
+#, fuzzy
+#| msgid "Vehículos agotados"
+msgid "Vehículos ingresados por mes"
+msgstr "Vehículos agotados"
 
-msgid "NOTES"
-msgstr "NOTAS"
+#: templates/taller/desarme/dashboard.html:301
+msgid "Sin ingresos en los últimos 6 meses"
+msgstr ""
 
-msgid "DOCUMENT TOTALS"
-msgstr "TOTALES DEL DOCUMENTO"
+#: templates/taller/desarme/dashboard.html:307
+msgid "Últimos vehículos"
+msgstr ""
 
-msgid "Apply all taxes"
-msgstr "Aplicar todos los impuestos"
+#: templates/taller/desarme/dashboard.html:317
+msgid "piezas"
+msgstr ""
 
-msgid "Other"
-msgstr "Otros"
+#: templates/taller/desarme/dashboard.html:318
+msgid "disp."
+msgstr ""
 
+#: templates/taller/desarme/dashboard.html:328
+#: templates/taller/desarme/lista_vehiculos.html:164
+#: templates/taller/desarme/lista_vehiculos_partial.html:31
+msgid "Ver"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:329
+#: templates/taller/desarme/lista_vehiculos.html:166
+#: templates/taller/desarme/lista_vehiculos_partial.html:33
+msgid "Vender repuestos"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:338
+msgid "Sin ventas"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:341
+msgid "vendido"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:351
+#: templates/taller/desarme/lista_interchange.html:202
+#: templates/taller/desarme/lista_vehiculos.html:176
+#: templates/taller/desarme/lista_vehiculos_partial.html:43
+msgid "Ver todos"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:353
+msgid "No hay vehículos"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:354
+#: templates/taller/desarme/lista_vehiculos.html:178
+#: templates/taller/desarme/lista_vehiculos_partial.html:45
+msgid "Crear el primero"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:358
+msgid "Últimas repuestos"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:362
+#: templates/taller/desarme/dashboard_financiero.html:38
+#: templates/taller/reportes/centro_contable_chile.html:812
+msgid "Código"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:362
+#: templates/taller/desarme/lista_piezas.html:190
+#: templates/taller/reportes/centro_contable_chile.html:747
+msgid "Estado"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:382
+#: templates/taller/desarme/partials/_lista_piezas_results.html:46
+msgid "Ver todas"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:384
+msgid "No hay repuestos registradas"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:385
+msgid "Registrar la primera"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:389
+msgid "Catálogo público"
+msgstr ""
+
+#: templates/taller/desarme/dashboard.html:409
+msgid "No se pudo generar el enlace público (slug no configurado)."
+msgstr ""
+
+#: templates/taller/desarme/dashboard_financiero.html:6
+msgid "Dashboard Financiero - Desarme"
+msgstr ""
+
+#: templates/taller/desarme/dashboard_financiero.html:10
+msgid "Inversión total"
+msgstr ""
+
+#: templates/taller/desarme/dashboard_financiero.html:14
+#: templates/taller/desarme/dashboard_financiero.html:38
+#: templates/taller/desarme/dashboard_financiero.html:57
+#: templates/taller/desarme/reportes.html:277
+msgid "Ingresos"
+msgstr ""
+
+#: templates/taller/desarme/dashboard_financiero.html:18
+msgid "Ganancia real"
+msgstr ""
+
+#: templates/taller/desarme/dashboard_financiero.html:22
+#, python-format
+msgid "Recuperación (%%)"
+msgstr ""
+
+#: templates/taller/desarme/dashboard_financiero.html:26
+#, python-format
+msgid "ROI (%%)"
+msgstr ""
+
+#: templates/taller/desarme/dashboard_financiero.html:30
+msgid "Inventario vivo"
+msgstr ""
+
+#: templates/taller/desarme/dashboard_financiero.html:35
+msgid "Top repuestos"
+msgstr ""
+
+#: templates/taller/desarme/dashboard_financiero.html:38
+msgid "Vendidas"
+msgstr ""
+
+#: templates/taller/desarme/dashboard_financiero.html:49
+#: templates/taller/desarme/dashboard_financiero.html:67
+#, fuzzy
+#| msgid "No technician data"
+msgid "No hay datos"
+msgstr "Sin datos de técnicos"
+
+#: templates/taller/desarme/dashboard_financiero.html:54
+msgid "Top vehículos"
+msgstr ""
+
+#: templates/taller/desarme/dashboard_financiero.html:57
+msgid "Patente / VIN"
+msgstr ""
+
+#: templates/taller/desarme/dashboard_financiero.html:57
+msgid "Repuestos vendidas"
+msgstr ""
+
+#: templates/taller/desarme/includes/subnav_desarme.html:22
+msgid "Ingresar Vehículo"
+msgstr ""
+
+#: templates/taller/desarme/includes/subnav_desarme.html:29
+msgid "Historial"
+msgstr ""
+
+#: templates/taller/desarme/inventario_inteligente.html:6
+#: templates/taller/desarme/partials/_inventario_toolbar.html:11
+#: templates/us/en/landing/usa_landing.html:131
+msgid "Inventario inteligente"
+msgstr ""
+
+#: templates/taller/desarme/inventario_inteligente.html:7
+msgid "Terminal de venta · busca, filtra y vende"
+msgstr ""
+
+#: templates/taller/desarme/lista_interchange.html:7
+msgid "Compatibilidad entre piezas de distintos vehículos"
+msgstr ""
+
+#: templates/taller/desarme/lista_interchange.html:134
+msgid "Pieza, marca, modelo..."
+msgstr ""
+
+#: templates/taller/desarme/lista_interchange.html:135
+#: templates/taller/desarme/lista_piezas.html:225
+#: templates/taller/desarme/reportes.html:96
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:209
+msgid "Filtrar"
+msgstr ""
+
+#: templates/taller/desarme/lista_interchange.html:137
+#: templates/taller/desarme/lista_piezas.html:227
+#: templates/taller/desarme/lista_vehiculos.html:124
+#: templates/taller/desarme/partials/_inventario_mobile_bar.html:43
+#: templates/taller/desarme/partials/_inventario_toolbar.html:97
+#: templates/taller/desarme/reportes.html:100
+msgid "Limpiar"
+msgstr ""
+
+#: templates/taller/desarme/lista_interchange.html:150
+msgid "Auto origen"
+msgstr ""
+
+#: templates/taller/desarme/lista_interchange.html:153
+#, fuzzy
+#| msgid "Configuración"
+msgid "Confirmaciones"
+msgstr "Configuración"
+
+#: templates/taller/desarme/lista_interchange.html:180
+msgid "¿Eliminar este registro?"
+msgstr ""
+
+#: templates/taller/desarme/lista_interchange.html:182
+msgid "Eliminar"
+msgstr ""
+
+#: templates/taller/desarme/lista_interchange.html:201
+msgid "Sin resultados para"
+msgstr ""
+
+#: templates/taller/desarme/lista_interchange.html:204
+msgid "Aún no hay compatibilidades registradas."
+msgstr ""
+
+#: templates/taller/desarme/lista_interchange.html:207
+msgid "Registrar primera compatibilidad"
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:9
+msgid "Repuestos extraídas de vehículos de desarme"
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:153
+#: templates/taller/desarme/lista_piezas.html:182
+#: templates/taller/desarme/lista_vehiculos.html:89
+#: templates/taller/desarme/lista_vehiculos.html:109
+msgid "Ver kiosko"
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:158
+msgid "Selecciona una pieza para agregarla al documento"
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:158
+msgid "Volver sin seleccionar"
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:171
+msgid "Pieza suelta"
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:188
+msgid "Código, nombre, marca o modelo..."
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:196
+msgid "Todos los vehículos"
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:204
+msgid "Toda condición"
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:210
+msgid "Zona..."
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:213
+msgid "Todo proveedor"
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:219
+msgid "Extraído desde"
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:220
+msgid "Extraído hasta"
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:222
+msgid "Costo mín."
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:223
+msgid "Costo máx."
+msgstr ""
+
+#: templates/taller/desarme/lista_piezas.html:233
+msgid "Generar PDF"
+msgstr ""
+
+#: templates/taller/desarme/lista_vehiculos.html:7
+#, fuzzy
+#| msgid "Vehículos agotados"
+msgid "Vehículos para desarme (yarda)"
+msgstr "Vehículos agotados"
+
+#: templates/taller/desarme/lista_vehiculos.html:97
+msgid "Nuevo vehículo desarme"
+msgstr ""
+
+#: templates/taller/desarme/lista_vehiculos.html:115
+msgid "Buscar por patente, VIN, marca, modelo..."
+msgstr ""
+
+#: templates/taller/desarme/lista_vehiculos.html:117
+msgid "Todos los estados"
+msgstr ""
+
+#: templates/taller/desarme/lista_vehiculos.html:146
+#: templates/taller/desarme/lista_vehiculos_partial.html:13
+msgid "Repuestos registradas"
+msgstr ""
+
+#: templates/taller/desarme/lista_vehiculos.html:146
+#: templates/taller/desarme/lista_vehiculos_partial.html:13
+msgid "repuestos"
+msgstr ""
+
+#: templates/taller/desarme/lista_vehiculos.html:159
+#: templates/taller/desarme/lista_vehiculos_partial.html:26
+msgid "Ingresos por repuestos vendidas menos costo del vehículo"
+msgstr ""
+
+#: templates/taller/desarme/lista_vehiculos.html:160
+#: templates/taller/desarme/lista_vehiculos_partial.html:27
+msgid "Ganancia"
+msgstr ""
+
+#: templates/taller/desarme/lista_vehiculos.html:165
+#: templates/taller/desarme/lista_vehiculos_partial.html:32
+#: templates/taller/desarme/partials/_inventario_grid.html:84
+#: templates/taller/desarme/partials/_lista_piezas_results.html:24
+msgid "Editar"
+msgstr ""
+
+#: templates/taller/desarme/lista_vehiculos.html:174
+#: templates/taller/desarme/lista_vehiculos_partial.html:41
+#: templates/taller/desarme/partials/_lista_piezas_results.html:44
+msgid "No hay resultados con los filtros aplicados."
+msgstr ""
+
+#: templates/taller/desarme/lista_vehiculos.html:174
+#: templates/taller/desarme/lista_vehiculos_partial.html:41
+msgid "No hay vehículos de desarme."
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_drawer.html:22
+#: templates/taller/desarme/partials/_inventario_sale_panel.html:8
+msgid "Panel de venta"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_drawer.html:23
+msgid "Venta activa"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_drawer.html:31
+#, fuzzy
+#| msgid "Cerrar sesión"
+msgid "Cerrar"
+msgstr "Cerrar sesión"
+
+#: templates/taller/desarme/partials/_inventario_drawer.html:38
+#: templates/taller/desarme/partials/_inventario_sale_panel.html:20
+msgid "Haz clic en las fichas para construir la venta."
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_drawer.html:56
+#: templates/taller/desarme/partials/_inventario_mobile_bar.html:80
+#: templates/taller/desarme/partials/_inventario_sale_panel.html:36
+msgid "Quitar"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_drawer.html:87
+msgid "Base"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_drawer.html:91
+msgid "Venta"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_drawer.html:95
+#: templates/taller/desarme/partials/_inventario_mobile_bar.html:110
+msgid "Línea"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_drawer.html:111
+#: templates/taller/desarme/partials/_inventario_sale_panel.html:65
+msgid "Cantidad total"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_drawer.html:115
+#, fuzzy
+#| msgid "Total clients"
+msgid "Total final"
+msgstr "Total de clientes"
+
+#: templates/taller/desarme/partials/_inventario_drawer.html:130
+#: templates/taller/desarme/partials/_inventario_mobile_bar.html:126
+#: templates/taller/desarme/partials/_inventario_sale_panel.html:84
+msgid "Crear venta"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_grid.html:4
+msgid "No hay repuestos con esos criterios."
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_grid.html:35
+#: templates/taller/desarme/ver_vehiculo.html:635
+msgid "Faltante"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_grid.html:36
+#: templates/taller/desarme/ver_vehiculo.html:634
+msgid "Dañada"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_grid.html:37
+#, fuzzy
+#| msgid "Stock"
+msgid "stock"
+msgstr "Stock"
+
+#: templates/taller/desarme/partials/_inventario_grid.html:38
+msgid "agotado"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_grid.html:46
+msgid "No disponible — faltante en inspección"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_grid.html:46
+msgid "No disponible — daño en inspección"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_grid.html:73
+msgid "Elegir"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_grid.html:74
+#: templates/taller/desarme/ver_vehiculo.html:363
+#, fuzzy
+#| msgid "Active"
+msgid "Activo"
+msgstr "Activos"
+
+#: templates/taller/desarme/partials/_inventario_mobile_bar.html:11
+msgid "seleccionados"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_mobile_bar.html:35
+msgid "Detalle"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_mobile_bar.html:53
+msgid "Ajustar y vender"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_mobile_bar.html:64
+msgid "No hay fichas seleccionadas."
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_sale_panel.html:9
+msgid "Selección activa"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_sale_panel.html:12
+msgid "items"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_sale_panel.html:42
+msgid "Precio"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:8
+msgid "Terminal de venta"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:20
+#: templates/taller/desarme/partials/_inventario_toolbar.html:111
+msgid "Visibles"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:24
+msgid "Seleccionados"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:37
+msgid "Búsqueda"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:45
+msgid "Nombre, código, categoría, ubicación…"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:65
+msgid "usar"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:74
+msgid "Orden"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:81
+msgid "Mayor stock"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:82
+msgid "Mayor precio"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:83
+msgid "Menor precio"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:89
+#: templates/taller/reportes/centro_contable_chile.html:788
+msgid "Acciones"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:104
+msgid "Vaciar"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:124
+msgid "Todas"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:141
+msgid "Con stock"
+msgstr ""
+
+#: templates/taller/desarme/partials/_inventario_toolbar.html:149
+#, fuzzy
+#| msgid "Stock"
+msgid "Sin stock"
+msgstr "Stock"
+
+#: templates/taller/desarme/partials/_lista_piezas_results.html:25
+msgid "Filtrar vehículo"
+msgstr ""
+
+#: templates/taller/desarme/partials/_lista_piezas_results.html:44
+msgid "No hay repuestos de desarme."
+msgstr ""
+
+#: templates/taller/desarme/partials/_lista_piezas_results.html:48
+msgid "Crear la primera"
+msgstr ""
+
+#: templates/taller/desarme/partials/_lista_piezas_results.html:50
+msgid "ir a vehículos"
+msgstr ""
+
+#: templates/taller/desarme/pieza_form.html:6
+msgid "Alta/edición de repuesto de desarme"
+msgstr ""
+
+#: templates/taller/desarme/pieza_form.html:111
+msgid "Centro de ventas"
+msgstr ""
+
+#: templates/taller/desarme/pieza_form.html:116
+msgid "Listado repuestos"
+msgstr ""
+
+#: templates/taller/desarme/pieza_form.html:127
+msgid "Vehículo e identificación"
+msgstr ""
+
+#: templates/taller/desarme/pieza_form.html:177
+msgid "Precios y estado"
+msgstr ""
+
+#: templates/taller/desarme/pieza_form.html:210
+#: templates/taller/desarme/pieza_form.html:252
+msgid "Más opciones (lado, zona, posición)"
+msgstr ""
+
+#: templates/taller/desarme/pieza_form.html:228
+#: templates/taller/desarme/vehiculo_form.html:450
+msgid "Guardar"
+msgstr ""
+
+#: templates/taller/desarme/pieza_form.html:249
+msgid "Ocultar opciones"
+msgstr ""
+
+#: templates/taller/desarme/reportes.html:88
+#: templates/taller/reportes/centro_contable_chile.html:592
+msgid "Desde"
+msgstr ""
+
+#: templates/taller/desarme/reportes.html:92
+#: templates/taller/reportes/centro_contable_chile.html:599
+msgid "Hasta"
+msgstr ""
+
+#: templates/taller/desarme/reportes.html:105
+msgid ""
+"Aplica solo a: top repuestos, top vehículos, top marcas, top modelos y top "
+"vendedores. Los demás indicadores (ROI, vehículos zombis, inventario muerto, "
+"proveedores, aging) son acumulados históricos y no se filtran por fecha."
+msgstr ""
+
+#: templates/taller/desarme/reportes.html:270
+msgid "Top vendedores"
+msgstr ""
+
+#: templates/taller/desarme/reportes.html:275
+msgid "Vendedor"
+msgstr ""
+
+#: templates/taller/desarme/reportes.html:276
+#, fuzzy
+#| msgid "Piezas vendidas hoy"
+msgid "Piezas vendidas"
+msgstr "Piezas vendidas hoy"
+
+#: templates/taller/desarme/reportes.html:291
+msgid "Sin ventas con vendedor registrado en este período."
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:6
+msgid "Alta/edición de vehículo para desarme"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:99
+#: templates/taller/desarme/ver_vehiculo.html:174
+msgid "Listado"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:131
+#, fuzzy
+#| msgid "Configuración"
+msgid "Identificación"
+msgstr "Configuración"
+
+#: templates/taller/desarme/vehiculo_form.html:134
+#: templates/taller/reportes/orden_trabajo.html:224
+#: templates/us/es/vehiculos/crear_vehiculo.html:418
+#, fuzzy
+#| msgid "Center"
+msgid "Patente"
+msgstr "Centro"
+
+#: templates/taller/desarme/vehiculo_form.html:144
+#: templates/taller/reportes/orden_trabajo.html:238
+#: templates/us/es/vehiculos/crear_vehiculo.html:434
+msgid "Año"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:158
+#: templates/taller/desarme/vehiculo_form.html:166
+#: templates/taller/desarme/vehiculo_form.html:181
+#: templates/taller/desarme/vehiculo_form.html:189
+#: templates/taller/desarme/vehiculo_form.html:197
+#: templates/taller/desarme/vehiculo_form.html:205
+#: templates/taller/desarme/vehiculo_form.html:638
+#: templates/us/es/vehiculos/crear_vehiculo.html:450
+#: templates/us/es/vehiculos/crear_vehiculo.html:474
+msgid "Agregar"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:175
+msgid "Especificaciones"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:178
+msgid "Motor"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:186
+msgid "Caja"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:194
+#: templates/us/en/vehiculos/detalle.html:97
+#: templates/us/en/vehiculos/editar.html:160
+msgid "Color"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:202
+msgid "Carrocería"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:216
+msgid "Ubicación física"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:225
+#, fuzzy
+#| msgid "Operation"
+msgid "Operación"
+msgstr "Operación"
+
+#: templates/taller/desarme/vehiculo_form.html:227
+#: templates/taller/reportes/orden_trabajo.html:183
+msgid "Fecha"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:229
+msgid "Comprado a"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:232
+#: templates/taller/desarme/vehiculo_form.html:237
+msgid "Nuevo vendedor"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:233
+msgid "+ Nuevo"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:243
+msgid "Lugar compra"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:246
+msgid "Crear"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:252
+msgid "Estado desarme"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:255
+msgid "Costo adq."
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:256
+msgid "Transporte/Grúa"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:257
+msgid "Otros gastos"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:261
+#: templates/taller/desarme/ver_vehiculo.html:205
+#: templates/taller/reportes/orden_trabajo.html:336
+msgid "Observaciones"
+msgstr ""
+
+#: templates/taller/desarme/vehiculo_form.html:638
+msgid "Seleccione un modelo primero"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:8
+msgid "Ficha de vehículo en desarme"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:178
+msgid "Editar vehículo"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:181
+msgid "Dar de baja"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:187
+msgid "Dar de baja el vehículo"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:188
+msgid ""
+"Esta acción marca el vehículo como inactivo. No se puede deshacer desde la "
+"UI."
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:193
+msgid "Monto venta chatarra"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:201
+msgid "Dejar en 0 si se desecha sin recuperar valor."
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:208
+msgid "Motivo de baja, destino del vehículo..."
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:212
+msgid "Confirmar baja"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:320
+#, fuzzy
+#| msgid "Vehículos agotados"
+msgid "Vehículo dado de baja"
+msgstr "Vehículos agotados"
+
+#: templates/taller/desarme/ver_vehiculo.html:322
+msgid "Fecha de baja:"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:324
+msgid "Chatarra:"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:326
+msgid "Vista de solo lectura."
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:361
+msgid "Dado de baja"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:366
+msgid "Solo superusuario"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:377
+msgid "Información de compra"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:380
+msgid "Proveedor"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:384
+msgid "Fecha de compra"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:388
+msgid "Costo total del vehículo"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:392
+msgid "Compra:"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:393
+msgid "Transporte/Grúa:"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:394
+msgid "Otros gastos:"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:399
+msgid "Ubicación"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:404
+msgid "Fecha de baja"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:407
+msgid "Monto chatarra"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:417
+#, fuzzy
+#| msgid "View Document"
+msgid "Ver documentos"
+msgstr "Ver Documento"
+
+#: templates/taller/desarme/ver_vehiculo.html:425
+msgid "Resumen de repuestos"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:430
+#, fuzzy
+#| msgid "Stock"
+msgid "En stock"
+msgstr "Stock"
+
+#: templates/taller/desarme/ver_vehiculo.html:439
+msgid "Vendidos"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:448
+msgid "Dañados"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:457
+msgid "Faltantes"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:466
+#, fuzzy
+#| msgid "Total strategic control"
+msgid "Total registrados:"
+msgstr "Control estratégico total"
+
+#: templates/taller/desarme/ver_vehiculo.html:469
+msgid "Sin repuestos registrados."
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:476
+msgid "Cierre financiero"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:480
+msgid "Costo total"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:484
+msgid "Total recaudado"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:492
+msgid "Ganancia final"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:492
+msgid "Ganancia neta"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:501
+msgid "Proyección total"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:506
+#, fuzzy
+#| msgid "Valor inventario"
+msgid "Valor chatarra"
+msgstr "Valor inventario"
+
+#: templates/taller/desarme/ver_vehiculo.html:511
+msgid "Proyección: si se vende todo el stock disponible al precio sugerido."
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:517
+msgid "Repuestos recientes"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:540
+msgid "Sin repuestos registrados aún."
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:545
+msgid "Ir a repuestos completos"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:631
+msgid "Disponible"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:632
+msgid "Reservada"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:633
+msgid "Vendida / Facturada"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:636
+msgid "Sin stock / Scrap"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:639
+msgid "En Patio - Montada"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:640
+msgid "En Bodega / Estante"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:641
+msgid "En tránsito"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:642
+msgid "En instalación externa"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:645
+msgid "Desarme original"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:646
+msgid "Compra externa / Tercero"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:647
+msgid "Compra externa de yarda"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:648
+msgid "Recompra / Devolución"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:688
+msgid "Pieza sin nombre"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:701
+msgid "Cambiar estado / Marcar extraída"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:702
+msgid "Cambiar estado"
+msgstr ""
+
+#: templates/taller/desarme/ver_vehiculo.html:800
+#, fuzzy
+#| msgid "Piezas inventariadas"
+msgid "piezas sincronizadas"
+msgstr "Piezas inventariadas"
+
+#: templates/taller/desarme/ver_vehiculo.html:804
+msgid "No se pudo cargar el mapa"
+msgstr ""
+
+#: templates/taller/registro_exitoso.html:8
+msgid "¡Ya casi llegamos!"
+msgstr ""
+
+#: templates/taller/registro_exitoso.html:10
+msgid "Bienvenido"
+msgstr ""
+
+#: templates/taller/registro_exitoso.html:10
+msgid "El registro para"
+msgstr ""
+
+#: templates/taller/registro_exitoso.html:10
+msgid "ha sido un éxito."
+msgstr ""
+
+#: templates/taller/registro_exitoso.html:14
+msgid "¿Qué sigue?"
+msgstr ""
+
+#: templates/taller/registro_exitoso.html:17
+msgid "Hemos enviado un correo electrónico"
+msgstr ""
+
+#: templates/taller/registro_exitoso.html:17
+msgid ""
+"con tus credenciales de acceso y los pasos iniciales para configurar tu "
+"taller."
+msgstr ""
+
+#: templates/taller/registro_exitoso.html:20
+msgid ""
+"Si no lo ves en unos minutos, revisa tu carpeta de Correos no deseados "
+"(SPAM)."
+msgstr ""
+
+#: templates/taller/registro_exitoso.html:26
+#, fuzzy
+#| msgid "Iniciar sesión"
+msgid "Ir al Inicio de Sesión"
+msgstr "Iniciar sesión"
+
+#: templates/taller/reportes/centro_contable_chile.html:6
+#: templates/taller/reportes/centro_contable_chile.html:553
+msgid "Centro Contable – Contador Virtual"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:554
+msgid "Todo lo que tu contador necesita, ordenado por eGarage en 3 clics."
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:561
+msgid "Filtros"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:566
+msgid "Empresa"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:575
+msgid "Período"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:579
+msgid "Mes Actual"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:582
+msgid "Mes Anterior"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:585
+msgid "Año Actual"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:605
+msgid "Actualizar Resumen"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:613
+#, python-format
+msgid "Estado contable del período: %(score)s%% listo"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:615
+#, python-format
+msgid "%(count)s documento en borrador"
+msgid_plural "%(count)s documentos en borrador"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/taller/reportes/centro_contable_chile.html:616
+#, python-format
+msgid "%(count)s documento sin RUT de cliente"
+msgid_plural "%(count)s documentos sin RUT de cliente"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/taller/reportes/centro_contable_chile.html:631
+msgid "Listo"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:642
+msgid "Neto afecto (Repuestos)"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:645
+#, python-format
+msgid "Base imponible 19%% (según líneas de repuestos)"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:651
+msgid "Neto exento (Servicios)"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:654
+msgid "Servicios sin IVA (regla Chile actual de eGarage)"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:660
+msgid "IVA del período"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:663
+#, python-format
+msgid "Cálculo automático 19%% sobre neto afecto"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:669
+#, fuzzy
+#| msgid "Total clients"
+msgid "Total Ventas"
+msgstr "Total de clientes"
+
+#: templates/taller/reportes/centro_contable_chile.html:672
+msgid "Neto afecto + exento + IVA"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:681
+msgid "Estos montos son la base sugerida para el IVA ventas del período."
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:681
+msgid "Tu contador puede usar directamente los PDF/Excel de abajo."
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:686
+#: templates/taller/reportes/centro_contable_chile.html:992
+msgid "Ventas Diarias"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:695
+msgid "Libro de Ventas eGarage"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:701
+#, fuzzy
+#| msgid "Today's documents"
+msgid "Tipo de documento"
+msgstr "Documentos de hoy"
+
+#: templates/taller/reportes/centro_contable_chile.html:704
+#: templates/taller/reportes/centro_contable_chile.html:755
+msgid "Factura"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:705
+#: templates/taller/reportes/centro_contable_chile.html:756
+msgid "Boleta"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:706
+#: templates/taller/reportes/centro_contable_chile.html:757
+#, fuzzy
+#| msgid "Center"
+msgid "Interno"
+msgstr "Centro"
+
+#: templates/taller/reportes/centro_contable_chile.html:712
+msgid "Incluir anulados"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:716
+msgid "Solo emitidos"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:724
+msgid "PDF Libro de Ventas"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:727
+msgid "Excel Libro de Ventas"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:729
+msgid ""
+"Incluye resumen IVA, libro de ventas, repuestos vendidos y servicios "
+"realizados."
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:730
+msgid "Pack para Contador (ZIP)"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:738
+#, fuzzy
+#| msgid "Cerrar sesión"
+msgid "Fecha emisión"
+msgstr "Cerrar sesión"
+
+#: templates/taller/reportes/centro_contable_chile.html:739
+msgid "Tipo doc"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:740
+msgid "N° doc eGarage"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:741
+#, fuzzy
+#| msgid "Total clients"
+msgid "RUT cliente"
+msgstr "Total de clientes"
+
+#: templates/taller/reportes/centro_contable_chile.html:742
+#, fuzzy
+#| msgid "New client"
+msgid "Nombre cliente"
+msgstr "Nuevo cliente"
+
+#: templates/taller/reportes/centro_contable_chile.html:743
+msgid "Neto afecto"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:744
+msgid "Neto exento"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:745
+#: templates/taller/reportes/orden_trabajo.html:326
+msgid "IVA"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:746
+#, fuzzy
+#| msgid "Digital documents"
+msgid "Total documento"
+msgstr "Documentos digitales"
+
+#: templates/taller/reportes/centro_contable_chile.html:760
+msgid "Sin número"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:762
+#, fuzzy
+#| msgid "New client"
+msgid "Sin cliente"
+msgstr "Nuevo cliente"
+
+#: templates/taller/reportes/centro_contable_chile.html:768
+msgid "Emitido"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:769
+msgid "Anulado"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:770
+msgid "Borrador"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:777
+msgid "No hay documentos en el período seleccionado"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:790
+msgid "Volver a Reportes"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:799
+msgid "Repuestos vendidos en el período"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:802
+#: templates/taller/reportes/centro_contable_chile.html:843
+msgid "PDF"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:805
+#: templates/taller/reportes/centro_contable_chile.html:846
+msgid "Excel"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:815
+#, fuzzy
+#| msgid "Total"
+msgid "Neto Total"
+msgstr "Total"
+
+#: templates/taller/reportes/centro_contable_chile.html:822
+#: templates/taller/reportes/centro_contable_chile.html:861
+msgid "Sin nombre"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:829
+msgid "No hay repuestos en el período"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:840
+msgid "Servicios realizados en el período"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:853
+#, fuzzy
+#| msgid "No service data"
+msgid "Nombre servicio"
+msgstr "Sin datos de servicios"
+
+#: templates/taller/reportes/centro_contable_chile.html:855
+#, fuzzy
+#| msgid "Total"
+msgid "Monto Total"
+msgstr "Total"
+
+#: templates/taller/reportes/centro_contable_chile.html:868
+msgid "No hay servicios en el período"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:879
+msgid "Alertas contables del período"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:883
+msgid "Críticas:"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:894
+#, python-format
+msgid "Ver Doc #%(id)s"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:898
+#: templates/taller/reportes/centro_contable_chile.html:924
+#, python-format
+msgid "y %(count)s más..."
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:909
+msgid "Advertencias:"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:935
+msgid "Info:"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:951
+msgid "Todo en orden"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:953
+msgid "No se detectaron problemas en el período."
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:1051
+msgid "Función de exportación PDF Libro de Ventas en desarrollo"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:1055
+msgid "Función de exportación Excel Libro de Ventas en desarrollo"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:1059
+msgid "Función de exportación Pack para Contador (ZIP) en desarrollo"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:1063
+msgid "Función de exportación PDF Repuestos en desarrollo"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:1067
+msgid "Función de exportación Excel Repuestos en desarrollo"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:1071
+msgid "Función de exportación PDF Servicios en desarrollo"
+msgstr ""
+
+#: templates/taller/reportes/centro_contable_chile.html:1075
+msgid "Función de exportación Excel Servicios en desarrollo"
+msgstr ""
+
+#: templates/taller/reportes/orden_trabajo.html:22
+msgid "Página"
+msgstr ""
+
+#: templates/taller/reportes/orden_trabajo.html:22
+#, fuzzy
+#| msgid "Code"
+msgid "de"
+msgstr "Código"
+
+#: templates/taller/reportes/orden_trabajo.html:169
+msgid "ORDEM DE SERVIÇO"
+msgstr ""
+
+#: templates/taller/reportes/orden_trabajo.html:171
+msgid "WORK ORDER"
+msgstr ""
+
+#: templates/taller/reportes/orden_trabajo.html:173
+msgid "ORDEN DE TRABAJO"
+msgstr ""
+
+#: templates/taller/reportes/orden_trabajo.html:179
+msgid "Número"
+msgstr ""
+
+#: templates/taller/reportes/orden_trabajo.html:188
+msgid "Datos del Cliente"
+msgstr ""
+
+#: templates/taller/reportes/orden_trabajo.html:217
+msgid "Datos del Vehículo"
+msgstr ""
+
+#: templates/taller/reportes/orden_trabajo.html:222
+msgid "Placa"
+msgstr ""
+
+#: templates/taller/reportes/orden_trabajo.html:245
+#: templates/us/en/vehiculos/detalle.html:150
+msgid "Mileage"
+msgstr "Kilometraje"
+
+#: templates/taller/reportes/orden_trabajo.html:247
+msgid "Kilometraje"
+msgstr "Kilometraje"
+
+#: templates/taller/reportes/orden_trabajo.html:261
+msgid "Detalle de Servicios"
+msgstr ""
+
+#: templates/taller/reportes/orden_trabajo.html:265
+msgid "Descripción"
+msgstr ""
+
+#: templates/taller/reportes/orden_trabajo.html:267
+msgid "Precio Unitario"
+msgstr ""
+
+#: templates/taller/reportes/orden_trabajo.html:285
+msgid "Peças de Reposição"
+msgstr ""
+
+#: templates/taller/reportes/orden_trabajo.html:311
 msgid "TOTAL"
 msgstr "TOTAL"
 
-msgid "Search client"
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:7
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:162
+msgid "Reportes de Mecánicos"
+msgstr ""
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:164
+msgid "Sistema de análisis de rendimiento técnico"
+msgstr ""
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:178
+msgid "Todos los técnicos"
+msgstr ""
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:191
+msgid "Fecha inicio"
+msgstr ""
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:200
+msgid "Fecha fin"
+msgstr ""
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:220
+msgid "Exportar a Excel"
+msgstr ""
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:230
+msgid "Rendimiento por Técnico"
+msgstr ""
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:241
+#, fuzzy
+#| msgid "Documents"
+msgid "Documentos"
+msgstr "Documentos"
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:242
+#, fuzzy
+#| msgid "Servicios hoy"
+msgid "Total Servicios"
+msgstr "Servicios hoy"
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:243
+#, fuzzy
+#| msgid "Total clients"
+msgid "Total Repuestos"
+msgstr "Total de clientes"
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:244
+#, fuzzy
+#| msgid "Total clients"
+msgid "Total General"
+msgstr "Total de clientes"
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:245
+msgid "Promedio por Doc"
+msgstr ""
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:289
+msgid "No hay datos para mostrar en el período seleccionado"
+msgstr ""
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:292
+msgid "Intenta ajustar los filtros o el rango de fechas"
+msgstr ""
+
+#: templates/taller/reportes/reportes_mecanicos_i18n.html:323
+msgid "Total Facturado"
+msgstr ""
+
+#: templates/taller/us/en/auth/login.html:88
+msgid "Create account"
+msgstr ""
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:7
+#, fuzzy
+#| msgid "Settings Center"
+msgid "Operations Center"
+msgstr "Centro de Configuración"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:332
+msgid "Setup"
+msgstr ""
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:336
+#: templates/taller/us/en/dashboard/centro_operaciones.html:338
+#: templates/us/en/vehiculos/detalle.html:215
+msgid "Company"
+msgstr ""
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:342
+#: templates/taller/us/en/dashboard/centro_operaciones.html:344
+#, fuzzy
+#| msgid "No technician data"
+msgid "Technician"
+msgstr "Sin datos de técnicos"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:348
+#: templates/taller/us/en/dashboard/centro_operaciones.html:350
+#: templates/us/en/vehiculos/editar.html:60
+#, fuzzy
+#| msgid "Clients"
+msgid "Client"
+msgstr "Clientes"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:354
+#: templates/taller/us/en/dashboard/centro_operaciones.html:356
+#: templates/taller/us/en/desarme/lista_vehiculos.html:67
+#, fuzzy
+#| msgid "Vehicles"
+msgid "Vehicle"
+msgstr "Vehículos"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:375
+msgid "Docs Today"
+msgstr ""
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:379
+msgid "Docs Week"
+msgstr ""
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:383
+msgid "Sales Today"
+msgstr ""
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:387
+#, fuzzy
+#| msgid "Salesperson"
+msgid "Sales Month"
+msgstr "Vendedor"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:391
+#, fuzzy
+#| msgid "Clients"
+msgid "Clients Week"
+msgstr "Clientes"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:395
+#, fuzzy
+#| msgid "Active"
+msgid "Active Tech"
+msgstr "Activos"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:406
+#, fuzzy
+#| msgid "Operation"
+msgid "Operational Summary"
+msgstr "Operación"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:409
+#, fuzzy
+#| msgid "Pending Quotes"
+msgid "Pending"
+msgstr "Presupuestos Pendientes"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:413
+msgid "In Progress"
+msgstr ""
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:417
+#, fuzzy
+#| msgid "Month Invoices"
+msgid "Invoices"
+msgstr "Facturas del Mes"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:421
+#, fuzzy
+#| msgid "Average Ticket"
+msgid "Avg Ticket"
+msgstr "Ticket Promedio"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:425
+#, fuzzy
+#| msgid "Conversion Rate"
+msgid "Conversion"
+msgstr "Tasa de Conversión"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:429
+#, fuzzy
+#| msgid "Projected Revenue"
+msgid "Projected"
+msgstr "Ingresos Proyectados"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:437
+msgid "Top 30 days"
+msgstr ""
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:441
+msgid "Services"
+msgstr "Servicios"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:448
+#: templates/taller/us/en/dashboard/centro_operaciones.html:462
+#, fuzzy
+#| msgid "No service data"
+msgid "No data"
+msgstr "Sin datos de servicios"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:453
+#, fuzzy
+#| msgid "No technician data"
+msgid "Technicians"
+msgstr "Sin datos de técnicos"
+
+#: templates/taller/us/en/dashboard/centro_operaciones.html:475
+msgid "Revenue trend"
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:4
+msgid "Dismantling - Vehicles List"
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:15
+#, fuzzy
+#| msgid "Vehicle Control"
+msgid "Vehicles for Dismantling"
+msgstr "Control de Vehículos"
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:16
+msgid "Manage vehicles in stock, in dismantling process, and extracted parts."
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:20
+#, fuzzy
+#| msgid "Vehicle Control"
+msgid "New Vehicle Entry"
+msgstr "Control de Vehículos"
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:32
+msgid "VIN, License Plate, Make, Model..."
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:35
+#: templates/taller/us/en/desarme/lista_vehiculos.html:70
+#, fuzzy
+#| msgid "Payment Status"
+msgid "Status"
+msgstr "Estado de Pago"
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:37
+#, fuzzy
+#| msgid "All modules"
+msgid "All Statuses"
+msgstr "Todos los módulos"
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:38
+msgid "Received"
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:39
+#, fuzzy
+#| msgid "Orders in Process"
+msgid "In Process"
+msgstr "Órdenes en Proceso"
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:40
+msgid "Fully Dismantled"
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:41
+msgid "Scrapped / Discarded"
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:50
+msgid "Filter"
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:52
+msgid "Clear"
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:68
+msgid "License Plate / VIN"
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:69
+msgid "Entry Date"
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:71
+#, fuzzy
+#| msgid "Parts Store"
+msgid "Parts Extracted"
+msgstr "Casa de Repuestos"
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:72
+#, fuzzy
+#| msgid "Active"
+msgid "Actions"
+msgstr "Activos"
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:95
+#, fuzzy
+#| msgid "Parts"
+msgid "parts"
+msgstr "Repuestos"
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:100
+msgid "View details"
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:103
+msgid "Extract parts"
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:116
+msgid "No vehicles found for dismantling."
+msgstr ""
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:127
+#, fuzzy
+#| msgid "Vehicle Control"
+msgid "Vehicles pagination"
+msgstr "Control de Vehículos"
+
+#: templates/taller/us/en/desarme/lista_vehiculos.html:132
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:280
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:159
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:159
+msgid "Previous"
+msgstr ""
+
+#: templates/taller/us/en/vehiculos/editar_vehiculo.html:6
+#: templates/us/en/vehiculos/editar_vehiculo.html:6
+msgid "Edit Vehicle USA"
+msgstr ""
+
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:5
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:5
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:5
+msgid "Vehicles"
+msgstr "Vehículos"
+
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:38
+#: templates/taller/us/es/vehiculos/vehiculo_list.html:33
+msgid "Manage your vehicle fleet"
+msgstr ""
+
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:51
+#: templates/taller/us/es/vehiculos/vehiculo_list.html:47
+msgid "Add new vehicle"
+msgstr ""
+
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:96
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:80
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:80
+#, fuzzy
+#| msgid "Search by code or name..."
+msgid "Search by license plate, brand, model..."
+msgstr "Buscar por código o nombre..."
+
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:103
+msgid "All Brands"
+msgstr ""
+
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:110
+#, fuzzy
+#| msgid "All modules"
+msgid "All Models"
+msgstr "Todos los módulos"
+
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:117
+#, fuzzy
+#| msgid "All modules"
+msgid "All Years"
+msgstr "Todos los módulos"
+
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:233
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:123
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:123
+msgid "Get started by adding your first vehicle to the system."
+msgstr ""
+
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:245
+#: templates/taller/us/es/vehiculos/vehiculo_list.html:142
+msgid "Add your first vehicle"
+msgstr ""
+
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:249
+#: templates/taller/us/es/vehiculos/vehiculo_list.html:146
+msgid "Add First Vehicle"
+msgstr ""
+
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:267
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:145
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:145
+msgid "records"
+msgstr ""
+
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:314
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:191
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:191
+msgid "Confirm Deletion"
+msgstr ""
+
+#: templates/taller/us/en/vehiculos/lista_vehiculos.html:315
+#: templates/taller/us/es/vehiculos/vehiculo_list_simple.html:192
+#: templates/us/en/vehiculos/vehiculo_list_simple.html:192
+msgid "Are you sure you want to delete the vehicle"
+msgstr ""
+
+#: templates/taller/us/es/auth/signup.html:287
+msgid "FREE"
+msgstr ""
+
+#: templates/taller/us/es/auth/signup.html:290
+msgid "days"
+msgstr ""
+
+#: templates/taller/us/es/auth/signup.html:292
+msgid "Full access"
+msgstr ""
+
+#: templates/taller/us/es/auth/signup.html:293
+msgid "Sin tarjeta"
+msgstr ""
+
+#: templates/taller/us/es/auth/signup.html:294
+msgid "Cancela cuando quieras"
+msgstr ""
+
+#: templates/taller/us/es/auth/signup.html:302
+msgid "1 user"
+msgstr ""
+
+#: templates/taller/us/es/auth/signup.html:303
+#, fuzzy
+#| msgid "All modules"
+msgid "All features"
+msgstr "Todos los módulos"
+
+#: templates/taller/us/es/auth/signup.html:307
+#: templates/taller/us/es/auth/signup.html:318
+msgid "Save with annual"
+msgstr ""
+
+#: templates/taller/us/es/auth/signup.html:311
+#: templates/taller/us/es/auth/signup.html:322
+msgid "Save"
+msgstr ""
+
+#: templates/taller/us/es/auth/signup.html:313
+#, fuzzy
+#| msgid "Everything from Monthly plan"
+msgid "Everything in Entry"
+msgstr "Todo del plan Mensual"
+
+#: templates/taller/us/es/auth/signup.html:314
+msgid "Priority support"
+msgstr "Soporte priorizado"
+
+#: templates/taller/us/es/auth/signup.html:324
+#, fuzzy
+#| msgid "Everything from Monthly plan"
+msgid "Everything in Growth"
+msgstr "Todo del plan Mensual"
+
+#: templates/taller/us/es/auth/signup.html:325
+msgid "Best value"
+msgstr ""
+
+#: templates/taller/us/es/vehiculos/editar_vehiculo.html:6
+#: templates/us/es/vehiculos/editar_vehiculo.html:6
+msgid "Editar vehículo USA"
+msgstr ""
+
+#: templates/taller/us/es/vehiculos/vehiculo_list.html:31
+#, fuzzy
+#| msgid "Vehicles"
+msgid "Vehicle List"
+msgstr "Vehículos"
+
+#: templates/taller/us/es/vehiculos/vehiculo_list.html:84
+#, fuzzy
+#| msgid "View Document"
+msgid "View Details"
+msgstr "Ver Documento"
+
+#: templates/taller/us/es/vehiculos/vehiculo_list.html:85
+msgid "View vehicle details"
+msgstr ""
+
+#: templates/taller/us/es/vehiculos/vehiculo_list.html:91
+#, fuzzy
+#| msgid "Vehicles"
+msgid "Edit vehicle"
+msgstr "Vehículos"
+
+#: templates/taller/us/es/vehiculos/vehiculo_list.html:131
+msgid "Start by adding your first vehicle to the system"
+msgstr ""
+
+#: templates/us/en/clientes/lista_clientes.html:7
+#, fuzzy
+#| msgid "Clients"
+msgid "Clients USA"
+msgstr "Clientes"
+
+#: templates/us/en/documentos/crear_documento.html:18
+#, fuzzy
+#| msgid "View Document"
+msgid "New document"
+msgstr "Ver Documento"
+
+#: templates/us/en/documentos/editar_documento.html:12
+#, fuzzy
+#| msgid "Digital documents"
+msgid "Edit document"
+msgstr "Documentos digitales"
+
+#: templates/us/en/documentos/lista_documentos.html:9
+#, fuzzy
+#| msgid "Documents"
+msgid "Documents (USA)"
+msgstr "Documentos"
+
+#: templates/us/en/landing/usa_landing.html:6
+msgid "TallerPro USA - Suscripción | Software para Talleres"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:113
+msgid "La plataforma más avanzada para talleres en USA"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:114
+msgid ""
+"Descubre TallerPro USA: software profesional para talleres técnicos en "
+"Estados Unidos. Prueba gratis, planes flexibles, testimonios y soporte "
+"bilingüe. Sin compromiso, sin letra chica."
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:116
+msgid "Virtudes"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:117
+msgid "Planes"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:118
+msgid "Testimonios"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:119
+msgid "Prueba Gratis"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:124
+msgid "Virtudes de TallerPro USA"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:127
+#, fuzzy
+#| msgid "Digital documents"
+msgid "Gestión integral de documentos"
+msgstr "Documentos digitales"
+
+#: templates/us/en/landing/usa_landing.html:128
+msgid "Presupuestos, órdenes de trabajo y facturas en segundos."
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:132
+msgid "Control visual y automático de repuestos y precios."
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:135
+msgid "Reportes avanzados"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:136
+msgid "Ventas, ganancias y ranking de servicios en tiempo real."
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:141
+msgid "Planes de Suscripción"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:144
+msgid "1 mes"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:146
+msgid "Acceso total, sin límite de usuarios ni documentos."
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:149
+msgid "6 meses"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:151
+#, python-format
+msgid "Ahorra 10%%. Acceso total, soporte prioritario."
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:154
+msgid "1 año"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:156
+#, python-format
+msgid "Ahorra 20%%. Acceso total, soporte premium."
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:160
+msgid "Comenzar Prueba Gratis"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:164
+msgid "Testimonios de Usuarios"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:167
+msgid ""
+"Antes usábamos Excel y papel... ahora todo está automatizado. ¡Un cambio "
+"total para nuestro taller!"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:167
+msgid "Taller Don Luis, Atlanta GA"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:170
+msgid ""
+"El soporte en español e inglés nos ayudó a migrar rápido. Recomendado para "
+"cualquier taller en USA."
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:170
+msgid "AutoPro Miami FL"
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:173
+msgid ""
+"La prueba gratis nos convenció. Ahora gestionamos todo digital y los "
+"clientes lo notan."
+msgstr ""
+
+#: templates/us/en/landing/usa_landing.html:173
+msgid "Speed Garage, Dallas TX"
+msgstr ""
+
+#: templates/us/en/vehiculos/crear_vehiculo.html:7
+#, fuzzy
+#| msgid "Vehicles"
+msgid "Create Vehicle"
+msgstr "Vehículos"
+
+#: templates/us/en/vehiculos/crear_vehiculo.html:8
+#: templates/us/es/vehiculos/crear_vehiculo.html:8
+#, fuzzy
+#| msgid "Advanced vehicle management system"
+msgid "Add a new vehicle to the system"
+msgstr "Sistema avanzado de gestión de vehículos"
+
+#: templates/us/en/vehiculos/detalle.html:26
+#, fuzzy
+#| msgid "Vehicles"
+msgid "Vehicle Details"
+msgstr "Vehículos"
+
+#: templates/us/en/vehiculos/detalle.html:28
+#, fuzzy
+#| msgid "Document Information"
+msgid "Complete vehicle information"
+msgstr "Información del Documento"
+
+#: templates/us/en/vehiculos/detalle.html:63
+msgid "Vehicle Overview"
+msgstr ""
+
+#: templates/us/en/vehiculos/detalle.html:68
+#: templates/us/en/vehiculos/editar.html:102
+msgid "Brand"
+msgstr ""
+
+#: templates/us/en/vehiculos/detalle.html:75
+#: templates/us/en/vehiculos/editar.html:115
+msgid "Model"
+msgstr ""
+
+#: templates/us/en/vehiculos/detalle.html:87
+#: templates/us/en/vehiculos/editar.html:131
+msgid "License Plate"
+msgstr ""
+
+#: templates/us/en/vehiculos/detalle.html:92
+#: templates/us/en/vehiculos/editar.html:144
+#: templates/us/es/vehiculos/crear_vehiculo.html:426
+msgid "VIN"
+msgstr ""
+
+#: templates/us/en/vehiculos/detalle.html:112
+msgid "Technical Specifications"
+msgstr ""
+
+#: templates/us/en/vehiculos/detalle.html:117
+#: templates/us/en/vehiculos/editar.html:173
+msgid "Engine"
+msgstr ""
+
+#: templates/us/en/vehiculos/detalle.html:128
+#: templates/us/en/vehiculos/editar.html:186
+msgid "Transmission"
+msgstr ""
+
+#: templates/us/en/vehiculos/detalle.html:139
+msgid "Registration Date"
+msgstr ""
+
+#: templates/us/en/vehiculos/detalle.html:144
+#, fuzzy
+#| msgid "Last 7 days"
+msgid "Last Updated"
+msgstr "Últimos 7 días"
+
+#: templates/us/en/vehiculos/detalle.html:151
+msgid "miles"
+msgstr ""
+
+#: templates/us/en/vehiculos/detalle.html:167
+#: templates/us/en/vehiculos/editar.html:213
+#, fuzzy
+#| msgid "Operation"
+msgid "Observations"
+msgstr "Operación"
+
+#: templates/us/en/vehiculos/detalle.html:189
+#: templates/us/en/vehiculos/editar.html:54
+#, fuzzy
+#| msgid "Document Information"
+msgid "Client Information"
+msgstr "Información del Documento"
+
+#: templates/us/en/vehiculos/detalle.html:194
+msgid "Name"
+msgstr ""
+
+#: templates/us/en/vehiculos/detalle.html:232
+msgid "Quick Actions"
+msgstr ""
+
+#: templates/us/en/vehiculos/detalle.html:239
+#: templates/us/en/vehiculos/editar.html:26
+#, fuzzy
+#| msgid "Vehicles"
+msgid "Edit Vehicle"
+msgstr "Vehículos"
+
+#: templates/us/en/vehiculos/detalle.html:245
+#, fuzzy
+#| msgid "Vehicles"
+msgid "View All Vehicles"
+msgstr "Vehículos"
+
+#: templates/us/en/vehiculos/detalle_vehiculo.html:6
+msgid "Vehicle Details USA"
+msgstr ""
+
+#: templates/us/en/vehiculos/editar.html:28
+msgid "Update vehicle information"
+msgstr ""
+
+#: templates/us/en/vehiculos/editar.html:81
+#, fuzzy
+#| msgid "Vehicles"
+msgid "Vehicle Data"
+msgstr "Vehículos"
+
+#: templates/us/en/vehiculos/editar.html:207
+#, fuzzy
+#| msgid "Document Information"
+msgid "Additional Information"
+msgstr "Información del Documento"
+
+#: templates/us/en/vehiculos/editar.html:236
+#, fuzzy
+#| msgid "Vehicles"
+msgid "Update Vehicle"
+msgstr "Vehículos"
+
+#: templates/us/en/vehiculos/editar.html:247
+msgid "Vehicle update form"
+msgstr ""
+
+#: templates/us/en/vehiculos/lista_vehiculos.html:8
+#, fuzzy
+#| msgid "Vehicles"
+msgid "Vehicles USA"
+msgstr "Vehículos"
+
+#: templates/us/es/clientes/lista_clientes.html:7
+#, fuzzy
+#| msgid "Clients"
+msgid "Clientes USA"
+msgstr "Clientes"
+
+#: templates/us/es/documentos/crear_documento.html:12
+msgid "Crear documento USA"
+msgstr ""
+
+#: templates/us/es/documentos/editar_documento.html:11
+#, fuzzy
+#| msgid "Digital documents"
+msgid "Editar documento USA"
+msgstr "Documentos digitales"
+
+#: templates/us/es/vehiculos/crear_vehiculo.html:7
+#: templates/us/es/vehiculos/crear_vehiculo.html:492
+msgid "Crear Vehículo"
+msgstr ""
+
+#: templates/us/es/vehiculos/crear_vehiculo.html:15
+msgid "Volver a la lista"
+msgstr ""
+
+#: templates/us/es/vehiculos/crear_vehiculo.html:410
+#, fuzzy
+#| msgid "Clients"
+msgid "Cliente"
+msgstr "Clientes"
+
+#: templates/us/es/vehiculos/crear_vehiculo.html:449
+#, fuzzy
+#| msgid "Agregar nuevo color..."
+msgid "Agregar nueva marca"
+msgstr "Agregar nuevo color..."
+
+#: templates/us/es/vehiculos/crear_vehiculo.html:460
+msgid "Ingresa el nombre de la nueva marca"
+msgstr ""
+
+#: templates/us/es/vehiculos/crear_vehiculo.html:473
+#, fuzzy
+#| msgid "Agregar nuevo color..."
+msgid "Agregar nuevo modelo"
+msgstr "Agregar nuevo color..."
+
+#: templates/us/es/vehiculos/crear_vehiculo.html:484
+msgid "Ingresa el nombre del nuevo modelo"
+msgstr ""
+
+#: templates/us/es/vehiculos/detalle_vehiculo.html:6
+msgid "Detalle vehículo USA"
+msgstr ""
+
+#: templates/us/es/vehiculos/lista_vehiculos.html:8
+#, fuzzy
+#| msgid "Vehículos agotados"
+msgid "Vehículos USA"
+msgstr "Vehículos agotados"
+
+#: templates/uy/es/clientes/crear_cliente.html:6
+#, fuzzy
+#| msgid "Search client"
+msgid "Crear cliente Chile"
 msgstr "Buscar cliente"
 
-msgid "Type at least 2 characters to search"
-msgstr "Escriba al menos 2 caracteres para buscar"
+#: templates/uy/es/clientes/editar_cliente.html:6
+msgid "Editar Cliente"
+msgstr ""
 
-msgid "Close"
-msgstr "Cerrar"
+#: templates/uy/es/clientes/lista_clientes.html:7
+#, fuzzy
+#| msgid "Clients"
+msgid "Clientes Chile"
+msgstr "Clientes"
 
-msgid "Searching..."
-msgstr "Buscando..."
+#: templates/ve/es/clientes/crear_cliente.html:6
+msgid "Crear cliente Venezuela"
+msgstr ""
 
-msgid "Server error"
-msgstr "Error del servidor"
+#: templates/ve/es/clientes/editar_cliente.html:6
+msgid "Editar cliente Venezuela"
+msgstr ""
 
-msgid "Document paid"
-msgstr "Documento pagado"
+#: templates/ve/es/clientes/lista_clientes.html:7
+#, fuzzy
+#| msgid "Clientes este mes"
+msgid "Clientes Venezuela"
+msgstr "Clientes este mes"
 
-msgid "Document Type is required"
-msgstr "El tipo de documento es obligatorio"
+#: templates/ve/es/vehiculos/crear_vehiculo.html:6
+msgid "Crear vehículo Venezuela"
+msgstr ""
 
-msgid "Service"
-msgstr "Servicio"
+#: templates/ve/es/vehiculos/detalle_vehiculo.html:6
+msgid "Detalle vehículo Venezuela"
+msgstr ""
 
-msgid "Click + Add to add services, then type to search."
-msgstr "Haz clic en + Agregar para añadir servicios, luego escribe para buscar."
+#: templates/ve/es/vehiculos/editar_vehiculo.html:6
+msgid "Editar vehículo Venezuela"
+msgstr ""
 
-msgid "Click + Add for external/outsourced services."
-msgstr "Haz clic en + Agregar para servicios externos."
+#: templates/ve/es/vehiculos/lista_vehiculos.html:8
+#, fuzzy
+#| msgid "Vehículos disponibles"
+msgid "Vehículos Venezuela"
+msgstr "Vehículos disponibles"
 
-msgid "Auto-saved"
-msgstr "Guardado automático"
+#: templates/ve/es/vehiculos/lista_vehiculos.html:13
+msgid "Sistema avanzado de gestión de vehículos"
+msgstr ""
+
+#: ubicacion/models.py:31
+msgid "Dirección Línea 1"
+msgstr ""
+
+#: ubicacion/models.py:34
+msgid "Dirección Línea 2"
+msgstr ""
+
+#: ubicacion/models.py:46
+msgid "Ciudad"
+msgstr ""
+
+#: ubicacion/models.py:52
+msgid "Código Postal"
+msgstr ""
+
+#: ubicacion/models.py:61
+msgid "Latitud"
+msgstr ""
+
+#: ubicacion/models.py:69
+msgid "Longitud"
+msgstr ""
+
+#: ubicacion/models.py:78
+msgid "Fecha de Creación"
+msgstr ""
+
+#: ubicacion/models.py:79
+msgid "Fecha de Actualización"
+msgstr ""
+
+#: ubicacion/models.py:83
+msgid "Direcciones"
+msgstr ""
+
+#~ msgid "Iniciar sesión o registrarse"
+#~ msgstr "Iniciar sesión o registrarse"
+
+#~ msgid "Sectors We Empower"
+#~ msgstr "Sectores que potenciamos"
+
+#~ msgid "Auto Repair Shop"
+#~ msgstr "Taller Mecánico"
+
+#~ msgid "Tire & Vulcanization"
+#~ msgstr "Vulcanización y Neumáticos"
+
+#~ msgid "Paint & Body Shop"
+#~ msgstr "Pintura y Hojalatería"
+
+#~ msgid "Simple Plans, No Fine Print"
+#~ msgstr "Planes simples y sin letra chica"
+
+#~ msgid "Monthly"
+#~ msgstr "Mensual"
+
+#~ msgid "Semi-Annual"
+#~ msgstr "Semestral"
+
+#~ msgid "Annual"
+#~ msgstr "Anual"
+
+#~ msgid "Real Stories from Real Shops"
+#~ msgstr "Historias reales de talleres reales"
+
+#~ msgid "Higher average revenue"
+#~ msgstr "Mayor facturación promedio"
+
+#~ msgid "Less time in reception"
+#~ msgstr "Menos tiempo en recepción"
+
+#~ msgid "Customer satisfaction"
+#~ msgstr "Satisfacción de clientes"
+
+#~ msgid "Language"
+#~ msgstr "Idioma"
+
+#~ msgid "Add new body type..."
+#~ msgstr "Agregar nuevo tipo de carrocería..."
+
+#~ msgid "Start Now"
+#~ msgstr "Comenzar Ahora"
+
+#~ msgid "Start Free Trial"
+#~ msgstr "Comenzar Prueba Gratuita"
+
+#~ msgid "See Pricing"
+#~ msgstr "Ver Precios"
+
+#~ msgid "Recommended"
+#~ msgstr "Recomendado"
+
+#~ msgid "Choose Semi-Annual"
+#~ msgstr "Elegir Semestral"
+
+#~ msgid "Choose Annual"
+#~ msgstr "Elegir Anual"
+
+#~ msgid "per month"
+#~ msgstr "por mes"
+
+#~ msgid "every 6 months"
+#~ msgstr "cada 6 meses"
+
+#~ msgid "per year"
+#~ msgstr "por año"
+
+#~ msgid "Unlimited users"
+#~ msgstr "Usuarios ilimitados"
+
+#~ msgid "Bilingual support"
+#~ msgstr "Soporte bilingüe"
+
+#~ msgid "Automatic reminders"
+#~ msgstr "Recordatorios automáticos"
+
+#~ msgid "Profit reports"
+#~ msgstr "Reportes de utilidad"
+
+#~ msgid "Everything from Semi-Annual plan"
+#~ msgstr "Todo del plan Semestral"
+
+#~ msgid "Volume discounts"
+#~ msgstr "Descuentos por volumen"
+
+#~ msgid ""
+#~ "Work orders, reception checklists, technician times and performance "
+#~ "tracking."
+#~ msgstr ""
+#~ "Órdenes de trabajo, checklist de recepción, tiempos y desempeño por "
+#~ "técnico."
+
+#~ msgid ""
+#~ "Rotation, balancing, tire set history, stock alerts and quick quotes."
+#~ msgstr ""
+#~ "Rotación, balanceo, historial por juego, alertas de stock y cotizaciones "
+#~ "rápidas."
+
+#~ msgid ""
+#~ "Process stages, materials per job, before/after photos and estimates."
+#~ msgstr ""
+#~ "Etapas del proceso, materiales por trabajo, fotos antes/después y "
+#~ "presupuestos."
+
+#~ msgid ""
+#~ "Catalog, part numbers, margins, sales and digital document integration."
+#~ msgstr ""
+#~ "Catálogo, part number, márgenes, ventas e integración con documentos "
+#~ "digitales."
+
+#~ msgid ""
+#~ "This software changed how we work; now everything is tracked and we get "
+#~ "paid faster."
+#~ msgstr ""
+#~ "Este software cambió cómo trabajamos; ahora todo queda trazado y cobramos "
+#~ "más rápido."
+
+#~ msgid "Bilingual support and quick migration. Perfect for growing shops."
+#~ msgstr ""
+#~ "Soporte bilingüe y migración rápida. Ideal para talleres que crecen."
+
+#~ msgid ""
+#~ "The free trial convinced us. Now everything is digital and customers "
+#~ "notice."
+#~ msgstr ""
+#~ "La prueba gratis nos convenció. Hoy todo es digital y los clientes lo "
+#~ "notan."
+
+#~ msgid "Command Center"
+#~ msgstr "Centro de Comando"
+
+#~ msgid "TACTICAL INTELLIGENCE"
+#~ msgstr "INTELIGENCIA TÁCTICA"
+
+#~ msgid "COMMAND CENTER"
+#~ msgstr "CENTRO DE COMANDO"
+
+#~ msgid "REPORTS"
+#~ msgstr "REPORTES"
+
+#~ msgid "ADVANCED AI"
+#~ msgstr "IA AVANZADA"
+
+#~ msgid "BUSINESS INTEL"
+#~ msgstr "INTELIGENCIA DE NEGOCIOS"
+
+#~ msgid "Unified strategic analysis"
+#~ msgstr "Análisis estratégico unificado"
+
+#~ msgid "Predictive operational AI"
+#~ msgstr "IA operativa predictiva"
+
+#~ msgid "TECHNICAL PERSONNEL"
+#~ msgstr "PERSONAL TÉCNICO"
+
+#~ msgid "Individual analysis"
+#~ msgstr "Análisis individual"
+
+#~ msgid "DOC ENGINE"
+#~ msgstr "MOTOR DE DOCUMENTOS"
+
+#~ msgid "Digital Workflow"
+#~ msgstr "Flujo de Trabajo Digital"
+
+#~ msgid "AI document management"
+#~ msgstr "Gestión de documentos con IA"
+
+#~ msgid "CLIENT MATRIX"
+#~ msgstr "MATRIZ DE CLIENTES"
+
+#~ msgid "360° Database"
+#~ msgstr "Base de Datos 360°"
+
+#~ msgid "Relational ecosystem"
+#~ msgstr "Ecosistema relacional"
+
+#~ msgid "FLEET CMD"
+#~ msgstr "COMANDO DE FLOTA"
+
+#~ msgid "Smart vehicle system"
+#~ msgstr "Sistema inteligente de vehículos"
+
+#~ msgid "PARTS"
+#~ msgstr "REPUESTOS"
+
+#~ msgid "Parts Management"
+#~ msgstr "Gestión de Repuestos"
+
+#~ msgid "Parts inventory"
+#~ msgstr "Inventario de repuestos"
+
+#~ msgid "SERVICE CORE"
+#~ msgstr "NÚCLEO DE SERVICIOS"
+
+#~ msgid "Service Center"
+#~ msgstr "Centro de Servicios"
+
+#~ msgid "Service management"
+#~ msgstr "Gestión de servicios"
+
+#~ msgid "SYSTEM CORE"
+#~ msgstr "NÚCLEO DEL SISTEMA"
+
+#~ msgid "USA TEMPLATE - FIXED URL"
+#~ msgstr "PLANTILLA USA - URL CORREGIDA"
+
+#~ msgid "SMART MOSAIC - WINDOWS STYLE"
+#~ msgstr "MOSAICO INTELIGENTE - ESTILO WINDOWS"
+
+#~ msgid "OPERATIONAL INCOME"
+#~ msgstr "INGRESOS OPERACIONALES"
+
+#~ msgid "TOP SERVICES"
+#~ msgstr "SERVICIOS PRINCIPALES"
+
+#~ msgid "DOCS TODAY"
+#~ msgstr "DOCUMENTOS HOY"
+
+#~ msgid "CUSTOMERS"
+#~ msgstr "CLIENTES"
+
+#~ msgid "TECHNICIAN PRODUCTIVITY"
+#~ msgstr "PRODUCTIVIDAD DE TÉCNICOS"
+
+#~ msgid "OPERATIONAL METRICS"
+#~ msgstr "MÉTRICAS OPERACIONALES"
+
+#~ msgid "Today's revenue"
+#~ msgstr "Ingresos de hoy"
+
+#~ msgid "EFFICIENCY METRICS"
+#~ msgstr "MÉTRICAS DE EFICIENCIA"
+
+#~ msgid "SERVICES"
+#~ msgstr "SERVICIOS"
+
+#~ msgid "VEHICLES"
+#~ msgstr "VEHÍCULOS"
+
+#~ msgid "SETTINGS"
+#~ msgstr "CONFIGURACIÓN"
+
+#~ msgid "CENTER"
+#~ msgstr "CENTRO"
+
+#~ msgid "DOCUMENTS"
+#~ msgstr "DOCUMENTOS"
+
+#~ msgid "LOGOUT"
+#~ msgstr "CERRAR SESIÓN"
+
+#~ msgid "AJUSTES"
+#~ msgstr "CONFIGURACIÓN"
+
+#~ msgid "SALIR"
+#~ msgstr "CERRAR SESIÓN"
+
+#~ msgid "EXTRA"
+#~ msgstr "EXTRA"
+
+#~ msgid "Extra"
+#~ msgstr "Extra"
+
+#~ msgid "Used Parts"
+#~ msgstr "Piezas Usadas"
+
+#~ msgid "from disassembly yard"
+#~ msgstr "de yarda de desarme"
+
+#~ msgid "MISSION COMMAND PANEL"
+#~ msgstr "PANEL DE COMANDO DE MISIÓN"
+
+#~ msgid "EFFICIENCY"
+#~ msgstr "EFICIENCIA"
+
+#~ msgid "SYSTEM"
+#~ msgstr "SISTEMA"
+
+#~ msgid "ONLINE"
+#~ msgstr "EN LÍNEA"
+
+#~ msgid "DOCS WEEK"
+#~ msgstr "DOCS SEMANA"
+
+#~ msgid "SALES TODAY"
+#~ msgstr "VENTAS HOY"
+
+#~ msgid "MONTH SALES"
+#~ msgstr "VENTAS DEL MES"
+
+#~ msgid "This month"
+#~ msgstr "Este mes"
+
+#~ msgid "ACTIVE CLIENTS"
+#~ msgstr "CLIENTES ACTIVOS"
+
+#~ msgid "TECHNICIANS"
+#~ msgstr "TÉCNICOS"
+
+#~ msgid "DOCUMENT STATUS"
+#~ msgstr "ESTADO DE DOCUMENTOS"
+
+#~ msgid "Brands Served"
+#~ msgstr "Marcas Atendidas"
+
+#~ msgid "AI PROJECTIONS"
+#~ msgstr "PROYECCIONES IA"
+
+#~ msgid "Projected Docs/Month"
+#~ msgstr "Docs Proyectados/Mes"
+
+#~ msgid "TOP TECHNICIANS"
+#~ msgstr "TOP TÉCNICOS"
+
+#~ msgid "ALERTS & OPPORTUNITIES"
+#~ msgstr "ALERTAS Y OPORTUNIDADES"
+
+#~ msgid "Part Sale"
+#~ msgstr "Venta de Repuestos"
+
+#~ msgid "EDIT DOCUMENT"
+#~ msgstr "EDITAR DOCUMENTO"
+
+#~ msgid "Document No."
+#~ msgstr "Documento N°"
+
+#~ msgid "Document Type"
+#~ msgstr "Tipo de Documento"
+
+#~ msgid "Will be generated automatically"
+#~ msgstr "Se generará automáticamente"
+
+#~ msgid "Validation errors"
+#~ msgstr "Errores de validación"
+
+#~ msgid "Date"
+#~ msgstr "Fecha"
+
+#~ msgid "Part sale only"
+#~ msgstr "Solo venta de repuestos"
+
+#~ msgid "CLIENT"
+#~ msgstr "CLIENTE"
+
+#~ msgid "VEHICLE"
+#~ msgstr "VEHÍCULO"
+
+#~ msgid "USED PARTS"
+#~ msgstr "PIEZAS USADAS"
+
+#~ msgid "ADD"
+#~ msgstr "AGREGAR"
+
+#~ msgid "Used"
+#~ msgstr "Usado"
+
+#~ msgid "Part name"
+#~ msgstr "Nombre de repuesto"
+
+#~ msgid "Qty"
+#~ msgstr "Cant."
+
+#~ msgid "Price"
+#~ msgstr "Precio"
+
+#~ msgid "OTHER SERVICES"
+#~ msgstr "OTROS SERVICIOS"
+
+#~ msgid "NOTES"
+#~ msgstr "NOTAS"
+
+#~ msgid "DOCUMENT TOTALS"
+#~ msgstr "TOTALES DEL DOCUMENTO"
+
+#~ msgid "Apply all taxes"
+#~ msgstr "Aplicar todos los impuestos"
+
+#~ msgid "Other"
+#~ msgstr "Otros"
+
+#~ msgid "Type at least 2 characters to search"
+#~ msgstr "Escriba al menos 2 caracteres para buscar"
+
+#~ msgid "Close"
+#~ msgstr "Cerrar"
+
+#~ msgid "Server error"
+#~ msgstr "Error del servidor"
+
+#~ msgid "Document paid"
+#~ msgstr "Documento pagado"
+
+#~ msgid "Document Type is required"
+#~ msgstr "El tipo de documento es obligatorio"
+
+#~ msgid "Service"
+#~ msgstr "Servicio"
+
+#~ msgid "Click + Add to add services, then type to search."
+#~ msgstr ""
+#~ "Haz clic en + Agregar para añadir servicios, luego escribe para buscar."
+
+#~ msgid "Click + Add for external/outsourced services."
+#~ msgstr "Haz clic en + Agregar para servicios externos."
+
+#~ msgid "Auto-saved"
+#~ msgstr "Guardado automático"
 
 # ---------------------------------------------------------------------------
 # Workspace UI 2.0 — Terminología por producto (claves semánticas)
 # ---------------------------------------------------------------------------
-
 # -- Taller: marca --
-msgid "workspace.taller.brand.name"
-msgstr "eGarage Taller"
+#~ msgid "workspace.taller.brand.name"
+#~ msgstr "eGarage Taller"
 
-msgid "workspace.taller.brand.tagline"
-msgstr "Gestión integral de tu taller"
+#~ msgid "workspace.taller.brand.tagline"
+#~ msgstr "Gestión integral de tu taller"
 
 # -- Taller: navegación --
-msgid "workspace.taller.nav.home"
-msgstr "Inicio"
+#~ msgid "workspace.taller.nav.home"
+#~ msgstr "Inicio"
 
-msgid "workspace.taller.nav.documents"
-msgstr "Presupuestos/OT"
+#~ msgid "workspace.taller.nav.documents"
+#~ msgstr "Presupuestos/OT"
 
-msgid "workspace.taller.nav.vehicles"
-msgstr "Vehículos"
+#~ msgid "workspace.taller.nav.vehicles"
+#~ msgstr "Vehículos"
 
-msgid "workspace.taller.nav.clients"
-msgstr "Clientes"
+#~ msgid "workspace.taller.nav.clients"
+#~ msgstr "Clientes"
 
-msgid "workspace.taller.nav.services"
-msgstr "Servicios"
+#~ msgid "workspace.taller.nav.services"
+#~ msgstr "Servicios"
 
-msgid "workspace.taller.nav.parts"
-msgstr "Repuestos"
+#~ msgid "workspace.taller.nav.parts"
+#~ msgstr "Repuestos"
 
-msgid "workspace.taller.nav.fleet"
-msgstr "Flota"
+#~ msgid "workspace.taller.nav.fleet"
+#~ msgstr "Flota"
 
-msgid "workspace.taller.nav.reports"
-msgstr "Reportes"
+#~ msgid "workspace.taller.nav.reports"
+#~ msgstr "Reportes"
 
-msgid "workspace.taller.nav.settings"
-msgstr "Configuración"
+#~ msgid "workspace.taller.nav.settings"
+#~ msgstr "Configuración"
 
 # -- Taller: acciones --
-msgid "workspace.taller.action.new_document"
-msgstr "Nueva OT"
+#~ msgid "workspace.taller.action.new_document"
+#~ msgstr "Nueva OT"
 
-msgid "workspace.taller.action.new_vehicle"
-msgstr "Nuevo Vehículo"
+#~ msgid "workspace.taller.action.new_vehicle"
+#~ msgstr "Nuevo Vehículo"
 
-msgid "workspace.taller.action.new_client"
-msgstr "Nuevo Cliente"
+#~ msgid "workspace.taller.action.new_client"
+#~ msgstr "Nuevo Cliente"
 
 # -- Desarmaduría: marca --
-msgid "workspace.desarm.brand.name"
-msgstr "eGarage Desarmaduría"
+#~ msgid "workspace.desarm.brand.name"
+#~ msgstr "eGarage Desarmaduría"
 
-msgid "workspace.desarm.brand.tagline"
-msgstr "Control total de tu desarmaduría"
+#~ msgid "workspace.desarm.brand.tagline"
+#~ msgstr "Control total de tu desarmaduría"
 
 # -- Desarmaduría: navegación --
-msgid "workspace.desarm.nav.home"
-msgstr "Inicio"
+#~ msgid "workspace.desarm.nav.home"
+#~ msgstr "Inicio"
 
-msgid "workspace.desarm.nav.vehicles"
-msgstr "Vehículos de Desarme"
+#~ msgid "workspace.desarm.nav.vehicles"
+#~ msgstr "Vehículos de Desarme"
 
-msgid "workspace.desarm.nav.parts"
-msgstr "Inventario de desarme"
+#~ msgid "workspace.desarm.nav.parts"
+#~ msgstr "Inventario de desarme"
 
-msgid "workspace.desarm.nav.documents"
-msgstr "Ventas de desarme"
+#~ msgid "workspace.desarm.nav.documents"
+#~ msgstr "Ventas de desarme"
 
-msgid "workspace.desarm.nav.clients"
-msgstr "Clientes"
+#~ msgid "workspace.desarm.nav.clients"
+#~ msgstr "Clientes"
 
-msgid "workspace.desarm.nav.reports"
-msgstr "Reportes"
+#~ msgid "workspace.desarm.nav.reports"
+#~ msgstr "Reportes"
 
-msgid "workspace.desarm.nav.settings"
-msgstr "Configuración"
+#~ msgid "workspace.desarm.nav.settings"
+#~ msgstr "Configuración"
 
 # -- Desarmaduría: acciones --
-msgid "workspace.desarm.action.new_vehicle"
-msgstr "Ingresar Vehículo"
+#~ msgid "workspace.desarm.action.new_vehicle"
+#~ msgstr "Ingresar Vehículo"
 
-msgid "workspace.desarm.action.new_sale"
-msgstr "Registrar Venta"
+#~ msgid "workspace.desarm.action.new_sale"
+#~ msgstr "Registrar Venta"
 
-msgid "workspace.desarm.action.view_inventory"
-msgstr "Ver Inventario"
+#~ msgid "workspace.desarm.action.view_inventory"
+#~ msgstr "Ver Inventario"
 
 # -- Casa de Repuestos: marca --
-msgid "workspace.parts.brand.name"
-msgstr "eGarage Casa de repuestos"
+#~ msgid "workspace.parts.brand.name"
+#~ msgstr "eGarage Casa de repuestos"
 
-msgid "workspace.parts.brand.tagline"
-msgstr "Tu casa de repuestos digitalizada"
+#~ msgid "workspace.parts.brand.tagline"
+#~ msgstr "Tu casa de repuestos digitalizada"
 
 # -- Casa de Repuestos: navegación --
-msgid "workspace.parts.nav.home"
-msgstr "Inicio"
+#~ msgid "workspace.parts.nav.home"
+#~ msgstr "Inicio"
 
-msgid "workspace.parts.nav.parts"
-msgstr "Inventario de repuestos"
+#~ msgid "workspace.parts.nav.parts"
+#~ msgstr "Inventario de repuestos"
 
-msgid "workspace.parts.nav.documents"
-msgstr "Ventas de repuestos"
+#~ msgid "workspace.parts.nav.documents"
+#~ msgstr "Ventas de repuestos"
 
-msgid "workspace.parts.nav.clients"
-msgstr "Clientes"
+#~ msgid "workspace.parts.nav.clients"
+#~ msgstr "Clientes"
 
-msgid "workspace.parts.nav.reports"
-msgstr "Reportes"
+#~ msgid "workspace.parts.nav.reports"
+#~ msgstr "Reportes"
 
-msgid "workspace.parts.nav.settings"
-msgstr "Configuración"
+#~ msgid "workspace.parts.nav.settings"
+#~ msgstr "Configuración"
 
 # -- Casa de Repuestos: acciones --
-msgid "workspace.parts.action.new_sale"
-msgstr "Nueva Venta"
+#~ msgid "workspace.parts.action.new_sale"
+#~ msgstr "Nueva Venta"
 
-msgid "workspace.parts.action.new_quote"
-msgstr "Nueva Cotización"
+#~ msgid "workspace.parts.action.new_quote"
+#~ msgstr "Nueva Cotización"
 
-msgid "workspace.parts.action.new_parts_sale"
-msgstr "Nueva Venta"
+#~ msgid "workspace.parts.action.new_parts_sale"
+#~ msgstr "Nueva Venta"
 
-msgid "workspace.parts.action.add_part"
-msgstr "Agregar Repuesto"
+#~ msgid "workspace.parts.action.add_part"
+#~ msgstr "Agregar Repuesto"
 
-msgid "workspace.parts.action.view_inventory"
-msgstr "Ver Inventario"
+#~ msgid "workspace.parts.action.view_inventory"
+#~ msgstr "Ver Inventario"
 
 # -- Reciclaje: marca --
-msgid "workspace.recycling.brand.name"
-msgstr "eGarage Reciclaje"
+#~ msgid "workspace.recycling.brand.name"
+#~ msgstr "eGarage Reciclaje"
 
-msgid "workspace.recycling.brand.tagline"
-msgstr "Compra y control de catalíticos, chatarra y metales"
+#~ msgid "workspace.recycling.brand.tagline"
+#~ msgstr "Compra y control de catalíticos, chatarra y metales"
 
 # -- Reciclaje: navegación --
-msgid "workspace.recycling.nav.home"
-msgstr "Inicio"
+#~ msgid "workspace.recycling.nav.home"
+#~ msgstr "Inicio"
 
-msgid "workspace.recycling.nav.purchases"
-msgstr "Compras"
+#~ msgid "workspace.recycling.nav.purchases"
+#~ msgstr "Compras"
 
-msgid "workspace.recycling.nav.clients"
-msgstr "Clientes"
+#~ msgid "workspace.recycling.nav.clients"
+#~ msgstr "Clientes"
 
-msgid "workspace.recycling.nav.reports"
-msgstr "Reportes"
+#~ msgid "workspace.recycling.nav.reports"
+#~ msgstr "Reportes"
 
-msgid "workspace.recycling.nav.settings"
-msgstr "Configuración"
+#~ msgid "workspace.recycling.nav.settings"
+#~ msgstr "Configuración"
 
 # -- Reciclaje: acciones --
-msgid "workspace.recycling.action.new_purchase"
-msgstr "Nueva Compra"
+#~ msgid "workspace.recycling.action.new_purchase"
+#~ msgstr "Nueva Compra"
 
-msgid "workspace.recycling.action.view_stock"
-msgstr "Ver Stock"
+#~ msgid "workspace.recycling.action.view_stock"
+#~ msgstr "Ver Stock"
 
-msgid "workspace.recycling.action.view_reports"
-msgstr "Reportes"
+#~ msgid "workspace.recycling.action.view_reports"
+#~ msgstr "Reportes"
 
 # -- Carwash: marca --
-msgid "workspace.carwash.brand.name"
-msgstr "eGarage Carwash"
+#~ msgid "workspace.carwash.brand.name"
+#~ msgstr "eGarage Carwash"
 
-msgid "workspace.carwash.brand.tagline"
-msgstr "Gestión simple para tu carwash"
+#~ msgid "workspace.carwash.brand.tagline"
+#~ msgstr "Gestión simple para tu carwash"
 
 # -- Carwash: navegación --
-msgid "workspace.carwash.nav.home"
-msgstr "Inicio"
+#~ msgid "workspace.carwash.nav.home"
+#~ msgstr "Inicio"
 
-msgid "workspace.carwash.nav.documents"
-msgstr "Caja"
+#~ msgid "workspace.carwash.nav.documents"
+#~ msgstr "Caja"
 
-msgid "workspace.carwash.nav.clients"
-msgstr "Clientes"
+#~ msgid "workspace.carwash.nav.clients"
+#~ msgstr "Clientes"
 
-msgid "workspace.carwash.nav.services"
-msgstr "Servicios"
+#~ msgid "workspace.carwash.nav.services"
+#~ msgstr "Servicios"
 
-msgid "workspace.carwash.nav.reports"
-msgstr "Reportes"
+#~ msgid "workspace.carwash.nav.reports"
+#~ msgstr "Reportes"
 
-msgid "workspace.carwash.nav.settings"
-msgstr "Configuración"
+#~ msgid "workspace.carwash.nav.settings"
+#~ msgstr "Configuración"
 
 # -- Carwash: acciones --
-msgid "workspace.carwash.action.new_service"
-msgstr "Registrar Servicio"
+#~ msgid "workspace.carwash.action.new_service"
+#~ msgstr "Registrar Servicio"
 
-msgid "workspace.carwash.action.new_client"
-msgstr "Nuevo Cliente"
+#~ msgid "workspace.carwash.action.new_client"
+#~ msgstr "Nuevo Cliente"
 
 # -- Textos contextuales de UI (workspace.texts) --
-msgid "workspace.taller.texts.search_title"
-msgstr "Buscar vehículo o cliente"
+#~ msgid "workspace.taller.texts.search_title"
+#~ msgstr "Buscar vehículo o cliente"
 
-msgid "workspace.taller.texts.search_label"
-msgstr "Vehículo o cliente"
+#~ msgid "workspace.taller.texts.search_label"
+#~ msgstr "Vehículo o cliente"
 
-msgid "workspace.taller.texts.search_placeholder"
-msgstr "Busca patente, VIN, nombre, teléfono o correo"
+#~ msgid "workspace.taller.texts.search_placeholder"
+#~ msgstr "Busca patente, VIN, nombre, teléfono o correo"
 
-msgid "workspace.taller.texts.search_hint"
-msgstr "la acción que más vas a usar, todo el día"
+#~ msgid "workspace.taller.texts.search_hint"
+#~ msgstr "la acción que más vas a usar, todo el día"
 
-msgid "workspace.taller.texts.live_title"
-msgstr "centro de mando"
+#~ msgid "workspace.taller.texts.live_title"
+#~ msgstr "centro de mando"
 
-msgid "workspace.taller.texts.live_metric"
-msgstr "en el taller"
+#~ msgid "workspace.taller.texts.live_metric"
+#~ msgstr "en el taller"
 
-msgid "workspace.taller.texts.quick_actions"
-msgstr "Accesos rápidos"
+#~ msgid "workspace.taller.texts.quick_actions"
+#~ msgstr "Accesos rápidos"
 
-msgid "workspace.taller.texts.activity_feed"
-msgstr "Actividad reciente"
+#~ msgid "workspace.taller.texts.activity_feed"
+#~ msgstr "Actividad reciente"
 
-msgid "workspace.desarm.texts.search_title"
-msgstr "Buscar vehículo de desarme"
+#~ msgid "workspace.desarm.texts.search_title"
+#~ msgstr "Buscar vehículo de desarme"
 
-msgid "workspace.desarm.texts.search_label"
-msgstr "Vehículo o pieza"
+#~ msgid "workspace.desarm.texts.search_label"
+#~ msgstr "Vehículo o pieza"
 
-msgid "workspace.desarm.texts.search_placeholder"
-msgstr "Busca patente, marca, modelo o número de pieza"
+#~ msgid "workspace.desarm.texts.search_placeholder"
+#~ msgstr "Busca patente, marca, modelo o número de pieza"
 
-msgid "workspace.desarm.texts.search_hint"
-msgstr "localiza cada vehículo o pieza al instante"
+#~ msgid "workspace.desarm.texts.search_hint"
+#~ msgstr "localiza cada vehículo o pieza al instante"
 
-msgid "workspace.desarm.texts.live_title"
-msgstr "centro de mando"
+#~ msgid "workspace.desarm.texts.live_title"
+#~ msgstr "centro de mando"
 
-msgid "workspace.desarm.texts.live_metric"
-msgstr "vehículos en desarme"
+#~ msgid "workspace.desarm.texts.live_metric"
+#~ msgstr "vehículos en desarme"
 
-msgid "workspace.desarm.texts.quick_actions"
-msgstr "Accesos rápidos"
+#~ msgid "workspace.desarm.texts.quick_actions"
+#~ msgstr "Accesos rápidos"
 
-msgid "workspace.desarm.texts.activity_feed"
-msgstr "Movimientos recientes"
+#~ msgid "workspace.desarm.texts.activity_feed"
+#~ msgstr "Movimientos recientes"
 
-msgid "workspace.parts.texts.search_title"
-msgstr "Buscar repuesto"
+#~ msgid "workspace.parts.texts.search_title"
+#~ msgstr "Buscar repuesto"
 
-msgid "workspace.parts.texts.search_label"
-msgstr "Repuesto o cliente"
+#~ msgid "workspace.parts.texts.search_label"
+#~ msgstr "Repuesto o cliente"
 
-msgid "workspace.parts.texts.search_placeholder"
-msgstr "Busca por código, SKU, nombre o proveedor"
+#~ msgid "workspace.parts.texts.search_placeholder"
+#~ msgstr "Busca por código, SKU, nombre o proveedor"
 
-msgid "workspace.parts.texts.search_hint"
-msgstr "tu inventario en tiempo real"
+#~ msgid "workspace.parts.texts.search_hint"
+#~ msgstr "tu inventario en tiempo real"
 
-msgid "workspace.parts.texts.live_title"
-msgstr "centro de operaciones"
+#~ msgid "workspace.parts.texts.live_title"
+#~ msgstr "centro de operaciones"
 
-msgid "workspace.parts.texts.live_metric"
-msgstr "productos críticos"
+#~ msgid "workspace.parts.texts.live_metric"
+#~ msgstr "productos críticos"
 
-msgid "workspace.parts.texts.quick_actions"
-msgstr "Acciones rápidas"
+#~ msgid "workspace.parts.texts.quick_actions"
+#~ msgstr "Acciones rápidas"
 
-msgid "workspace.parts.texts.activity_feed"
-msgstr "Movimientos recientes"
+#~ msgid "workspace.parts.texts.activity_feed"
+#~ msgstr "Movimientos recientes"
 
-msgid "workspace.carwash.texts.search_title"
-msgstr "Buscar cliente o vehículo"
+#~ msgid "workspace.carwash.texts.search_title"
+#~ msgstr "Buscar cliente o vehículo"
 
-msgid "workspace.carwash.texts.search_label"
-msgstr "Cliente o vehículo"
+#~ msgid "workspace.carwash.texts.search_label"
+#~ msgstr "Cliente o vehículo"
 
-msgid "workspace.carwash.texts.search_placeholder"
-msgstr "Busca nombre, patente, teléfono"
+#~ msgid "workspace.carwash.texts.search_placeholder"
+#~ msgstr "Busca nombre, patente, teléfono"
 
-msgid "workspace.carwash.texts.search_hint"
-msgstr "registra servicios al instante"
+#~ msgid "workspace.carwash.texts.search_hint"
+#~ msgstr "registra servicios al instante"
 
-msgid "workspace.carwash.texts.live_title"
-msgstr "caja del día"
+#~ msgid "workspace.carwash.texts.live_title"
+#~ msgstr "caja del día"
 
-msgid "workspace.carwash.texts.live_metric"
-msgstr "servicios hoy"
+#~ msgid "workspace.carwash.texts.live_metric"
+#~ msgstr "servicios hoy"
 
-msgid "workspace.carwash.texts.quick_actions"
-msgstr "Servicios rápidos"
+#~ msgid "workspace.carwash.texts.quick_actions"
+#~ msgstr "Servicios rápidos"
 
-msgid "workspace.carwash.texts.activity_feed"
-msgstr "Servicios del día"
+#~ msgid "workspace.carwash.texts.activity_feed"
+#~ msgstr "Servicios del día"
 
 # -- Grúas y asistencia vial --
-msgid "workspace.towing.brand.name"
-msgstr "eGarage Grúas"
+#~ msgid "workspace.towing.brand.name"
+#~ msgstr "eGarage Grúas"
 
-msgid "workspace.towing.brand.tagline"
-msgstr "Despacho, traslado y cobranza de asistencia vial"
+#~ msgid "workspace.towing.brand.tagline"
+#~ msgstr "Despacho, traslado y cobranza de asistencia vial"
 
-msgid "workspace.towing.nav.home"
-msgstr "Inicio"
+#~ msgid "workspace.towing.nav.home"
+#~ msgstr "Inicio"
 
-msgid "workspace.towing.nav.orders"
-msgstr "Órdenes de traslado"
+#~ msgid "workspace.towing.nav.orders"
+#~ msgstr "Órdenes de traslado"
 
-msgid "workspace.towing.nav.clients"
-msgstr "Clientes"
+#~ msgid "workspace.towing.nav.clients"
+#~ msgstr "Clientes"
 
-msgid "workspace.towing.nav.documents"
-msgstr "Documentos"
+#~ msgid "workspace.towing.nav.documents"
+#~ msgstr "Documentos"
 
-msgid "workspace.towing.nav.reports"
-msgstr "Reportes"
+#~ msgid "workspace.towing.nav.reports"
+#~ msgstr "Reportes"
 
-msgid "workspace.towing.nav.settings"
-msgstr "Configuración"
+#~ msgid "workspace.towing.nav.settings"
+#~ msgstr "Configuración"
 
-msgid "workspace.towing.texts.search_title"
-msgstr "Buscar orden o cliente"
+#~ msgid "workspace.towing.texts.search_title"
+#~ msgstr "Buscar orden o cliente"
 
-msgid "workspace.towing.texts.search_label"
-msgstr "Orden o cliente"
+#~ msgid "workspace.towing.texts.search_label"
+#~ msgstr "Orden o cliente"
 
-msgid "workspace.towing.texts.search_placeholder"
-msgstr "Busca número de orden, patente o cliente"
+#~ msgid "workspace.towing.texts.search_placeholder"
+#~ msgstr "Busca número de orden, patente o cliente"
 
-msgid "workspace.towing.texts.search_hint"
-msgstr "coordina tus traslados en tiempo real"
+#~ msgid "workspace.towing.texts.search_hint"
+#~ msgstr "coordina tus traslados en tiempo real"
 
-msgid "workspace.towing.texts.live_title"
-msgstr "despacho en vivo"
+#~ msgid "workspace.towing.texts.live_title"
+#~ msgstr "despacho en vivo"
 
-msgid "workspace.towing.texts.live_metric"
-msgstr "traslados hoy"
+#~ msgid "workspace.towing.texts.live_metric"
+#~ msgstr "traslados hoy"
 
-msgid "workspace.towing.texts.quick_actions"
-msgstr "Acciones rápidas"
+#~ msgid "workspace.towing.texts.quick_actions"
+#~ msgstr "Acciones rápidas"
 
-msgid "workspace.towing.texts.activity_feed"
-msgstr "Actividad reciente"
+#~ msgid "workspace.towing.texts.activity_feed"
+#~ msgstr "Actividad reciente"
 
-msgid "workspace.recycling.texts.search_title"
-msgstr "Buscar catalítico"
+#~ msgid "workspace.recycling.texts.search_title"
+#~ msgstr "Buscar catalítico"
 
-msgid "workspace.recycling.texts.search_label"
-msgstr "Código, marca o modelo"
+#~ msgid "workspace.recycling.texts.search_label"
+#~ msgstr "Código, marca o modelo"
 
-msgid "workspace.recycling.texts.search_placeholder"
-msgstr "Busca por código, marca o modelo"
+#~ msgid "workspace.recycling.texts.search_placeholder"
+#~ msgstr "Busca por código, marca o modelo"
 
-msgid "workspace.recycling.texts.search_hint"
-msgstr "tu catálogo de catalíticos y chatarra"
+#~ msgid "workspace.recycling.texts.search_hint"
+#~ msgstr "tu catálogo de catalíticos y chatarra"
 
-msgid "workspace.recycling.texts.live_title"
-msgstr "centro de reciclaje"
+#~ msgid "workspace.recycling.texts.live_title"
+#~ msgstr "centro de reciclaje"
 
-msgid "workspace.recycling.texts.live_metric"
-msgstr "chatarra bajo stock mínimo"
+#~ msgid "workspace.recycling.texts.live_metric"
+#~ msgstr "chatarra bajo stock mínimo"
 
-msgid "workspace.recycling.texts.quick_actions"
-msgstr "Acciones rápidas"
+#~ msgid "workspace.recycling.texts.quick_actions"
+#~ msgstr "Acciones rápidas"
 
-msgid "workspace.recycling.texts.activity_feed"
-msgstr "Compras recientes"
+#~ msgid "workspace.recycling.texts.activity_feed"
+#~ msgstr "Compras recientes"
 
 # -- Títulos de widgets (dashboard_service) --
-msgid "OT Abiertas"
-msgstr "OT Abiertas"
+#~ msgid "OT Abiertas"
+#~ msgstr "OT Abiertas"
 
-msgid "Documentos hoy"
-msgstr "Documentos hoy"
+#~ msgid "Ventas del día"
+#~ msgstr "Ventas del día"
 
-msgid "Ventas del día"
-msgstr "Ventas del día"
 
-msgid "Clientes este mes"
-msgstr "Clientes este mes"
+msgid "WORKSPACE.DESARM.NAV.HOME"
+msgstr "Inicio"
 
-msgid "Stock crítico"
-msgstr "Stock crítico"
+msgid "WORKSPACE.DESARM.NAV.VEHICLES"
+msgstr "Vehículos"
 
-msgid "Vehículos disponibles"
-msgstr "Vehículos disponibles"
+msgid "WORKSPACE.DESARM.NAV.PARTS"
+msgstr "Repuestos"
 
-msgid "Valor inventario"
-msgstr "Valor inventario"
+msgid "WORKSPACE.DESARM.NAV.DOCUMENTS"
+msgstr "Ventas"
 
-msgid "Servicios hoy"
-msgstr "Servicios hoy"
+msgid "WORKSPACE.DESARM.NAV.CLIENTS"
+msgstr "Clientes"
 
-msgid "Vehículos agotados"
-msgstr "Vehículos agotados"
+msgid "WORKSPACE.DESARM.NAV.REPORTS"
+msgstr "Reportes"
 
-msgid "Piezas vendidas hoy"
-msgstr "Piezas vendidas hoy"
-
-msgid "Piezas inventariadas"
-msgstr "Piezas inventariadas"
+msgid "WORKSPACE.DESARM.NAV.SETTINGS"
+msgstr "Configuración"

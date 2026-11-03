@@ -379,26 +379,4 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
             return "/cl/es/accounts/login/"
 
     def get_login_redirect_url(self, request):
-        next_url = request.GET.get("next") or request.POST.get("next")
-
-        if next_url:
-            next_clean = (next_url or "").strip()
-            if next_clean and next_clean not in ["/cl", "/cl/", "/us", "/us/"]:
-                return next_clean
-
-        country = "CL"
-
-        try:
-            if request.user.is_authenticated:
-                empresa = getattr(request.user, "empresa", None)
-                if empresa and getattr(empresa, "pais", None):
-                    pais = str(empresa.pais).upper()
-                    if pais in ("US", "USA"):
-                        country = "US"
-        except Exception:
-            pass
-
-        if country == "US":
-            return "/us/en/workspace/"
-
-        return "/cl/es/workspace/"
+        return '/cl/es/reportes/'

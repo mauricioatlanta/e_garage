@@ -60,52 +60,6 @@ def _inject_desarm_widget_urls(widgets: list, prefix: str, docs_ns: str, today) 
 
 
 @country_login_required
-def workspace_dashboard(request):
-    empresa = get_or_create_empresa(request)
-    config = getattr(empresa, "config", None)
-    ws_def = WorkspaceService.get_workspace_def(config)
-    prefix = _workspace_prefix_from_request(request)
-
-    if ws_def.product_key == PRODUCT_RECYCLING:
-        # RECYCLING has its own fully-built dashboard (KPIs, charts, recent
-        # compras/ventas) at taller/reciclaje/ — the generic widget system
-        # below only knows about Documento/Repuesto/VehiculoDesarme, none of
-        # which apply to a reciclaje business.
-        return redirect(f"{prefix}/reciclaje/")
-
-    dashboard_data = WorkspaceDashboardService.resolve(ws_def, empresa)
-    docs_ns = _docs_ns_from_request(request)
-
-    if ws_def.product_key == PRODUCT_CASA_REPUESTOS:
-        search_url = f"{prefix}/repuestos/buscar/"
-    else:
-        search_url = f"{prefix}/workspace/buscar/"
-
-    # WGT_KPI_QUOTES_PENDING — pending quotes list (TALLER / PARTS workspaces)
-    quotes_url = reverse(f"{docs_ns}:lista_documentos") + "?tipo=PRES&estado=BORRADOR,EMITIDO"
-    for widget in dashboard_data["widgets"]:
-        if widget["key"] == WGT_KPI_QUOTES_PENDING:
-            widget["url"] = quotes_url
-            break
-
-    # DESARMADURIA — all four KPI cards link to filtered list views
-    if ws_def.product_key == PRODUCT_DESARMADURIA:
-        _inject_desarm_widget_urls(
-            dashboard_data["widgets"], prefix, docs_ns, dashboard_data["date"]
-        )
-
-    alerts_data = WorkspaceAlertsService.resolve(ws_def, empresa, prefix)
-
-    briefing_url = (
-        f"{prefix}/workspace/briefing/"
-        if ws_def.product_key == PRODUCT_DESARMADURIA
-        else None
-    )
-
-    return render(request, "dashboard/index.html", {
-        "dashboard_data": dashboard_data,
-        "workspace_search_url": search_url,
-        "workspace_base_prefix": prefix,
-        "alerts_data": alerts_data,
-        "briefing_url": briefing_url,
-    })
+def workspace_dashboard(request, *args, **kwargs):
+    from django.shortcuts import redirect
+    return redirect('/cl/es/reportes/')

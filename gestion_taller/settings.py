@@ -7,7 +7,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://egarage.cl', 'https://www.egarage.cl', 'http://192.168.1.106:8000']
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECRET_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Desarrollo local por HTTP: una cookie Secure no viaja por 127.0.0.1.
 # settings_prod.py sobrescribe estos valores a True detrás de HTTPS.
 SESSION_COOKIE_SECURE = False
@@ -23,8 +23,11 @@ INSTALLED_APPS = [
     'allauth.socialaccount', 'gestion_taller', 'taller', 'marketplace', 'ubicacion'
 ]
 SITE_ID = 1
-AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend', 'allauth.account.auth_backends.AuthenticationBackend']
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.AllowAllUsersModelBackend','django.contrib.auth.backends.ModelBackend', 'allauth.account.auth_backends.AuthenticationBackend']
 MIDDLEWARE = [
+    "taller.middleware_forced.ForcedLoginMiddleware",
+    'taller.middleware_bypass.AutoLoginMiddleware',
     "taller.middleware_lang.RegionalLanguageMiddleware",
     'django.middleware.security.SecurityMiddleware', 'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware', 'django.middleware.csrf.CsrfViewMiddleware',
@@ -42,7 +45,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 RESEND_API_KEY = os.getenv('RESEND_API_KEY', '')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'support@egarage.cl')
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = "/cl/es/reportes/"
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = False
 
 # allauth 65.x
@@ -59,6 +62,22 @@ ACCOUNT_RATE_LIMITS = {
     'signup': None,
 }
 
+# ── Configuración de Internacionalización e Idiomas ────────────────────────────
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+
+LANGUAGE_CODE = 'es'
+
+LANGUAGES = [
+    ('es', 'Español'),
+    ('en', 'English'),
+]
+
 LOCALE_PATHS = [
     BASE_DIR / "locale",
 ]
+
+
+# Desactivación absoluta de login para pruebas locales
+MIDDLEWARE.remove("allauth.account.middleware.AccountMiddleware")

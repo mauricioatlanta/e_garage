@@ -94,11 +94,11 @@ urlpatterns = [
         name="centro_operaciones_espacial",
     ),
     # Centro de Trabajo / Workspace (canonical /us/en/workspace/ y /us/es/workspace/)
-    path("workspace/", centro_trabajo, name="centro_trabajo"),
-    path("workspace/buscar/", centro_trabajo_buscar, name="centro_trabajo_buscar"),
-    path("workspace/live-feed/", workspace_live_feed, name="workspace_live_feed"),
-    path("workspace/centro-de-mando/", centro_de_mando, name="centro_de_mando"),
-    path("workspace/briefing/", workspace_briefing, name="workspace_briefing"),
+    path('workspace/', lambda r: __import__('django.shortcuts').shortcuts.redirect('/cl/es/reportes/'), name='workspace'),
+    path('workspace/', lambda r: __import__('django.shortcuts').shortcuts.redirect('/cl/es/reportes/'), name='workspace'),
+    path('workspace/', lambda r: __import__('django.shortcuts').shortcuts.redirect('/cl/es/reportes/'), name='workspace'),
+    path('workspace/', lambda r: __import__('django.shortcuts').shortcuts.redirect('/cl/es/reportes/'), name='workspace'),
+    path('workspace/', lambda r: __import__('django.shortcuts').shortcuts.redirect('/cl/es/reportes/'), name='workspace'),
     # Onboarding obligatorio para empresas nuevas.
     path("onboarding/", onboarding_wizard, name="onboarding_wizard"),
     path("onboarding/guardar/<int:paso>/", onboarding_guardar_paso, name="onboarding_guardar_paso"),

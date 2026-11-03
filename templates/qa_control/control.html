@@ -52,13 +52,13 @@
       <label class="grid gap-2 text-sm">País
         <select name="country" required class="rounded border border-slate-600 bg-slate-900 px-3 py-2 text-white">
           <option value="">Seleccionar</option>
-          {% for item in countries %}<option value="{{ item.value }}" {% if selected_country == item.value %}selected{% endif %}>{{ item.label }}</option>{% endfor %}
+          {% for item in countries %}<option value="{{ item.value }}" {% if selected_country == item.value %}selected{% endif %}>{% if item.label == "workspace.desarm.nav.home" %}Inicio{% elif item.label == "workspace.desarm.nav.vehicles" %}Vehículos{% elif item.label == "workspace.desarm.nav.parts" %}Repuestos{% elif item.label == "workspace.desarm.nav.documents" %}Ventas{% elif item.label == "workspace.desarm.nav.clients" %}Clientes{% elif item.label == "workspace.desarm.nav.reports" %}Reportes{% elif item.label == "workspace.desarm.nav.settings" %}Configuración{% else %}{{ item.label }}{% endif %}</option>{% endfor %}
         </select>
       </label>
       <label class="grid gap-2 text-sm">Rubro
         <select name="rubro" required class="rounded border border-slate-600 bg-slate-900 px-3 py-2 text-white">
           <option value="">Seleccionar</option>
-          {% for item in rubros %}<option value="{{ item.value }}" {% if selected_rubro == item.value %}selected{% endif %}>{{ item.label }}</option>{% endfor %}
+          {% for item in rubros %}<option value="{{ item.value }}" {% if selected_rubro == item.value %}selected{% endif %}>{% if item.label == "workspace.desarm.nav.home" %}Inicio{% elif item.label == "workspace.desarm.nav.vehicles" %}Vehículos{% elif item.label == "workspace.desarm.nav.parts" %}Repuestos{% elif item.label == "workspace.desarm.nav.documents" %}Ventas{% elif item.label == "workspace.desarm.nav.clients" %}Clientes{% elif item.label == "workspace.desarm.nav.reports" %}Reportes{% elif item.label == "workspace.desarm.nav.settings" %}Configuración{% else %}{{ item.label }}{% endif %}</option>{% endfor %}
         </select>
       </label>
       <label class="grid gap-2 text-sm">Tenant QA existente
