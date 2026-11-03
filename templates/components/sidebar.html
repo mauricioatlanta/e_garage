@@ -1,4 +1,4 @@
-{% load static %}
+{% load nav_i18n %}{% load static %}
 <aside class="eg-sidebar">
 
   <div class="eg-brand">
@@ -25,17 +25,17 @@
       {% ifchanged item.section_label %}{% if item.section_label %}<div class="eg-nav-section">{{ item.section_label }}</div>{% endif %}{% endifchanged %}
       <a href="{{ item.url }}"{% if item.is_active %} class="is-active"{% endif %}>
         <i class="{{ item.icon }}"></i>
-        {% if item.label == "workspace.desarm.nav.home" %}Inicio{% elif item.label == "workspace.desarm.nav.vehicles" %}Vehículos{% elif item.label == "workspace.desarm.nav.parts" %}Repuestos{% elif item.label == "workspace.desarm.nav.documents" %}Ventas{% elif item.label == "workspace.desarm.nav.clients" %}Clientes{% elif item.label == "workspace.desarm.nav.reports" %}Reportes{% elif item.label == "workspace.desarm.nav.settings" %}Configuración{% else %}{{ item.label }}{% endif %}
+        {% if "/en/" in request.path or LANGUAGE_CODE == "en" %}{% if item.label == "Ajustes" %}Settings{% elif item.label == "Equipo" %}Team{% elif item.label == "Centro" %}Operations{% elif item.label == "Clientes" %}Clients{% elif item.label == "Trabajos" or item.label == "Work" %}Work{% elif item.label == "Repuestos" %}Parts{% elif item.label == "Reportes" %}Reports{% elif item.label == "Servicios" %}Services{% elif item.label == "Vehículos" %}Vehicles{% elif item.label == "Salir" %}Logout{% else %}{{item.label|translate_nav:request}}{% endif %}{% else %}{% if item.label == "Work" %}Trabajos{% elif item.label == "Logout" %}Salir{% else %}{{item.label|translate_nav:request}}{% endif %}{% endif %}
       </a>
       {% endfor %}
     {% else %}
       {# Fallback for unauthenticated or no-config users #}
       <a href="/cl/es/dashboard/"><i class="fas fa-home"></i> Inicio</a>
-      <a href="/cl/es/clientes/"><i class="fas fa-users"></i> Clientes</a>
-      <a href="/cl/es/vehiculos/"><i class="fas fa-car"></i> Vehículos</a>
+      <a href="/cl/es/clientes/"><i class="fas fa-users"></i> {% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Clients{% else %}Clientes{% endif %}</a>
+      <a href="/cl/es/vehiculos/"><i class="fas fa-car"></i> {% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Vehicles{% else %}Vehículos{% endif %}</a>
       <a href="/cl/es/documentos/form/"><i class="fas fa-file-invoice"></i> Documentos</a>
-      <a href="/cl/es/repuestos/"><i class="fas fa-cogs"></i> Repuestos</a>
-      <a href="/cl/es/reportes/"><i class="fas fa-chart-bar"></i> Reportes</a>
+      <a href="/cl/es/repuestos/"><i class="fas fa-cogs"></i> {% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Parts{% else %}Repuestos{% endif %}</a>
+      <a href="/cl/es/reportes/"><i class="fas fa-chart-bar"></i> {% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Reports{% else %}Reportes{% endif %}</a>
       <a href="/cl/es/settings/"><i class="fas fa-cog"></i> Configuración</a>
     {% endif %}
   </nav>

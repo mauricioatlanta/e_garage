@@ -110,6 +110,11 @@ PRICE_MATRIX = {
         PLAN_GROWTH: {BILLING_MONTHLY: Decimal("399"), BILLING_ANNUAL: Decimal("2199")},
         PLAN_BUSINESS: {BILLING_MONTHLY: Decimal("399"), BILLING_ANNUAL: Decimal("3990")},
     },
+    "PE": {
+        PLAN_ENTRY: {BILLING_MONTHLY: Decimal("20000"), BILLING_ANNUAL: Decimal("200000")},
+        PLAN_GROWTH: {BILLING_MONTHLY: Decimal("39000"), BILLING_ANNUAL: Decimal("390000")},
+        PLAN_BUSINESS: {BILLING_MONTHLY: Decimal("69000"), BILLING_ANNUAL: Decimal("690000")},
+    },
 }
 
 DEFAULT_COUNTRY = "US"
@@ -118,6 +123,7 @@ COUNTRY_CURRENCY = {
     "CL": "CLP",
     "US": "USD",
     "MX": "MXN",
+    "PE": "PEN",
 }
 
 MONTHS_BY_BILLING_CYCLE = {

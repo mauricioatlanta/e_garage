@@ -96,7 +96,7 @@
       <!-- Repuestos -->
       {% if documento.lineas_repuesto.exists %}
       <div class="mb-6">
-        <h3 class="font-semibold mb-2 text-gray-700">Repuestos</h3>
+        <h3 class="font-semibold mb-2 text-gray-700">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Parts{% else %}Repuestos{% endif %}</h3>
         <div class="overflow-x-auto">
           <table class="w-full border-collapse">
             <thead>
@@ -125,7 +125,7 @@
       <!-- Servicios -->
       {% if documento.lineas_servicio.exists %}
       <div class="mb-6">
-        <h3 class="font-semibold mb-2 text-gray-700">Servicios</h3>
+        <h3 class="font-semibold mb-2 text-gray-700">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Services{% else %}Servicios{% endif %}</h3>
         <div class="overflow-x-auto">
           <table class="w-full border-collapse">
             <thead>

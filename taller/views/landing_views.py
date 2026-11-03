@@ -104,12 +104,15 @@ def hub_usa_es(request):
     return render_country_hub(request, "us_es")
 
 
+import logging
+logger=logging.getLogger(__name__)
 def landing_vertical(request, country_key: str, url_slug: str):
     """
     Unified country-aware landing view.
     URL: /<country_key>/<url_slug>/   e.g. /cl/talleres/ or /ar/gomeria/
     For US: /us/en/<slug>/ and /us/es/<slug>/ are routed here with country_key=us_en/us_es.
     """
+    logger.error(f"[ANALYTICS_HIT] path={request.path} host={request.get_host()} country={country_key} slug={url_slug} UA={request.META.get('HTTP_USER_AGENT','')[:50]}")
     vertical_key = URL_SLUG_TO_VERTICAL.get(url_slug)
     if not vertical_key or country_key not in COUNTRY_HUB:
         raise Http404
@@ -134,11 +137,17 @@ def landing_vertical(request, country_key: str, url_slug: str):
 # ── Legacy country-agnostic routes — 301 to Chile equivalents ───────────────
 
 def landing_talleres(request):
-    return HttpResponsePermanentRedirect("/cl/talleres/")
+    from taller.models.public_page_view import PublicPageView
+    from taller.services.public_analytics import track_public_page
+    track_public_page(request, page_type=PublicPageView.PAGE_LANDING, country="cl", language="es")
+    return landing_vertical(request, country_key="cl", url_slug="talleres")
 
 
 def landing_desarmadurias(request):
-    return HttpResponsePermanentRedirect("/cl/desarmadurias/")
+    from taller.models.public_page_view import PublicPageView
+    from taller.services.public_analytics import track_public_page
+    track_public_page(request, page_type=PublicPageView.PAGE_LANDING, country="cl", language="es")
+    return landing_vertical(request, country_key="cl", url_slug="desarmadurias")
 
 
 def landing_repuestos(request):

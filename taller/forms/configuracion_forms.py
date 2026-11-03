@@ -1,6 +1,13 @@
 from django import forms
+from django.utils import timezone
 
 from taller.models import ConfiguracionEmpresa
+from taller.config.business_activities import (
+    GROUP_CHOICES,
+    VALID_GROUP_KEYS,
+    expand_activity_groups,
+    groups_for_rubros,
+)
 
 
 class CompanyInfoForm(forms.ModelForm):
@@ -234,92 +241,57 @@ class ConfiguracionRubroForm(forms.ModelForm):
 
 
 class ConfiguracionServiciosForm(forms.ModelForm):
-    """Formulario para configurar los rubros que ofrece el taller."""
+    """Edita actividades usando los mismos grupos visibles del registro."""
+
+    actividad_principal = forms.ChoiceField(
+        choices=GROUP_CHOICES,
+        label="Actividad principal",
+        required=True,
+    )
+    actividades_adicionales = forms.MultipleChoiceField(
+        choices=GROUP_CHOICES,
+        label="Actividades adicionales",
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
 
     class Meta:
         model = ConfiguracionEmpresa
-        fields = ["rubros"]
+        fields = []
 
     def __init__(self, *args, **kwargs):
-        request = kwargs.pop("request", None)
+        kwargs.pop("request", None)  # compatibility with the existing view
         super().__init__(*args, **kwargs)
-        from taller.config.rubros_translations import get_rubros_choices_for_country
-
-        # Detectar país del usuario/empresa
-        country_code = "CL"  # Por defecto Chile
-
-        if request:
-            # 1. Intentar obtener desde empresa del usuario
-            try:
-                from taller.utils.empresa import get_or_create_empresa
-
-                empresa = get_user_empresa_safe(request.user)
-                if empresa and hasattr(empresa, "pais") and empresa.pais:
-                    country_code = str(empresa.pais).upper().strip()
-            except Exception:
-                pass
-
-            # 2. Si no hay empresa, intentar desde request.company_country (middleware)
-            if country_code == "CL" and hasattr(request, "company_country"):
-                country_code = (
-                    str(request.company_country).upper().strip()
-                    if request.company_country
-                    else "CL"
-                )
-
-            # 3. Si no hay, detectar desde la URL
-            if country_code == "CL" and hasattr(request, "path"):
-                path = request.path.lower()
-                if path.startswith("/us/"):
-                    country_code = "US"
-                elif path.startswith("/mx/"):
-                    country_code = "MX"
-                elif path.startswith("/pe/"):
-                    country_code = "PE"
-                elif path.startswith("/ve/"):
-                    country_code = "VE"
-                elif path.startswith("/br/"):
-                    country_code = "BR"
-                elif path.startswith("/co/"):
-                    country_code = "CO"
-
-        # Normalizar código de país
-        country_code = str(country_code).upper().strip()
-        if country_code not in ["US", "CL", "MX", "PE", "VE", "BR", "CO"]:
-            country_code = "CL"  # Fallback a Chile
-
-        # Convertir JSONField a lista para el MultipleChoiceField
         if self.instance and self.instance.pk:
-            rubros_actuales = self.instance.rubros or []
-        else:
-            rubros_actuales = []
+            primary, additional = groups_for_rubros(
+                self.instance.rubro_principal,
+                self.instance.rubros,
+            )
+            self.fields["actividad_principal"].initial = primary
+            self.fields["actividades_adicionales"].initial = additional
 
-        # Obtener traducciones por país
-        translated_choices = get_rubros_choices_for_country(country_code)
-
-        # Determinar idioma para el label
-        is_spanish = country_code in {"CL", "MX", "PE", "VE", "CO"}
-        is_portuguese = country_code == "BR"
-
-        if is_portuguese:
-            label_text = "Selecione os setores que sua oficina oferece"
-        elif is_spanish:
-            label_text = "Selecciona los rubros que ofrece tu taller"
-        else:
-            label_text = "Select the industries your shop offers"
-
-        self.fields["rubros"] = forms.MultipleChoiceField(
-            choices=translated_choices,
-            widget=forms.CheckboxSelectMultiple(attrs={"class": "form-check-input"}),
-            label=label_text,
-            required=False,
-            initial=rubros_actuales,
-        )
+    def clean(self):
+        cleaned = super().clean()
+        primary = cleaned.get("actividad_principal")
+        additional = list(cleaned.get("actividades_adicionales") or [])
+        if primary not in VALID_GROUP_KEYS:
+            self.add_error("actividad_principal", "Actividad principal no válida.")
+            return cleaned
+        if any(group not in VALID_GROUP_KEYS for group in additional):
+            self.add_error("actividades_adicionales", "Existe una actividad no válida.")
+            return cleaned
+        cleaned["actividades_adicionales"] = [g for g in additional if g != primary]
+        return cleaned
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        # Guardar como lista JSON
-        instance.rubros = self.cleaned_data.get("rubros", [])
+        rubros = expand_activity_groups(
+            self.cleaned_data["actividad_principal"],
+            self.cleaned_data.get("actividades_adicionales") or [],
+        )
+        instance.rubro_principal = rubros[0]
+        instance.rubros = rubros
+        instance.modules_configured_at = timezone.now()
         if commit:
-            instance.save()
+            instance.save(update_fields=["rubro_principal", "rubros", "modules_configured_at"])
         return instance

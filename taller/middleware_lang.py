@@ -6,20 +6,30 @@ class RegionalLanguageMiddleware:
 
     def __call__(self, request):
         path = request.path_info
-        if "/en/" in path or path.startswith("/us/en/"):
-            lang = "en"
-        elif "/es/" in path or path.startswith("/cl/es/") or path.startswith("/us/es/"):
+        
+        # 1. Determinar idioma
+        if "/es/" in path or path.startswith("/us/es/") or path.startswith("/cl/es/"):
             lang = "es"
+        elif "/en/" in path or path.startswith("/us/en/"):
+            lang = "en"
         else:
-            lang = "en" if request.session.get("django_language") == "en" else "es"
+            lang = request.session.get("django_language") or request.COOKIES.get("django_language") or "es"
 
         translation.activate(lang)
         request.LANGUAGE_CODE = lang
         if hasattr(request, "session"):
             request.session["django_language"] = lang
 
+        # 2. Excepción para Superusuario en Modo Soporte
+        if hasattr(request, "user") and request.user.is_authenticated and request.user.is_superuser:
+            request.session["modo_soporte_activo"] = True
+            if path.startswith("/us/"):
+                request.session["support_country"] = "us"
+                request.session["modo_soporte_pais"] = "us"
+
         with translation.override(lang):
             response = self.get_response(request)
 
-        response.set_cookie("django_language", lang, max_age=365*24*60*60)
+        if response is not None and hasattr(response, "set_cookie"):
+            response.set_cookie("django_language", lang, max_age=365*24*60*60, domain=".egarage.cl", path="/")
         return response

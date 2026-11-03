@@ -159,7 +159,7 @@ def test_orden_preservado_adicionales_sin_usar_set():
     last_principal_idx = max(rubros.index(r) for r in ["WORKSHOP", "WORKSHOP_MOTO", "WORKSHOP_HEAVY"])
     first_especialista_idx = min(
         rubros.index(r)
-        for r in ["ELECTRIC", "EXHAUST", "SUSPENSION_STEERING", "GLASS_AUDIO", "BRAKES"]
+        for r in ["ELECTRIC", "GLASS"]
     )
     assert last_principal_idx < first_especialista_idx
 
@@ -197,6 +197,12 @@ def test_desarmaduria_mas_casa_repuestos():
     assert "DESARMADURIA" in rubros
     assert "PARTS" in rubros
     assert rubros[0] == "DESARMADURIA"  # DESARMADURIA es el principal
+
+
+def test_desarmaduria_mas_taller_no_exige_parts():
+    rubros = _build("DESARMADURIA", adicionales=["TALLER_MECANICO"])
+    assert rubros == ["DESARMADURIA", "WORKSHOP", "WORKSHOP_MOTO", "WORKSHOP_HEAVY"]
+    assert "PARTS" not in rubros
 
 
 # ─── 9. Más de 2 adicionales → inválido solo en signup ───────────────────────

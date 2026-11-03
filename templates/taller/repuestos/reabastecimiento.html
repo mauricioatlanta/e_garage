@@ -181,11 +181,11 @@
     class="toolbar-input"
     placeholder="Buscar por código, nombre, proveedor o categoría">
   <select name="status" class="toolbar-select">
-    <option value="" {% if not status_filter %}selected{% endif %}>Todos los estados</option>
-    <option value="critical" {% if status_filter == 'critical' %}selected{% endif %}>Críticos</option>
-    <option value="warning" {% if status_filter == 'warning' %}selected{% endif %}>En observación</option>
-    <option value="stable" {% if status_filter == 'stable' %}selected{% endif %}>Estables</option>
-    <option value="idle" {% if status_filter == 'idle' %}selected{% endif %}>Sin consumo</option>
+    <option value="" {% if not status_filter %}selected{% endif %}>Alertas activas</option>
+    <option value="negative" {% if status_filter == 'negative' %}selected{% endif %}>Incidencias negativas</option>
+    <option value="out" {% if status_filter == 'out' %}selected{% endif %}>Agotados</option>
+    <option value="low" {% if status_filter == 'low' %}selected{% endif %}>Stock bajo</option>
+    <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Todos los productos</option>
   </select>
   <button type="submit" class="toolbar-button">Filtrar</button>
 </form>
@@ -225,7 +225,7 @@
         </td>
         <td class="text-slate-300">{{ row.repuesto.proveedor|default:"-" }}</td>
         <td class="text-white font-semibold">{{ row.stock_actual }}</td>
-        <td class="text-slate-300">{{ row.stock_minimo|default:"0" }}</td>
+        <td class="text-slate-300">{% if row.alert_enabled %}{{ row.stock_minimo }}{% else %}Desactivada{% endif %}</td>
         <td class="text-slate-200">{{ row.consumo_diario }}</td>
         <td class="text-slate-200">
           {% if row.dias_cobertura is not None %}
@@ -244,7 +244,7 @@
         </td>
         <td>
           <span class="status-pill status-pill--{{ row.status }}">
-            {% if row.status == "critical" %}Crítico{% elif row.status == "warning" %}Observación{% elif row.status == "stable" %}Estable{% else %}Sin consumo{% endif %}
+            {% if row.alert_state %}{{ row.alert_label }}{% elif row.status == "critical" %}Crítico{% elif row.status == "warning" %}Observación{% elif row.status == "stable" %}Estable{% else %}Sin consumo{% endif %}
           </span>
         </td>
         <td>

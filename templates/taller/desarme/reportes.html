@@ -73,10 +73,10 @@
 {% block page_stats %}
 <div class="desarme-nav-module flex flex-wrap gap-2 mt-4">
   <a href="{% country_url 'desarme:index' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">Dashboard</a>
-  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🚗 Vehículos</a>
+  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚗 Vehicles{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚗 Vehicles{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚗 Vehicles{% else %}🚗 Vehículos{% endif %}{% endif %}{% endif %}</a>
   <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📦 Repuestos</a>
-  <a href="{% country_url 'desarme:lista_interchange' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🔄 {% if "/en/" in request.path or LANGUAGE_CODE == "en" and "/es/" not in request.path %}Interchange{% else %}Cruce de piezas{% endif %}</a>
-  <a href="{% country_url 'desarme:reportes' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">📊 Reportes</a>
+  <a href="{% country_url 'desarme:lista_interchange' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🔄 Interchange</a>
+  <a href="{% country_url 'desarme:reportes' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}📊 Reports{% else %}📊 Reportes{% endif %}{% endif %}{% endif %}</a>
 </div>
 {% endblock %}
 
@@ -307,7 +307,7 @@
         <tr>
           <td>{{ v.patente }}</td>
           <td>{{ v.marca }} {{ v.modelo }}</td>
-          <td class="{% if v.health_score < 40 %}pct{% endif %} style="{% if v.health_score < 40 %}color:#f87171{% endif %}>{{ v.health_score|floatformat:0 }}</td>
+          <td class="{% if v.health_score < 40 %}pct{% endif %}" style="{% if v.health_score < 40 %}color:#f87171{% endif %}">{{ v.health_score|floatformat:0 }}</td>
           <td class="num">${{ v.inventario_muerto|floatformat:0|intcomma }}</td>
         </tr>
         {% endfor %}
@@ -324,7 +324,7 @@
     {% if top_proveedores %}
     <table class="rpt-table">
       <thead>
-        <tr><th>Proveedor</th><th class="num">Vehículos</th><th class="pct">ROI prom.</th></tr>
+        <tr><th>Proveedor</th><th class="num">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Vehicles{% else %}Vehículos{% endif %}</th><th class="pct">ROI prom.</th></tr>
       </thead>
       <tbody>
         {% for p in top_proveedores %}

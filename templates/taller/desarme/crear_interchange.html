@@ -1,4 +1,4 @@
-{% extends "layouts/base_egarage_panel.html" %}
+{% load nav_i18n %}{% extends "layouts/base_egarage_panel.html" %}
 {% load i18n %}
 {% load country_url %}
 
@@ -110,7 +110,7 @@
   <a href="{% country_url 'desarme:index' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">{% trans "Dashboard" %}</a>
   <a href="{% country_url 'desarme:lista_vehiculos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🚗 {% trans "Vehículos" %}</a>
   <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📦 {% trans "Repuestos" %}</a>
-  <a href="{% country_url 'desarme:lista_interchange' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">🔄 {% if "/en/" in request.path or LANGUAGE_CODE == "en" and "/es/" not in request.path %}Interchange{% else %}Cruce de piezas{% endif %}</a>
+  <a href="{% country_url 'desarme:lista_interchange' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">🔄 {% trans "Interchange" %}</a>
 </div>
 {% endblock %}
 
@@ -144,7 +144,7 @@
               {% for item in zona_group.list %}
               <option value="{{ item.codigo }}"
                 {% if post.codigo_pieza == item.codigo %}selected{% endif %}>
-                {{ item.codigo }} — {{ item.nombre }}
+                {{ item.codigo }} — {{item.nombre|translate_nav:request}}
               </option>
               {% endfor %}
             </optgroup>

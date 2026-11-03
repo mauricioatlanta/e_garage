@@ -49,6 +49,19 @@ class LanguagePolicyMiddleware:
             # Detectar país desde empresa O desde request.country (URL)
             pais = getattr(getattr(request, "empresa", None), "pais", None)
 
+            # Modo soporte (superusuario): el país simulado manda sobre la Empresa
+            # real. El menú de soporte escribe support_country en sesión sin tocar
+            # la Empresa, por lo que la política de idioma debe leerlo para que
+            # LANGUAGE_CODE siga al país seleccionado (p.ej. US → en).
+            user = getattr(request, "user", None)
+            if getattr(user, "is_superuser", False):
+                session = getattr(request, "session", None)
+                support_country = ""
+                if session is not None:
+                    support_country = (session.get("support_country") or "").strip().upper()
+                if support_country:
+                    pais = support_country
+
             # Si no hay empresa (usuario no autenticado), usar request.country desde URL
             if not pais:
                 pais = getattr(request, "country", None)

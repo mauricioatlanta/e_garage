@@ -2,7 +2,46 @@
 {% load static %}
 {% load widget_tweaks %}
 
-{% block title %}Iniciar Sesión - eGarage Chile{% endblock %}
+{% block title %}Iniciar Sesión - eGarage Chile
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("login-form-main") || document.querySelector("form");
+    const btn = document.getElementById("btn-login-action");
+    if (!form || !btn) return;
+
+    let envioAutorizado = false;
+
+    // Bloquear cualquier auto-submit disparado por el gestor de contraseñas
+    form.addEventListener("submit", function(e) {
+        if (!envioAutorizado) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }, true);
+
+    // Bloquear que el teclado virtual mande Enter solo
+    form.querySelectorAll("input").forEach(function(inp) {
+        inp.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Enviar exclusivamente cuando tocas el botón con tu dedo o mouse
+    function dispararIngreso(e) {
+        if (e) e.preventDefault();
+        envioAutorizado = true;
+        HTMLFormElement.prototype.submit.call(form);
+    }
+
+    btn.addEventListener("click", dispararIngreso);
+    btn.addEventListener("touchend", dispararIngreso);
+});
+</script>
+
+{% endblock %}
 
 {% block extra_head %}
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -73,6 +112,45 @@ body {
 .error-message { background: rgba(213, 43, 30, 0.2); border: 1px solid rgba(213, 43, 30, 0.5); color: #ff6b6b; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem; font-size: 0.9rem; }
 @media (max-width: 640px) { .glass-card { padding: 2rem 1.5rem; } .brand-title { font-size: 1.5rem; } .login-title { font-size: 1.5rem; } }
 </style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("login-form-main") || document.querySelector("form");
+    const btn = document.getElementById("btn-login-action");
+    if (!form || !btn) return;
+
+    let envioAutorizado = false;
+
+    // Bloquear cualquier auto-submit disparado por el gestor de contraseñas
+    form.addEventListener("submit", function(e) {
+        if (!envioAutorizado) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }, true);
+
+    // Bloquear que el teclado virtual mande Enter solo
+    form.querySelectorAll("input").forEach(function(inp) {
+        inp.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Enviar exclusivamente cuando tocas el botón con tu dedo o mouse
+    function dispararIngreso(e) {
+        if (e) e.preventDefault();
+        envioAutorizado = true;
+        HTMLFormElement.prototype.submit.call(form);
+    }
+
+    btn.addEventListener("click", dispararIngreso);
+    btn.addEventListener("touchend", dispararIngreso);
+});
+</script>
+
 {% endblock %}
 
 {% block content %}
@@ -102,10 +180,10 @@ body {
                     {% if form.password.errors %}<div class="error-message">{{ form.password.errors }}</div>{% endif %}
                 </div>
                 <div class="checkbox-container">
-                    {{ form.remember_me|add_class:"form-checkbox" }}
-                    <label for="id_remember_me" class="checkbox-label">Mantener sesión iniciada</label>
+                    {{ form.remember|add_class:"form-checkbox" }}
+                    <label for="id_remember" class="checkbox-label">Mantener sesión iniciada</label>
                 </div>
-                <button type="submit" class="login-button font-futuristic">🔐 Iniciar Sesión</button>
+                <button type="button" id="btn-login-action" class="login-button font-futuristic">🔐 Iniciar Sesión</button>
                 <div class="forgot-password"><a href="/cl/es/accounts/password/reset/">¿Olvidaste tu contraseña?</a></div>
             </form>
             <div class="divider"><span>o</span></div>
@@ -120,4 +198,43 @@ body {
 const pc = document.createElement('div'); pc.className = 'particles'; document.body.appendChild(pc);
 for (let i = 0; i < 20; i++) { const p = document.createElement('div'); p.className = 'particle'; p.style.left = `${Math.random()*100}%`; p.style.animationDelay = `${Math.random()*10}s`; p.style.animationDuration = `${10+Math.random()*10}s`; pc.appendChild(p); }
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("login-form-main") || document.querySelector("form");
+    const btn = document.getElementById("btn-login-action");
+    if (!form || !btn) return;
+
+    let envioAutorizado = false;
+
+    // Bloquear cualquier auto-submit disparado por el gestor de contraseñas
+    form.addEventListener("submit", function(e) {
+        if (!envioAutorizado) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }, true);
+
+    // Bloquear que el teclado virtual mande Enter solo
+    form.querySelectorAll("input").forEach(function(inp) {
+        inp.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Enviar exclusivamente cuando tocas el botón con tu dedo o mouse
+    function dispararIngreso(e) {
+        if (e) e.preventDefault();
+        envioAutorizado = true;
+        HTMLFormElement.prototype.submit.call(form);
+    }
+
+    btn.addEventListener("click", dispararIngreso);
+    btn.addEventListener("touchend", dispararIngreso);
+});
+</script>
+
 {% endblock %}

@@ -8,7 +8,6 @@ QA_CONTROL_TENANTS = {
     ("CL", "PARTS"): 50,
     ("CL", "DETAILING"): 53,
     ("CL", "TIRE"): 54,
-    ("CL", "EXHAUST"): 55,
     ("CL", "FLEET"): 56,
     ("CL", "MIXED"): 57,
     ("CL", "RECYCLING"): 63,

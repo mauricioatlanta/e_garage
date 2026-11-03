@@ -4,6 +4,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Min, OuterRef, Subquery
 from django.shortcuts import render
 from django.utils import timezone
+import pytz
+SCL_TZ = pytz.timezone("America/Santiago")
 
 from taller.models.configuracion import ConfiguracionEmpresa
 from taller.models.empresa import Empresa
@@ -154,7 +156,7 @@ def _aggregate(rows):
 
 def _blocked(rows, cutoff_hours=24):
     """Panel 4 — empresas sin email confirmado o sin victoria después de N horas."""
-    now = timezone.now()
+    now = timezone.now().astimezone(SCL_TZ)
     cutoff = now - timedelta(hours=cutoff_hours)
     unconfirmed = []
     stalled = []
@@ -196,7 +198,7 @@ def _fmt_minutes(m):
 def first_victory_dashboard(request):
     period = request.GET.get("period", "30d")
 
-    now = timezone.now()
+    now = timezone.now().astimezone(SCL_TZ)
     if period == "7d":
         since = now - timedelta(days=7)
         period_label = "Últimos 7 días"

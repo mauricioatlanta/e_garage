@@ -459,7 +459,7 @@
   </div>
   <div class="flex gap-2">
     <a href="/dashboard/" class="nav-button-standard">🏠 Dashboard</a>
-    <a href="/cl/reportes/" class="nav-button-standard">📊 Reportes</a>
+    <a href="/cl/reportes/" class="nav-button-standard">{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}📊 Reports{% else %}📊 Reportes{% endif %}{% endif %}{% endif %}</a>
     <a href="/cl/reportes/inteligencia/" class="nav-button-standard">🔮 Inteligencia</a>
   </div>
 </nav>

@@ -186,7 +186,10 @@ class RepuestoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewM
         logger.info(f"[REPUESTOS DEBUG] Diferencia: ${manual_total - sql_total}")
 
         context["total_value"] = sql_total
-        context["low_stock_count"] = qs.filter(cantidad_stock__lt=5).count()
+        context["low_stock_count"] = qs.filter(
+            stock_minimo__isnull=False,
+            cantidad_stock__lte=F("stock_minimo"),
+        ).count()
         return context
 
 

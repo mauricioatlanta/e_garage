@@ -33,6 +33,7 @@ from .views_extra.ajax import (
     vehiculos_por_cliente,
 )
 from .views_extra.company_settings_views import company_settings_view
+from .views_extra.configuracion_servicios_views import configurar_servicios
 from .views_extra.dashboard_empresa import (
     dashboard_centro_operaciones,
     dashboard_centro_operaciones_espacial,
@@ -137,6 +138,7 @@ urlpatterns = [
     path("configuracion/", configuracion_empresa, name="configuracion"),
     path("configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"),
     # === CONFIGURACIÓN DE EMPRESA Y BRANDING ===
+    path("settings/activities/", configurar_servicios, name="company_activities"),
     path("settings/", company_settings_view, name="company_settings"),
     # Comentado temporalmente - módulo no existe
     # path(

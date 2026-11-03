@@ -318,8 +318,8 @@
                 qtyEl.value = String(Math.max(1, parseInt(data && data.cantidad || 1, 10) || 1));
             }
             if (priceEl) {
-                priceEl.value = formatCurrencyInputValue(item.precio);
-                priceEl.dispatchEvent(new Event('input', { bubbles: true }));
+                priceEl.value = '';
+                priceEl.focus();
             }
             recalcSubtotal();
             hideDropdown();
@@ -405,7 +405,6 @@
                         var metaParts = [];
                         if (item.codigo_interno) metaParts.push(item.codigo_interno);
                         if (item.categoria) metaParts.push(item.categoria);
-                        if (item.precio) metaParts.push(EG.utils.money(item.precio));
                         return buildDropdownItem(item, item.nombre || '', metaParts.join(' | '));
                     });
                 }

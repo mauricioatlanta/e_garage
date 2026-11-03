@@ -11,17 +11,18 @@ RESPONSABLE_LABEL_POR_RUBRO = {
     "WORKSHOP": "Mecánico responsable",
     "WORKSHOP_MOTO": "Mecánico responsable",
     "WORKSHOP_HEAVY": "Mecánico responsable",
-    "EXHAUST": "Mecánico responsable",
     "BODYSHOP": "Mecánico responsable",
+    "GLASS": "Técnico responsable",
     "ELECTRIC": "Técnico responsable",
     "TIRE": "Técnico responsable",
     # Casa de repuestos
     "PARTS": "Vendedor responsable",
     # Otros rubros
     "DETAILING": "Técnico responsable",
-    "GLASS_AUDIO": "Técnico responsable",
     "FLEET": "Técnico responsable de flota",
+    "DESARMADURIA": "Responsable de desarme",
     "RECYCLING": "Responsable de acopio",
+    "TOWING": "Operador responsable",
     "MIXED": "Responsable",
 }
 

@@ -339,8 +339,3 @@ ANTHROPIC_API_KEY   = (os.getenv("ANTHROPIC_API_KEY") or "").strip()
 ANTHROPIC_MODEL     = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
 BRIEFING_CACHE_TTL  = int(os.getenv("BRIEFING_CACHE_TTL", "1800"))    # segundos
 BRIEFING_DAILY_LIMIT = int(os.getenv("BRIEFING_DAILY_LIMIT", "10"))   # llamadas AI/empresa/día
-
-CSRF_TRUSTED_ORIGINS = [
-    "http://10.*:8000",
-    "http://192.168.*:8000",
-    "http://*.local:8000","http://127.0.0.1:8000", "http://localhost:8000"]

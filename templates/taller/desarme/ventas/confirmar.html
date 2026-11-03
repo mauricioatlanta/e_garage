@@ -1,4 +1,4 @@
-{% extends "layouts/base_egarage_panel.html" %}
+{% load nav_i18n %}{% extends "layouts/base_egarage_panel.html" %}
 {% load i18n %}
 {% load humanize %}
 {% load custom_filters %}
@@ -43,7 +43,7 @@
 
   {# ── Tabla de repuestos ── #}
   <div class="vta-card">
-    <h3>🔧 Repuestos seleccionados</h3>
+    <h3>{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🔧 Parts{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🔧 Parts{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🔧 Parts{% else %}🔧 Repuestos{% endif %}{% endif %}{% endif %} seleccionados</h3>
     <table class="vta-table">
       <thead>
         <tr>
@@ -58,7 +58,7 @@
         {% for item in items %}
         <tr>
           <td><span class="font-mono text-cyan-300 text-xs">{{ item.codigo|default:"—" }}</span></td>
-          <td>{{ item.nombre }}</td>
+          <td>{{item.nombre|translate_nav:request}}</td>
           <td class="num">{{ item.cantidad }}</td>
           <td class="num">
             {% if request.path|slice:':4' == '/us/' %}${{ item.precio|floatformat:2|intcomma }}

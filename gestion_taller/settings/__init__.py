@@ -108,3 +108,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Matriz de tenants QA (torre de control) — cargada en el paquete efectivo de settings.
+# Antes estaba definida en settings/qa_control.py pero nunca importada, por lo que
+# `settings.QA_CONTROL_TENANTS` lanzaba AttributeError y la matriz efectiva era {}.
+from .qa_control import *  # noqa: F401,F403

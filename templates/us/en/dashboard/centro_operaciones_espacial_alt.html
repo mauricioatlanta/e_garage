@@ -128,7 +128,7 @@ body {
             <a href="/us/business-intelligence/dashboard/" class="command-panel">
                 <div class="text-3xl mb-2">🧠</div>
                 <div class="font-semibold console-text">BUSINESS INTELLIGENCE</div>
-                <div class="text-sm text-gray-400 console-text">Advanced Analytics</div>
+                <div class="text-sm text-gray-400 console-text">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Advanced Analytics{% else %}Analítica Avanzada{% endif %}</div>
             </a>
 
             <!-- Technical Personnel -->

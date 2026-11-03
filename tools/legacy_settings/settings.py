@@ -49,6 +49,7 @@ SITE_ID = 1
 
 # 🧱 Middleware
 MIDDLEWARE = [
+    "taller.middleware_lang.RegionalLanguageMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -133,7 +134,7 @@ APPEND_SLASH = True
 
 # ✅ Redirecciones de autenticación
 LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/dashboard/"
+LOGIN_REDIRECT_URL = "/cl/es/workspace/"
 LOGOUT_REDIRECT_URL = "/"
 
 
@@ -162,3 +163,19 @@ LOGGING = {
         "level": "DEBUG" if DEBUG else "INFO",
     },
 }
+
+# Autenticacion flexible: Permite login con username o con email (case-insensitive)
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_PRESERVE_USERNAME_CASING = False
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_PRESERVE_USERNAME_CASING = False
+
+ACCOUNT_ADAPTER = "taller.adapters.EgarageAccountAdapter"

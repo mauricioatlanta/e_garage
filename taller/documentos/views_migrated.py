@@ -414,6 +414,12 @@ class DocumentoLineItemsMixin:
     OTRO_FIELDS = ("proveedor", "descripcion", "costo_interno", "precio_cliente")
 
     def procesar_items_dinamicos(self, documento, clear_existing=False):
+        # OBSOLETO — la creación de líneas se hace vía JSON del formulario
+        # (_process_json_data en taller/forms/documento_form.py). Guarda para
+        # detectar cualquier caller residual antes de la eliminación física.
+        raise NotImplementedError(
+            "procesar_items_dinamicos está obsoleto; usa el JSON del formulario."
+        )
         from taller.models.lineas_documento import (
             LineaOtroServicio,
             LineaRepuesto,
@@ -1807,7 +1813,9 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
 
         # Calcular subtotales
         subtotal_repuestos = sum(linea.precio_unitario * linea.cantidad for linea in repuestos)
-        subtotal_servicios = sum(linea.precio_unitario * linea.cantidad for linea in servicios)
+        subtotal_servicios = sum(
+            (linea.precio_unitario or Decimal("0")) * linea.cantidad for linea in servicios
+        )
         subtotal_otros_servicios = sum(
             getattr(otro, "precio_cliente", Decimal("0.00")) for otro in otros_servicios
         )

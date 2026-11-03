@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
@@ -345,10 +346,10 @@ class ProductProfileTests(TestCase):
         profile = BusinessModuleService.get_product_profile(self.config)
         self.assertEqual(profile["name"], "eGarage Taller")
 
-    def test_mixed_resuelve_perfil_desarmaduria(self):
+    def test_mixed_resuelve_perfil_taller(self):
         self._set_rubro("MIXED")
         profile = BusinessModuleService.get_product_profile(self.config)
-        self.assertEqual(profile["name"], "eGarage Desarmaduría")
+        self.assertEqual(profile["name"], "eGarage Taller")
 
     def test_parts_resuelve_perfil_casa_repuestos(self):
         self._set_rubro("PARTS")
@@ -370,7 +371,7 @@ class ProductProfileTests(TestCase):
         self.assertEqual(profile["name"], "eGarage Taller")
 
     def test_desarmaduria_label_vehiculos_de_desarme(self):
-        self._set_rubro("MIXED")
+        self._set_rubro("DESARMADURIA")
         self.config.usa_vehiculos = True
         self.config.usa_servicios = True
         items = BusinessModuleService.get_nav_items(self.config, "/cl/es", "")

@@ -24,7 +24,7 @@ Credentials (all passwords: vc1234)
   05 vc_repuestos_taller  Repuestos + Taller     PARTS + [WORKSHOP]
   06 vc_carwash           Carwash / Detailing    DETAILING
   07 vc_vulcanizacion     Vulcanización          TIRE
-  08 vc_escapes           Escapes / Mufflers     EXHAUST
+  08 vc_escapes           Taller Mecánico        WORKSHOP
   09 vc_flotas            Mantención Flotas      FLEET
   10 vc_enterprise        Full Enterprise        MIXED (multi-rubro)
 """
@@ -143,7 +143,7 @@ PROFILES = [
         "username":      "vc_escapes",
         "display":       "Demo Escapes",
         "nombre_taller": "Demo Escapes y Tubos",
-        "rubro":         "EXHAUST",
+        "rubro":         "WORKSHOP",
         "rubros_extra":  [],
         "tagline":       "Especialistas en escapes y sistemas de escape",
         "with_desarme":  False,

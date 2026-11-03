@@ -19,6 +19,7 @@ from .catalog_bootstrap import get_master_catalog_service_items
 from .models import (
     CategoriaServicio,
     CategoriaServicioName,
+    CatalogoServicio,
     Servicio,
     ServicioExterno,
     SubcategoriaServicio,
@@ -172,7 +173,7 @@ def _scope_services_by_rubro(queryset, empresa, request=None):
     if not rubros or "WORKSHOP" in rubros:
         return queryset
 
-    supported = rubros.intersection({"DETAILING", "TIRE", "BODYSHOP", "EXHAUST", "ELECTRIC", "GLASS_AUDIO"})
+    supported = rubros.intersection({"DETAILING", "TIRE", "BODYSHOP", "ELECTRIC", "GLASS"})
     if not supported:
         return queryset.none()
 
@@ -470,6 +471,63 @@ def servicios_menu_data_api(request):
     return JsonResponse(result)
 
 
+def _catalogo_semilla_items(empresa, country, language, query="", limit=20, rubros=None):
+    """Servicios sugeridos del catálogo semilla por (rubro, país).
+
+    Prioridad: entrada específica del país → fallback internacional (pais=None).
+    Sin precio: la mano de obra se ingresa manualmente en la línea del documento.
+    """
+    active_rubros = {
+        str(value or "").strip().upper()
+        for value in (rubros or [])
+        if str(value or "").strip()
+    }
+    if not active_rubros:
+        active_rubros = {"WORKSHOP"}
+
+    qs = CatalogoServicio.objects.filter(activo=True, rubro__in=active_rubros)
+    especificos = qs.filter(pais=country).order_by("orden", "nombre")
+    internacionales = qs.filter(pais__isnull=True).order_by("orden", "nombre")
+
+    seen = set()
+    items = []
+    for item in list(especificos) + list(internacionales):
+        if item.nombre in seen:
+            continue
+        seen.add(item.nombre)
+        if language == "en":
+            label = item.nombre_en or item.nombre
+        elif language == "pt":
+            label = item.nombre_pt or item.nombre
+        else:
+            label = item.nombre
+        if query and query.lower() not in label.lower():
+            continue
+        items.append(
+            {
+                "id": "",
+                "pk": "",
+                "nombre": label,
+                "label": label,
+                "text": label,
+                "descripcion": "",
+                "codigo_interno": "",
+                "categoria": "",
+                "categoria_id": None,
+                "categoria_code": "",
+                "subcategoria": "",
+                "subcategoria_id": None,
+                "subcategoria_code": "",
+                "precio": None,
+                "precio_base": None,
+                "tipo": "",
+            }
+        )
+        if len(items) >= limit:
+            break
+    return items
+
+
 # API para búsqueda en tiempo real
 def buscar_servicios_api(request):
     query = (request.GET.get("q") or "").strip()
@@ -546,6 +604,17 @@ def buscar_servicios_api(request):
                 ),
             }
         )
+    if not data:
+        data = _catalogo_semilla_items(
+            empresa,
+            country,
+            language=language,
+            query=query,
+            limit=20,
+            rubros=active_rubros,
+        )
+        total = len(data)
+
     if not data:
         data = get_master_catalog_service_items(
             country,

@@ -70,7 +70,7 @@
       <div class="flex flex-wrap gap-2">
         <span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 text-xs">Órdenes de trabajo</span>
         <span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 text-xs">Inventario</span>
-        <span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 text-xs">Clientes</span>
+        <span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 text-xs">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Clients{% else %}Clientes{% endif %}</span>
       </div>
     </a>
 

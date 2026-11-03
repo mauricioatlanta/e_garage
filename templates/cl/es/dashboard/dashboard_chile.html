@@ -68,10 +68,10 @@
       </div>
       <nav class="hidden md:flex items-center gap-6 text-sm">
         <a href="/cl/" class="hover:text-cyan-300 transition-colors font-medium border-b-2 border-cyan-400">Inicio</a>
-        <a href="/cl/vehiculos/" class="hover:text-cyan-300 transition-colors">Vehículos</a>
-        <a href="/cl/clientes/" class="hover:text-cyan-300 transition-colors">Clientes</a>
-        <a href="/cl/repuestos/" class="hover:text-cyan-300 transition-colors">Repuestos</a>
-        <a href="/cl/servicios/" class="hover:text-cyan-300 transition-colors">Servicios</a>
+        <a href="/cl/vehiculos/" class="hover:text-cyan-300 transition-colors">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Vehicles{% else %}Vehículos{% endif %}</a>
+        <a href="/cl/clientes/" class="hover:text-cyan-300 transition-colors">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Clients{% else %}Clientes{% endif %}</a>
+        <a href="/cl/repuestos/" class="hover:text-cyan-300 transition-colors">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Parts{% else %}Repuestos{% endif %}</a>
+        <a href="/cl/servicios/" class="hover:text-cyan-300 transition-colors">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Services{% else %}Servicios{% endif %}</a>
       </nav>
       <div class="flex items-center gap-3">
         <a href="/us/" class="text-xs md:text-sm text-slate-300 hover:text-sky-300 transition-colors flex items-center gap-1">

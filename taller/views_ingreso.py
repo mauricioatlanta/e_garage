@@ -316,5 +316,4 @@ def workspace_live_feed(request, *args, **kwargs):
 @login_required
 def centro_de_mando(request, *args, **kwargs):
     empresa = get_active_empresa(request) or get_user_empresa_safe(request.user)
-    from django.shortcuts import redirect
-    return redirect('/cl/es/reportes/')
+    return render(request, "taller/workspace/centro_de_mando.html", {"empresa": empresa})

@@ -48,7 +48,7 @@
         {% if obj.neto_otros_servicios %}
         <div class="kv">
           <span class="muted">
-            {% if empresa_pais == "US" %} Outsourced Services {% else %} Otros Servicios {% endif %}
+            {% if empresa_pais == "US" %} {% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Servicios Externos{% else %}Outsourced Services{% endif %} {% else %} Otros Servicios {% endif %}
           </span>
           <span>
             {{ obj.neto_otros_servicios|default:0|money_fmt:empresa_moneda }}

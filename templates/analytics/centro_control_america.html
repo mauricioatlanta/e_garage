@@ -351,6 +351,47 @@
             color: #fff;
             font-size: 0.9rem;
         }
+    
+        /* Estilos Semáforo y Tabla Registros */
+        .traffic-legend {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+        .traffic-item { display: flex; align-items: center; gap: 6px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        .dot-green { background-color: #00ff88; box-shadow: 0 0 8px #00ff88; }
+        .dot-yellow { background-color: #ffdd00; box-shadow: 0 0 8px #ffdd00; }
+        .dot-red { background-color: #ff3344; box-shadow: 0 0 8px #ff3344; }
+
+        .latest-subscribers-box {
+            margin-top: 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .latest-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        .latest-table th {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid rgba(0, 245, 255, 0.3);
+            color: var(--neon-cyan);
+        }
+        .latest-table td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .badge-active { color: #00ff88; font-weight: bold; }
+        .badge-inactive { color: #ff3344; font-weight: bold; }
+
     </style>
 </head>
 <body>
@@ -362,9 +403,11 @@
         </div>
         <div class="filters-container">
             <select id="dateRange" class="filter-select">
-                <option value="30">Últimos 30 días</option>
+                <option value="1">Hoy (Últimas 24h)</option>
+                <option value="7">Últimos 7 días</option>
+                <option value="30" selected>Últimos 30 días</option>
                 <option value="90">Últimos 90 días</option>
-                <option value="365">Últimos 12 meses</option>
+                <option value="365">Último año</option>
             </select>
             <select id="planFilter" class="filter-select">
                 <option value="all">Todos los planes</option>
@@ -398,7 +441,7 @@
             <div class="kpi-card">
                 <div class="kpi-icon">📈</div>
                 <div class="kpi-number" id="kpiNuevos">-</div>
-                <div class="kpi-label">Nuevos (30 días)</div>
+                <div class="kpi-label">Nuevos (Periodo)</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-icon">🔁</div>
@@ -420,6 +463,33 @@
             </div>
 
             <!-- Panel de ranking -->
+            
+                <div class="traffic-legend">
+                    <span class="traffic-item"><span class="dot dot-green"></span> Tráfico Alto (&ge; 5)</span>
+                    <span class="traffic-item"><span class="dot dot-yellow"></span> Tráfico Medio (2-4)</span>
+                    <span class="traffic-item"><span class="dot dot-red"></span> Tráfico Bajo (1)</span>
+                </div>
+            </div>
+
+            <!-- Tabla de Últimos Suscriptores Registrados -->
+            <div class="latest-subscribers-box">
+                <h3 style="color: var(--neon-cyan); font-family: Orbitron; margin-bottom: 10px;">📋 ÚLTIMAS REGISTRACIONES DE SUSCRIPTORES</h3>
+                <table class="latest-table">
+                    <thead>
+                        <tr>
+                            <th>Taller / Empresa</th>
+                            <th>País</th>
+                            <th>Plan</th>
+                            <th>Estado</th>
+                            <th>Fecha Registro</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaUltimosSuscriptores">
+                        <tr><td colspan="5" style="text-align: center;">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
             <div class="ranking-panel">
                 <h2 class="ranking-title">Ranking de Países</h2>
                 <div id="rankingList" class="loading">
@@ -463,30 +533,84 @@
         });
 
         // Cargar KPIs globales
+        
         async function loadGlobalKPIs() {
             try {
                 const response = await fetch(`/analytics/admin/api/global-kpis/?days=${currentDays}`);
                 const data = await response.json();
-                
-                document.getElementById('kpiActivos').textContent = data.suscriptores_activos.toLocaleString();
-                document.getElementById('kpiPaises').textContent = data.paises_activos;
-                document.getElementById('kpiMRR').textContent = formatCurrency(data.mrr_total);
-                document.getElementById('kpiNuevos').textContent = data.nuevos_periodo;
-                document.getElementById('kpiRetencion').textContent = data.tasa_retencion.toFixed(1) + '%';
-                
-                if (data.rubro_mas_frecuente) {
-                    document.getElementById('kpiRubro').textContent = 
-                        data.rubro_mas_frecuente.nombre + ' ' + 
-                        data.rubro_mas_frecuente.porcentaje.toFixed(0) + '%';
-                } else {
-                    document.getElementById('kpiRubro').textContent = 'N/A';
+
+                document.getElementById("kpiActivos").textContent = data.suscriptores_activos;
+                document.getElementById("kpiPaises").textContent = data.paises_activos;
+                document.getElementById("kpiMRR").textContent = formatCurrency(data.mrr_total);
+                document.getElementById("kpiNuevos").textContent = data.nuevos_periodo;
+
+                // Cargar Mapa con GeoJSON y colores de semáforo
+                renderMapSemaforo(data.map_data);
+
+                // Llenar tabla de últimos registros
+                const tbody = document.getElementById("listaUltimosSuscriptores");
+                if (tbody && data.ultimos_registros) {
+                    tbody.innerHTML = "";
+                    data.ultimos_registros.forEach(item => {
+                        const tr = document.createElement("tr");
+                        const estadoHtml = item.activo ? "<span class="badge-active">ACTIVO</span>" : "<span class="badge-inactive">INACTIVO</span>";
+                        tr.innerHTML = `
+                            <td><strong>${item.nombre}</strong></td>
+                            <td>${item.pais === "CL" ? "🇨🇱 Chile" : (item.pais === "US" ? "🇺🇸 USA" : item.pais)}</td>
+                            <td>${item.plan}</td>
+                            <td>${estadoHtml}</td>
+                            <td>${item.fecha}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
                 }
             } catch (error) {
-                console.error('Error cargando KPIs:', error);
+                console.error("Error cargando KPIs:", error);
             }
         }
 
-        // Cargar ranking de países
+        async function renderMapSemaforo(mapData) {
+            const mapDiv = document.getElementById("map-americas");
+            if (!mapChart) {
+                mapChart = echarts.init(mapDiv);
+            }
+            try {
+                const res = await fetch("/static/geojson/americas.geojson");
+                const geoJson = await res.json();
+                echarts.registerMap("americas", geoJson);
+
+                mapChart.setOption({
+                    backgroundColor: "transparent",
+                    tooltip: {
+                        trigger: "item",
+                        formatter: function(params) {
+                            const val = params.value || 0;
+                            let estado = val >= 5 ? "🟢 Alto" : (val >= 2 ? "🟡 Medio" : (val > 0 ? "🔴 Bajo" : "Sin actividad"));
+                            return `<b>${params.name}</b><br/>Suscriptores: ${val}<br/>Estado 🚦: ${estado}`;
+                        }
+                    },
+                    series: [{
+                        type: "map",
+                        map: "americas",
+                        roam: true,
+                        itemStyle: {
+                            areaColor: "rgba(255, 255, 255, 0.05)",
+                            borderColor: "rgba(0, 245, 255, 0.3)",
+                            borderWidth: 1
+                        },
+                        emphasis: {
+                            label: { show: true, color: "#fff" },
+                            itemStyle: { areaColor: "#00f5ff" }
+                        },
+                        data: mapData
+                    }]
+                });
+            } catch (e) {
+                console.error("Error renderizando mapa:", e);
+            }
+        }
+
+
         async function loadCountryRanking() {
             try {
                 const response = await fetch(`/analytics/admin/api/country-ranking/?days=${currentDays}`);

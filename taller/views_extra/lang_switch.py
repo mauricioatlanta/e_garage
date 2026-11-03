@@ -1,4 +1,3 @@
-
 import re
 from urllib.parse import urlparse, urlunparse
 
@@ -17,6 +16,7 @@ def set_language_us(request):
     pais = None
     next_url = request.POST.get("next", "")
 
+    # FIX: Priorizar next_url de USA sobre empresa
     if next_url.startswith("/us/") or "/us/" in next_url:
         pais = "US"
     elif empresa:
@@ -30,7 +30,14 @@ def set_language_us(request):
 
     lang = request.POST.get("language")
     if not lang or lang not in ALLOWED_BY_COUNTRY["US"]:
-        messages.error(request, "Language not allowed." if getattr(request, "LANGUAGE_CODE", "en") == "en" else "Idioma no permitido.")
+        messages.error(
+            request,
+            (
+                "Language not allowed."
+                if getattr(request, "LANGUAGE_CODE", "en") == "en"
+                else "Idioma no permitido."
+            ),
+        )
         return redirect(request.POST.get("next") or "/")
 
     request.session["django_language"] = lang
@@ -54,15 +61,29 @@ def set_language_us(request):
     elif lang == "es" and "/en/" in path:
         path = path.replace("/en/", "/es/", 1)
 
-    next_url = urlunparse((parsed.scheme, parsed.netloc, path, parsed.params, parsed.query, parsed.fragment))
+    next_url = urlunparse(
+        (parsed.scheme, parsed.netloc, path, parsed.params, parsed.query, parsed.fragment)
+    )
+
     response = redirect(next_url)
     from django.conf import settings
+
     cookie_name = getattr(settings, "LANGUAGE_COOKIE_NAME", "django_language")
-    cookie_age = getattr(settings, "LANGUAGE_COOKIE_AGE", 60*60*24*365)
+    cookie_age = getattr(settings, "LANGUAGE_COOKIE_AGE", 60 * 60 * 24 * 365)
     cookie_path = getattr(settings, "LANGUAGE_COOKIE_PATH", "/")
     cookie_domain = getattr(settings, "LANGUAGE_COOKIE_DOMAIN", None)
     cookie_secure = getattr(settings, "LANGUAGE_COOKIE_SECURE", False)
     cookie_httponly = getattr(settings, "LANGUAGE_COOKIE_HTTPONLY", False)
     cookie_samesite = getattr(settings, "LANGUAGE_COOKIE_SAMESITE", "Lax")
-    response.set_cookie(cookie_name, lang, max_age=cookie_age, path=cookie_path, domain=cookie_domain, secure=cookie_secure, httponly=cookie_httponly, samesite=cookie_samesite)
+
+    response.set_cookie(
+        cookie_name,
+        lang,
+        max_age=cookie_age,
+        path=cookie_path,
+        domain=cookie_domain,
+        secure=cookie_secure,
+        httponly=cookie_httponly,
+        samesite=cookie_samesite,
+    )
     return response

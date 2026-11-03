@@ -141,25 +141,24 @@ class ClienteForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        self.empresa = kwargs.pop("empresa", None)  # Almacenar empresa
+        self.language = kwargs.pop("language", None) or "es"
+        self.request = kwargs.pop("request", None)
+        self.empresa = kwargs.pop("empresa", None)
         pais_override = kwargs.pop("pais", None)
-        self.language = str(kwargs.pop("language", "") or "").lower()
+
         super().__init__(*args, **kwargs)
 
-        # Solo nombre, apellido y teléfono son obligatorios (el modelo permite blank en apellido/teléfono).
-        self.fields["nombre"].required = True
-        self.fields["apellido"].required = True
-        self.fields["telefono"].required = True
-        self.fields["email"].required = False
-        self.fields["direccion"].required = False
-
-        # Agregar atributo pais para el template
+        req = getattr(self, "request", None)
         if pais_override:
             self.pais = pais_override
+        elif req and getattr(req, "user", None) and req.user.is_superuser and req.session.get("modo_soporte_pais"):
+            self.pais = req.session.get("modo_soporte_pais")
+        elif req and getattr(req, "path_info", "").startswith("/us/"):
+            self.pais = "US"
         elif self.empresa and hasattr(self.empresa, "pais"):
             self.pais = self.empresa.pais
         else:
-            self.pais = "CL"  # Default a Chile
+            self.pais = "CL"
         self.pais = str(self.pais or "CL").upper()
 
         if self.pais == "US" and self.language == "en":
@@ -188,7 +187,8 @@ class ClienteForm(forms.ModelForm):
             ensure_legacy_chile_locations()
 
         # Chile: región/ciudad
-        if "region" in self.data and self.data.get("region") not in [None, ""]:
+        data_dict = getattr(self, "data", None) or {}
+        if "region" in data_dict and data_dict.get("region") not in [None, ""]:
             try:
                 region_id = int(self.data.get("region"))
                 self.fields["ciudad"].queryset = TallerCiudad.objects.filter(region_id=region_id)
@@ -229,7 +229,8 @@ class ClienteForm(forms.ModelForm):
                 self.fields["ciudad_usa"].empty_label = "Select city"
 
         # Cargar ciudades si hay estado seleccionado
-        if "estado_usa" in self.data and self.data.get("estado_usa") not in [None, ""]:
+        data_dict = getattr(self, "data", None) or {}
+        if "estado_usa" in data_dict and data_dict.get("estado_usa") not in [None, ""]:
             try:
                 estado_id = int(self.data.get("estado_usa"))
                 self.fields["ciudad_usa"].queryset = CiudadUSA.objects.filter(

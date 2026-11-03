@@ -15,10 +15,10 @@
 
       <a href="/cl/es/dashboard/" class="nav-item">Dashboard</a>
       <a href="/cl/es/documentos/" class="nav-item">Documentos</a>
-      <a href="/cl/es/clientes/" class="nav-item">Clientes</a>
-      <a href="/cl/es/vehiculos/" class="nav-item">Vehículos</a>
-      <a href="/cl/es/repuestos/" class="nav-item">Repuestos</a>
-      <a href="/cl/es/reportes/" class="nav-item">Reportes</a>
+      <a href="/cl/es/clientes/" class="nav-item">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Clients{% else %}Clientes{% endif %}</a>
+      <a href="/cl/es/vehiculos/" class="nav-item">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Vehicles{% else %}Vehículos{% endif %}</a>
+      <a href="/cl/es/repuestos/" class="nav-item">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Parts{% else %}Repuestos{% endif %}</a>
+      <a href="/cl/es/reportes/" class="nav-item">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Reports{% else %}Reportes{% endif %}</a>
 
     </nav>
 

@@ -203,7 +203,8 @@ class RepuestoForm(forms.ModelForm):
             ),
             "stock_minimo": forms.NumberInput(
                 attrs={
-                    "class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"
+                    "class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2",
+                    "min": "0",
                 }
             ),
             "proveedor": forms.TextInput(
@@ -308,7 +309,7 @@ class RepuestoForm(forms.ModelForm):
 
             self.fields["stock_minimo"].label = "Stock Mínimo"
             self.fields["stock_minimo"].help_text = (
-                "Umbral opcional para alertas de reabastecimiento"
+                "Déjalo vacío para desactivar la alerta. Cero alerta solamente al agotarse."
             )
 
             self.fields["proveedor"].label = "Proveedor"

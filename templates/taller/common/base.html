@@ -499,22 +499,22 @@
     {% if request.user|is_owner %}
     <a href="{% nav_url 'settings' %}" class="nav-button-standard">
       <span class="nav-icon">⚙️</span>
-      <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Settings{% else %}Ajustes{% endif %}</span>
+      <span>{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Settings{% else %}Ajustes{% endif %}</span>
     </a>
     <a href="{% nav_url 'team' %}" class="nav-button-standard {% if 'equipo' in request.path %}bg-gray-100 text-gray-900{% endif %}">
       <span class="nav-icon">👤</span>
-      <span>Equipo</span>
+      <span>{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Team{% else %}Equipo{% endif %}</span>
     </a>
     {% endif %}
 
     <a href="{% nav_url 'center' %}" class="nav-button-standard">
       <span class="nav-icon">🚀</span>
-      <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Center{% else %}Centro{% endif %}</span>
+      <span>{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Center{% else %}Centro{% endif %}</span>
     </a>
 
     <a href="{% nav_url 'clients' %}" class="nav-button-standard">
       <span class="nav-icon">👥</span>
-      <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Clients{% else %}Clientes{% endif %}</span>
+      <span>{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Clients{% else %}Clientes{% endif %}</span>
     </a>
 
     <a href="{% nav_url 'documents' %}" class="nav-button-standard">
@@ -524,39 +524,39 @@
 
     <a href="{% nav_url 'extra' %}" class="nav-button-standard">
       <span class="nav-icon">⭐</span>
-      <span>Extra</span>
+      <span>{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Extra{% else %}Extra{% endif %}</span>
     </a>
 
     <a href="{% nav_url 'parts' %}" class="nav-button-standard">
       <span class="nav-icon">🔧</span>
-      <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Parts{% else %}Repuestos{% endif %}</span>
+      <span>{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Parts{% else %}Repuestos{% endif %}</span>
     </a>
 
     <a href="{% nav_url 'reports' %}" class="nav-button-standard">
       <span class="nav-icon">📊</span>
-      <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Reports{% else %}Reportes{% endif %}</span>
+      <span>{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Reports{% else %}Reportes{% endif %}</span>
     </a>
 
     <a href="{% nav_url 'services' %}" class="nav-button-standard">
       <span class="nav-icon">🛠️</span>
-      <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Services{% else %}Servicios{% endif %}</span>
+      <span>{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Services{% else %}Servicios{% endif %}</span>
     </a>
 
     <a href="{% nav_url 'disassembly' %}" class="nav-button-standard">
       <span class="nav-icon">🧩</span>
-      <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Disassembly{% else %}Desarme{% endif %}</span>
+      <span>{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Disassembly{% else %}Desarme{% endif %}</span>
     </a>
 
     <a href="{% nav_url 'vehicles' %}" class="nav-button-standard">
       <span class="nav-icon">🚗</span>
-      <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Vehicles{% else %}Vehículos{% endif %}</span>
+      <span>{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Vehicles{% else %}Vehículos{% endif %}</span>
     </a>
 
     <form action="{% url 'account_logout' %}" method="post" style="display: inline;">
       {% csrf_token %}
       <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
         <span class="nav-icon">🚪</span>
-        <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Logout{% else %}Salir{% endif %}</span>
+        <span>{% trans "Salir" %}</span>
       </button>
     </form>
 

@@ -1336,7 +1336,7 @@
                     <div class="metric-icon">�</div>
                     <div class="metric-data">
                         <div class="metric-value">{{ resumen_general.total_servicios_realizados|default:"0" }}</div>
-                        <div class="metric-label">Servicios</div>
+                        <div class="metric-label">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Services{% else %}Servicios{% endif %}</div>
                         <div class="trend-indicator neutral">+2.1%</div>
                     </div>
                 </div>
@@ -1366,7 +1366,7 @@
                 <div class="chart-stats">
                     <div class="mini-stat">
                         <span class="stat-value">{{ servicios_ranking|length }}</span>
-                        <span class="stat-label">Servicios</span>
+                        <span class="stat-label">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Services{% else %}Servicios{% endif %}</span>
                     </div>
                 </div>
             </div>
@@ -1383,7 +1383,7 @@
                 <div class="chart-stats">
                     <div class="mini-stat">
                         <span class="stat-value">{{ repuestos_utilidad|length }}</span>
-                        <span class="stat-label">Repuestos</span>
+                        <span class="stat-label">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Parts{% else %}Repuestos{% endif %}</span>
                     </div>
                 </div>
             </div>
@@ -1644,8 +1644,8 @@
                             <tr>
                                 <th>Técnico</th>
                                 <th>Documentos</th>
-                                <th>Repuestos</th>
-                                <th>Servicios</th>
+                                <th>{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Parts{% else %}Repuestos{% endif %}</th>
+                                <th>{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Services{% else %}Servicios{% endif %}</th>
                                 <th>Ingresos Totales</th>
                                 <th>Promedio/Doc</th>
                                 <th>Performance</th>

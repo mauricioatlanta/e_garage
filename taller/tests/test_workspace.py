@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 """
 Tests for Workspace UI 2.0 layer.
 
@@ -71,9 +72,9 @@ class WorkspaceDefResolutionTests(TestCase):
         ws = get_workspace_def("WORKSHOP")
         self.assertEqual(ws.product_key, PRODUCT_TALLER)
 
-    def test_mixed_returns_desarmaduria(self):
+    def test_mixed_returns_taller(self):
         ws = get_workspace_def("MIXED")
-        self.assertEqual(ws.product_key, PRODUCT_DESARMADURIA)
+        self.assertEqual(ws.product_key, PRODUCT_TALLER)
 
     def test_parts_returns_casa_repuestos(self):
         ws = get_workspace_def("PARTS")
@@ -92,10 +93,8 @@ class WorkspaceDefResolutionTests(TestCase):
         self.assertEqual(ws.product_key, PRODUCT_TALLER)
 
     def test_all_workshop_variants_resolve_to_taller(self):
-        for rubro in ["WORKSHOP", "WORKSHOP_MOTO", "WORKSHOP_HEAVY", "EXHAUST", "BODYSHOP",
-                      "ELECTRIC", "GLASS_AUDIO", "SUSPENSION_STEERING", "BRAKES",
-                      "OBD_DIAGNOSTIC", "CLASSIC_CARS", "AUDIO_ENTERTAINMENT",
-                      "GAS_CONVERSION", "BODY_GLASS", "TUNING", "FLEET", "FLEET_REPAIR"]:
+        for rubro in ["WORKSHOP", "WORKSHOP_MOTO", "WORKSHOP_HEAVY", "BODYSHOP",
+                      "GLASS", "ELECTRIC", "FLEET"]:
             ws = get_workspace_def(rubro)
             self.assertEqual(ws.product_key, PRODUCT_TALLER, f"{rubro} should map to TALLER")
 
@@ -114,7 +113,7 @@ class WorkspaceServiceZeroQueryTests(TestCase):
         self.assertIn("theme", result)
 
     def test_resolve_desarmaduria_zero_queries(self):
-        config = _make_config("MIXED")
+        config = _make_config("DESARMADURIA")
         with self.assertNumQueries(0):
             WorkspaceService.resolve(config, "/cl/es", "/cl/es/dashboard/")
 
@@ -147,7 +146,7 @@ class WorkspaceBrandTests(TestCase):
         self.assertEqual(ws["brand"]["icon"], "fas fa-wrench")
 
     def test_desarm_icon_is_car_crash(self):
-        config = _make_config("MIXED")
+        config = _make_config("DESARMADURIA")
         ws = WorkspaceService.resolve(config)
         self.assertEqual(ws["brand"]["icon"], "fas fa-car-crash")
 
@@ -227,7 +226,7 @@ class WorkspaceNavTests(TestCase):
         self.assertIn("recycling_catalog", nav_keys)
 
     def test_desarm_nav_includes_desarme(self):
-        config = _make_config("MIXED")
+        config = _make_config("DESARMADURIA")
         ws = WorkspaceService.resolve(config, "/cl/es", "")
         keys = [item["key"] for item in ws["nav"]]
         self.assertIn(MOD_DESARME, keys)
@@ -287,18 +286,18 @@ class WorkspaceWidgetKeyTests(TestCase):
         self.assertNotIn(WGT_KPI_STOCK_CRITICAL, ws.widget_keys)
 
     def test_desarm_widget_keys(self):
-        ws = get_workspace_def("MIXED")
+        ws = get_workspace_def("DESARMADURIA")
         self.assertIn(WGT_KPI_DESARM_AVAIL, ws.widget_keys)
         self.assertIn(WGT_KPI_DESARM_DEPLETED, ws.widget_keys)
         self.assertIn(WGT_KPI_PARTS_COUNT, ws.widget_keys)
         self.assertIn(WGT_KPI_PARTS_SOLD_TODAY, ws.widget_keys)
 
     def test_desarm_has_no_ot_open_widget(self):
-        ws = get_workspace_def("MIXED")
+        ws = get_workspace_def("DESARMADURIA")
         self.assertNotIn(WGT_KPI_OT_OPEN, ws.widget_keys)
 
     def test_desarm_excludes_generic_inventory_value(self):
-        ws = get_workspace_def("MIXED")
+        ws = get_workspace_def("DESARMADURIA")
         self.assertNotIn(WGT_KPI_INVENTORY_VALUE, ws.widget_keys)
 
     def test_parts_widget_keys(self):
@@ -319,7 +318,7 @@ class WorkspaceWidgetKeyTests(TestCase):
         self.assertIn(WGT_KPI_DOCS_TODAY, ws.widget_keys)
 
     def test_desarm_uses_parts_sold_today_not_docs_today(self):
-        ws = get_workspace_def("MIXED")
+        ws = get_workspace_def("DESARMADURIA")
         self.assertIn(WGT_KPI_PARTS_SOLD_TODAY, ws.widget_keys)
         self.assertNotIn(WGT_KPI_DOCS_TODAY, ws.widget_keys)
 
@@ -419,8 +418,8 @@ class WorkspaceDashboardServiceTests(TestCase):
     def test_desarm_dashboard_query_count(self):
         # DESARM: GROUP_INVENTORY + GROUP_DESARM + GROUP_PARTS_TODAY + ACTIVITY_FEED = 4 queries
         from taller.services.workspace_dashboard_service import WorkspaceDashboardService
-        empresa = self._make_empresa("MIXED")
-        ws_def = get_workspace_def("MIXED")
+        empresa = self._make_empresa("DESARMADURIA")
+        ws_def = get_workspace_def("DESARMADURIA")
         with self.assertNumQueries(4):
             WorkspaceDashboardService.resolve(ws_def, empresa)
 
@@ -579,7 +578,7 @@ class WorkspaceDesarmDepletedTests(TestCase):
 
     def _resolve_desarm(self, empresa):
         from taller.services.workspace_dashboard_service import WorkspaceDashboardService
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         result = WorkspaceDashboardService.resolve(ws_def, empresa)
         return {w["key"]: w["value"] for w in result["widgets"]}
 
@@ -638,7 +637,7 @@ class WorkspacePartsSoldTodayTests(TestCase):
 
     def _resolve_parts_sold(self, empresa, today=None):
         from taller.services.workspace_dashboard_service import WorkspaceDashboardService
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         result = WorkspaceDashboardService.resolve(ws_def, empresa, today=today)
         return next(w["value"] for w in result["widgets"] if w["key"] == WGT_KPI_PARTS_SOLD_TODAY)
 
@@ -704,7 +703,7 @@ class WorkspacePartsCountTests(TestCase):
 
     def _resolve_parts_count(self, empresa):
         from taller.services.workspace_dashboard_service import WorkspaceDashboardService
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         result = WorkspaceDashboardService.resolve(ws_def, empresa)
         return next(w["value"] for w in result["widgets"] if w["key"] == WGT_KPI_PARTS_COUNT)
 
@@ -805,7 +804,7 @@ class WorkspaceActivityFeedTests(TestCase):
     def test_feed_present_for_desarm(self):
         empresa = self._make_empresa()
         self._make_doc(empresa, tipo="PTS", estado="EMITIDO")
-        feed = self._resolve_feed(empresa, rubro="MIXED")
+        feed = self._resolve_feed(empresa, rubro="DESARMADURIA")
         self.assertEqual(len(feed), 1)
         self.assertEqual(feed[0]["tipo"], "PTS")
         self.assertEqual(feed[0]["tipo_label"], "Venta Repuestos")
@@ -919,14 +918,14 @@ class WorkspaceAlertsQueryCountTests(TestCase):
     def test_exactly_two_queries_for_desarmaduria(self):
         from taller.services.workspace_alerts_service import WorkspaceAlertsService
         empresa = self._make_empresa()
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         with self.assertNumQueries(2):
             WorkspaceAlertsService.resolve(ws_def, empresa)
 
     def test_empty_result_when_no_issues(self):
         from taller.services.workspace_alerts_service import WorkspaceAlertsService
         empresa = self._make_empresa()
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         result = WorkspaceAlertsService.resolve(ws_def, empresa)
         self.assertEqual(result, [])
 
@@ -945,7 +944,7 @@ class WorkspaceAlertsDelayedTests(TestCase):
     def _resolve(self, empresa, today=None):
         from datetime import date
         from taller.services.workspace_alerts_service import WorkspaceAlertsService
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         today = today or date.today()
         return WorkspaceAlertsService.resolve(ws_def, empresa, today=today)
 
@@ -1081,7 +1080,7 @@ class WorkspaceAlertsDelayedTests(TestCase):
         today = date(2026, 6, 1)
         old_date = today - timedelta(days=DELAYED_DAYS + 1)
         self._make_vehiculo(empresa, estado_desarme="INGRESADO", fecha_ingreso_desarme=old_date, es_placeholder=False)
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         from taller.services.workspace_alerts_service import WorkspaceAlertsService
         alerts = WorkspaceAlertsService.resolve(ws_def, empresa, prefix="/cl/es", today=today)
         alert = self._get_alert(alerts, ALRT_DESARM_DELAYED)
@@ -1103,7 +1102,7 @@ class WorkspaceAlertsPiezaTests(TestCase):
 
     def _resolve(self, empresa):
         from taller.services.workspace_alerts_service import WorkspaceAlertsService
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         return WorkspaceAlertsService.resolve(ws_def, empresa)
 
     def _get_alert(self, alerts, key):
@@ -1221,7 +1220,7 @@ class WorkspaceAlertsPiezaTests(TestCase):
         from taller.services.workspace_alerts_service import ALRT_PIEZA_NO_FOTO, WorkspaceAlertsService
         empresa = self._make_empresa()
         self._make_pieza(empresa, estado_pieza="DISPONIBLE", activo=True, imagen=None)
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         alerts = WorkspaceAlertsService.resolve(ws_def, empresa, prefix="/cl/es")
         alert = self._get_alert(alerts, ALRT_PIEZA_NO_FOTO)
         self.assertIn("sin_foto=1", alert["url"])
@@ -1232,7 +1231,7 @@ class WorkspaceAlertsPiezaTests(TestCase):
         empresa = self._make_empresa()
         self._make_pieza(empresa, estado_pieza="DISPONIBLE", activo=True,
                          precio_venta_sugerido=None, precio_sugerido=None)
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         alerts = WorkspaceAlertsService.resolve(ws_def, empresa, prefix="/cl/es")
         alert = self._get_alert(alerts, ALRT_PIEZA_NO_PRECIO)
         self.assertIn("sin_precio=1", alert["url"])
@@ -1241,7 +1240,7 @@ class WorkspaceAlertsPiezaTests(TestCase):
         from taller.services.workspace_alerts_service import ALRT_PIEZA_NO_UBICACION, WorkspaceAlertsService
         empresa = self._make_empresa()
         self._make_pieza(empresa, estado_pieza="DISPONIBLE", activo=True, ubicacion_fisica=None)
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         alerts = WorkspaceAlertsService.resolve(ws_def, empresa, prefix="/cl/es")
         alert = self._get_alert(alerts, ALRT_PIEZA_NO_UBICACION)
         self.assertIn("sin_ubicacion=1", alert["url"])
@@ -1262,7 +1261,7 @@ class WorkspaceAlertsStructureTests(TestCase):
         from taller.services.workspace_alerts_service import WorkspaceAlertsService
         empresa = self._make_empresa()
         self._make_pieza_sin_foto(empresa)
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         alerts = WorkspaceAlertsService.resolve(ws_def, empresa)
         self.assertTrue(len(alerts) > 0)
         for alert in alerts:
@@ -1272,7 +1271,7 @@ class WorkspaceAlertsStructureTests(TestCase):
     def test_only_nonzero_alerts_returned(self):
         from taller.services.workspace_alerts_service import WorkspaceAlertsService
         empresa = self._make_empresa()
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         alerts = WorkspaceAlertsService.resolve(ws_def, empresa)
         for alert in alerts:
             self.assertGreater(alert["count"], 0)
@@ -1282,7 +1281,7 @@ class WorkspaceAlertsStructureTests(TestCase):
         from taller.services.workspace_alerts_service import WorkspaceAlertsService
         empresa = self._make_empresa()
         PiezaDesarmeFactory(empresa=empresa, estado_pieza="DISPONIBLE", activo=True, imagen=None)
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         alerts = WorkspaceAlertsService.resolve(ws_def, empresa)
         for alert in alerts:
             self.assertIn(alert["severity"], ("warning", "info"))
@@ -1298,7 +1297,7 @@ class WorkspaceAlertsStructureTests(TestCase):
         old_date = today - timedelta(days=DELAYED_DAYS + 1)
         VehiculoDesarmeFactory(empresa=empresa, estado_desarme="INGRESADO",
                                fecha_ingreso_desarme=old_date, es_placeholder=False)
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         alerts = WorkspaceAlertsService.resolve(ws_def, empresa, today=today)
         alert = next(a for a in alerts if a["key"] == ALRT_DESARM_DELAYED)
         self.assertEqual(alert["severity"], "warning")
@@ -1313,7 +1312,7 @@ class WorkspaceAlertsStructureTests(TestCase):
         PiezaDesarmeFactory(empresa=empresa, estado_pieza="DISPONIBLE", activo=True,
                             imagen=None, precio_venta_sugerido=None,
                             precio_sugerido=None, ubicacion_fisica=None)
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         alerts = WorkspaceAlertsService.resolve(ws_def, empresa)
         pieza_keys = {ALRT_PIEZA_NO_FOTO, ALRT_PIEZA_NO_PRECIO, ALRT_PIEZA_NO_UBICACION}
         for alert in alerts:
@@ -1750,7 +1749,7 @@ class BriefingContextBuilderTests(TestCase):
     def test_build_returns_briefing_context(self):
         from taller.services.workspace_briefing_service import BriefingContext, BriefingContextBuilder
         empresa = self._make_empresa()
-        ws_def = get_workspace_def("MIXED")  # DESARMADURIA
+        ws_def = get_workspace_def("DESARMADURIA")  # DESARMADURIA
         ctx = BriefingContextBuilder.build(empresa, ws_def, "/cl/es", "es")
         self.assertIsInstance(ctx, BriefingContext)
 
@@ -1758,14 +1757,14 @@ class BriefingContextBuilderTests(TestCase):
         from taller.services.workspace_briefing_service import BriefingContextBuilder
         from taller.constants.product_profiles import PRODUCT_DESARMADURIA
         empresa = self._make_empresa()
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         ctx = BriefingContextBuilder.build(empresa, ws_def, "/cl/es", "es")
         self.assertEqual(ctx.product_key, PRODUCT_DESARMADURIA)
 
     def test_kpi_snapshot_has_no_url_field(self):
         from taller.services.workspace_briefing_service import BriefingContextBuilder
         empresa = self._make_empresa()
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         ctx = BriefingContextBuilder.build(empresa, ws_def, "/cl/es", "es")
         for kpi in ctx.kpi_snapshot:
             self.assertNotIn("url", kpi, "kpi_snapshot must not contain URLs")
@@ -1774,7 +1773,7 @@ class BriefingContextBuilderTests(TestCase):
     def test_alert_snapshot_has_no_url_or_icon(self):
         from taller.services.workspace_briefing_service import BriefingContextBuilder
         empresa = self._make_empresa()
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         ctx = BriefingContextBuilder.build(empresa, ws_def, "/cl/es", "es")
         for a in ctx.alert_snapshot:
             self.assertNotIn("url", a, "alert_snapshot must not contain URLs")
@@ -1783,7 +1782,7 @@ class BriefingContextBuilderTests(TestCase):
     def test_empresa_id_is_pk(self):
         from taller.services.workspace_briefing_service import BriefingContextBuilder
         empresa = self._make_empresa()
-        ws_def = get_workspace_def("MIXED")
+        ws_def = get_workspace_def("DESARMADURIA")
         ctx = BriefingContextBuilder.build(empresa, ws_def, "/cl/es", "es")
         self.assertEqual(ctx.empresa_id, empresa.pk)
 
@@ -2046,19 +2045,20 @@ class MultiRubroNavGroupTests(TestCase):
         self.assertGreater(len(sections), 0,
                            "Se esperan section_labels en nav multi-rubro WORKSHOP+DESARMADURIA")
 
-    def test_workshop_plus_desarmaduria_mod_repuestos_appears_twice(self):
+    def test_workshop_plus_desarmaduria_repuestos_destinations_are_unique(self):
         nav = self._nav("WORKSHOP", ["DESARMADURIA"])
         repuestos_items = [i for i in nav if i["key"] == MOD_REPUESTOS]
-        self.assertEqual(len(repuestos_items), 2,
-                         "MOD_REPUESTOS debe aparecer dos veces: taller_parts + desarm_parts")
+        self.assertEqual(len(repuestos_items), 3)
         nav_keys = {i.get("nav_key") for i in repuestos_items}
         self.assertIn("taller_parts", nav_keys)
         self.assertIn("desarm_parts", nav_keys)
+        self.assertIn("desarm_kiosko", nav_keys)
+        self.assertEqual(len({i["url"] for i in repuestos_items}), 3)
 
     def test_workshop_plus_desarmaduria_always_on_not_duplicated(self):
         from taller.constants.business_modules import ALWAYS_ON
         nav = self._nav("WORKSHOP", ["DESARMADURIA"])
-        for mod in ALWAYS_ON:
+        for mod in ALWAYS_ON - {MOD_DOCUMENTOS}:
             count = sum(1 for i in nav if i["key"] == mod)
             if mod == MOD_DOCUMENTOS:
                 # El workspace de desarme aporta su historial de ventas
@@ -2088,11 +2088,28 @@ class MultiRubroNavGroupTests(TestCase):
             f"Se esperan nav_keys de taller en sección secundaria. Obtenido: {secondary_nav_keys}",
         )
 
+    def test_desarmaduria_plus_expanded_workshop_has_sales_and_jobs_once(self):
+        nav = self._nav(
+            "DESARMADURIA",
+            ["WORKSHOP", "WORKSHOP_MOTO", "WORKSHOP_HEAVY"],
+        )
+        document_items = [item for item in nav if item["key"] == MOD_DOCUMENTOS]
+        self.assertEqual(len(document_items), 2)
+        self.assertEqual(
+            {item["nav_key"] for item in document_items},
+            {"desarm_sales", "taller_docs"},
+        )
+        self.assertTrue(any(item["url"].endswith("/desarme/ventas/") for item in document_items))
+        self.assertTrue(any(item["url"].endswith("/documentos/") for item in document_items))
+        self.assertEqual(
+            len([item for item in nav if item["nav_key"] == "taller_services"]),
+            1,
+        )
+
     def test_parts_plus_workshop_repuestos_appears_twice(self):
         nav = self._nav("PARTS", ["WORKSHOP"])
         repuestos_items = [i for i in nav if i["key"] == MOD_REPUESTOS]
-        self.assertGreaterEqual(len(repuestos_items), 2,
-                                "PARTS+WORKSHOP debe tener al menos 2 entradas MOD_REPUESTOS")
+        self.assertEqual(len(repuestos_items), 1,
+                         "El mismo destino de repuestos no debe repetirse")
         nav_keys = {i.get("nav_key") for i in repuestos_items}
         self.assertIn("parts_inventory", nav_keys)
-        self.assertIn("taller_parts", nav_keys)

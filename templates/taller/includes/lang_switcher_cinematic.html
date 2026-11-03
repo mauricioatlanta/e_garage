@@ -1,11 +1,28 @@
+{% load i18n %}
 <div class="language-switcher-cinematic flex items-center">
   <div class="lang-btn-group inline-flex items-center rounded-lg bg-black/50 border border-cyan-500/30 p-0.5">
-    {% if "/en/" in request.path %}
-      <span class="lang-btn px-2.5 py-1 text-xs font-bold rounded bg-cyan-500 text-slate-950 shadow-[0_0_10px_rgba(6,182,212,0.6)]">🇺🇸 EN</span>
-      <a href="/us/es/desarme/vehiculos/" class="lang-btn px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-white/10 transition-colors">🇪🇸 ES</a>
+    {# Botón INGLÉS (EN) #}
+    {% if "/en/" in request.path or LANGUAGE_CODE == "en" and "/es/" not in request.path %}
+      <span class="lang-btn lang-btn--active px-2.5 py-1 text-xs font-bold rounded bg-cyan-500 text-slate-950 shadow-[0_0_10px_rgba(6,182,212,0.6)] cursor-default">
+        🇺🇸 EN
+      </span>
     {% else %}
-      <a href="/us/en/desarme/vehiculos/" class="lang-btn px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-white/10 transition-colors">🇺🇸 EN</a>
-      <span class="lang-btn px-2.5 py-1 text-xs font-bold rounded bg-amber-400 text-slate-950 shadow-[0_0_10px_rgba(251,191,36,0.6)]">🇪🇸 ES</span>
+      <a href="{% if "/es/" in request.path %}{{ request.path|slice:":4" }}en/{{ request.path|slice:"7:" }}{% else %}/us/en/workspace/{% endif %}"
+         class="lang-btn px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+        🇺🇸 EN
+      </a>
+    {% endif %}
+
+    {# Botón ESPAÑOL (ES) #}
+    {% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}
+      <span class="lang-btn lang-btn--active px-2.5 py-1 text-xs font-bold rounded bg-amber-400 text-slate-950 shadow-[0_0_10px_rgba(251,191,36,0.6)] cursor-default">
+        🇪🇸 ES
+      </span>
+    {% else %}
+      <a href="{% if "/en/" in request.path %}{{ request.path|slice:":4" }}es/{{ request.path|slice:"7:" }}{% else %}/us/es/workspace/{% endif %}"
+         class="lang-btn px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+        🇪🇸 ES
+      </a>
     {% endif %}
   </div>
 </div>

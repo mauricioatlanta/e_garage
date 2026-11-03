@@ -163,32 +163,10 @@ from decimal import Decimal
 
 from core.models import TenantScoped
 
-# Definir RUBRO_CHOICES aquí para evitar dependencia circular
-# Estos deben coincidir con RUBRO_CHOICES
-RUBRO_CHOICES = [
-    ("WORKSHOP", "Taller mecánico integral"),
-    ("WORKSHOP_MOTO", "Taller de motos"),
-    ("WORKSHOP_HEAVY", "Taller de camiones/buses"),
-    ("EXHAUST", "Escapes y mufflers"),
-    ("PARTS", "Casa de repuestos / Autopartes"),
-    ("TIRE", "Vulcanización / Neumáticos y llantas"),
-    ("BODYSHOP", "Carrocería / Pintura"),
-    ("DETAILING", "Lavado, detailing y estética"),
-    ("ELECTRIC", "Electricidad / electrónica automotriz"),
-    ("GLASS_AUDIO", "Parabrisas, vidrios y audio / accesorios"),
-    ("FLEET", "Mantención de flotas empresariales"),
-    ("SUSPENSION_STEERING", "Taller de Suspensión y Dirección"),
-    ("BRAKES", "Taller de Frenos"),
-    ("OBD_DIAGNOSTIC", "Taller de Diagnóstico Computarizado (OBD-II)"),
-    ("CLASSIC_CARS", "Taller de Reparación de Vehículos Clásicos"),
-    ("AUDIO_ENTERTAINMENT", "Taller de Sistemas de Audio y Entretenimiento Automotriz"),
-    ("GAS_CONVERSION", "Taller de Conversiones a Gas"),
-    ("FLEET_REPAIR", "Taller de Reparación de Flotas Corporativas"),
-    ("BODY_GLASS", "Taller de Carrocería y Reparación de Vidrios"),
-    ("TUNING", "Taller de Tuning / Personalización"),
-    ("RECYCLING", "Reciclaje / Chatarra electrónica y catalíticos"),
-    ("MIXED", "Mixto (varios rubros)"),
-]
+from taller.config.rubros import RUBROS_TALLER
+
+# Fuente única de verdad: taller/config/rubros.py (taxonomía canónica).
+RUBRO_CHOICES = list(RUBROS_TALLER)
 
 
 class ServicioBase(models.Model):
@@ -446,3 +424,36 @@ class ServicioExterno(TenantScoped):
         if self.costo_taller > 0:
             return ((self.precio_cliente - self.costo_taller) / self.costo_taller) * 100
         return 0
+
+
+class CatalogoServicio(models.Model):
+    """Catálogo semilla de servicios sugeridos por (rubro, país).
+
+    `pais=None` representa el fallback internacional (DEFAULT): se usa cuando
+    no existe una entrada específica para el país del taller.
+    """
+
+    rubro = models.CharField(max_length=30, choices=RUBRO_CHOICES, db_index=True)
+    pais = models.CharField(max_length=2, null=True, blank=True, db_index=True)
+    nombre = models.CharField(max_length=160)
+    nombre_en = models.CharField(max_length=160, blank=True, default="")
+    nombre_pt = models.CharField(max_length=160, blank=True, default="")
+    orden = models.PositiveIntegerField(default=0)
+    activo = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["orden", "nombre"]
+        verbose_name = "Servicio de catálogo semilla"
+        verbose_name_plural = "Servicios de catálogo semilla"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["rubro", "pais", "nombre"],
+                name="uq_catalogo_servicio_rubro_pais_nombre",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["rubro", "pais", "activo"], name="idx_cat_serv_rubro_pais"),
+        ]
+
+    def __str__(self):
+        return f"{self.nombre} ({self.rubro}/{self.pais or 'DEFAULT'})"

@@ -528,7 +528,7 @@ body {
             <div class="nav-group-grid">
                 <a href="/cl/reportes/" class="nav-card">
                     <div class="text-3xl mb-2">📊</div>
-                    <div class="font-semibold">Reportes</div>
+                    <div class="font-semibold">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Reports{% else %}Reportes{% endif %}</div>
                     <div class="text-xs text-gray-400">Análisis detallados</div>
                 </a>
                 <a href="/cl/reportes/inteligencia/" class="nav-card">
@@ -560,12 +560,12 @@ body {
                 </a>
                 <a href="/cl/clientes/" class="nav-card">
                     <div class="text-3xl mb-2">👥</div>
-                    <div class="font-semibold">Clientes</div>
+                    <div class="font-semibold">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Clients{% else %}Clientes{% endif %}</div>
                     <div class="text-xs text-gray-400">Base de clientes</div>
                 </a>
                 <a href="/cl/vehiculos/" class="nav-card">
                     <div class="text-3xl mb-2">🚗</div>
-                    <div class="font-semibold">Vehículos</div>
+                    <div class="font-semibold">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Vehicles{% else %}Vehículos{% endif %}</div>
                     <div class="text-xs text-gray-400">Flota del taller</div>
                 </a>
                 <a href="{% country_url 'vehiculos:ingreso_foto' %}" class="nav-card">

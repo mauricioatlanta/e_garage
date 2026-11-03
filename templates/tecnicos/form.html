@@ -71,7 +71,7 @@
 
         {% if not team_member_names and modo == 'crear' %}
           <p class="text-gray-500 text-xs mt-2">
-            Add team members in <a href="{% country_url 'company_settings' %}" class="text-cyan-500 hover:underline">Settings</a> to enable the dropdown.
+            Add team members in <a href="{% country_url 'company_settings' %}" class="text-cyan-500 hover:underline">{% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Configuración{% else %}Settings{% endif %}</a> to enable the dropdown.
           </p>
         {% endif %}
       </div>

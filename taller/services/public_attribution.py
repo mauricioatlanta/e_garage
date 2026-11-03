@@ -11,7 +11,7 @@ from django.utils import timezone
 from taller.country.engine import URL_SLUG_TO_VERTICAL
 from taller.models.public_analytics_session import PublicAnalyticsSession
 from taller.models.public_page_view import is_probable_bot
-from taller.services.public_analytics import _clean_referrer, _is_mobile
+from taller.services.public_traffic_classifier import _clean_referrer, _is_mobile
 from taller.services.public_traffic_classifier import (
     is_allowed_public_analytics_host,
     is_probable_non_human_request,

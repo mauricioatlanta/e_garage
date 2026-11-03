@@ -729,7 +729,7 @@ class DocumentoForm(forms.ModelForm):
                 nombre=nombre,
                 cantidad=_to_positive_int(serv_data.get("cantidad"), default=1),
                 precio_unitario=_to_decimal(
-                    serv_data.get("precio", serv_data.get("precio_unitario", 0))
+                    serv_data.get("precio", serv_data.get("precio_unitario")), None
                 ),
                 descuento=_to_decimal(serv_data.get("descuento", 0)),
                 tecnico_responsable_id=_to_optional_int(serv_data.get("tecnico_responsable_id")),

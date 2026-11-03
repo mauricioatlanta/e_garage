@@ -1,6 +1,9 @@
 {% extends "base_login.html" %}
 {% load i18n static account socialaccount %}
 
+
+
+
 {% block content %}
 
 <a href="/cl/es/bienvenida/" class="top-back">
@@ -30,7 +33,7 @@
   </div>
   {% endif %}
 
-  <form method="post" action="" id="eg-login-form" autocomplete="off">
+  <form method="post" id="login-form-main" action="" id="eg-login-form">
     {% csrf_token %}
 
     <div class="form-group">
@@ -43,7 +46,7 @@
         name="login"
         id="id_login"
         class="form-input"
-        autocomplete="off"
+       
         autocapitalize="none"
         autocorrect="off"
         spellcheck="false"
@@ -61,7 +64,7 @@
         name="password"
         id="id_password"
         class="form-input"
-        autocomplete="off"
+       
         required
       >
     </div>
@@ -80,4 +83,38 @@
 
 </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.querySelector("form");
+    if (!form) return;
+    
+    // Evitar que gestores de contraseñas simulen Enter en el input de contraseña y disparen el form
+    const inputs = form.querySelectorAll("input");
+    inputs.forEach(inp => {
+        inp.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+            }
+        });
+    });
+});
+</script>
+
 {% endblock %}\n\n
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(r=>r.forEach(x=>x.unregister()));}</script>

@@ -698,9 +698,9 @@
 <link rel='stylesheet' href='{% static "css/theme.css" %}'>
 </head>
 
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %} eg-desarme-dashboard-compact{% endif %}">
 
-  {% include "components/support_switcher_bar.html" %}
+  {% if user.is_authenticated and user.is_superuser and "/accounts/" not in request.path %}{% include "components/support_switcher_bar.html" %}{% endif %}
 
   {% if qa_control_authorized %}
     {% include "qa_control/bar.html" %}
@@ -817,14 +817,14 @@
         {% for item in workspace.nav %}
         <a href="{{ item.url }}" class="nav-button-standard{% if item.is_active %} bg-gray-100 text-gray-900{% endif %}">
           <span class="nav-icon"><i class="{{ item.icon }}"></i></span>
-          <span class="nav-text">{% if "/en/" in request.path or request.LANGUAGE_CODE == "en" %}{% if item.label == "Vehículos de Desarme" %}Dismantle Vehicles{% elif item.label == "Inventario de desarme" %}Dismantle Inventory{% elif item.label == "Ventas" %}Sales{% elif item.label == "Clientes" %}Clients{% elif item.label == "Reportes" %}Reports{% elif item.label == "Configuración" %}Settings{% else %}{% if item.label == "workspace.desarm.nav.home" %}Inicio{% elif item.label == "workspace.desarm.nav.vehicles" %}Vehículos{% elif item.label == "workspace.desarm.nav.parts" %}Repuestos{% elif item.label == "workspace.desarm.nav.documents" %}Ventas{% elif item.label == "workspace.desarm.nav.clients" %}Clientes{% elif item.label == "workspace.desarm.nav.reports" %}Reportes{% elif item.label == "workspace.desarm.nav.settings" %}Configuración{% else %}{{ item.label }}{% endif %}{% endif %}{% else %}{% if item.label == "workspace.desarm.nav.home" %}Inicio{% elif item.label == "workspace.desarm.nav.vehicles" %}Vehículos{% elif item.label == "workspace.desarm.nav.parts" %}Repuestos{% elif item.label == "workspace.desarm.nav.documents" %}Ventas{% elif item.label == "workspace.desarm.nav.clients" %}Clientes{% elif item.label == "workspace.desarm.nav.reports" %}Reportes{% elif item.label == "workspace.desarm.nav.settings" %}Configuración{% else %}{{ item.label }}{% endif %}{% endif %}</span>
+          <span class="nav-text">{{ item.label }}</span>
         </a>
         {% endfor %}
         <form action="{% url 'account_logout' %}" method="post" class="inline-block">
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
             <span class="nav-icon">🚪</span>
-            <span class="nav-text">{% if request.country == 'US' %}Logout{% else %}Salir{% endif %}</span>
+            <span class="nav-text">{% trans "Salir" %}</span>
           </button>
         </form>
       </div>
@@ -888,7 +888,7 @@
         </a>
         <a href="{% country_url 'reciclaje_staff:reporte_fechas' %}" class="nav-button-standard">
           <span class="nav-icon">📊</span>
-          <span class="nav-text">Reportes</span>
+          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Reports{% else %}Reportes{% endif %}</span>
         </a>
         {% else %}
         <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
@@ -930,7 +930,7 @@
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
             <span class="nav-icon">🚪</span>
-            <span class="nav-text">{% if request.country == 'US' %}Logout{% else %}Salir{% endif %}</span>
+            <span class="nav-text">{% trans "Salir" %}</span>
           </button>
         </form>
       </div>
@@ -1141,10 +1141,10 @@
           }
           swRefreshing = true;
           console.log('Nueva version del Service Worker activa. Recargando...');
-          window.location.reload();
+          if (window.location.pathname.includes('/accounts/')) { console.log('SW reload bloqueado en auth'); return; } window.location.reload();
         });
 
-        navigator.serviceWorker.register('/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/service-worker.js', { scope: '/' })
+        navigator.serviceWorker.register('/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/service-worker.js', { scope: '/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/' })
           .then(function(registration) {
             console.log('✅ Service Worker registrado exitosamente:', registration.scope);
             
@@ -1166,7 +1166,7 @@
                   // Hay una nueva versión disponible
                   if (confirm('🎉 Nueva versión de eGarage disponible. ¿Deseas actualizar ahora?')) {
                     newWorker.postMessage({ type: 'SKIP_WAITING' });
-                    window.location.reload();
+                    if (window.location.pathname.includes('/accounts/')) { console.log('SW reload bloqueado en auth'); return; } window.location.reload();
                   }
                 }
               });

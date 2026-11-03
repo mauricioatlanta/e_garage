@@ -1,9 +1,11 @@
 from collections import Counter
+from datetime import timedelta
 
 from django.apps import apps
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
+from django.http import JsonResponse
 from django.template.response import TemplateResponse
 from django.utils import timezone
 
@@ -170,6 +172,12 @@ def public_analytics_dashboard(request):
         }
         for country, total_visitas in pais_counter.most_common()
     ]
+
+    # Semáforo 🚦 de visitas por país: verde (>= 5), amarillo (2-4), rojo (1).
+    for p in por_pais:
+        tot = p.get("total", 0)
+        p["semaforo"] = "green" if tot >= 5 else ("yellow" if tot >= 2 else "red")
+        p["semaforo_icon"] = "🟢" if tot >= 5 else ("🟡" if tot >= 2 else "🔴")
 
     # -------------------------------------------------------------
     # Rubros: solo visitas humanas a landings.
@@ -376,6 +384,26 @@ def public_analytics_dashboard(request):
         "signup_submit_attempts": _count_event_sessions([PublicAnalyticsEvent.EVENT_SIGNUP_SUBMIT_ATTEMPT], start_at),
         "signup_validation_errors": _count_event_sessions([PublicAnalyticsEvent.EVENT_SIGNUP_VALIDATION_ERROR], start_at),
         "signup_success": _count_event_sessions([PublicAnalyticsEvent.EVENT_SIGNUP_SUCCESS], start_at),
+        "signup_starts": _count_event_sessions(
+            [
+                PublicAnalyticsEvent.EVENT_SIGNUP_START,
+                PublicAnalyticsEvent.EVENT_SIGNUP_STARTED,
+            ], start_at
+        ),
+        "signup_completes": _count_event_sessions(
+            [
+                PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETE,
+                PublicAnalyticsEvent.EVENT_SIGNUP_COMPLETED,
+            ], start_at
+        ),
+        "cta_clicks": _count_event_sessions(
+            [
+                PublicAnalyticsEvent.EVENT_CTA_CLICK,
+                PublicAnalyticsEvent.EVENT_CTA_TRIAL_30_CLICK,
+                PublicAnalyticsEvent.EVENT_CTA_WHATSAPP_CLICK,
+                PublicAnalyticsEvent.EVENT_CTA_SIGNUP_CLICK,
+            ], start_at
+        ),
     }
     signup_attempts = eventos_funnel["signup_submit_attempts"]
     signup_errors = eventos_funnel["signup_validation_errors"]
@@ -482,6 +510,8 @@ def public_analytics_dashboard(request):
         .order_by("-total")
     )
 
+    ultimos_suscriptores = list(Empresa.objects.all().order_by("-id")[:10])
+
     context = {
         "total": total,
         "humanos": humanos,
@@ -507,6 +537,7 @@ def public_analytics_dashboard(request):
         "por_referrer": por_referrer,
         "mobile_share": mobile_share,
         "por_idioma": por_idioma,
+        "ultimos_suscriptores": ultimos_suscriptores,
         "empresas_por_dia": empresas_por_dia,
         "period": period,
         "period_start": start_at,
@@ -523,3 +554,84 @@ def public_analytics_dashboard(request):
         "analytics/public_dashboard.html",
         context,
     )
+
+
+# ==========================================
+# API CENTRO DE CONTROL AMÉRICA (DATOS REALES)
+# ==========================================
+def api_centro_control_america(request):
+    Empresa = apps.get_model("taller", "Empresa")
+
+    days = int(request.GET.get("days", 30))
+    desde = timezone.now() - timedelta(days=days)
+
+    total_empresas = Empresa.objects.count()
+    activas = Empresa.objects.filter(suscripcion_activa=True).count()
+
+    # Nuevas en el periodo.
+    nuevas = (
+        Empresa.objects.filter(created_at__gte=desde).count()
+        if hasattr(Empresa, "created_at")
+        else total_empresas
+    )
+
+    # Conteo por país.
+    geo_names = {
+        "CL": "Chile",
+        "US": "United States of America",
+        "BR": "Brazil",
+        "MX": "Mexico",
+        "AR": "Argentina",
+        "PE": "Peru",
+        "UY": "Uruguay",
+        "VE": "Venezuela",
+    }
+    paises_query = {}
+    for emp in Empresa.objects.all():
+        pais_cod = getattr(emp, "pais", "CL") or "CL"
+        nombre_mapa = geo_names.get(pais_cod, pais_cod)
+        paises_query[nombre_mapa] = paises_query.get(nombre_mapa, 0) + 1
+
+    # Datos para el mapa con color de semáforo.
+    map_data = []
+    for pais, cant in paises_query.items():
+        color = "#00ff88" if cant >= 5 else ("#ffdd00" if cant >= 2 else "#ff3344")
+        map_data.append({
+            "name": pais,
+            "value": cant,
+            "itemStyle": {"areaColor": color},
+        })
+
+    # Últimas registraciones (tabla).
+    ultimos_registros = []
+    for u in Empresa.objects.all().order_by("-id")[:8]:
+        fecha_str = (
+            u.created_at.strftime("%d/%m/%Y %H:%M")
+            if hasattr(u, "created_at") and u.created_at
+            else "Reciente"
+        )
+        ultimos_registros.append({
+            "id": u.id,
+            "nombre": getattr(u, "nombre", "Taller"),
+            "pais": getattr(u, "pais", "CL"),
+            "plan": getattr(u, "plan", "trial").upper(),
+            "activo": getattr(u, "suscripcion_activa", True),
+            "fecha": fecha_str,
+        })
+
+    ranking_paises = [
+        {"country": k, "subscribers": v, "growth": 0}
+        for k, v in sorted(paises_query.items(), key=lambda x: x[1], reverse=True)
+    ]
+
+    return JsonResponse({
+        "countries": ranking_paises,
+        "ranking": ranking_paises,
+        "suscriptores_activos": total_empresas,
+        "total_empresas": total_empresas,
+        "paises_activos": len(paises_query),
+        "mrr_total": activas * 20,
+        "nuevos_periodo": nuevas,
+        "map_data": map_data,
+        "ultimos_registros": ultimos_registros,
+    })

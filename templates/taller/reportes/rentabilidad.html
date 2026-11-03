@@ -253,7 +253,7 @@
                     <thead>
                         <tr>
                             <th>Proveedor</th>
-                            <th>Servicios</th>
+                            <th>{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Services{% else %}Servicios{% endif %}</th>
                             <th>Volumen</th>
                             <th>Ganancia</th>
                         </tr>

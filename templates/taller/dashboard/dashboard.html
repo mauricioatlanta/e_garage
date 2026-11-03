@@ -17,22 +17,22 @@
 <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-6xl mx-auto mt-10 px-6 pb-20">
   <a href="{% country_url 'clientes:lista_clientes' %}" class="card">
     <div class="emoji">👥</div>
-    <div class="label">Clientes</div>
+    <div class="label">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Clients{% else %}Clientes{% endif %}</div>
     <div class="desc">Gestión completa de clientes.</div>
   </a>
   <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}" class="card">
     <div class="emoji">🚗</div>
-    <div class="label">Vehículos</div>
+    <div class="label">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Vehicles{% else %}Vehículos{% endif %}</div>
     <div class="desc">Listado por cliente y detalles.</div>
   </a>
   <a href="{% country_url 'servicios:servicios_menu' %}" class="card">
     <div class="emoji">🧰</div>
-    <div class="label">Servicios</div>
+    <div class="label">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Services{% else %}Servicios{% endif %}</div>
     <div class="desc">Catálogo de servicios ofrecidos.</div>
   </a>
   <a href="{% country_url 'repuestos:lista_repuestos' %}" class="card">
     <div class="emoji">🧩</div>
-    <div class="label">Repuestos</div>
+    <div class="label">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Parts{% else %}Repuestos{% endif %}</div>
     <div class="desc">Precios, stock y categorías.</div>
   </a>
   <a href="{% country_url 'documentos:lista_documentos' %}" class="card">
@@ -42,7 +42,7 @@
   </a>
   <a href="{% country_url 'reportes:reportes_dashboard' %}" class="card">
     <div class="emoji">📊</div>
-    <div class="label">Reportes</div>
+    <div class="label">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Reports{% else %}Reportes{% endif %}</div>
     <div class="desc">Indicadores clave de productividad.</div>
   </a>
 </section>

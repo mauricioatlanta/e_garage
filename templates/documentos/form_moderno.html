@@ -14,7 +14,7 @@
     </div>
 
     <div class="bg-[#111827] p-6 rounded-xl">
-      <h3 class="mb-4">Repuestos</h3>
+      <h3 class="mb-4">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Parts{% else %}Repuestos{% endif %}</h3>
       <button id="add-repuesto" class="btn-primary">+ Agregar repuesto</button>
     </div>
 

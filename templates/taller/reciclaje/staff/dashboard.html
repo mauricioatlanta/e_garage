@@ -43,7 +43,7 @@
   <a href="{% country_url 'reciclaje_staff:listado_compras' %}">Compras</a>
   <a href="{% country_url 'reciclaje_staff:listado_ventas' %}">Ventas</a>
   <a href="{% country_url 'reciclaje_staff:resumen_stock' %}">Stock</a>
-  <a href="{% country_url 'reciclaje_staff:reporte_fechas' %}">Reportes</a>
+  <a href="{% country_url 'reciclaje_staff:reporte_fechas' %}">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Reports{% else %}Reportes{% endif %}</a>
 </div>
 
 <div class="rec-grid">

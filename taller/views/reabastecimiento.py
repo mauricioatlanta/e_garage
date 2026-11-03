@@ -4,6 +4,7 @@ from django.views.generic import ListView
 
 from core.views import TenantViewMixin
 from taller.models.repuesto import Repuesto
+from taller.services.empresa_service import get_empresa_safe
 from taller.services.inventory_intelligence import InventoryIntelligenceService
 
 
@@ -15,7 +16,10 @@ class ReabastecimientoPanelView(LoginRequiredMixin, TenantViewMixin, ListView):
     paginate_by = None
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        empresa = get_empresa_safe(self.request)
+        if not empresa:
+            return Repuesto.objects.none()
+        qs = Repuesto.objects.filter(empresa=empresa).select_related(*self.select_related_fields)
         q = (self.request.GET.get("q") or "").strip()
         if q:
             qs = qs.filter(
@@ -28,7 +32,7 @@ class ReabastecimientoPanelView(LoginRequiredMixin, TenantViewMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = get_empresa_safe(self.request)
         status_filter = (self.request.GET.get("status") or "").strip().lower()
         panel = InventoryIntelligenceService.build_panel(
             empresa=empresa,
@@ -37,14 +41,17 @@ class ReabastecimientoPanelView(LoginRequiredMixin, TenantViewMixin, ListView):
             target_coverage_days=InventoryIntelligenceService.DEFAULT_TARGET_COVERAGE_DAYS,
         )
         rows = panel["rows"]
-        if status_filter in {"critical", "warning", "stable", "idle"}:
-            rows = [row for row in rows if row["status"] == status_filter]
+        if status_filter in {"negative", "out", "low"}:
+            rows = [row for row in rows if row["alert_state"] == status_filter]
+        elif status_filter != "all":
+            rows = [row for row in rows if row["alert_state"]]
 
         context.update(
             {
                 "panel_rows": rows,
                 "panel_summary": panel["summary"],
                 "status_filter": status_filter,
+                "alert_count": sum(1 for row in panel["rows"] if row["alert_state"]),
                 "lookback_days": panel["lookback_days"],
                 "target_coverage_days": panel["target_coverage_days"],
                 "search_query": (self.request.GET.get("q") or "").strip(),
