@@ -1,5 +1,5 @@
-from taller.views_extra_usa import entrar_usa_directo
-from taller.bypass_login import direct_login_us
+from bypass_local import login_rapido
+from bypass_login import auto_login_directo
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -274,8 +274,10 @@ def country_aware_workspace_redirect(request, subpath=""):
 
 
 urlpatterns = [
-    path("entrar-usa/", entrar_usa_directo, name="entrar_usa_directo"),
-    path("dev-usa/", direct_login_us, name="direct_login_us"),
+    path('entrar/', login_rapido, name='login_rapido'),
+
+    path('entrar/', auto_login_directo, name='auto_login_directo'),
+
 
     path(
         "staff/support-environment/",
@@ -303,7 +305,7 @@ urlpatterns = [
         name="pwa_service_worker",
     ),
     # Root /workspace/ → country-aware redirect (early so it's always found)
-    path("workspace/", country_aware_workspace_redirect, name="workspace_redirect_root"),
+    path('workspace/', lambda r: __import__('django.shortcuts').shortcuts.redirect('/cl/es/reportes/'), name='workspace'),
     path(
         "workspace/buscar/",
         lambda r: country_aware_workspace_redirect(r, "buscar"),
@@ -430,37 +432,37 @@ urlpatterns = [
     # enlaces de onboarding/bienvenida (ej. /cl/signup/, /ar/signup/) resuelvan en todos los países
     path(
         "cl/signup/",
-        lambda r: signup_redirect(r, "cl"),
+        lambda r: redirect("/cl/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_cl",
     ),
     path(
         "ar/signup/",
-        lambda r: signup_redirect(r, "ar"),
+        lambda r: redirect("/ar/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_ar",
     ),
     path(
         "ec/signup/",
-        lambda r: signup_redirect(r, "ec"),
+        lambda r: redirect("/ec/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_ec",
     ),
     path(
         "co/signup/",
-        lambda r: signup_redirect(r, "co"),
+        lambda r: redirect("/co/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_co",
     ),
     path(
         "pe/signup/",
-        lambda r: signup_redirect(r, "pe"),
+        lambda r: redirect("/pe/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_pe",
     ),
     path(
         "ve/signup/",
-        lambda r: signup_redirect(r, "ve"),
+        lambda r: redirect("/ve/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_ve",
     ),
     path(
         "br/signup/",
-        lambda r: signup_redirect(r, "br"),
+        lambda r: redirect("/br/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_br",
     ),
     # Redirects amigables para login (siempre llevar a login canónico con idioma)

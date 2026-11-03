@@ -54,8 +54,8 @@ USE_X_FORWARDED_HOST = True
 SECURE_SSL_REDIRECT = True
 
 # Cookies seguras
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 
@@ -254,8 +254,8 @@ DATA_CLEANUP_SCHEDULE = "0 3 * * 0"  # Domingo a las 3 AM
 # ✅ ALLOWED_HOSTS configurado
 # ✅ CSRF_TRUSTED_ORIGINS configurado
 # ✅ SECURE_SSL_REDIRECT = True
-# ✅ SESSION_COOKIE_SECURE = True
-# ✅ CSRF_COOKIE_SECURE = True
+# ✅ SESSION_COOKIE_SECURE = False
+# ✅ CSRF_COOKIE_SECURE = False
 # ✅ SECRET_KEY en variables de entorno
 # ✅ Base de datos con SSL
 # ✅ Logging configurado
