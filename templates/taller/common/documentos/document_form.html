@@ -143,7 +143,7 @@
           <div class="doc-field-card">
             <label for="doc_mode" data-i18n="operacion">Operación</label>
             <select id="doc_mode" name="doc_mode">
-              <option value="services" data-i18n="op_servicios">Servicios</option>
+              <option value="services" data-i18n="op_servicios">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Services{% else %}Servicios{% endif %}</option>
               <option value="parts" data-i18n="op_solo_repuestos">Solo venta de repuestos</option>
             </select>
           </div>
@@ -572,7 +572,7 @@
         <section class="doc-panel doc-panel--section">
           <div class="doc-section-head">
             <div>
-              <h2 data-i18n="repuestos">REPUESTOS</h2>
+              <h2 data-i18n="repuestos">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}PARTS{% else %}REPUESTOS{% endif %}</h2>
             </div>
             <div class="doc-section-actions">
               <button type="button" id="add-repuesto" class="doc-action-btn doc-action-btn--cyan">
@@ -611,7 +611,7 @@
         {% if ui_config.show_services %}
         <section class="doc-panel doc-panel--section">
           <div class="doc-section-head">
-            <h2 data-i18n="servicios">SERVICIOS</h2>
+            <h2 data-i18n="servicios">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}SERVICES{% else %}SERVICIOS{% endif %}</h2>
             <div class="doc-section-actions">
               <button type="button" id="add-servicio" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span data-i18n="agregar">AGREGAR</span></button>
               <a href="{% country_url 'servicios:crear_servicio' %}?return_to={{ request.get_full_path|urlencode }}&select_field=servicio" class="doc-action-btn doc-action-btn--cyan-alt"><span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span></a>
@@ -797,7 +797,7 @@
     <p id="modal-unsaved-body" style="margin:0 0 22px;font-size:13px;color:#95abc2;line-height:1.5">Tienes cambios sin guardar. Si sales ahora se perderán.</p>
     <div style="display:flex;gap:10px;justify-content:flex-end">
       <button type="button" id="modal-unsaved-stay" style="padding:8px 16px;border-radius:6px;border:1.5px solid #4a5a72;background:#1e2a3a;color:#cbd5e1;font-size:12px;font-weight:700;cursor:pointer">Quedarme</button>
-      <button type="button" id="modal-unsaved-leave" style="padding:8px 16px;border-radius:6px;border:none;background:#dc2626;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Salir</button>
+      <button type="button" id="modal-unsaved-leave" style="padding:8px 16px;border-radius:6px;border:none;background:#dc2626;color:#fff;font-size:12px;font-weight:700;cursor:pointer">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Logout{% else %}Salir{% endif %}</button>
     </div>
   </div>
 </div>

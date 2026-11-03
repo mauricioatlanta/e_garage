@@ -912,3 +912,25 @@ msgstr "Logout"
 #: templates/taller/desarme/lista_vehiculos.html
 msgid "Ver kiosko"
 msgstr "View store"
+
+
+msgid "Vehículos de desarme"
+msgstr "Vehicles"
+
+msgid "Inventario de desarme"
+msgstr "Parts / Inventory"
+
+msgid "Inventario de repuestos"
+msgstr "Parts"
+
+msgid "Ventas"
+msgstr "Sales"
+
+msgid "Clientes"
+msgstr "Clients"
+
+msgid "Reportes"
+msgstr "Reports"
+
+msgid "Work"
+msgstr "Work"

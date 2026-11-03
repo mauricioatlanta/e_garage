@@ -59,7 +59,7 @@
 {% block card_totales_title %}💰 Totals Summary{% endblock %}
 {% block totales_labels %}
   <div>
-    <p class="text-gray-400 text-sm">Parts</p>
+    <p class="text-gray-400 text-sm">{% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Repuestos{% else %}Parts{% endif %}</p>
     <p class="text-lg font-semibold text-cyan-300" id="t_rep">${{ subtotal_repuestos|floatformat:0|default:"0" }}</p>
   </div>
   <div>

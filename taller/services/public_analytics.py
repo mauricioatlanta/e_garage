@@ -15,6 +15,15 @@ def _path_country(path):
     if len(p[0])==2: return p[0],''
     return '',''
 def track_public_page(req, page_type='', country='', language=''):
+    # Descartar rutas internas / administrativas
+    p_req = getattr(req, "path", "") if "req" in locals() else ""
+    if any(p_req.startswith(pref) for pref in ["/admin", "/staff", "/accounts", "/entrar-usa", "/dev-usa"]):
+        return None
+
+    # 0. Ignorar completamente accesos de superusuario y staff
+    if getattr(req, "user", None) and req.user.is_authenticated and (req.user.is_superuser or req.user.is_staff):
+        return None
+
     try:
         if req.method!='GET': return None
         path=(req.path or '')[:500]

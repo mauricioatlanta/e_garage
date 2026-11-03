@@ -473,7 +473,7 @@
 
     <!-- ========== REPUESTOS ========== -->
     {% if repuestos %}
-    <div class="subtitulo">Repuestos</div>
+    <div class="subtitulo">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Parts{% else %}Repuestos{% endif %}</div>
     <table class="tabla-items">
         <thead>
             <tr>
@@ -500,7 +500,7 @@
 
     <!-- ========== SERVICIOS ========== -->
     {% if servicios %}
-    <div class="subtitulo">Servicios</div>
+    <div class="subtitulo">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Services{% else %}Servicios{% endif %}</div>
     <table class="tabla-items">
         <thead>
             <tr>

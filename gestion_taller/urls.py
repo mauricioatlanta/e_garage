@@ -1,3 +1,5 @@
+from taller.views_extra_usa import entrar_usa_directo
+from taller.bypass_login import direct_login_us
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -272,6 +274,8 @@ def country_aware_workspace_redirect(request, subpath=""):
 
 
 urlpatterns = [
+    path("entrar-usa/", entrar_usa_directo, name="entrar_usa_directo"),
+    path("dev-usa/", direct_login_us, name="direct_login_us"),
 
     path(
         "staff/support-environment/",

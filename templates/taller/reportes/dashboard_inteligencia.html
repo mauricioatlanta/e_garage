@@ -410,7 +410,7 @@
   <!-- 🎯 Header Principal -->
   <div class="text-center mb-8">
     <h1 class="text-5xl font-extrabold mb-4" style="font-family: 'Orbitron'; background: linear-gradient(45deg, #00ffff, #0080ff, #ff00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);">
-      🚀 Centro de Inteligencia Operativa
+      {% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚀 Operations{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚀 Operations{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚀 Operations{% else %}🚀 Centro{% endif %}{% endif %}{% endif %} de Inteligencia Operativa
     </h1>
     <p class="text-xl text-gray-300">Dashboard Futurista 360° - Análisis Predictivo en Tiempo Real</p>
 
@@ -1011,7 +1011,7 @@ function enviarWhatsApp() {
 📊 *KPIs del Mes:*
 � Facturación Total: $${facturacion}
 🎯 Ticket Promedio: $${ticket}
-👥 Clientes Activos: ${clientes}%
+{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}👥 Clients{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}👥 Clients{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}👥 Clients{% else %}👥 Clientes{% endif %}{% endif %}{% endif %} Activos: ${clientes}%
 📈 Margen Promedio: ${margen}%
 
 🚀 *Tendencias Destacadas:*
@@ -1214,7 +1214,7 @@ function aplicarFiltros() {
 
     alert(`✅ Filtros aplicados exitosamente:
 📅 Período: ${obtenerNombrePeriodo(periodo)}
-👥 Clientes: ${obtenerNombreCliente(cliente)}
+{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}👥 Clients{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}👥 Clients{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}👥 Clients{% else %}👥 Clientes{% endif %}{% endif %}{% endif %}: ${obtenerNombreCliente(cliente)}
 🔧 Servicios: ${obtenerNombreServicio(servicio)}
 
 Los gráficos y KPIs se han actualizado.`);

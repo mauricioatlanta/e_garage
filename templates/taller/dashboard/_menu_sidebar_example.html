@@ -19,12 +19,12 @@ Para usar, incluye este archivo en tu base.html o sidebar principal:
             </li>
             <li>
                 <a href="{% url 'clientes:lista_clientes' %}">
-                    👥 Clientes
+                    {% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}👥 Clients{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}👥 Clients{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}👥 Clients{% else %}👥 Clientes{% endif %}{% endif %}{% endif %}
                 </a>
             </li>
             <li>
                 <a href="{% url 'vehiculos:lista_vehiculos' %}">
-                    🚗 Vehículos
+                    {% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚗 Vehicles{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚗 Vehicles{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚗 Vehicles{% else %}🚗 Vehículos{% endif %}{% endif %}{% endif %}
                 </a>
             </li>
         </ul>

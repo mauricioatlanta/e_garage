@@ -1,96 +1,28 @@
 {% load i18n %}
-{% if request.empresa and request.empresa.pais == "US" or request.path|slice:":4" == "/us/" %}
-<div class="language-switcher-cinematic">
-  <form action="{% url 'set_language_us' %}" method="post" class="lang-form-cinematic">
-    {% csrf_token %}
-    <input type="hidden" name="next" value="{{ request.get_full_path }}">
-    <div class="lang-btn-group">
-      <button type="submit" name="language" value="en"
-        class="lang-btn{% if request.LANGUAGE_CODE == 'en' %} lang-btn--active{% endif %}">
+<div class="language-switcher-cinematic flex items-center">
+  <div class="lang-btn-group inline-flex items-center rounded-lg bg-black/50 border border-cyan-500/30 p-0.5">
+    {# Botón INGLÉS (EN) #}
+    {% if "/en/" in request.path or LANGUAGE_CODE == "en" and "/es/" not in request.path %}
+      <span class="lang-btn lang-btn--active px-2.5 py-1 text-xs font-bold rounded bg-cyan-500 text-slate-950 shadow-[0_0_10px_rgba(6,182,212,0.6)] cursor-default">
         🇺🇸 EN
-      </button>
-      <button type="submit" name="language" value="es"
-        class="lang-btn{% if request.LANGUAGE_CODE == 'es' %} lang-btn--active{% endif %}">
+      </span>
+    {% else %}
+      <a href="{% if "/es/" in request.path %}{{ request.path|slice:":4" }}en/{{ request.path|slice:"7:" }}{% else %}/us/en/workspace/{% endif %}"
+         class="lang-btn px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+        🇺🇸 EN
+      </a>
+    {% endif %}
+
+    {# Botón ESPAÑOL (ES) #}
+    {% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}
+      <span class="lang-btn lang-btn--active px-2.5 py-1 text-xs font-bold rounded bg-amber-400 text-slate-950 shadow-[0_0_10px_rgba(251,191,36,0.6)] cursor-default">
         🇪🇸 ES
-      </button>
-    </div>
-  </form>
+      </span>
+    {% else %}
+      <a href="{% if "/en/" in request.path %}{{ request.path|slice:":4" }}es/{{ request.path|slice:"7:" }}{% else %}/us/es/workspace/{% endif %}"
+         class="lang-btn px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+        🇪🇸 ES
+      </a>
+    {% endif %}
+  </div>
 </div>
-
-<style>
-.language-switcher-cinematic {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  z-index: 50;
-}
-
-.lang-form-cinematic {
-  margin: 0;
-  padding: 0;
-}
-
-.lang-btn-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(5, 15, 30, 0.9);
-  border: 1px solid rgba(0, 212, 255, 0.25);
-  border-radius: 8px;
-  padding: 3px;
-}
-
-.lang-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  min-height: 36px;
-  padding: 0.3rem 0.6rem;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  color: rgba(176, 224, 255, 0.7);
-  font-weight: 600;
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  line-height: 1;
-}
-
-.lang-btn:hover {
-  color: #ffffff;
-  background: rgba(0, 212, 255, 0.12);
-  border-color: rgba(0, 212, 255, 0.35);
-}
-
-.lang-btn--active {
-  color: #00d4ff;
-  background: rgba(0, 212, 255, 0.15);
-  border-color: rgba(0, 212, 255, 0.5);
-  box-shadow: 0 0 8px rgba(0, 212, 255, 0.25);
-}
-
-.lang-btn--active:hover {
-  background: rgba(0, 212, 255, 0.22);
-  border-color: rgba(0, 212, 255, 0.7);
-}
-
-/* Compact mode: slightly smaller but still accessible */
-.eg-desarme-dashboard-compact .lang-btn-group {
-  padding: 2px;
-  gap: 2px;
-  border-color: rgba(0, 212, 255, 0.18);
-}
-
-.eg-desarme-dashboard-compact .lang-btn {
-  min-width: 38px;
-  min-height: 30px;
-  padding: 0.2rem 0.45rem;
-  font-size: 0.68rem;
-}
-</style>
-{% endif %}

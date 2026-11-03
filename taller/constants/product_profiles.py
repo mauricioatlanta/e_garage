@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 """
 Product profiles — groups rubros into named product experiences.
 
@@ -62,13 +63,13 @@ PRODUCT_PROFILES = {
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",          "icon": "fas fa-home"},
             {"key": MOD_DOCUMENTOS,    "label": "Trabajos",        "icon": "fas fa-file-invoice"},
-            {"key": MOD_VEHICULOS,     "label": "Vehículos",       "icon": "fas fa-car"},
-            {"key": MOD_CLIENTES,      "label": "Clientes",        "icon": "fas fa-users"},
-            {"key": MOD_SERVICIOS,     "label": "Servicios",       "icon": "fas fa-tools"},
-            {"key": MOD_REPUESTOS,     "label": "Repuestos",       "icon": "fas fa-cogs"},
+            {"key": MOD_VEHICULOS,     "label": _("Vehículos"),       "icon": "fas fa-car"},
+            {"key": MOD_CLIENTES,      "label": _("Clientes"),        "icon": "fas fa-users"},
+            {"key": MOD_SERVICIOS,     "label": _("Servicios"),       "icon": "fas fa-tools"},
+            {"key": MOD_REPUESTOS,     "label": _("Repuestos"),       "icon": "fas fa-cogs"},
             {"key": MOD_FLOTA,         "label": "Flota",           "icon": "fas fa-truck"},
-            {"key": MOD_REPORTES,      "label": "Reportes",        "icon": "fas fa-chart-bar"},
-            {"key": MOD_CONFIGURACION, "label": "Configuración",   "icon": "fas fa-cog"},
+            {"key": MOD_REPORTES,      "label": _("Reportes"),        "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"),   "icon": "fas fa-cog"},
         ],
         "kpi_labels": ["OT Abiertas", "OT Terminadas", "Vehículos en espera", "Ventas del día"],
         "quick_access": [
@@ -87,11 +88,11 @@ PRODUCT_PROFILES = {
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",               "icon": "fas fa-home"},
             {"key": MOD_DESARME,       "label": "Vehículos de Desarme", "icon": "fas fa-car-crash"},
-            {"key": MOD_REPUESTOS,     "label": "Inventario de desarme", "icon": "fas fa-boxes"},
-            {"key": MOD_DOCUMENTOS,    "label": "Ventas",               "icon": "fas fa-shopping-cart"},
-            {"key": MOD_CLIENTES,      "label": "Clientes",             "icon": "fas fa-users"},
-            {"key": MOD_REPORTES,      "label": "Reportes",             "icon": "fas fa-chart-bar"},
-            {"key": MOD_CONFIGURACION, "label": "Configuración",        "icon": "fas fa-cog"},
+            {"key": MOD_REPUESTOS,     "label": _("Inventario de desarme"), "icon": "fas fa-boxes"},
+            {"key": MOD_DOCUMENTOS,    "label": _("Ventas"),               "icon": "fas fa-shopping-cart"},
+            {"key": MOD_CLIENTES,      "label": _("Clientes"),             "icon": "fas fa-users"},
+            {"key": MOD_REPORTES,      "label": _("Reportes"),             "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"),        "icon": "fas fa-cog"},
         ],
         "kpi_labels": ["Vehículos disponibles", "Valor inventario", "Piezas vendidas hoy", "Vehículos sin movimiento"],
         "quick_access": [
@@ -109,11 +110,11 @@ PRODUCT_PROFILES = {
         "default_rubro": "PARTS",
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",        "icon": "fas fa-home"},
-            {"key": MOD_REPUESTOS,     "label": "Inventario de repuestos", "icon": "fas fa-boxes"},
-            {"key": MOD_DOCUMENTOS,    "label": "Ventas",        "icon": "fas fa-shopping-cart"},
-            {"key": MOD_CLIENTES,      "label": "Clientes",      "icon": "fas fa-users"},
-            {"key": MOD_REPORTES,      "label": "Reportes",      "icon": "fas fa-chart-bar"},
-            {"key": MOD_CONFIGURACION, "label": "Configuración", "icon": "fas fa-cog"},
+            {"key": MOD_REPUESTOS,     "label": _("Inventario de repuestos"), "icon": "fas fa-boxes"},
+            {"key": MOD_DOCUMENTOS,    "label": _("Ventas"),        "icon": "fas fa-shopping-cart"},
+            {"key": MOD_CLIENTES,      "label": _("Clientes"),      "icon": "fas fa-users"},
+            {"key": MOD_REPORTES,      "label": _("Reportes"),      "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"), "icon": "fas fa-cog"},
         ],
         "kpi_labels": ["Ventas hoy", "Productos críticos", "Rotación", "Clientes frecuentes"],
         "quick_access": [
@@ -134,10 +135,10 @@ PRODUCT_PROFILES = {
             {"key": MOD_REPUESTOS,     "label": "Inventario de Neumáticos",  "icon": "fas fa-circle-notch"},
             {"key": MOD_SERVICIOS,     "label": "Servicios Vulcanización",   "icon": "fas fa-tools"},
             {"key": MOD_DOCUMENTOS,    "label": "Ventas de Mostrador",       "icon": "fas fa-cash-register"},
-            {"key": MOD_CLIENTES,      "label": "Clientes",                  "icon": "fas fa-users"},
-            {"key": MOD_VEHICULOS,     "label": "Vehículos",                 "icon": "fas fa-car"},
-            {"key": MOD_REPORTES,      "label": "Reportes",                  "icon": "fas fa-chart-bar"},
-            {"key": MOD_CONFIGURACION, "label": "Configuración",             "icon": "fas fa-cog"},
+            {"key": MOD_CLIENTES,      "label": _("Clientes"),                  "icon": "fas fa-users"},
+            {"key": MOD_VEHICULOS,     "label": _("Vehículos"),                 "icon": "fas fa-car"},
+            {"key": MOD_REPORTES,      "label": _("Reportes"),                  "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"),             "icon": "fas fa-cog"},
         ],
         "kpi_labels": ["Ventas hoy", "Neumáticos críticos", "Servicios hoy", "Ticket promedio"],
         "quick_access": [
@@ -156,15 +157,15 @@ PRODUCT_PROFILES = {
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",        "icon": "fas fa-home"},
             {"key": MOD_RECICLAJE,     "label": "Compras",       "icon": "fas fa-recycle"},
-            {"key": MOD_CLIENTES,      "label": "Clientes",      "icon": "fas fa-users"},
-            {"key": MOD_REPORTES,      "label": "Reportes",      "icon": "fas fa-chart-bar"},
-            {"key": MOD_CONFIGURACION, "label": "Configuración", "icon": "fas fa-cog"},
+            {"key": MOD_CLIENTES,      "label": _("Clientes"),      "icon": "fas fa-users"},
+            {"key": MOD_REPORTES,      "label": _("Reportes"),      "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"), "icon": "fas fa-cog"},
         ],
         "kpi_labels": ["Compras hoy", "Catalíticos en stock", "Margen del mes", "Chatarra bajo stock mínimo"],
         "quick_access": [
             {"label": "Nueva Compra",     "icon": "fas fa-recycle",       "path": "reciclaje/compras/nueva/"},
             {"label": "Ver Stock",        "icon": "fas fa-boxes",         "path": "reciclaje/stock/"},
-            {"label": "Reportes",         "icon": "fas fa-chart-bar",     "path": "reciclaje/reportes/"},
+            {"label": _("Reportes"),         "icon": "fas fa-chart-bar",     "path": "reciclaje/reportes/"},
         ],
     },
 
@@ -177,10 +178,10 @@ PRODUCT_PROFILES = {
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",        "icon": "fas fa-home"},
             {"key": MOD_DOCUMENTOS,    "label": "Trabajos",       "icon": "fas fa-cash-register"},
-            {"key": MOD_CLIENTES,      "label": "Clientes",      "icon": "fas fa-users"},
-            {"key": MOD_SERVICIOS,     "label": "Servicios",     "icon": "fas fa-tint"},
-            {"key": MOD_REPORTES,      "label": "Reportes",      "icon": "fas fa-chart-bar"},
-            {"key": MOD_CONFIGURACION, "label": "Configuración", "icon": "fas fa-cog"},
+            {"key": MOD_CLIENTES,      "label": _("Clientes"),      "icon": "fas fa-users"},
+            {"key": MOD_SERVICIOS,     "label": _("Servicios"),     "icon": "fas fa-tint"},
+            {"key": MOD_REPORTES,      "label": _("Reportes"),      "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"), "icon": "fas fa-cog"},
         ],
         "kpi_labels": ["Servicios hoy", "Ingresos hoy", "Clientes hoy", "Servicios semana"],
         "quick_access": [
@@ -198,10 +199,10 @@ PRODUCT_PROFILES = {
         "nav": [
             {"key": MOD_INICIO, "label": "Inicio", "icon": "fas fa-home"},
             {"key": MOD_GRUAS, "label": "Órdenes de traslado", "icon": "fas fa-truck-pickup"},
-            {"key": MOD_CLIENTES, "label": "Clientes", "icon": "fas fa-users"},
+            {"key": MOD_CLIENTES, "label": _("Clientes"), "icon": "fas fa-users"},
             {"key": MOD_DOCUMENTOS, "label": "Documentos", "icon": "fas fa-file-invoice"},
-            {"key": MOD_REPORTES, "label": "Reportes", "icon": "fas fa-chart-bar"},
-            {"key": MOD_CONFIGURACION, "label": "Configuración", "icon": "fas fa-cog"},
+            {"key": MOD_REPORTES, "label": _("Reportes"), "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"), "icon": "fas fa-cog"},
         ],
         "kpi_labels": ["Órdenes hoy", "Pendientes de asignación", "Saldo por cobrar", "Margen registrado"],
         "quick_access": [

@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 """
 Business module definitions for eGarage.
 
@@ -23,15 +24,15 @@ MOD_GRUAS = "gruas"
 # Labels/icons here are defaults; product profiles may override them per rubro.
 NAV_ITEMS = {
     MOD_INICIO:        {"label": "Inicio",        "path": "dashboard/",       "icon": "fas fa-home",         "order": 1},
-    MOD_CLIENTES:      {"label": "Clientes",      "path": "clientes/",        "icon": "fas fa-users",        "order": 2},
-    MOD_VEHICULOS:     {"label": "Vehículos",     "path": "vehiculos/",       "icon": "fas fa-car",          "order": 3},
+    MOD_CLIENTES:      {"label": _("Clientes"),      "path": "clientes/",        "icon": "fas fa-users",        "order": 2},
+    MOD_VEHICULOS:     {"label": _("Vehículos"),     "path": "vehiculos/",       "icon": "fas fa-car",          "order": 3},
     MOD_DOCUMENTOS:    {"label": "Documentos",    "path": "documentos/form/", "icon": "fas fa-file-invoice", "order": 4},
-    MOD_REPUESTOS:     {"label": "Repuestos",     "path": "repuestos/",       "icon": "fas fa-cogs",         "order": 5},
-    MOD_SERVICIOS:     {"label": "Servicios",     "path": "servicios/",       "icon": "fas fa-tools",        "order": 6},
+    MOD_REPUESTOS:     {"label": _("Repuestos"),     "path": "repuestos/",       "icon": "fas fa-cogs",         "order": 5},
+    MOD_SERVICIOS:     {"label": _("Servicios"),     "path": "servicios/",       "icon": "fas fa-tools",        "order": 6},
     MOD_DESARME:       {"label": "Desarme",       "path": "desarme/",         "icon": "fas fa-car-crash",    "order": 7},
     MOD_RECICLAJE:     {"label": "Reciclaje",     "path": "reciclaje/",       "icon": "fas fa-recycle",      "order": 10},
     MOD_FLOTA:         {"label": "Flota",         "path": "flota/",           "icon": "fas fa-truck",        "order": 8},
-    MOD_REPORTES:      {"label": "Reportes",      "path": "reportes/",        "icon": "fas fa-chart-bar",    "order": 9},
+    MOD_REPORTES:      {"label": _("Reportes"),      "path": "reportes/",        "icon": "fas fa-chart-bar",    "order": 9},
     MOD_CONFIGURACION: {"label": "Configuración", "path": "settings/",        "icon": "fas fa-cog",          "order": 99},
     MOD_GRUAS:         {"label": "Grúas",         "path": "gruas/",           "icon": "fas fa-truck-pickup",  "order": 6},
 }

@@ -1,6 +1,7 @@
-
-
 {% extends "admin/base_site.html" %}
+{% load nav_i18n %}
+
+
 
 {% block extrahead %}
 {{ block.super }}
@@ -994,7 +995,7 @@
 
     const paisLabels = [
         {% for row in por_pais %}
-        "{{ row.label|escapejs }}"{% if not forloop.last %},{% endif %}
+        "{{row.label|translate_nav:request}}"{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
 
@@ -1046,7 +1047,7 @@
 
     const rubroLabels = [
         {% for row in por_rubro %}
-        "{{ row.label|escapejs }}"{% if not forloop.last %},{% endif %}
+        "{{row.label|translate_nav:request}}"{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
 

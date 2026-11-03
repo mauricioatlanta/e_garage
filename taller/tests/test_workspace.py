@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 """
 Tests for Workspace UI 2.0 layer.
 

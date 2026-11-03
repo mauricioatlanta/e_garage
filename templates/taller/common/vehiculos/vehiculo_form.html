@@ -628,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentUrl = window.location.pathname + window.location.search;
 
             const createUrl =
-                "/cl/es/clientes/crear/" +
+                "{% country_url 'clientes:crear' %}" +
                 "?return_to=" +
                 encodeURIComponent(currentUrl);
 

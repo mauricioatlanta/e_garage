@@ -1,4 +1,4 @@
-{% extends "layouts/base_egarage_panel.html" %}
+{% load nav_i18n %}{% extends "layouts/base_egarage_panel.html" %}
 {% load i18n %}
 {% load country_url %}
 {% load humanize %}
@@ -95,7 +95,7 @@
         <div class="flex justify-between items-start mb-3 gap-2">
           <div class="min-w-0">
             <span class="text-xs text-cyan-300 font-mono font-bold">{{ item.codigo }}</span>
-            <div class="text-sm font-semibold text-white mt-0.5 truncate">{{ item.nombre }}</div>
+            <div class="text-sm font-semibold text-white mt-0.5 truncate">{{item.nombre|translate_nav:request}}</div>
           </div>
           <label class="flex items-center gap-1.5 text-xs text-slate-300 flex-shrink-0 cursor-pointer">
             <input type="checkbox" class="cat-checkbox"

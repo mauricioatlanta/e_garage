@@ -1015,3 +1015,28 @@ msgstr "Piezas vendidas hoy"
 
 msgid "Piezas inventariadas"
 msgstr "Piezas inventariadas"
+
+
+msgid "Vehículos de desarme"
+msgstr "Vehículos"
+
+msgid "Inventario de desarme"
+msgstr "Repuestos"
+
+msgid "Inventario de repuestos"
+msgstr "Repuestos"
+
+msgid "Ventas"
+msgstr "Ventas"
+
+msgid "Clientes"
+msgstr "Clientes"
+
+msgid "Reportes"
+msgstr "Reportes"
+
+msgid "Dashboard"
+msgstr "Panel"
+
+msgid "Work"
+msgstr "Trabajo"

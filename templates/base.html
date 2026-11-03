@@ -888,7 +888,7 @@
         </a>
         <a href="{% country_url 'reciclaje_staff:reporte_fechas' %}" class="nav-button-standard">
           <span class="nav-icon">📊</span>
-          <span class="nav-text">Reportes</span>
+          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Reports{% else %}Reportes{% endif %}</span>
         </a>
         {% else %}
         <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">

@@ -128,13 +128,25 @@ def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
         documento = context.get("documento")
         if not context_empresa and documento is not None:
             context_empresa = getattr(documento, "empresa", None)
-        active_empresa = context_empresa or getattr(request, "empresa", None)
-        if active_empresa:
-            country_ns = _country_ns_from_empresa(active_empresa)
-            if country_ns == "us_es" and getattr(request, "LANGUAGE_CODE", "") == "en":
-                country_ns = "us_en"
+        # 1. Prioridad: Ruta de USA (/us/) o Modo Soporte USA para Superusuario
+        p_act = getattr(request, "path_info", "") or getattr(request, "path", "") or "/"
+        is_us = p_act.startswith("/us/") or p_act == "/us"
+        is_support_us = (
+            getattr(request, "user", None)
+            and getattr(request.user, "is_superuser", False)
+            and (request.session.get("modo_soporte_pais") == "us" or request.session.get("support_country") == "us")
+        )
+        if is_us or is_support_us:
+            lang_act = _extract_lang_from_path(p_act) or getattr(request, "LANGUAGE_CODE", "es")
+            country_ns = "us_en" if str(lang_act).lower() == "en" else "us_es"
         else:
-            country_ns = _country_ns_from_path(request.path or "/")
+            active_empresa = context_empresa or getattr(request, "empresa", None)
+            if active_empresa:
+                country_ns = _country_ns_from_empresa(active_empresa)
+                if country_ns == "us_es" and getattr(request, "LANGUAGE_CODE", "") == "en":
+                    country_ns = "us_en"
+            else:
+                country_ns = _country_ns_from_path(p_act)
 
     # Normalizar servicios: y repuestos: según el país
     # Chile/Uruguay: viven bajo country:taller: (chile:taller:servicios:...)

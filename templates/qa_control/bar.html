@@ -27,7 +27,7 @@
     {% endif %}
     {% if qa_control_empresa %}
       <form method="post" action="{% url 'qa_control:exit' %}" style="display:inline;">
-        {% csrf_token %}<button type="submit" style="color:#fde68a;text-decoration:underline;background:none;border:0;padding:0;cursor:pointer;">Salir</button>
+        {% csrf_token %}<button type="submit" style="color:#fde68a;text-decoration:underline;background:none;border:0;padding:0;cursor:pointer;">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Logout{% else %}Salir{% endif %}</button>
       </form>
     {% endif %}
   </div>

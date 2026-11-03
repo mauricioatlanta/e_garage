@@ -87,7 +87,7 @@
 </style>
 <div class="eg-support-switcher" role="region" aria-label="{% trans "Entorno de soporte" %}">
   <span class="eg-support-switcher__badge">🛡️ {% trans "Modo Soporte" %}</span>
-  <form method="post" action="{% url 'switch_support_environment' %}">
+  <form method="post" action="/staff/support-environment/"switch_support_environment' %}">
     {% csrf_token %}
     <label for="support-country" class="sr-only">{% trans "País" %}</label>
     <select id="support-country" name="country" aria-label="{% trans "País" %}">
@@ -113,7 +113,7 @@
     </fieldset>
     <button type="submit">{% trans "Aplicar" %}</button>
   </form>
-  <form method="post" action="{% url 'switch_support_environment' %}">
+  <form method="post" action="/staff/support-environment/"switch_support_environment' %}">
     {% csrf_token %}
     <input type="hidden" name="action" value="reset">
     <button type="submit" class="eg-support-switcher__reset">{% trans "Restablecer" %}</button>

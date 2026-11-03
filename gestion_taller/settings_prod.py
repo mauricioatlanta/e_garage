@@ -182,7 +182,7 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = env_bool("ACCOUNT_LOGIN_ON_EMAIL_CONFIRMAT
 # Allauth usa /accounts/profile/ por defecto si no existe una redireccion explicita.
 # En eGarage, despues de iniciar sesion se debe entrar al workspace country-aware.
 LOGIN_URL = "/accounts/login/"
-LOGIN_REDIRECT_URL = "/cl/es/workspace/"
+LOGIN_REDIRECT_URL = '/cl/es/reportes/'
 ACCOUNT_ADAPTER = "taller.views_extra.account_adapter.CountryAwareAccountAdapter"
 ACCOUNT_FORMS = {
     "login": "taller.forms.custom_login.CustomLoginForm",
@@ -409,3 +409,7 @@ MP_ACCESS_TOKEN = env_str("MP_ACCESS_TOKEN", "")
 MP_ENABLED = bool(
     os.getenv("MP_ENABLED", "1" if MP_ACCESS_TOKEN else "0") not in ("0", "false", "False", "")
 )
+
+ACCOUNT_SESSION_REMEMBER = True
+
+SESSION_COOKIE_AGE = 2592000  # 30 dias

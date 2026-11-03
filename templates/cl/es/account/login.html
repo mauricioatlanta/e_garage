@@ -180,8 +180,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     {% if form.password.errors %}<div class="error-message">{{ form.password.errors }}</div>{% endif %}
                 </div>
                 <div class="checkbox-container">
-                    {{ form.remember_me|add_class:"form-checkbox" }}
-                    <label for="id_remember_me" class="checkbox-label">Mantener sesión iniciada</label>
+                    {{ form.remember|add_class:"form-checkbox" }}
+                    <label for="id_remember" class="checkbox-label">Mantener sesión iniciada</label>
                 </div>
                 <button type="button" id="btn-login-action" class="login-button font-futuristic">🔐 Iniciar Sesión</button>
                 <div class="forgot-password"><a href="/cl/es/accounts/password/reset/">¿Olvidaste tu contraseña?</a></div>

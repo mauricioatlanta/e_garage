@@ -1,4 +1,4 @@
-{% extends "layouts/base_egarage_panel.html" %}
+{% load nav_i18n %}{% extends "layouts/base_egarage_panel.html" %}
 {% load i18n %}
 {% load country_url %}
 
@@ -144,7 +144,7 @@
               {% for item in zona_group.list %}
               <option value="{{ item.codigo }}"
                 {% if post.codigo_pieza == item.codigo %}selected{% endif %}>
-                {{ item.codigo }} — {{ item.nombre }}
+                {{ item.codigo }} — {{item.nombre|translate_nav:request}}
               </option>
               {% endfor %}
             </optgroup>
