@@ -482,7 +482,7 @@
       </div>
       <div class="flex gap-3">
         <a href="{% country_url 'clientes:crear_cliente' %}" class="btn-filter">
-          <i class="fas fa-plus"></i> Nuevo Cliente
+          <i class="fas fa-plus"></i> {% if "/en/" in request.path or LANGUAGE_CODE == "en" %}New Client{% else %}Nuevo Cliente{% endif %}
         </a>
       </div>
     </div>
@@ -492,7 +492,7 @@
   <div class="kpis-grid">
     <div class="kpi-card">
       <div class="kpi-icon">👥</div>
-      <div class="kpi-label">Total Clientes</div>
+      <div class="kpi-label">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Total Clients{% else %}Total Clientes{% endif %}</div>
       <div class="kpi-value">{{ estadisticas.total|default:0|intcomma }}</div>
     </div>
     <div class="kpi-card">
@@ -517,7 +517,7 @@
     </div>
     <div class="kpi-card">
       <div class="kpi-icon">⚡</div>
-      <div class="kpi-label">Activos (90 días)</div>
+      <div class="kpi-label">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Active{% else %}Activo{% endif %}s (90 días)</div>
       <div class="kpi-value">{{ clientes_activos|default:0|intcomma }}</div>
     </div>
   </div>
@@ -627,7 +627,7 @@
           <th>Email</th>
           <th>Teléfono</th>
           <th>Ciudad</th>
-          <th>Acciones</th>
+          <th>{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Actions{% else %}Acciones{% endif %}</th>
         </tr>
       </thead>
       <tbody>

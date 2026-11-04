@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n country_url static humanize %}
 
-{% block title %}Directorio de Clientes · eGarage{% endblock %}
+{% block title %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Client Directory{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Directory{% else %}Directorio{% endif %} de Clientes{% endif %} · eGarage{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -114,34 +114,34 @@
         <i class="fas fa-users"></i>
       </div>
       <div>
-        <h1 class="text-2xl font-black text-white m-0">Directorio de Clientes</h1>
-        <p class="text-xs text-slate-300 m-0 mt-0.5 font-medium">Gestión centralizada de contactos, datos fiscales y vehículos.</p>
+        <h1 class="text-2xl font-black text-white m-0">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Client Directory{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Directory{% else %}Directorio{% endif %} de Clientes{% endif %}</h1>
+        <p class="text-xs text-slate-300 m-0 mt-0.5 font-medium">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Centralized management of contacts, tax data, and vehicles.{% else %}Gestión centralizada de contactos, datos fiscales y vehículos.{% endif %}</p>
       </div>
     </div>
     <div>
       <a href="{% country_url 'clientes:crear_cliente' %}" 
          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-lg shadow-cyan-500/30">
         <i class="fas fa-user-plus"></i>
-        <span>Nuevo Cliente</span>
+        <span>{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}New Client{% else %}Nuevo Cliente{% endif %}</span>
       </a>
     </div>
   </div>
 
   <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-5">
     <div class="eg-stat-card flex items-center justify-between">
-      <span class="eg-stat-label">Total Clientes</span>
+      <span class="eg-stat-label">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Total Clients{% else %}Total Clientes{% endif %}</span>
       <span class="eg-stat-val text-white">{{ cliente_list|length }}</span>
     </div>
     <div class="eg-stat-card flex items-center justify-between">
-      <span class="eg-stat-label">Con Contacto</span>
+      <span class="eg-stat-label">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}With Contact{% else %}Con Contacto{% endif %}</span>
       <span class="eg-stat-val" style="color: #38bdf8;">{{ cliente_list|length }}</span>
     </div>
     <div class="eg-stat-card flex items-center justify-between">
-      <span class="eg-stat-label">Directorio</span>
-      <span class="eg-stat-val" style="color: #34d399;">Activo</span>
+      <span class="eg-stat-label">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Directory{% else %}Directorio{% endif %}</span>
+      <span class="eg-stat-val" style="color: #34d399;">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Active{% else %}Activo{% endif %}</span>
     </div>
     <div class="eg-stat-card flex items-center justify-between">
-      <span class="eg-stat-label">Soporte</span>
+      <span class="eg-stat-label">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Support{% else %}Soporte{% endif %}</span>
       <span class="eg-stat-val" style="color: #fbbf24;">ONLINE</span>
     </div>
   </div>
@@ -160,10 +160,10 @@
       <table class="w-full text-left border-collapse" id="clients-table">
         <thead>
           <tr>
-            <th>Cliente / ID</th>
-            <th>Datos de Contacto</th>
-            <th>Ubicación</th>
-            <th class="text-right">Acciones</th>
+            <th>{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Client / ID{% else %}Cliente / ID{% endif %}</th>
+            <th>{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Contact Information{% else %}Datos de Contacto{% endif %}</th>
+            <th>{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Location{% else %}Ubicación{% endif %}</th>
+            <th class="text-right">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Actions{% else %}Acciones{% endif %}</th>
           </tr>
         </thead>
         <tbody id="clients-tbody">
