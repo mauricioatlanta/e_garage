@@ -280,7 +280,7 @@
 <div class="container mx-auto px-4 py-8">
     <!-- Header Principal -->
     <div class="cyber-header">
-        <h1 class="cyber-title">{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}📊 Reports{% else %}📊 Reportes{% endif %}{% endif %}{% endif %} por Fecha</h1>
+        <h1 class="cyber-title">{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}📊 Reports{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.LANGUAGE_CODE == "en" %}📊 Reports{% else %}📊 Reportes{% endif %}{% endif %}{% endif %}{% endif %} por Fecha</h1>
         <p class="cyber-subtitle">Sistema unificado de análisis temporal con filtros inteligentes</p>
     </div>
 
@@ -305,7 +305,7 @@
                     <option value="orden" {% if request.GET.tipo == 'orden' %}selected{% endif %}>🔧 Órdenes de Trabajo</option>
                     <option value="presupuesto" {% if request.GET.tipo == 'presupuesto' %}selected{% endif %}>📋 Presupuestos</option>
                     <option value="repuesto" {% if request.GET.tipo == 'repuesto' %}selected{% endif %}>⚙️ Repuestos</option>
-                    <option value="servicio" {% if request.GET.tipo == 'servicio' %}selected{% endif %}>{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🛠️ Services{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🛠️ Services{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🛠️ Services{% else %}🛠️ Servicios{% endif %}{% endif %}{% endif %}</option>
+                    <option value="servicio" {% if request.GET.tipo == 'servicio' %}selected{% endif %}>{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🛠️ Services{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🛠️ Services{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🛠️ Services{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🛠️ Services{% else %}🛠️ Servicios{% endif %}{% endif %}{% endif %}{% endif %}</option>
                     <option value="otros" {% if request.GET.tipo == 'otros' %}selected{% endif %}>📦 Otros Servicios</option>
                 </select>
             </div>

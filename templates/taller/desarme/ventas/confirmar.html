@@ -43,7 +43,7 @@
 
   {# ── Tabla de repuestos ── #}
   <div class="vta-card">
-    <h3>{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🔧 Parts{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🔧 Parts{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🔧 Parts{% else %}🔧 Repuestos{% endif %}{% endif %}{% endif %} seleccionados</h3>
+    <h3>{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🔧 Parts{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🔧 Parts{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🔧 Parts{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.LANGUAGE_CODE == "en" %}🔧 Parts{% else %}🔧 Repuestos{% endif %}{% endif %}{% endif %}{% endif %} seleccionados</h3>
     <table class="vta-table">
       <thead>
         <tr>

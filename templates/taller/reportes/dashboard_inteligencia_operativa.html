@@ -280,7 +280,7 @@
   <!-- 🎯 Header Principal -->
   <div class="text-center mb-8">
     <h1 class="text-5xl font-extrabold mb-4" style="font-family: 'Orbitron'; background: linear-gradient(45deg, #00ffff, #0080ff, #ff00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);">
-      {% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚀 Operations{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚀 Operations{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚀 Operations{% else %}🚀 Centro{% endif %}{% endif %}{% endif %} de Inteligencia Operativa
+      {% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚀 Operations{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚀 Operations{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚀 Operations{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.LANGUAGE_CODE == "en" %}🚀 Operations{% else %}🚀 Centro{% endif %}{% endif %}{% endif %}{% endif %} de Inteligencia Operativa
     </h1>
     <p class="text-xl text-gray-300">Dashboard Futurista 360° - Análisis Predictivo en Tiempo Real</p>
 

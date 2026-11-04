@@ -109,7 +109,7 @@
 
             <div class="benefits">
                 <h3>🚀 Mantén tu taller activo con calma</h3>
-                <p><strong>✨ IA Avanzada • {% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}📊 Reports{% else %}📊 Reportes{% endif %}{% endif %}{% endif %} Pro • 💰 Facturación • 📱 App Móvil</strong></p>
+                <p><strong>✨ IA Avanzada • {% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}📊 Reports{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.LANGUAGE_CODE == "en" %}📊 Reports{% else %}📊 Reportes{% endif %}{% endif %}{% endif %}{% endif %} Pro • 💰 Facturación • 📱 App Móvil</strong></p>
             </div>
 
             <div class="price-highlight">
