@@ -6,7 +6,7 @@ Compatibilidad: /br/es/... redirige a /br/pt/...
 """
 
 from django.shortcuts import redirect
-from django.urls import path
+from django.urls import include, path
 from django.views.generic import RedirectView
 
 from taller.views.country_aware_auth import country_aware_login
@@ -52,4 +52,17 @@ urlpatterns = [
     # --- ESPAÑOL ---
     path("es/", RedirectView.as_view(url="/br/es/bienvenida/", permanent=False)),
     path("es/bienvenida/", bienvenida_br_es, name="bienvenida_es"),
+    path(
+        "es/reportes/",
+        RedirectView.as_view(
+            url="/br/pt/reportes/",
+            query_string=True,
+            permanent=False,
+        ),
+        name="reportes_es_redirect",
+    ),
+    path(
+        "pt/reportes/",
+        include(("taller.reportes.urls", "reportes"), namespace="reportes"),
+    ),
 ]
