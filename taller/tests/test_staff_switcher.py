@@ -9,6 +9,7 @@ from django.utils import translation
 from taller.context_processors import company_country
 from taller.context_processors.business_modules import business_modules
 from taller.middleware.lang_policy import LanguagePolicyMiddleware
+from taller.models.empresa import Empresa
 from taller.tests.factories import ConfiguracionEmpresaFactory, EmpresaFactory, UserFactory
 
 
@@ -141,6 +142,23 @@ def test_superuser_switch_to_us_sets_english_cookie_session_and_us_en_url():
     assert client.session["django_language"] == "en"
     assert client.session["preferred_lang"] == "en"
     assert response.cookies["django_language"].value == "en"
+
+
+@pytest.mark.django_db
+def test_switch_to_us_without_us_company_does_not_create_invalid_empresa():
+    user = UserFactory(is_superuser=True, is_staff=True)
+    EmpresaFactory(user=user, pais="CL")
+    client = Client()
+    client.force_login(user)
+
+    response = client.post(
+        "/staff/support-environment/",
+        {"country": "us", "rubros": ["TALLER"]},
+    )
+
+    assert response.status_code == 302
+    assert client.session["support_country"] == "us"
+    assert not Empresa.objects.filter(pais="US").exists()
 
 
 def test_lang_policy_uses_support_country_for_superuser():

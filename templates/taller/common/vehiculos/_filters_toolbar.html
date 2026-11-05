@@ -23,6 +23,7 @@
       <span>{% trans "Search" %}</span>
     </button>
   </div>
+  <p id="search-status" class="mt-2 text-sm text-red-300" role="status" aria-live="polite" hidden></p>
 </div>
 
 <script>
@@ -30,68 +31,83 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search-input');
     const searchBtn = document.getElementById('search-btn');
     const searchLoading = document.getElementById('search-loading');
+    const searchStatus = document.getElementById('search-status');
     let searchTimeout;
+    let activeSearch;
 
-    // Real-time search functionality
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const query = this.value.trim();
+    if (!searchInput) return;
 
-            // Clear previous timeout
-            if (searchTimeout) {
-                clearTimeout(searchTimeout);
-            }
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => performSearch(this.value.trim()), 250);
+    });
 
-            // Show loading indicator
-            if (searchLoading) searchLoading.classList.remove('hidden');
+    searchInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            clearTimeout(searchTimeout);
+            performSearch(this.value.trim());
+        }
+    });
 
-            // Debounce search - wait 300ms after user stops typing
-            searchTimeout = setTimeout(() => {
-                performSearch(query);
-            }, 300);
-        });
-
-        // Enter key search
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const query = this.value.trim();
-                performSearch(query);
-            }
-        });
-    }
-
-    // Search button click
     if (searchBtn) {
         searchBtn.addEventListener('click', function() {
-            const query = searchInput ? searchInput.value.trim() : '';
-            performSearch(query);
+            clearTimeout(searchTimeout);
+            performSearch(searchInput.value.trim());
         });
     }
 
-    function performSearch(query) {
-        // Hide loading indicator
-        if (searchLoading) searchLoading.classList.add('hidden');
-
-        // Get current URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-
-        // Update search parameter
-        if (query) {
-            urlParams.set('q', query);
-        } else {
-            urlParams.delete('q');
+    async function performSearch(query) {
+        if (activeSearch) activeSearch.abort();
+        activeSearch = new AbortController();
+        const controller = activeSearch;
+        if (searchLoading) searchLoading.classList.remove('hidden');
+        if (searchStatus) {
+            searchStatus.hidden = true;
+            searchStatus.textContent = '';
         }
 
-        // Build new URL
-        const newUrl = window.location.pathname + '?' + urlParams.toString();
+        const url = new URL(window.location.href);
+        if (query) {
+            url.searchParams.set('q', query);
+        } else {
+            url.searchParams.delete('q');
+        }
+        url.searchParams.delete('page');
 
-        // Fallback to page reload
-        window.location.href = newUrl;
+        try {
+            const response = await fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+                signal: controller.signal
+            });
+            if (!response.ok) throw new Error(`Search failed (${response.status})`);
+
+            const html = await response.text();
+            const parsed = new DOMParser().parseFromString(html, 'text/html');
+            const results = parsed.getElementById('vehicle-results');
+            const currentResults = document.getElementById('vehicle-results');
+            if (!results || !currentResults) throw new Error('Vehicle results were not found');
+            if (controller.signal.aborted) return;
+
+            currentResults.innerHTML = results.innerHTML;
+            window.history.replaceState({}, '', url);
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error('Vehicle search error:', error);
+                if (searchStatus) {
+                    searchStatus.textContent = 'No se pudo completar la búsqueda. Inténtalo nuevamente.';
+                    searchStatus.hidden = false;
+                }
+            }
+        } finally {
+            if (activeSearch === controller && searchLoading) {
+                searchLoading.classList.add('hidden');
+            }
+        }
     }
 });
 </script>
-
 
 
 

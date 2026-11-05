@@ -221,6 +221,10 @@ class ClienteForm(forms.ModelForm):
         # Filtrar estados por país de la empresa
         estados_con_pais = ["US", "BR", "VE", "PE", "MX", "CO", "EC"]
         if self.pais in estados_con_pais:
+            if self.pais == "US":
+                from taller.utils.usa_locations import ensure_usa_locations
+
+                ensure_usa_locations()
             self.fields["estado_usa"].queryset = EstadoUSA.objects.filter(pais=self.pais).order_by(
                 "nombre"
             )

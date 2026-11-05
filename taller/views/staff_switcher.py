@@ -16,8 +16,6 @@ def switch_support_environment(request):
         # Asignar la empresa de USA limpia
         if country == "us":
             emp = Empresa.objects.filter(pais="US").first()
-            if not emp:
-                emp = Empresa.objects.create(nombre_taller="eGarage Workshop USA", rut="US-999999", pais="US")
         else:
             emp = Empresa.objects.filter(pais="CL").first() or Empresa.objects.filter(id=1).first()
 

@@ -216,8 +216,10 @@
 {% endblock %}
 
 {% block panel_content %}
+<div id="vehicle-results" aria-live="polite">
   {% include "taller/common/vehiculos/_ai_badges.html" %}
   {% include "taller/common/vehiculos/_table.html" %}
   {% include "taller/common/vehiculos/_empty_state.html" %}
   {% include "taller/common/vehiculos/_pagination.html" %}
+</div>
 {% endblock %}

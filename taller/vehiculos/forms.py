@@ -149,22 +149,24 @@ class VehiculoForm(forms.ModelForm):
         self.empresa = kwargs.pop('empresa', None) or getattr(self, 'empresa', None)
         self.request = kwargs.pop('request', None) or getattr(self, 'request', None)
         self.user = kwargs.pop("user", None)
-        self.request = kwargs.pop("request", None)
         args_list = list(args)
-        bound_data = kwargs.pop("data", None)
         if args_list:
-            bound_data = args_list.pop(0)
-
-        prepared_data, pending_custom_choices = self._prepare_bound_data(bound_data)
-        if prepared_data is not None:
-            kwargs["data"] = prepared_data
-
-        # Evitar colisión de data/files si ya vienen en args_list o kwargs
-        if args_list:
+            prepared_data, pending_custom_choices = self._prepare_bound_data(args_list[0])
+            args_list[0] = prepared_data
             kwargs.pop('data', None)
-            if len(args_list) > 1:
-                kwargs.pop('files', None)
+        else:
+            bound_data = kwargs.get("data")
+            prepared_data, pending_custom_choices = self._prepare_bound_data(bound_data)
+            if bound_data is not None:
+                kwargs["data"] = prepared_data
         super().__init__(*args_list, **kwargs)
+
+        if "empresa" in self.fields:
+            self.fields["empresa"].required = False
+            if self.empresa:
+                self.initial.setdefault("empresa", self.empresa.pk)
+        if "tipo_uso" in self.fields:
+            self.fields["tipo_uso"].required = False
 
         # Desactivar validación estricta de ModelChoiceField para campos dinámicos
         for campo_dinamico in ['cliente', 'color', 'motor', 'caja', 'modelo']:
@@ -183,6 +185,10 @@ class VehiculoForm(forms.ModelForm):
         # The request tenant is authoritative during QA context switching.
         # Keep the owner's company as the fallback for regular requests.
         empresa = getattr(self.request, "empresa", None) or getattr(self.user, "empresa", None)
+        if "cliente" in self.fields and isinstance(
+            self.fields["cliente"], forms.ModelChoiceField
+        ):
+            self.fields["cliente"].queryset = Cliente.objects.filter(empresa=empresa)
         # Detectar país: primero de empresa, luego de request.path
         # Detección estricta para entorno USA
         req_path = getattr(self.request, 'path_info', '') or getattr(self.request, 'path', '') or ''
@@ -320,6 +326,13 @@ class VehiculoForm(forms.ModelForm):
                 w = self.fields[f_name].widget
                 self.fields[f_name] = forms.CharField(required=False, widget=w)
 
+        if 'color' in self.fields:
+            colores = ColorVehiculo.get_colores_para_pais('US')
+            opciones_color = [('', 'Select color...')] + [
+                (str(color.pk), color.nombre) for color in colores
+            ]
+            self.fields['color'].widget.choices = opciones_color
+
         
 
         # Permitir valores creados al vuelo sin disparar invalid_choice
@@ -413,7 +426,7 @@ class VehiculoForm(forms.ModelForm):
                 marcas_choices_tuple = tuple(marcas_choices)
                 self.fields["marca"] = forms.ChoiceField(
                     choices=marcas_choices_tuple,
-                    required=True,
+                    required=False,
                     label="Brand",
                     widget=forms.Select(
                         attrs={
@@ -439,7 +452,7 @@ class VehiculoForm(forms.ModelForm):
                     marcas_choices = [("", "Select a brand")] + [(m, m) for m in marcas_catalogo]
                     self.fields["marca"] = forms.ChoiceField(
                         choices=marcas_choices,
-                        required=True,
+                        required=False,
                         label="Brand",
                         widget=forms.Select(
                             attrs={
@@ -453,7 +466,7 @@ class VehiculoForm(forms.ModelForm):
                     )
                     self.fields["marca"] = forms.ChoiceField(
                         choices=[("", "No brands - Run: python manage.py cargar_marcas_usa")],
-                        required=True,
+                        required=False,
                         label="Brand",
                         widget=forms.Select(
                             attrs={
@@ -489,7 +502,7 @@ class VehiculoForm(forms.ModelForm):
                         )
                 self.fields["marca"] = forms.ChoiceField(
                     choices=marcas_choices,
-                    required=True,
+                    required=False,
                     label="Brand",
                     widget=forms.Select(
                         attrs={
@@ -510,7 +523,7 @@ class VehiculoForm(forms.ModelForm):
                 )
                 self.fields["marca"] = forms.ChoiceField(
                     choices=[("", "No brands available - Run: python manage.py cargar_marcas_usa")],
-                    required=True,
+                    required=False,
                     label="Brand",
                     widget=forms.Select(
                         attrs={
@@ -522,7 +535,7 @@ class VehiculoForm(forms.ModelForm):
         # Campo modelo para USA (se carga dinámicamente via JavaScript)
         # ✅ Usar CharField con widget Select para evitar validación de queryset estático
         self.fields["modelo"] = forms.CharField(
-            required=True,
+            required=False,
             label="Model",
             widget=forms.Select(
                 choices=[("", "Select brand and year first")],
@@ -646,6 +659,7 @@ class VehiculoForm(forms.ModelForm):
 
         empresa = getattr(self.user, "empresa", None)
         ensure_vehicle_catalog_for_country(pais)
+        self.fields["color"].queryset = ColorVehiculo.get_colores_para_pais(pais)
 
         # Eliminar el campo marca si ya existe (del Meta) para reemplazarlo
         if "marca" in self.fields:
@@ -906,6 +920,13 @@ class VehiculoForm(forms.ModelForm):
         elif caja_res is None:
             instance.caja = None
 
+        modelo_res = self.cleaned_data.get('modelo')
+        if modelo_res and hasattr(modelo_res, 'pk'):
+            if motor_res and hasattr(motor_res, 'modelos'):
+                motor_res.modelos.add(modelo_res)
+            if caja_res and hasattr(caja_res, 'modelos'):
+                caja_res.modelos.add(modelo_res)
+
         if commit:
             instance.save()
             self.save_m2m()
@@ -914,7 +935,11 @@ class VehiculoForm(forms.ModelForm):
 
 
     def clean_motor(self):
-        val = self.data.get('motor') or self.cleaned_data.get('motor')
+        val = (
+            self.data.get('motor')
+            or self.cleaned_data.get('motor')
+            or self._pending_motor_nombre
+        )
         if not val or str(val).strip() in ['', 'None', 'null', '---------']:
             return None
         if hasattr(val, 'pk'):
@@ -930,19 +955,17 @@ class VehiculoForm(forms.ModelForm):
             if obj:
                 return obj
         country = getattr(self, 'country', None) or 'US'
-        obj = MotorVehiculo.objects.filter(nombre__iexact=val_str).first()
+        obj = MotorVehiculo.objects.filter(nombre__iexact=val_str, country=country).first()
         if not obj:
-            kwargs = {'nombre': val_str}
-            if hasattr(MotorVehiculo, 'country'):
-                kwargs['country'] = country
-            empresa = getattr(self, 'empresa', None)
-            if hasattr(MotorVehiculo, 'empresa') and empresa:
-                kwargs['empresa'] = empresa
-            obj = MotorVehiculo.objects.create(**kwargs)
+            obj = MotorVehiculo.objects.create(nombre=val_str, country=country)
         return obj
 
     def clean_caja(self):
-        val = self.data.get('caja') or self.cleaned_data.get('caja')
+        val = (
+            self.data.get('caja')
+            or self.cleaned_data.get('caja')
+            or self._pending_caja_nombre
+        )
         if not val or str(val).strip() in ['', 'None', 'null', '---------']:
             return None
         if hasattr(val, 'pk'):
@@ -961,15 +984,9 @@ class VehiculoForm(forms.ModelForm):
             if obj:
                 return obj
         country = getattr(self, 'country', None) or 'US'
-        obj = CajaVehiculo.objects.filter(nombre__iexact=val_str).first()
+        obj = CajaVehiculo.objects.filter(nombre__iexact=val_str, country=country).first()
         if not obj:
-            kwargs = {'nombre': val_str}
-            if hasattr(CajaVehiculo, 'country'):
-                kwargs['country'] = country
-            empresa = getattr(self, 'empresa', None)
-            if hasattr(CajaVehiculo, 'empresa') and empresa:
-                kwargs['empresa'] = empresa
-            obj = CajaVehiculo.objects.create(**kwargs)
+            obj = CajaVehiculo.objects.create(nombre=val_str, country=country)
         return obj
 
     def clean_color(self):
@@ -1004,7 +1021,10 @@ class VehiculoForm(forms.ModelForm):
             return val
         from taller.models import Modelo, Marca
         val_str = str(val).strip()
-        if val_str.isdigit():
+        es_nombre_catalogo = val_str.startswith("nombre:")
+        if es_nombre_catalogo:
+            val_str = val_str.removeprefix("nombre:").strip()
+        if val_str.isdigit() and not es_nombre_catalogo:
             m = Modelo.objects.filter(id=int(val_str)).first()
             if m:
                 return m

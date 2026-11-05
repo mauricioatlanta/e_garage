@@ -60,6 +60,18 @@ def test_cliente_form_usa_filters_states_for_company_country(empresa_usa):
 
 
 @pytest.mark.django_db
+def test_cliente_form_bootstraps_usa_states_and_cities(empresa_usa):
+    Estado.objects.filter(pais="US").delete()
+
+    form = ClienteForm(empresa=empresa_usa)
+
+    assert form.fields["estado_usa"].queryset.count() == 50
+    estado = form.fields["estado_usa"].queryset.first()
+    assert estado is not None
+    assert Ciudad.objects.filter(estado=estado).exists()
+
+
+@pytest.mark.django_db
 def test_obtener_ciudades_usa_returns_cities_for_selected_state(empresa_usa):
     estado = Estado.objects.create(nombre="Georgia", codigo="GA", pais="US", sales_tax=4.00)
     ciudad = Ciudad.objects.create(nombre="Atlanta", estado=estado, sales_tax_local=0.00)

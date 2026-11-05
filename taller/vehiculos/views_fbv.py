@@ -93,6 +93,7 @@ from taller.common.mixins.context_return import (
 )
 from taller.vehiculos.catalog_bootstrap import ensure_vehicle_catalog_for_country
 from taller.vehiculos.forms import VehiculoForm
+from taller.vehiculos.usa_model_catalog import USA_MODELS_BY_MAKE
 from taller.services.empresa_service import get_empresa_safe
 
 # CBVs "shim"
@@ -369,6 +370,20 @@ def lista_vehiculos(request):
         .select_related("cliente", "marca", "modelo", "motor", "caja", "color")
         .order_by("-id")
     )
+    query = (request.GET.get("q") or "").strip()
+    if query:
+        for term in query.split():
+            vehiculos = vehiculos.filter(
+                models.Q(patente__icontains=term)
+                | models.Q(vin__icontains=term)
+                | models.Q(modelo__nombre__icontains=term)
+                | models.Q(marca__nombre__icontains=term)
+                | models.Q(cliente__nombre__icontains=term)
+                | models.Q(cliente__apellido__icontains=term)
+                | models.Q(cliente__email__icontains=term)
+                | models.Q(cliente__telefono__icontains=term)
+                | models.Q(cliente__tax_id__icontains=term)
+            )
 
     # Detectar país e idioma desde la URL
     country, lang = _get_country_from_path(request.path)
@@ -388,6 +403,7 @@ def lista_vehiculos(request):
         {
             "vehiculos": vehiculos,
             "empresa": empresa,
+            "search_query": query,
         },
     )
 
@@ -458,10 +474,18 @@ def crear_vehiculo(request, *args, **kwargs):
                     )
                     if return_to:
                         return redirect(return_to)
-                    return redirect(f"{country.lower()}:taller:vehiculos:lista_vehiculos")
+                    if country == "US" and lang in {"en", "es"}:
+                        return redirect(f"us_{lang}:vehiculos:lista_vehiculos")
+                    if country == "US":
+                        return redirect("usa:taller:vehiculos:lista_vehiculos")
+                    return redirect(f"{_country_namespace(country)}:taller:vehiculos:lista_vehiculos")
             except Exception as e:
                 log.error(f"Error creando vehículo: {e}", exc_info=True)
                 messages.error(request, f"Error al guardar el vehículo: {e}")
+                form.add_error(
+                    None,
+                    "No se pudo guardar el vehículo. Revise los datos e intente nuevamente.",
+                )
         else:
             messages.error(request, "Por favor corrija los errores en el formulario.")
     else:
@@ -761,7 +785,7 @@ def modelos_por_marca_api(request):
         log.error(f"[modelos_por_marca_api] marca_id inválido: {marca_id}")
         return JsonResponse([], safe=False)
 
-    country = _get_country(request)
+    country = "US" if request.path.lower().startswith("/us/") else _get_country(request)
     log.info(
         f"[modelos_por_marca_api] Buscando modelos para marca_id={marca_id}, country={country}, anio={anio_str}"
     )
@@ -869,8 +893,47 @@ def modelos_por_marca_api(request):
                 f"[modelos_por_marca_api] 💡 Los modelos deben tener country={search_country} para aparecer. Considera actualizar los modelos existentes o crear nuevos."
             )
 
-    # Formato de respuesta: lista de objetos con id y nombre
-    data = [{"id": m.pk, "nombre": str(m)} for m in qs.order_by("nombre")[:200]]
+    modelos = list(qs.order_by("nombre")[:200])
+    data = [{"id": modelo.pk, "nombre": str(modelo)} for modelo in modelos]
+    nombres_incluidos = {modelo.nombre.casefold() for modelo in modelos}
+
+    if country == "US" and ModeloVehiculo is not None:
+        modelos_usa = ModeloVehiculo.objects.filter(
+            marca__nombre__iexact=marca.nombre,
+            activo=True,
+        )
+        if anio_str:
+            try:
+                anio = int(anio_str)
+                modelos_usa = modelos_usa.filter(anio_inicio__lte=anio).filter(
+                    models.Q(anio_fin__isnull=True) | models.Q(anio_fin__gte=anio)
+                )
+            except (ValueError, TypeError):
+                log.warning("[modelos_por_marca_api] Año inválido para catálogo USA: %s", anio_str)
+
+        for modelo in modelos_usa.order_by("nombre")[:200]:
+            nombre = modelo.nombre.strip()
+            if nombre and nombre.casefold() not in nombres_incluidos:
+                # The form resolves this value by make/name and persists the shared Modelo.
+                data.append({"id": f"nombre:{nombre}", "nombre": nombre})
+                nombres_incluidos.add(nombre.casefold())
+
+    if country == "US":
+        modelos_predefinidos = next(
+            (
+                nombres
+                for nombre_marca, nombres in USA_MODELS_BY_MAKE.items()
+                if nombre_marca.casefold() == marca.nombre.strip().casefold()
+            ),
+            (),
+        )
+        for nombre in modelos_predefinidos:
+            if nombre.casefold() not in nombres_incluidos:
+                data.append({"id": f"nombre:{nombre}", "nombre": nombre})
+                nombres_incluidos.add(nombre.casefold())
+
+    data.sort(key=lambda item: item["nombre"].casefold())
+    data = data[:200]
     log.info(f"[modelos_por_marca_api] Retornando {len(data)} modelos")
     return JsonResponse(data, safe=False)
 
@@ -1108,6 +1171,54 @@ def subir_imagenes_vehiculo(request, vehiculo_id):
 
 
 
+def _resolve_ajax_model(data, country):
+    from taller.models import Marca, Modelo
+
+    modelo_value = str(data.get("modelo_id") or data.get("modelo") or "").strip()
+    marca_value = str(data.get("marca_id") or data.get("marca") or "").strip()
+    nombre_modelo = str(data.get("modelo_nombre") or "").strip()
+    if not nombre_modelo and modelo_value and not modelo_value.isdigit():
+        nombre_modelo = modelo_value.removeprefix("nombre:").strip()
+
+    marca = None
+    if marca_value:
+        marcas = Marca.objects.filter(country=country)
+        if marca_value.isdigit():
+            marcas = marcas.filter(pk=int(marca_value))
+        else:
+            marcas = marcas.filter(nombre__iexact=marca_value)
+        marca = marcas.first()
+
+    if nombre_modelo and marca:
+        modelo = Modelo.objects.filter(
+            marca=marca,
+            country=country,
+            nombre__iexact=nombre_modelo,
+        ).first()
+        if modelo:
+            return modelo
+        return Modelo.objects.create(
+            marca=marca,
+            country=country,
+            nombre=nombre_modelo,
+        )
+
+    if not modelo_value:
+        return None
+
+    if modelo_value.isdigit():
+        modelos = Modelo.objects.filter(pk=int(modelo_value), country=country)
+        if marca:
+            modelos = modelos.filter(marca=marca)
+        return modelos.first()
+
+    nombre_modelo = modelo_value.removeprefix("nombre:").strip()
+    modelos = Modelo.objects.filter(country=country, nombre__iexact=nombre_modelo)
+    if marca:
+        modelos = modelos.filter(marca=marca)
+    return modelos.first()
+
+
 def ajax_agregar_motor(request):
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
@@ -1127,16 +1238,26 @@ def ajax_agregar_motor(request):
         from taller.models import MotorVehiculo
 
     country = 'US' if '/us/' in request.path else 'CL'
+    has_model = bool(data.get('modelo_id') or data.get('modelo') or data.get('modelo_nombre'))
+    modelo = _resolve_ajax_model(data, country) if has_model else None
+    if has_model and not modelo:
+        return JsonResponse(
+            {'success': False, 'error': 'No se pudo resolver el modelo seleccionado.'},
+            status=400,
+        )
+
     motor, created = MotorVehiculo.objects.get_or_create(nombre=nombre, country=country)
+    if modelo and hasattr(motor, 'modelos'):
+        motor.modelos.add(modelo)
 
-    modelo_id = data.get('modelo_id') or data.get('modelo')
-    if modelo_id and hasattr(motor, 'modelos'):
-        from taller.models import Modelo
-        m_obj = Modelo.objects.filter(id=int(modelo_id)).first() if str(modelo_id).isdigit() else Modelo.objects.filter(nombre__iexact=str(modelo_id).strip()).first()
-        if m_obj:
-            motor.modelos.add(m_obj)
-
-    return JsonResponse({'success': True, 'id': motor.id, 'nombre': motor.nombre})
+    return JsonResponse(
+        {
+            'success': True,
+            'id': motor.id,
+            'nombre': motor.nombre,
+            'motor': {'id': motor.id, 'nombre': motor.nombre},
+        }
+    )
 
 def ajax_agregar_caja(request):
     if request.method != 'POST':
@@ -1160,16 +1281,26 @@ def ajax_agregar_caja(request):
             from taller.models import Transmision as CajaVehiculo
 
     country = 'US' if '/us/' in request.path else 'CL'
+    has_model = bool(data.get('modelo_id') or data.get('modelo') or data.get('modelo_nombre'))
+    modelo = _resolve_ajax_model(data, country) if has_model else None
+    if has_model and not modelo:
+        return JsonResponse(
+            {'success': False, 'error': 'No se pudo resolver el modelo seleccionado.'},
+            status=400,
+        )
+
     caja, created = CajaVehiculo.objects.get_or_create(nombre=nombre, country=country)
+    if modelo and hasattr(caja, 'modelos'):
+        caja.modelos.add(modelo)
 
-    modelo_id = data.get('modelo_id') or data.get('modelo')
-    if modelo_id and hasattr(caja, 'modelos'):
-        from taller.models import Modelo
-        m_obj = Modelo.objects.filter(id=int(modelo_id)).first() if str(modelo_id).isdigit() else Modelo.objects.filter(nombre__iexact=str(modelo_id).strip()).first()
-        if m_obj:
-            caja.modelos.add(m_obj)
-
-    return JsonResponse({'success': True, 'id': caja.id, 'nombre': caja.nombre})
+    return JsonResponse(
+        {
+            'success': True,
+            'id': caja.id,
+            'nombre': caja.nombre,
+            'caja': {'id': caja.id, 'nombre': caja.nombre},
+        }
+    )
 
 
 
@@ -1180,21 +1311,12 @@ def ajax_motores_por_modelo(request):
         from taller.models.extras_vehiculo import MotorVehiculo
     except ImportError:
         from taller.models import MotorVehiculo
-    from taller.models import Modelo
-
     qs = MotorVehiculo.objects.filter(country=country)
 
-    if modelo_val:
-        m_obj = None
-        if str(modelo_val).isdigit():
-            m_obj = Modelo.objects.filter(id=int(modelo_val)).first()
-        if not m_obj:
-            m_obj = Modelo.objects.filter(nombre__iexact=str(modelo_val).strip()).first()
-
-        if m_obj and hasattr(MotorVehiculo, 'modelos'):
-            qs = qs.filter(modelos=m_obj)
-        else:
-            qs = qs.none()
+    has_model = bool(modelo_val or request.GET.get('modelo_nombre'))
+    modelo = _resolve_ajax_model(request.GET, country) if has_model else None
+    if modelo and hasattr(MotorVehiculo, 'modelos'):
+        qs = qs.filter(modelos=modelo)
     else:
         qs = qs.none()
 
@@ -1211,21 +1333,12 @@ def ajax_cajas_por_modelo(request):
             from taller.models import CajaVehiculo
         except ImportError:
             from taller.models import Transmision as CajaVehiculo
-    from taller.models import Modelo
-
     qs = CajaVehiculo.objects.filter(country=country)
 
-    if modelo_val:
-        m_obj = None
-        if str(modelo_val).isdigit():
-            m_obj = Modelo.objects.filter(id=int(modelo_val)).first()
-        if not m_obj:
-            m_obj = Modelo.objects.filter(nombre__iexact=str(modelo_val).strip()).first()
-
-        if m_obj and hasattr(CajaVehiculo, 'modelos'):
-            qs = qs.filter(modelos=m_obj)
-        else:
-            qs = qs.none()
+    has_model = bool(modelo_val or request.GET.get('modelo_nombre'))
+    modelo = _resolve_ajax_model(request.GET, country) if has_model else None
+    if modelo and hasattr(CajaVehiculo, 'modelos'):
+        qs = qs.filter(modelos=modelo)
     else:
         qs = qs.none()
 
