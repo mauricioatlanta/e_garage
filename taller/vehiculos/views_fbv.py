@@ -68,6 +68,8 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.translation import get_language
 from django.views.decorators.http import require_GET, require_POST
 
+from taller.config.country_settings import CountrySettings
+
 log = logging.getLogger(__name__)
 
 # Modelos centrales
@@ -187,24 +189,30 @@ def _get_country_from_path(path: str) -> tuple[str, str]:
 
 
 def _get_country(request, default="CL"):
-    """Detección robusta de país con fallback por path y normalización."""
-    # 1) tenant activo del request
+    """Resolve the catalog country from the route before tenant fallbacks."""
+    path = (getattr(request, "path_info", None) or getattr(request, "path", "") or "").lower()
+    for country, settings in CountrySettings.COUNTRIES.items():
+        prefix = settings["url_prefix"].rstrip("/").lower()
+        if path == prefix or path.startswith(f"{prefix}/"):
+            return country
+
+    user = getattr(request, "user", None)
+    if user and getattr(user, "is_superuser", False):
+        session = getattr(request, "session", {})
+        support_country = (
+            session.get("modo_soporte_pais")
+            or session.get("support_country")
+            or ""
+        ).strip().upper()
+        if support_country in CountrySettings.COUNTRIES:
+            return support_country
+
+    # Fall back to the active tenant when no country route/context is available.
     empresa = get_empresa_safe(request)
     raw = getattr(empresa, "pais", None)
 
-    # 2) request.country si algún middleware/context processor lo define
     if not raw:
         raw = getattr(request, "country", None)
-
-    # 3) Path fallback: /us/..., /cl/...
-    if not raw:
-        p = (request.path or "").lower()
-        if p.startswith("/us/"):
-            raw = "US"
-        elif p.startswith("/cl/"):
-            raw = "CL"
-        elif p.startswith("/mx/"):
-            raw = "MX"
 
     c = str(raw or default).strip().upper()
     if c in ("US", "USA"):

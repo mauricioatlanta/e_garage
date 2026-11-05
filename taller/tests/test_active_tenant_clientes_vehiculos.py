@@ -218,6 +218,34 @@ def test_modelos_por_marca_usa_incluye_catalogo_usa_y_filtra_por_anio(empresa_us
 
 
 @pytest.mark.django_db
+def test_catalogo_vehiculos_sigue_pais_explicito_de_ruta_aunque_tenant_sea_otro(empresas_ab):
+    empresa_cl, _ = empresas_ab
+    marca_cl = Marca.objects.create(nombre="Route Test Make", country="CL")
+    marca_us = Marca.objects.create(nombre="Route Test Make", country="US")
+    Modelo.objects.create(marca=marca_cl, nombre="Modelo Chile", country="CL")
+    Modelo.objects.create(marca=marca_us, nombre="US Route Model", country="US")
+
+    request = _active_request(
+        "/us/es/vehiculos/api/marcas/",
+        empresa_cl,
+        empresa_cl,
+    )
+    marcas_response = vehiculos_views.api_marcas(request)
+    marcas = json.loads(marcas_response.content)
+    assert {marca["id"] for marca in marcas} == {marca_us.pk}
+
+    request = _active_request(
+        "/us/es/vehiculos/api/modelos-por-marca/",
+        empresa_cl,
+        empresa_cl,
+        data={"marca_id": str(marca_us.pk)},
+    )
+    modelos_response = vehiculos_views.modelos_por_marca_api(request)
+    modelos = json.loads(modelos_response.content)
+    assert modelos == [{"id": Modelo.objects.get(marca=marca_us).pk, "nombre": "US Route Model"}]
+
+
+@pytest.mark.django_db
 def test_modelos_por_marca_usa_usa_catalogo_predefinido_si_la_base_no_tiene_modelos(
     empresa_usa,
 ):
