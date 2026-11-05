@@ -265,6 +265,40 @@ def test_modelos_por_marca_usa_usa_catalogo_predefinido_si_la_base_no_tiene_mode
 
 
 @pytest.mark.django_db
+def test_modelos_por_marca_usa_no_falla_si_falta_tabla_catalogo_opcional(
+    empresa_usa, monkeypatch
+):
+    marca = Marca.objects.create(nombre="Acura", country="US")
+    modelo = Modelo.objects.create(marca=marca, nombre="ILX", country="US")
+    real_table_names = vehiculos_views.connection.introspection.table_names
+
+    def table_names_without_legacy_catalog(*args, **kwargs):
+        return [
+            table
+            for table in real_table_names(*args, **kwargs)
+            if table != ModeloVehiculo._meta.db_table
+        ]
+
+    monkeypatch.setattr(
+        vehiculos_views.connection.introspection,
+        "table_names",
+        table_names_without_legacy_catalog,
+    )
+    request = RequestFactory().get(
+        "/us/es/vehiculos/api/modelos-por-marca/",
+        {"marca_id": str(marca.pk), "anio": "2027"},
+    )
+    request.user = empresa_usa.user
+
+    response = vehiculos_views.modelos_por_marca_api(request)
+
+    assert response.status_code == 200
+    data = json.loads(response.content)
+    assert {"id": modelo.pk, "nombre": "ILX"} in data
+    assert {"id": "nombre:Integra", "nombre": "Integra"} in data
+
+
+@pytest.mark.django_db
 def test_vehiculo_form_usa_carga_colores_en_select(empresa_usa):
     request = RequestFactory().get("/us/es/vehiculos/crear/")
     request.user = empresa_usa.user

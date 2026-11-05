@@ -58,7 +58,7 @@ from urllib.parse import urlencode, urlparse, parse_qsl, urlunparse
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db import models, transaction
+from django.db import connection, models, transaction
 from django.db.models.deletion import ProtectedError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -906,25 +906,36 @@ def modelos_por_marca_api(request):
     nombres_incluidos = {modelo.nombre.casefold() for modelo in modelos}
 
     if country == "US" and ModeloVehiculo is not None:
-        modelos_usa = ModeloVehiculo.objects.filter(
-            marca__nombre__iexact=marca.nombre,
-            activo=True,
-        )
-        if anio_str:
-            try:
-                anio = int(anio_str)
-                modelos_usa = modelos_usa.filter(anio_inicio__lte=anio).filter(
-                    models.Q(anio_fin__isnull=True) | models.Q(anio_fin__gte=anio)
-                )
-            except (ValueError, TypeError):
-                log.warning("[modelos_por_marca_api] Año inválido para catálogo USA: %s", anio_str)
+        legacy_catalog_table = ModeloVehiculo._meta.db_table
+        if legacy_catalog_table not in connection.introspection.table_names():
+            log.warning(
+                "[modelos_por_marca_api] Tabla opcional %s no existe; "
+                "se usarán los catálogos compartido y predefinido.",
+                legacy_catalog_table,
+            )
+        else:
+            modelos_usa = ModeloVehiculo.objects.filter(
+                marca__nombre__iexact=marca.nombre,
+                activo=True,
+            )
+            if anio_str:
+                try:
+                    anio = int(anio_str)
+                    modelos_usa = modelos_usa.filter(anio_inicio__lte=anio).filter(
+                        models.Q(anio_fin__isnull=True) | models.Q(anio_fin__gte=anio)
+                    )
+                except (ValueError, TypeError):
+                    log.warning(
+                        "[modelos_por_marca_api] Año inválido para catálogo USA: %s",
+                        anio_str,
+                    )
 
-        for modelo in modelos_usa.order_by("nombre")[:200]:
-            nombre = modelo.nombre.strip()
-            if nombre and nombre.casefold() not in nombres_incluidos:
-                # The form resolves this value by make/name and persists the shared Modelo.
-                data.append({"id": f"nombre:{nombre}", "nombre": nombre})
-                nombres_incluidos.add(nombre.casefold())
+            for modelo in modelos_usa.order_by("nombre")[:200]:
+                nombre = modelo.nombre.strip()
+                if nombre and nombre.casefold() not in nombres_incluidos:
+                    # The form resolves this value by make/name and persists the shared Modelo.
+                    data.append({"id": f"nombre:{nombre}", "nombre": nombre})
+                    nombres_incluidos.add(nombre.casefold())
 
     if country == "US":
         modelos_predefinidos = next(
