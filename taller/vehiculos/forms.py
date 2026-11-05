@@ -4,6 +4,7 @@ from datetime import date
 from dal import autocomplete
 from django import forms
 from django.db.models import Q
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from taller.models import Vehiculo
@@ -200,6 +201,10 @@ class VehiculoForm(forms.ModelForm):
 
         if pais == 'US':
             self._configurar_campos_usa()
+            us_namespace = "us_en" if "/us/en/" in req_path.lower() else "us_es"
+            self.fields["cliente"].widget._url = reverse(
+                f"{us_namespace}:vehiculos:cliente_autocomplete"
+            )
         else:
             self._configurar_campos_latam(pais=pais)
 

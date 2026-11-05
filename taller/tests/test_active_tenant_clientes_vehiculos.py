@@ -309,6 +309,17 @@ def test_vehiculo_form_usa_carga_colores_en_select(empresa_usa):
     assert choices[0] == ("", "Select color...")
     assert any(label == "White" for _, label in choices)
     assert len(choices) > 1
+    assert form.fields["cliente"].widget._url == "/us/es/vehiculos/autocomplete/cliente/"
+
+
+@pytest.mark.django_db
+def test_vehiculo_form_usa_en_usa_autocomplete_url_usa_ingles(empresa_usa):
+    request = RequestFactory().get("/us/en/vehiculos/crear/")
+    request.user = empresa_usa.user
+
+    form = VehiculoForm(user=empresa_usa.user, request=request)
+
+    assert form.fields["cliente"].widget._url == "/us/en/vehiculos/autocomplete/cliente/"
 
 
 @pytest.mark.django_db
