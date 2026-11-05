@@ -345,7 +345,7 @@ h1 {
 {% block content %}
 <div class="max-w-4xl mx-auto cuadro">
   <div class="flex justify-between items-center mb-8">
-    <h1 class="text-4xl font-bold font-orbitron">ðŸš€ {% trans "Create Client" %}</h1>
+    <h1 class="text-4xl font-bold font-orbitron">ðŸš€ {% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Crear Cliente{% else %}Create Client{% endif %}</h1>
     <a href="{% country_url 'clientes:lista_clientes' %}" class="btn-futuristic btn-secondary">â† {% trans "Back to list" %}</a>
   </div>
 
@@ -494,7 +494,7 @@ h1 {
 
       <div class="flex gap-3 mt-8 pt-6 border-t border-gray-600">
         <button type="submit" class="btn-futuristic">
-          ðŸ’¾ {% trans "Create Client" %}
+          ðŸ’¾ {% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Crear Cliente{% else %}Create Client{% endif %}
         </button>
         <a href="{% country_url 'clientes:lista_clientes' %}" class="btn-futuristic btn-secondary">
           âŒ {% trans "Cancel" %}

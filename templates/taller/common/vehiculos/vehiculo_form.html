@@ -406,6 +406,21 @@ select optgroup {
   }
 }
 </style>
+
+<script>
+// Callback global para inyectar y seleccionar el elemento creado con (+)
+function registrarNuevaOpcionVehiculo(campoId, id, texto) {
+    var $el = $('#' + campoId);
+    if ($el.length) {
+        var opt = new Option(texto, id, true, true);
+        $el.append(opt).trigger('change');
+        if (typeof $el.select2 !== 'undefined') {
+            $el.trigger('change.select2');
+        }
+    }
+}
+</script>
+
 {% endblock %}
 
 {% block fondo_extra %}
@@ -418,7 +433,7 @@ select optgroup {
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold font-orbitron">
         </h1>
-    <a href="{% if return_to %}{{ return_to }}{% elif url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}{% endif %}"
+    <a href="{% if return_to %}{{ return_to }}{% elif url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}{% endif %}
        class="btn-futuristic btn-secondary">Volver</a>
   </div>
 
@@ -487,7 +502,7 @@ select optgroup {
         </div>
 
         <div class="form-group field-span-2">
-          <label for="{{ form.millas.id_for_label }}" style="{% if request.path|slice:':4' == '/us/' %}visibility: visible;{% else %}visibility: hidden;{% endif %}">
+          <label for="{{ form.millas.id_for_label }}" style="{% if request.path|slice:':4' == '/us/' %}visibility: visible;{% else %}visibility: hidden;{% endif %}>
             {% if request.path|slice:":4" == "/us/" %}Miles{% else %}Kilometraje{% endif %}
           </label>
           {{ form.millas }}
@@ -596,7 +611,7 @@ select optgroup {
           {% if vehiculo %}Guardar cambios{% else %}Guardar veh?culo{% endif %}
         </button>
 
-        <a href="{% if return_to %}{{ return_to }}{% elif url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}{% endif %}"
+        <a href="{% if return_to %}{{ return_to }}{% elif url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}{% endif %}
            class="btn-futuristic btn-secondary">
           Cancelar
         </a>
@@ -628,7 +643,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentUrl = window.location.pathname + window.location.search;
 
             const createUrl =
-                "{% country_url 'clientes:crear' %}" +
+                "{% country_url 'clientes:crear_cliente' %}" +
                 "?return_to=" +
                 encodeURIComponent(currentUrl);
 
@@ -1051,9 +1066,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     motorSelect.innerHTML = '<option value="">---------</option>';
                     
-                    // Usar data.motores directamente
-                    if (data.motores && Array.isArray(data.motores)) {
-                        data.motores.forEach(motor => {
+                    // Usar (Array.isArray(data) ? data : data.motores) directamente
+                    if ((Array.isArray(data) ? data : data.motores) && Array.isArray((Array.isArray(data) ? data : data.motores))) {
+                        (Array.isArray(data) ? data : data.motores).forEach(motor => {
                             const option = document.createElement('option');
                             option.value = motor.id;
                             option.textContent = motor.nombre;
@@ -1088,9 +1103,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     cajaSelect.innerHTML = '<option value="">---------</option>';
                     
-                    // Usar data.cajas directamente
-                    if (data.cajas && Array.isArray(data.cajas)) {
-                        data.cajas.forEach(caja => {
+                    // Usar (Array.isArray(data) ? data : data.cajas) directamente
+                    if ((Array.isArray(data) ? data : data.cajas) && Array.isArray((Array.isArray(data) ? data : data.cajas))) {
+                        (Array.isArray(data) ? data : data.cajas).forEach(caja => {
                             const option = document.createElement('option');
                             option.value = caja.id;
                             option.textContent = caja.nombre;
@@ -1888,4 +1903,65 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 {# form.media (DAL/Select2) se carga UNA SOLA VEZ en base.html (CSS en head, JS al final). NO duplicar aquÃ­. #}
 
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectMarca = document.getElementById('id_marca') || document.querySelector('[name="marca"]');
+    const selectModelo = document.getElementById('id_modelo') || document.querySelector('[name="modelo"]');
+    const selectMotor = document.getElementById('id_motor') || document.querySelector('[name="motor"]');
+    const selectCaja = document.getElementById('id_caja') || document.querySelector('[name="caja"]');
+
+    if (!selectModelo) return;
+
+    function resetSelect(sel, placeholder) {
+        if (!sel) return;
+        sel.innerHTML = '<option value="">' + placeholder + '</option>';
+    }
+
+    selectModelo.addEventListener('change', function() {
+        const modeloId = this.value;
+        const placeholderMotor = (window.location.pathname.includes('/en/') ? 'Select engine' : 'Seleccione motor');
+        const placeholderCaja = (window.location.pathname.includes('/en/') ? 'Select transmission' : 'Seleccione caja');
+
+        resetSelect(selectMotor, placeholderMotor);
+        resetSelect(selectCaja, placeholderCaja);
+
+        if (!modeloId) return;
+
+        // Cargar Motores correspondientes al Modelo
+        const urlMotores = "{% country_url 'vehiculos:ajax_motores_por_modelo' %}?modelo_id=" + encodeURIComponent(modeloId);
+        fetch(urlMotores, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(res => res.json())
+            .then(data => {
+                const motores = data.motores || data;
+                if (selectMotor && Array.isArray(motores)) {
+                    motores.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.id || item.nombre;
+                        opt.textContent = item.nombre || item.nombre_completo;
+                        selectMotor.appendChild(opt);
+                    });
+                }
+            }).catch(() => {});
+
+        // Cargar Cajas correspondientes al Modelo
+        const urlCajas = "{% country_url 'vehiculos:ajax_cajas_por_modelo' %}?modelo_id=" + encodeURIComponent(modeloId);
+        fetch(urlCajas, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(res => res.json())
+            .then(data => {
+                const cajas = data.cajas || data;
+                if (selectCaja && Array.isArray(cajas)) {
+                    cajas.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.id || item.nombre;
+                        opt.textContent = item.nombre || item.tipo || item.nombre_completo;
+                        selectCaja.appendChild(opt);
+                    });
+                }
+            }).catch(() => {});
+    });
+});
+</script>
+
 {% endblock %}
+{% block extra_js %}{{ block.super }}<script>window.addEventListener("load",function(){var s=document.createElement("script");s.src="/static/js/egarage_select2_vehiculo.js?v=4";document.body.appendChild(s);});</script>{% endblock %}

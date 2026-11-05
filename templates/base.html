@@ -836,7 +836,7 @@
           <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Settings{% else %}Ajustes{% endif %}</span>
         </a>
         {% if request.user|is_owner %}
-        <a href="{% nav_url 'team' %}" class="nav-button-standard {% if 'equipo' in request.path %}bg-gray-100 text-gray-900{% endif %}">
+        <a href="{% country_url 'team' %}" class="nav-button-standard {% if 'equipo' in request.path %}bg-gray-100 text-gray-900{% endif %}">
           <span class="nav-icon">👤</span>
           <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Team{% else %}Equipo{% endif %}</span>
         </a>

@@ -53,11 +53,11 @@
                         {% if not url_crear_vehiculo %}
                             {% url 'usa:vehiculos:crear_vehiculo' as url_crear_vehiculo %}
                         {% endif %}
-                        <a href="{% if url_crear_vehiculo %}{{ url_crear_vehiculo }}{% else %}/us/vehiculos/crear/{% endif %}" 
+                        <a href="{% if url_crear_vehiculo %}{{ url_crear_vehiculo }}{% else %}/us/vehiculos/crear/{% endif %} 
                            id="add-vehicle-btn"
                            class="glass-btn position-relative bg-gradient-to-r from-emerald-600 to-green-600 border-emerald-400/50 text-white font-semibold px-5 py-2 hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105">
                             <i class="fas fa-plus me-2"></i>
-                            {% trans "Add Vehicle" %}
+                            {% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %}
                         </a>
                     </div>
                 </div>
@@ -123,7 +123,7 @@
                     <p class="empty-description text-gray-300">{% trans "Get started by adding your first vehicle to the system." %}</p>
                     <a href="{% country_url 'vehiculos:crear_vehiculo' %}" class="glass-btn mt-3">
                         <i class="fas fa-plus me-2"></i>
-                        {% trans "Add Vehicle" %}
+                        {% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %}
                     </a>
                 </div>
             </div>
@@ -148,12 +148,12 @@
 
                     <nav class="d-flex align-items-center">
                         {% if page_obj.has_previous %}
-                        <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                        <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}
                            class="glass-btn me-2">
                             <i class="fas fa-angle-double-left me-1"></i>
                             {% trans "First" %}
                         </a>
-                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}
                            class="glass-btn me-2">
                             <i class="fas fa-angle-left me-1"></i>
                             {% trans "Previous" %}
@@ -161,12 +161,12 @@
                         {% endif %}
 
                         {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}
                            class="glass-btn me-2">
                             {% trans "Next" %}
                             <i class="fas fa-angle-right ms-1"></i>
                         </a>
-                        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}
                            class="glass-btn">
                             {% trans "Last" %}
                             <i class="fas fa-angle-double-right ms-1"></i>

@@ -4,13 +4,180 @@
 {% load static %}
 {% load i18n %}
 
-{% block page_title %}{% trans "Create Vehicle" %}{% endblock %}
+{% block page_title %}{% trans "Create Vehicle" %}
+
+<script>
+// Callback global para inyectar y seleccionar el elemento creado con (+)
+function registrarNuevaOpcionVehiculo(campoId, id, texto) {
+    var $el = $('#' + campoId);
+    if ($el.length) {
+        var opt = new Option(texto, id, true, true);
+        $el.append(opt).trigger('change');
+        if (typeof $el.select2 !== 'undefined') {
+            $el.trigger('change.select2');
+        }
+    }
+}
+</script>
+
+
+<script>
+// Función global para inyectar y seleccionar inmediatamente cualquier motor/caja creado
+window.inyectarOpcionSelect2 = function(selector, id, text) {
+    var $el = $(selector);
+    if ($el.length) {
+        var option = new Option(text, id, true, true);
+        $el.append(option).trigger('change');
+        if (typeof $el.select2 === 'function') {
+            $el.trigger('change.select2');
+        }
+    }
+};
+
+$(document).ready(function() {
+    // Permitir escritura libre y selección directa en Motor y Caja
+    if ($('#id_motor').length) {
+        $('#id_motor').select2({
+            tags: true,
+            placeholder: 'Select or type engine...',
+            allowClear: true,
+            width: '100%'
+        });
+    }
+    if ($('#id_caja').length) {
+        $('#id_caja').select2({
+            tags: true,
+            placeholder: 'Select or type transmission...',
+            allowClear: true,
+            width: '100%'
+        });
+    }
+
+    // Interceptar llamadas AJAX exitosas de los modales de agregar motor/caja
+    $(document).ajaxSuccess(function(event, xhr, settings) {
+        try {
+            var res = JSON.parse(xhr.responseText);
+            if (res && res.success && res.id && res.nombre) {
+                if (settings.url.indexOf('agregar-motor') !== -1) {
+                    window.inyectarOpcionSelect2('#id_motor', res.id, res.nombre);
+                } else if (settings.url.indexOf('agregar-caja') !== -1) {
+                    window.inyectarOpcionSelect2('#id_caja', res.id, res.nombre);
+                }
+            }
+        } catch(e) {}
+    });
+});
+</script>
+
+
+<script>
+$(document).ready(function() {
+    $('#id_modelo').on('change', function() {
+        var modeloId = $(this).val();
+        var $motor = $('#id_motor');
+        var $caja = $('#id_caja');
+
+        $motor.empty().append(new Option('Select or type engine...', '', false, false));
+        $caja.empty().append(new Option('Select or type transmission...', '', false, false));
+
+        if (!modeloId) {
+            $motor.trigger('change.select2');
+            $caja.trigger('change.select2');
+            return;
+        }
+
+        // Consultar motores filtrados exclusivamente por el modelo elegido
+        var urlMotores = '/us/en/vehiculos/ajax/motores-por-modelo/?modelo_id=' + encodeURIComponent(modeloId);
+        fetch(urlMotores)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    data.forEach(function(item) {
+                        $motor.append(new Option(item.nombre || item.text, item.id, false, false));
+                    });
+                }
+                $motor.trigger('change.select2');
+            });
+
+        // Consultar cajas filtradas
+        var urlCajas = '/us/en/vehiculos/ajax/cajas-por-modelo/?modelo_id=' + encodeURIComponent(modeloId);
+        fetch(urlCajas)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    data.forEach(function(item) {
+                        $caja.append(new Option(item.nombre || item.text, item.id, false, false));
+                    });
+                }
+                $caja.trigger('change.select2');
+            });
+    });
+});
+</script>
+
+
+<script>
+$(document).ready(function() {
+    // Escuchar cambios en el selector de Modelo
+    $(document).on('change', '#id_modelo', function() {
+        var modeloId = $(this).val();
+        var $motor = $('#id_motor');
+        var $caja = $('#id_caja');
+
+        // Limpiar inmediatamente las opciones anteriores
+        $motor.empty().append(new Option('Select or type engine...', '', false, false));
+        $caja.empty().append(new Option('Select or type transmission...', '', false, false));
+
+        if (!modeloId) {
+            $motor.trigger('change').trigger('change.select2');
+            $caja.trigger('change').trigger('change.select2');
+            return;
+        }
+
+        // Consultar motores asociados al modelo
+        var urlMotores = '/us/en/vehiculos/ajax/motores-por-modelo/?modelo_id=' + encodeURIComponent(modeloId);
+        fetch(urlMotores)
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                $motor.empty().append(new Option('Select or type engine...', '', false, false));
+                if (Array.isArray(data)) {
+                    data.forEach(function(item) {
+                        $motor.append(new Option(item.nombre || item.text, item.id, false, false));
+                    });
+                }
+                $motor.trigger('change').trigger('change.select2');
+            })
+            .catch(function(err) {
+                console.error('Error cargando motores:', err);
+            });
+
+        // Consultar cajas asociadas al modelo
+        var urlCajas = '/us/en/vehiculos/ajax/cajas-por-modelo/?modelo_id=' + encodeURIComponent(modeloId);
+        fetch(urlCajas)
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                $caja.empty().append(new Option('Select or type transmission...', '', false, false));
+                if (Array.isArray(data)) {
+                    data.forEach(function(item) {
+                        $caja.append(new Option(item.nombre || item.text, item.id, false, false));
+                    });
+                }
+                $caja.trigger('change').trigger('change.select2');
+            })
+            .catch(function(err) {
+                console.error('Error cargando cajas:', err);
+            });
+    });
+});
+</script>
+
+{% endblock %}
 {% block page_subtitle %}{% trans "Add a new vehicle to the system" %}{% endblock %}
 {% block page_icon %}🚗{% endblock %}
 
 {% block main_actions %}
 {% country_url 'vehiculos:lista_vehiculos' as url_lista_vehiculos %}
-<a href="{% if url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}/us/en/vehiculos/{% endif %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white text-sm font-semibold transition-all">
+<a href="{% if url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}/us/en/vehiculos/{% endif %} class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white text-sm font-semibold transition-all">
   <span>←</span>
   <span>{% trans "Back to list" %}</span>
 </a>
@@ -525,7 +692,7 @@ input:focus {
           💾 Create Vehicle
         </button>
         {% country_url 'vehiculos:lista_vehiculos' as url_lista_vehiculos %}
-        <a href="{% if url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}/us/vehiculos/{% endif %}" class="btn-futuristic btn-secondary">
+        <a href="{% if url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}/us/vehiculos/{% endif %} class="btn-futuristic btn-secondary">
           ❌ Cancel
         </a>
       </div>
@@ -780,68 +947,66 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Función para cargar motores y cajas por modelo
     // Nota: Los campos motor y caja son Select2, así que necesitamos trabajar con ellos de manera especial
+        // Función robusta para cargar motores y cajas
     function cargarMotoresYCajas(modeloId, motorSeleccionado = null, cajaSeleccionada = null) {
-        const motorSelect = $('#id_motor');
-        const cajaSelect = $('#id_caja');
+        var $motorSelect = $('#id_motor');
+        var $cajaSelect = $('#id_caja');
 
-        if (!motorSelect.length || !cajaSelect.length) {
-            console.warn('Motor or caja select fields not found');
-            return;
-        }
+        if (!$motorSelect.length || !$cajaSelect.length) return;
 
-        // Los campos Select2 se actualizan automáticamente cuando cambia el modelo
-        // porque tienen forward=["modelo"], pero podemos forzar la actualización
-        if (motorSelect.hasClass('select2-hidden-accessible')) {
-            // Si es Select2, disparar el evento change para que se recargue
-            motorSelect.trigger('change');
-        }
-        
-        if (cajaSelect.hasClass('select2-hidden-accessible')) {
-            cajaSelect.trigger('change');
-        }
+        try {
+            $motorSelect.select2({ tags: true, placeholder: 'Select or type engine...', allowClear: true, width: '100%' });
+            $cajaSelect.select2({ tags: true, placeholder: 'Select or type transmission...', allowClear: true, width: '100%' });
+        } catch(e) {}
 
-        // También cargar manualmente para mostrar la opción de agregar nuevo
+        var qModelo = modeloId ? ('?modelo_id=' + encodeURIComponent(modeloId)) : '';
+
         // Cargar motores
-        fetch(`${urlMotoresPorModelo}?modelo_id=${modeloId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
+        fetch(urlMotoresPorModelo + qModelo)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var lista = Array.isArray(data) ? data : (data.motores || []);
+                var actual = motorSeleccionado || $motorSelect.val();
+                
+                // // $motorSelect.empty();
+                $motorSelect.append(new Option('Select or type engine...', '', false, false));
+
+                lista.forEach(function(m) {
+                    var valId = m.id || m.nombre;
+                    var txt = m.nombre || m.text;
+                    var isSel = (String(valId) === String(actual) || String(txt) === String(actual));
+                    $motorSelect.append(new Option(txt, valId, isSel, isSel));
+                });
+                $motorSelect.trigger('change.select2');
             })
-            .then(data => {
-                console.log('Motores loaded:', data);
-                // Los motores se cargan automáticamente por Select2, pero podemos verificar
-                if (data.motores && data.motores.length > 0) {
-                    console.log(`✅ ${data.motores.length} engines available`);
-                } else {
-                    console.log('⚠️ No engines available for this model');
-                }
-            })
-            .catch(error => {
-                console.error('Error loading engines:', error);
-            });
+            .catch(function(err) { console.error('Error motores:', err); });
 
         // Cargar cajas
-        fetch(`${urlCajasPorModelo}?modelo_id=${modeloId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
+        fetch(urlCajasPorModelo + qModelo)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var lista = Array.isArray(data) ? data : (data.cajas || []);
+                var actual = cajaSeleccionada || $cajaSelect.val();
+                
+                // // $cajaSelect.empty();
+                $cajaSelect.append(new Option('Select or type transmission...', '', false, false));
+
+                lista.forEach(function(c) {
+                    var valId = c.id || c.nombre;
+                    var txt = c.nombre || c.text;
+                    var isSel = (String(valId) === String(actual) || String(txt) === String(actual));
+                    $cajaSelect.append(new Option(txt, valId, isSel, isSel));
+                });
+                $cajaSelect.trigger('change.select2');
             })
-            .then(data => {
-                console.log('Cajas loaded:', data);
-                if (data.cajas && data.cajas.length > 0) {
-                    console.log(`✅ ${data.cajas.length} transmissions available`);
-                } else {
-                    console.log('⚠️ No transmissions available for this model');
-                }
-            })
-            .catch(error => {
-                console.error('Error loading transmissions:', error);
-            });
+            .catch(function(err) { console.error('Error cajas:', err); });
     }
+
+
+
+
+
+
 
     function obtenerAnio() {
         if (anioSelect && anioSelect.value) {
@@ -1127,6 +1292,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+    // Disparo inicial para poblar motores y cajas en USA sin esperar cambio de modelo
+    .ready(function() {
+        setTimeout(function() {
+            const mVal = .val() || '';
+            cargarMotoresYCajas(mVal);
+        }, 200);
+    });
+
+
+    // Disparo forzado al iniciar para llenar de inmediato motor y caja en USA
+    $(document).ready(function() {
+        setTimeout(function() {
+            var mId = $('#id_modelo').val() || '';
+            cargarMotoresYCajas(mId);
+        }, 300);
+    });
+
 </script>
 
 
@@ -1266,4 +1449,5 @@ $(document).ready(function() {
     setTimeout(initializeDAL, 2000);
 })();
 </script>
+<script src="/static/js/egarage_select2_vehiculo.js?v=2"></script>
 {% endblock %}

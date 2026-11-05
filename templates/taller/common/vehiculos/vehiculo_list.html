@@ -207,7 +207,7 @@
 <a href="{% country_url 'vehiculos:crear_vehiculo' %}"
    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-sm font-semibold border border-emerald-400/40 shadow-lg shadow-emerald-900/40 transition-all">
   <span>➕</span>
-  <span>{% trans "Add Vehicle" %}</span>
+  <span>{% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %}</span>
 </a>
 {% endblock %}
 

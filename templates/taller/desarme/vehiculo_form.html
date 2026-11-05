@@ -109,14 +109,14 @@
       <div class="p-3 rounded text-sm border
         {% if message.tags == 'error' %}bg-red-900/60 border-red-500 text-red-300
         {% elif message.tags == 'warning' %}bg-yellow-900/60 border-yellow-500 text-yellow-200
-        {% else %}bg-cyan-900/60 border-cyan-500 text-cyan-200{% endif %}">
+        {% else %}bg-cyan-900/60 border-cyan-500 text-cyan-200{% endif %}>
         {{ message }}
       </div>
       {% endfor %}
     </div>
     {% endif %}
 
-    <form method="post" action="{% if vehiculo %}{% country_url 'desarme:editar_vehiculo' vehiculo.pk %}{% else %}{% country_url 'desarme:crear_vehiculo' %}{% endif %}" enctype="multipart/form-data">
+    <form method="post" action="{% if vehiculo %}{% country_url 'desarme:editar_vehiculo' vehiculo.pk %}{% else %}{% country_url 'desarme:crear_vehiculo' %}{% endif %} enctype="multipart/form-data">
       {% csrf_token %}
 
       {% if form.non_field_errors %}
@@ -449,7 +449,7 @@
             <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold shadow-lg shadow-emerald-500/20">
               {% trans "Guardar" %}
             </button>
-            <a href="{% if vehiculo %}{% country_url 'desarme:ver_vehiculo' vehiculo.pk %}{% else %}{% country_url 'desarme:lista_vehiculos' %}{% endif %}"
+            <a href="{% if vehiculo %}{% country_url 'desarme:ver_vehiculo' vehiculo.pk %}{% else %}{% country_url 'desarme:lista_vehiculos' %}{% endif %}
                class="px-4 py-2 rounded-xl border border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20 text-sm font-medium">
               {% trans "Cancelar" %}
             </a>
@@ -884,4 +884,64 @@ document.getElementById('btn-agregar-anio')?.addEventListener('click', function(
   document.head.appendChild(style);
 })();
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectMarca = document.getElementById('id_marca') || document.querySelector('[name="marca"]');
+    const selectModelo = document.getElementById('id_modelo') || document.querySelector('[name="modelo"]');
+    const selectMotor = document.getElementById('id_motor') || document.querySelector('[name="motor"]');
+    const selectCaja = document.getElementById('id_caja') || document.querySelector('[name="caja"]');
+
+    if (!selectModelo) return;
+
+    function resetSelect(sel, placeholder) {
+        if (!sel) return;
+        sel.innerHTML = '<option value="">' + placeholder + '</option>';
+    }
+
+    selectModelo.addEventListener('change', function() {
+        const modeloId = this.value;
+        const placeholderMotor = (window.location.pathname.includes('/en/') ? 'Select engine' : 'Seleccione motor');
+        const placeholderCaja = (window.location.pathname.includes('/en/') ? 'Select transmission' : 'Seleccione caja');
+
+        resetSelect(selectMotor, placeholderMotor);
+        resetSelect(selectCaja, placeholderCaja);
+
+        if (!modeloId) return;
+
+        // Cargar Motores correspondientes al Modelo
+        const urlMotores = "{% country_url 'vehiculos:ajax_motores_por_modelo' %}?modelo_id=" + encodeURIComponent(modeloId);
+        fetch(urlMotores, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(res => res.json())
+            .then(data => {
+                const motores = data.motores || data;
+                if (selectMotor && Array.isArray(motores)) {
+                    motores.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.id || item.nombre;
+                        opt.textContent = item.nombre || item.nombre_completo;
+                        selectMotor.appendChild(opt);
+                    });
+                }
+            }).catch(() => {});
+
+        // Cargar Cajas correspondientes al Modelo
+        const urlCajas = "{% country_url 'vehiculos:ajax_cajas_por_modelo' %}?modelo_id=" + encodeURIComponent(modeloId);
+        fetch(urlCajas, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(res => res.json())
+            .then(data => {
+                const cajas = data.cajas || data;
+                if (selectCaja && Array.isArray(cajas)) {
+                    cajas.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.id || item.nombre;
+                        opt.textContent = item.nombre || item.tipo || item.nombre_completo;
+                        selectCaja.appendChild(opt);
+                    });
+                }
+            }).catch(() => {});
+    });
+});
+</script>
+
 {% endblock %}

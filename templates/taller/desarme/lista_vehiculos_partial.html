@@ -28,10 +28,10 @@
       </span>
     </div>
     <div class="flex flex-wrap gap-1">
-      <a href="{% country_url 'desarme:ver_vehiculo' v.pk %}" class="interactive-btn">{% trans "Ver" %}</a>
-      <a href="{% country_url 'desarme:editar_vehiculo' v.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
-      <a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ v.pk }}&modo=venta" class="interactive-btn font-medium">🧾 {% trans "Vender repuestos" %}</a>
-      <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ v.pk }}" class="interactive-btn font-medium">➕ {% trans "Nueva repuesto" %}</a>
+      <a href="{{ request.path|slice:":7" }}/desarme/vehiculos/{{ v.pk }}/" onclick="event.stopPropagation();" class="interactive-btn">{% trans "Ver" %}</a>
+      <a href="{{ request.path|slice:":7" }}/desarme/vehiculos/{{ v.pk }}/editar/" onclick="event.stopPropagation();" class="interactive-btn">{% trans "Editar" %}</a>
+      <a href="{{ request.path|slice:":7" }}/desarme/piezas/?vehiculo={{ v.pk }}&modo=venta" onclick="event.stopPropagation();" class="interactive-btn font-medium">🧾 {% trans "Vender repuestos" %}</a>
+      <a href="{{ request.path|slice:":7" }}/desarme/piezas/crear/?vehiculo={{ v.pk }}" onclick="event.stopPropagation();" class="interactive-btn font-medium">➕ {% trans "Nuevo repuesto" %}</a>
     </div>
   </div>
   {% endfor %}

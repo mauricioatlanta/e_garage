@@ -96,6 +96,7 @@ def crear_vehiculo(request, lang=None, *args, **kwargs):
                 log.error(f"Error creating vehicle: {e}")
                 messages.error(request, f"{create_error_msg}: {str(e)}")
         else:
+            log.warning("Vehiculo form invalido (views_usa): %s", form.errors.as_json())
             messages.error(request, error_msg)
     else:
         form = VehiculoForm(user=request.user, request=request)

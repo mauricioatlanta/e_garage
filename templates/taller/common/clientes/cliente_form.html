@@ -7,10 +7,10 @@
   {% if form.instance.pk %}
     {% trans "Edit Client" %}
   {% else %}
-    {% trans "Create Client" %}
+    {% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Crear Cliente{% else %}Create Client{% endif %}
   {% endif %}
 {% endblock %}
-{% block page_subtitle %}{% trans "Standard client form inside the official eGarage panel layout." %}{% endblock %}
+{% block page_subtitle %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Formulario estándar de clientes dentro del panel oficial de eGarage.{% else %}Standard client form inside the official eGarage panel layout.{% endif %}{% endblock %}
 
 {% block page_extra_css %}
 <style>

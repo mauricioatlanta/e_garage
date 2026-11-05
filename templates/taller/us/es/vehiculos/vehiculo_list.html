@@ -41,14 +41,14 @@
         {% if not url_crear_vehiculo %}
             {% url 'usa:vehiculos:crear_vehiculo' as url_crear_vehiculo %}
         {% endif %}
-        <a href="{% if url_crear_vehiculo %}{{ url_crear_vehiculo }}{% else %}/us/vehiculos/crear/{% endif %}"
+        <a href="{% if url_crear_vehiculo %}{{ url_crear_vehiculo }}{% else %}/us/vehiculos/crear/{% endif %}
            id="add-vehicle-btn"
            class="inline-flex items-center justify-center space-x-2 px-4 py-3 sm:px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 border border-emerald-400/50 text-white font-semibold hover:from-emerald-500 hover:to-green-500 hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 w-full sm:w-auto min-w-[200px]"
            aria-label="{% trans 'Add new vehicle' %}">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span class="text-sm sm:text-base">{% trans "Add Vehicle" %}</span>
+          <span class="text-sm sm:text-base">{% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %}</span>
         </a>
       </div>
     </div>
@@ -136,7 +136,7 @@
         {% if not url_crear_vehiculo_empty %}
             {% url 'usa:vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
         {% endif %}
-        <a href="{% if url_crear_vehiculo_empty %}{{ url_crear_vehiculo_empty }}{% else %}/us/vehiculos/crear/{% endif %}"
+        <a href="{% if url_crear_vehiculo_empty %}{{ url_crear_vehiculo_empty }}{% else %}/us/vehiculos/crear/{% endif %}
            id="add-vehicle-btn-empty"
            class="inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 border border-emerald-400/50 text-white font-semibold hover:from-emerald-500 hover:to-green-500 hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 w-full sm:w-auto min-w-[220px] mx-auto"
            aria-label="{% trans 'Add your first vehicle' %}">
@@ -170,7 +170,7 @@
             // Buscar por texto
             const links = document.querySelectorAll('a');
             for (let link of links) {
-                if (link.textContent.includes('Add Vehicle') || link.textContent.includes('➕')) {
+                if (link.textContent.includes({% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %}) || link.textContent.includes('➕')) {
                     link.id = 'add-vehicle-btn';
                     btn = link;
                     console.log('✅ Botón encontrado y ID asignado');

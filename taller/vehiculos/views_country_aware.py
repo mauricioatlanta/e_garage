@@ -160,6 +160,7 @@ def vehiculo_crear(request, country_code="cl", lang_code="es"):
             except Exception as e:
                 messages.error(request, f"Error al crear vehículo: {str(e)}")
         else:
+            __import__("logging").getLogger("egarage").warning("Vehiculo form invalido (country_aware): %s", form.errors.as_json())
             messages.error(request, "Por favor corrige los errores en el formulario")
     else:
         form = VehiculoForm(user=request.user, request=request)

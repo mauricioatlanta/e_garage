@@ -196,7 +196,7 @@
 
     <!-- Acciones -->
     <div class="flex flex-wrap gap-2 justify-center">
-      <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}"
+      <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}
          class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white font-semibold rounded-lg text-sm transition-all shadow-lg">
         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -204,7 +204,7 @@
         {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Back to List{% else %}Volver a la Lista{% endif %}
       </a>
 
-      <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ vehiculo.id }}/editar/{% else %}/cl/vehiculos/{{ vehiculo.id }}/editar/{% endif %}"
+      <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ vehiculo.id }}/editar/{% else %}/cl/vehiculos/{{ vehiculo.id }}/editar/{% endif %}
          class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold rounded-lg text-sm transition-all shadow-lg">
         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -244,7 +244,7 @@
         <h3 class="text-lg font-bold text-white mb-2">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Confirm Deletion{% else %}Confirmar Eliminación{% endif %}</h3>
         <p class="text-gray-300 text-sm mb-5">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Are you sure you want to delete the vehicle <strong>{{ vehiculo.patente }}</strong>? This action cannot be undone.{% else %}¿Estás seguro de que quieres eliminar el vehículo <strong>{{ vehiculo.patente }}</strong>? Esta acción no se puede deshacer.{% endif %}</p>
 
-        <form method="post" action="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ vehiculo.id }}/eliminar/{% else %}/cl/vehiculos/{{ vehiculo.id }}/eliminar/{% endif %}">
+        <form method="post" action="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ vehiculo.id }}/eliminar/{% else %}/cl/vehiculos/{{ vehiculo.id }}/eliminar/{% endif %}>
           {% csrf_token %}
           <div class="flex space-x-3">
             <button type="button" onclick="cerrarModal()"

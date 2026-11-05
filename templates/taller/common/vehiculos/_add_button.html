@@ -1,4 +1,4 @@
-<!-- Add Vehicle Button -->
+<!-- {% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} Button -->
 {% load country_url %}
 {% load i18n %}
 <div class="mt-8 flex justify-center">
@@ -10,7 +10,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
         </svg>
       </div>
-      <span class="text-white font-semibold">{% trans "Add Vehicle" %}</span>
+      <span class="text-white font-semibold">{% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %}</span>
     </div>
   </a>
 </div>

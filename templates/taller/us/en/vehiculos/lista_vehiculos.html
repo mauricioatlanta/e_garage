@@ -44,7 +44,7 @@
             {% if not url_crear_vehiculo %}
                 {% url 'usa:vehiculos:crear_vehiculo' as url_crear_vehiculo %}
             {% endif %}
-            <a href="{% if url_crear_vehiculo %}{{ url_crear_vehiculo }}{% else %}/us/vehiculos/crear/{% endif %}"
+            <a href="{% if url_crear_vehiculo %}{{ url_crear_vehiculo }}{% else %}/us/vehiculos/crear/{% endif %}
                id="add-vehicle-btn"
                class="inline-flex items-center justify-center space-x-2 px-4 py-3 sm:px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 border-2 border-emerald-400 text-white font-bold hover:from-emerald-500 hover:to-green-500 hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 w-full sm:w-auto min-w-[200px] text-base sm:text-base"
                style="display: flex !important; visibility: visible !important; opacity: 1 !important;"
@@ -52,7 +52,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
-                <span class="text-base font-bold">{% trans "Add Vehicle" %}</span>
+                <span class="text-base font-bold">{% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %}</span>
             </a>
         </div>
     </div>
@@ -238,7 +238,7 @@
             {% if not url_crear_vehiculo_empty %}
                 {% url 'usa:vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
             {% endif %}
-            <a href="{% if url_crear_vehiculo_empty %}{{ url_crear_vehiculo_empty }}{% else %}/us/vehiculos/crear/{% endif %}"
+            <a href="{% if url_crear_vehiculo_empty %}{{ url_crear_vehiculo_empty }}{% else %}/us/vehiculos/crear/{% endif %}
                id="add-vehicle-btn-empty"
                class="mt-6 inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 border-2 border-emerald-400 text-white font-bold hover:from-emerald-500 hover:to-green-500 hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 w-full sm:w-auto min-w-[220px] text-base mx-auto"
                style="display: flex !important; visibility: visible !important; opacity: 1 !important;"
@@ -269,12 +269,12 @@
 
             <nav class="flex items-center space-x-2">
                 {% if page_obj.has_previous %}
-                <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}
                    class="glass-btn text-xs">
                     <span>⏮️</span>
                     <span class="hidden sm:inline">{% trans "First" %}</span>
                 </a>
-                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}
                    class="glass-btn text-xs">
                     <span>⬅️</span>
                     <span class="hidden sm:inline">{% trans "Previous" %}</span>
@@ -282,12 +282,12 @@
                 {% endif %}
 
                 {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}
                    class="glass-btn text-xs">
                     <span class="hidden sm:inline">{% trans "Next" %}</span>
                     <span>➡️</span>
                 </a>
-                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}
                    class="glass-btn text-xs">
                     <span class="hidden sm:inline">{% trans "Last" %}</span>
                     <span>⏭️</span>
@@ -848,8 +848,8 @@ window.eliminarVehiculo = function() {
 window.testNavigation = function() {
     const addBtn = document.getElementById('add-vehicle-btn');
     if (addBtn) {
-        console.log('Add Vehicle Button URL:', addBtn.href);
-        console.log('Add Vehicle Button Text:', addBtn.textContent);
+        console.log({% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} Button URL:', addBtn.href);
+        console.log({% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} Button Text:', addBtn.textContent);
 
         // Probar navegación
         if (addBtn.href && addBtn.href !== '#' && !addBtn.href.includes('undefined')) {
@@ -860,8 +860,8 @@ window.testNavigation = function() {
             alert('Error: Invalid URL detected. Check console for details.');
         }
     } else {
-        console.error('Add Vehicle button not found');
-        alert('Error: Add Vehicle button not found');
+        console.error({% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} button not found');
+        alert('Error: {% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} button not found');
     }
 };
 
@@ -876,14 +876,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Si no se encuentra, intentar buscar por otros métodos
     if (!addBtn) {
         addBtn = document.querySelector('a[href*="crear"]');
-        if (addBtn && addBtn.textContent.includes('Add Vehicle')) {
+        if (addBtn && addBtn.textContent.includes({% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %})) {
             addBtn.id = 'add-vehicle-btn';
             console.log('✅ Botón encontrado y ID asignado');
         }
     }
     
     if (addBtn) {
-        console.log('Add Vehicle URL:', addBtn.href);
+        console.log({% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} URL:', addBtn.href);
     } else {
         console.warn('⚠️ Botón no encontrado, intentando crear uno...');
         // Crear el botón si no existe
@@ -893,7 +893,7 @@ document.addEventListener('DOMContentLoaded', function() {
             newBtn.id = 'add-vehicle-btn';
             newBtn.href = '/us/vehiculos/crear/';
             newBtn.className = 'inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 border border-emerald-400/50 text-white font-semibold hover:from-emerald-500 hover:to-green-500 hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105';
-            newBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg><span>Add Vehicle</span>';
+            newBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg><span>{% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %}</span>';
             header.appendChild(newBtn);
             addBtn = newBtn;
             console.log('✅ Botón creado dinámicamente');
@@ -901,21 +901,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (addBtn) {
-        console.log('Add Vehicle Button found:', addBtn);
-        console.log('Add Vehicle Button href:', addBtn.href);
-        console.log('Add Vehicle Button computed styles:', window.getComputedStyle(addBtn));
-        console.log('Add Vehicle Button position:', addBtn.getBoundingClientRect());
+        console.log({% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} Button found:', addBtn);
+        console.log({% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} Button href:', addBtn.href);
+        console.log({% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} Button computed styles:', window.getComputedStyle(addBtn));
+        console.log({% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} Button position:', addBtn.getBoundingClientRect());
 
         // Verificar si el botón tiene un href válido
         if (!addBtn.href || addBtn.href === '#' || addBtn.href.includes('undefined')) {
-            console.error('❌ Add Vehicle button has invalid URL');
+            console.error('❌ {% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} button has invalid URL');
         } else {
-            console.log('✅ Add Vehicle button has valid URL');
+            console.log('✅ {% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} button has valid URL');
         }
 
         // Agregar event listener para debug
         addBtn.addEventListener('click', function(e) {
-            console.log('🔍 Add Vehicle button clicked!', e);
+            console.log('🔍 {% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} button clicked!', e);
             console.log('Event target:', e.target);
             console.log('Event currentTarget:', e.currentTarget);
             console.log('Event defaultPrevented:', e.defaultPrevented);
@@ -929,7 +929,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Elements at button center:', elementsAtPoint);
 
     } else {
-        console.error('❌ Add Vehicle button not found');
+        console.error('❌ {% if "/es/" in request.path or LANGUAGE_CODE == "es" %}Agregar Vehículo{% else %}Add Vehicle{% endif %} button not found');
     }
 
     // Verificar todos los enlaces de acción

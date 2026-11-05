@@ -4,15 +4,298 @@
 {% load static %}
 {% load i18n %}
 
-{% block page_title %}{% trans "Crear Vehículo" %}{% endblock %}
+{% block page_title %}{% trans "Create Vehicle" %}
+
+
+
+<script>
+window.addEventListener('load', function() {
+    function montarSelect2Seguro() {
+        if (typeof jQuery === 'undefined' || typeof jQuery.fn.select2 === 'undefined') {
+            setTimeout(montarSelect2Seguro, 100);
+            return;
+        }
+        var $ = jQuery;
+
+        // Inicializar motor con Select2 y tags libres
+        var $motor = $('#id_motor');
+        if ($motor.length) {
+            if ($motor.data('select2')) {
+                $motor.select2('destroy');
+            }
+            $motor.select2({
+                tags: true,
+                placeholder: 'Select or type engine...',
+                allowClear: true,
+                width: '100%',
+                createTag: function (params) {
+                    var term = $.trim(params.term);
+                    if (term === '') return null;
+                    return { id: term, text: term, newTag: true };
+                }
+            });
+        }
+
+        // Inicializar caja con Select2 y tags libres
+        var $caja = $('#id_caja');
+        if ($caja.length) {
+            if ($caja.data('select2')) {
+                $caja.select2('destroy');
+            }
+            $caja.select2({
+                tags: true,
+                placeholder: 'Select or type transmission...',
+                allowClear: true,
+                width: '100%',
+                createTag: function (params) {
+                    var term = $.trim(params.term);
+                    if (term === '') return null;
+                    return { id: term, text: term, newTag: true };
+                }
+            });
+        }
+
+        // Si se cambia el modelo, traer los motores específicos o mantener el catálogo de USA
+        $('#id_modelo').off('change.motores').on('change.motores', function() {
+            var modeloId = $(this).val();
+            var q = modeloId ? ('?modelo_id=' + encodeURIComponent(modeloId)) : '';
+
+            fetch('/us/en/vehiculos/ajax/motores-por-modelo/' + q)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (Array.isArray(data) && data.length > 0) {
+                        var valActual = $motor.val();
+                        $motor.empty().append(new Option('Select or type engine...', '', false, false));
+                        data.forEach(function(m) {
+                            var sel = (String(m.id) === String(valActual) || String(m.nombre) === String(valActual));
+                            $motor.append(new Option(m.nombre, m.id, sel, sel));
+                        });
+                        $motor.trigger('change.select2');
+                    }
+                })
+                .catch(function(e) { console.warn('Error motores:', e); });
+
+            fetch('/us/en/vehiculos/ajax/cajas-por-modelo/' + q)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (Array.isArray(data) && data.length > 0) {
+                        var valActualC = $caja.val();
+                        $caja.empty().append(new Option('Select or type transmission...', '', false, false));
+                        data.forEach(function(c) {
+                            var sel = (String(c.id) === String(valActualC) || String(c.nombre) === String(valActualC));
+                            $caja.append(new Option(c.nombre, c.id, sel, sel));
+                        });
+                        $caja.trigger('change.select2');
+                    }
+                })
+                .catch(function(e) { console.warn('Error cajas:', e); });
+        });
+
+        // Conectar el botón modal (+) para inyectar al instante
+        window.insertarOpcionCreada = function(campo, id, nombre) {
+            var $campo = $(campo);
+            if ($campo.length) {
+                var opt = new Option(nombre, id, true, true);
+                $campo.append(opt).trigger('change').trigger('change.select2');
+            }
+        };
+    }
+
+    montarSelect2Seguro();
+});
+</script>
+
+
+<script>
+window.addEventListener('load', function() {
+    function activarUI() {
+        if (typeof jQuery === 'undefined' || typeof jQuery.fn.select2 === 'undefined') {
+            setTimeout(activarUI, 100);
+            return;
+        }
+        var $ = jQuery;
+        .select2({ tags: true, placeholder: 'Select or type engine...', allowClear: true, width: '100%' });
+        .select2({ tags: true, placeholder: 'Select or type transmission...', allowClear: true, width: '100%' });
+    }
+    activarUI();
+});
+</script>
+
+
+<script>
+// Callback global para inyectar y seleccionar el elemento creado con (+)
+function registrarNuevaOpcionVehiculo(campoId, id, texto) {
+    var $el = $('#' + campoId);
+    if ($el.length) {
+        var opt = new Option(texto, id, true, true);
+        $el.append(opt).trigger('change');
+        if (typeof $el.select2 !== 'undefined') {
+            $el.trigger('change.select2');
+        }
+    }
+}
+</script>
+
+
+<script>
+// Función global para inyectar y seleccionar inmediatamente cualquier motor/caja creado
+window.inyectarOpcionSelect2 = function(selector, id, text) {
+    var $el = $(selector);
+    if ($el.length) {
+        var option = new Option(text, id, true, true);
+        $el.append(option).trigger('change');
+        if (typeof $el.select2 === 'function') {
+            $el.trigger('change.select2');
+        }
+    }
+};
+
+$(document).ready(function() {
+    // Permitir escritura libre y selección directa en Motor y Caja
+    if ($('#id_motor').length) {
+        $('#id_motor').select2({
+            tags: true,
+            placeholder: 'Select or type engine...',
+            allowClear: true,
+            width: '100%'
+        });
+    }
+    if ($('#id_caja').length) {
+        $('#id_caja').select2({
+            tags: true,
+            placeholder: 'Select or type transmission...',
+            allowClear: true,
+            width: '100%'
+        });
+    }
+
+    // Interceptar llamadas AJAX exitosas de los modales de agregar motor/caja
+    $(document).ajaxSuccess(function(event, xhr, settings) {
+        try {
+            var res = JSON.parse(xhr.responseText);
+            if (res && res.success && res.id && res.nombre) {
+                if (settings.url.indexOf('agregar-motor') !== -1) {
+                    window.inyectarOpcionSelect2('#id_motor', res.id, res.nombre);
+                } else if (settings.url.indexOf('agregar-caja') !== -1) {
+                    window.inyectarOpcionSelect2('#id_caja', res.id, res.nombre);
+                }
+            }
+        } catch(e) {}
+    });
+});
+</script>
+
+
+<script>
+$(document).ready(function() {
+    $('#id_modelo').on('change', function() {
+        var modeloId = $(this).val();
+        var $motor = $('#id_motor');
+        var $caja = $('#id_caja');
+
+        $motor.empty().append(new Option('Select or type engine...', '', false, false));
+        $caja.empty().append(new Option('Select or type transmission...', '', false, false));
+
+        if (!modeloId) {
+            $motor.trigger('change.select2');
+            $caja.trigger('change.select2');
+            return;
+        }
+
+        // Consultar motores filtrados exclusivamente por el modelo elegido
+        var urlMotores = '/us/en/vehiculos/ajax/motores-por-modelo/?modelo_id=' + encodeURIComponent(modeloId);
+        fetch(urlMotores)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    data.forEach(function(item) {
+                        $motor.append(new Option(item.nombre || item.text, item.id, false, false));
+                    });
+                }
+                $motor.trigger('change.select2');
+            });
+
+        // Consultar cajas filtradas
+        var urlCajas = '/us/en/vehiculos/ajax/cajas-por-modelo/?modelo_id=' + encodeURIComponent(modeloId);
+        fetch(urlCajas)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    data.forEach(function(item) {
+                        $caja.append(new Option(item.nombre || item.text, item.id, false, false));
+                    });
+                }
+                $caja.trigger('change.select2');
+            });
+    });
+});
+</script>
+
+
+<script>
+$(document).ready(function() {
+    // Escuchar cambios en el selector de Modelo
+    $(document).on('change', '#id_modelo', function() {
+        var modeloId = $(this).val();
+        var $motor = $('#id_motor');
+        var $caja = $('#id_caja');
+
+        // Limpiar inmediatamente las opciones anteriores
+        $motor.empty().append(new Option('Select or type engine...', '', false, false));
+        $caja.empty().append(new Option('Select or type transmission...', '', false, false));
+
+        if (!modeloId) {
+            $motor.trigger('change').trigger('change.select2');
+            $caja.trigger('change').trigger('change.select2');
+            return;
+        }
+
+        // Consultar motores asociados al modelo
+        var urlMotores = '/us/en/vehiculos/ajax/motores-por-modelo/?modelo_id=' + encodeURIComponent(modeloId);
+        fetch(urlMotores)
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                $motor.empty().append(new Option('Select or type engine...', '', false, false));
+                if (Array.isArray(data)) {
+                    data.forEach(function(item) {
+                        $motor.append(new Option(item.nombre || item.text, item.id, false, false));
+                    });
+                }
+                $motor.trigger('change').trigger('change.select2');
+            })
+            .catch(function(err) {
+                console.error('Error cargando motores:', err);
+            });
+
+        // Consultar cajas asociadas al modelo
+        var urlCajas = '/us/en/vehiculos/ajax/cajas-por-modelo/?modelo_id=' + encodeURIComponent(modeloId);
+        fetch(urlCajas)
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                $caja.empty().append(new Option('Select or type transmission...', '', false, false));
+                if (Array.isArray(data)) {
+                    data.forEach(function(item) {
+                        $caja.append(new Option(item.nombre || item.text, item.id, false, false));
+                    });
+                }
+                $caja.trigger('change').trigger('change.select2');
+            })
+            .catch(function(err) {
+                console.error('Error cargando cajas:', err);
+            });
+    });
+});
+</script>
+
+{% endblock %}
 {% block page_subtitle %}{% trans "Add a new vehicle to the system" %}{% endblock %}
 {% block page_icon %}🚗{% endblock %}
 
 {% block main_actions %}
 {% country_url 'vehiculos:lista_vehiculos' as url_lista_vehiculos %}
-<a href="{% if url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}/us/es/vehiculos/{% endif %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white text-sm font-semibold transition-all">
+<a href="{% if url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}/us/en/vehiculos/{% endif %} class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white text-sm font-semibold transition-all">
   <span>←</span>
-  <span>{% trans "Volver a la lista" %}</span>
+  <span>{% trans "Back to list" %}</span>
 </a>
 {% endblock %}
 
@@ -20,23 +303,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 {# Select2/DAL: form.media se carga UNA SOLA VEZ en base.html (form.media.css en head, form.media.js al final). NO duplicar aquí. #}
 <style>
+.relative h1.bg-clip-text {
+  color: #00e6d0 !important;
+  -webkit-text-fill-color: #00e6d0 !important;
+  background-image: none !important;
+  text-shadow: 0 0 12px rgba(0, 230, 208, 0.35);
+}
+.relative p.text-gray-400 {
+  color: #d7f7f5 !important;
+}
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
-
-
-@keyframes gentlePulse {
-  0%, 100% { 
-    opacity: 0.3;
-  }
-  50% { 
-    opacity: 0.5;
-  }
-}
-
-
 
 @keyframes glowPulse {
   0%, 100% { 
@@ -90,6 +370,25 @@
   animation: borderGlow 3s ease-in-out infinite;
 }
 
+/* Keep headings readable over the dark futuristic background. */
+.form-card h1,
+.form-card h2,
+.form-card h3,
+.form-card h4,
+.form-card .section-title {
+  color: #00e6d0 !important;
+  -webkit-text-fill-color: #00e6d0 !important;
+  text-shadow: 0 0 10px rgba(0, 230, 208, 0.35);
+}
+.form-card p,
+.form-card .text-gray-500,
+.form-card .text-gray-600,
+.form-card .text-gray-700,
+.form-card .text-gray-800,
+.form-card .text-gray-900 {
+  color: #d7f7f5 !important;
+}
+
 .form-card::before {
   content: '';
   position: absolute;
@@ -136,6 +435,19 @@
   padding-left: 8px;
 }
 
+.selected-customer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-left: 3px solid #00e6d0;
+  background: rgba(0, 230, 208, 0.1);
+  color: #d7f7f5;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .form-group label::before {
   content: '▶';
   position: absolute;
@@ -180,10 +492,6 @@ input:focus {
 }
 
 /* Estilos para Select2 - unificar con el resto */
-.select2-container {
-  width: 100% !important;
-}
-
 .select2-container--default .select2-selection--single,
 .select2-container--default .select2-selection--multiple {
   background: rgba(0, 0, 0, 0.4) !important;
@@ -191,7 +499,7 @@ input:focus {
   border-radius: 8px !important;
   height: auto !important;
   min-height: 48px !important;
-  padding: 0 !important;
+  padding: 4px !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
 }
@@ -202,44 +510,13 @@ input:focus {
   font-family: 'Rajdhani', sans-serif !important;
   font-weight: 500 !important;
   font-size: 15px !important;
-  line-height: 48px !important;
-  padding-left: 16px !important;
-  padding-right: 40px !important;
-  height: 48px !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
-/* Placeholder de Select2 con el mismo estilo */
-.select2-container--default .select2-selection--single .select2-selection__rendered .select2-selection__placeholder {
-  color: rgba(255, 255, 255, 0.6) !important;
-  font-family: 'Rajdhani', sans-serif !important;
-  font-weight: 500 !important;
-  font-size: 15px !important;
-}
-
-/* Asegurar que Select2 tenga el mismo ancho que los demás campos */
-.form-group .select2-container {
-  width: 100% !important;
-}
-
-.form-group .flex-1 {
-  width: 100% !important;
-}
-
-.form-group .flex-1 .select2-container {
-  width: 100% !important;
-}
-
-/* Asegurar que los campos Select2 dentro de flex tengan el mismo estilo */
-.form-group .flex-1 .select2-container--default .select2-selection--single {
-  width: 100% !important;
+  line-height: 38px !important;
+  padding-left: 8px !important;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-  height: 48px !important;
-  right: 16px !important;
-  top: 0 !important;
+  height: 46px !important;
+  right: 10px !important;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow b {
@@ -260,7 +537,6 @@ input:focus {
     0 0 0 3px rgba(0, 230, 208, 0.2),
     0 0 20px rgba(0, 230, 208, 0.4),
     inset 0 0 10px rgba(0, 230, 208, 0.1) !important;
-  transform: translateY(-2px);
 }
 
 .select2-dropdown {
@@ -330,8 +606,8 @@ input:focus {
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 230, 208, 0.3);
   animation: glowPulse 2s ease-in-out infinite;
-  pointer-events: auto;
-  z-index: 1;
+  pointer-events: auto; /* Asegurar que los enlaces sean clicables */
+  z-index: 1; /* Asegurar que estén por encima de otros elementos */
 }
 
 .btn-futuristic::before {
@@ -343,7 +619,7 @@ input:focus {
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transition: left 0.5s;
-  pointer-events: none;
+  pointer-events: none; /* Permitir clics a través del pseudo-elemento */
 }
 
 .btn-futuristic:hover::before {
@@ -395,7 +671,6 @@ input:focus {
     0 0 0 3px rgba(0, 230, 208, 0.2),
     0 0 20px rgba(0, 230, 208, 0.4) !important;
 }
-
 </style>
 {% endblock %}
 
@@ -403,97 +678,138 @@ input:focus {
 <div class="form-card max-w-4xl mx-auto">
     <form method="post" id="vehicle-form">
       {% csrf_token %}
+      <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
+      <input type="hidden" name="return_to" value="{% firstof return_to request.GET.return_to request.GET.next '' %}">
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        <div class="form-group space-y-3 sm:space-y-4">
-          <label for="{{ form.cliente.id_for_label }}" class="text-sm sm:text-base">{% trans "Cliente" %}</label>
+        <div class="form-group">
+          <label for="{{ form.cliente.id_for_label }}">Customer</label>
           {{ form.cliente }}
+          {% if form.cliente.value %}
+            <div class="selected-customer" role="status">
+              <span aria-hidden="true">👤</span>
+              <span>Selected customer ID: {{ form.cliente.value }}</span>
+            </div>
+          {% endif %}
           {% if form.cliente.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.cliente.errors.0 }}</div>
           {% endif %}
         </div>
 
-        <div class="form-group space-y-3 sm:space-y-4">
-          <label for="{{ form.patente.id_for_label }}" class="text-sm sm:text-base">{% trans "Patente" %}</label>
+        <div class="form-group">
+          <label for="{{ form.patente.id_for_label }}">License Plate</label>
           {{ form.patente }}
           {% if form.patente.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.patente.errors.0 }}</div>
           {% endif %}
         </div>
 
-        <div class="form-group space-y-3 sm:space-y-4">
-          <label for="{{ form.vin.id_for_label }}" class="text-sm sm:text-base">{% trans "VIN" %}</label>
+        <div class="form-group">
+          <label for="{{ form.vin.id_for_label }}">VIN</label>
           {{ form.vin }}
           {% if form.vin.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.vin.errors.0 }}</div>
           {% endif %}
         </div>
 
-        <div class="form-group space-y-3 sm:space-y-4">
-          <label for="{{ form.anio.id_for_label }}" class="text-sm sm:text-base">{% trans "Año" %}</label>
+        <div class="form-group">
+          <label for="{{ form.anio.id_for_label }}">Year</label>
           {{ form.anio }}
           {% if form.anio.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.anio.errors.0 }}</div>
           {% endif %}
         </div>
 
-        <div class="form-group space-y-3 sm:space-y-4">
-          <label for="{{ form.marca.id_for_label }}" class="text-sm sm:text-base">{% trans "Marca" %}</label>
-          <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-start">
-            <div class="flex-1 w-full">{{ form.marca }}</div>
-            <button type="button" 
-                    id="btn-add-marca" 
-                    class="btn-futuristic py-2 px-4 text-sm sm:text-base w-full sm:w-auto" 
-                    style="margin: 0; white-space: nowrap; flex-shrink: 0;"
-                    title="{% trans 'Agregar nueva marca' %}">
-              ➕ {% trans "Agregar" %}
-            </button>
-          </div>
+        <div class="form-group">
+          <label for="{{ form.marca.id_for_label }}">Brand</label>
+          {{ form.marca }}
           {% if form.marca.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.marca.errors.0 }}</div>
           {% endif %}
-          <div id="marca-nuevo-container" style="display: none;" class="mt-2">
-            <input type="text"
-                   name="nuevo_marca"
-                   id="marca_nuevo"
-                   placeholder="{% trans 'Ingresa el nombre de la nueva marca' %}"
-                   class="form-control">
-          </div>
         </div>
 
-        <div class="form-group space-y-3 sm:space-y-4">
-          <label for="{{ form.modelo.id_for_label }}" class="text-sm sm:text-base">{% trans "Modelo" %}</label>
-          <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-start">
-            <div class="flex-1 w-full">{{ form.modelo }}</div>
-            <button type="button" 
-                    id="btn-add-modelo" 
-                    class="btn-futuristic py-2 px-4 text-sm sm:text-base w-full sm:w-auto" 
-                    style="margin: 0; white-space: nowrap; flex-shrink: 0;"
-                    title="{% trans 'Agregar nuevo modelo' %}">
-              ➕ {% trans "Agregar" %}
-            </button>
-          </div>
+        <div class="form-group">
+          <label for="{{ form.modelo.id_for_label }}">Model</label>
+          {{ form.modelo }}
           {% if form.modelo.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.modelo.errors.0 }}</div>
           {% endif %}
-          <div id="modelo-nuevo-container" style="display: none;" class="mt-2">
+        </div>
+
+
+        <div class="form-group">
+          <label for="{{ form.color.id_for_label }}">Color</label>
+          {{ form.color }}
+          {% if form.color.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.color.errors.0 }}</div>
+          {% endif %}
+          <div id="color-nuevo-container" style="display: none;" class="mt-2">
             <input type="text"
-                   name="nuevo_modelo"
-                   id="modelo_nuevo"
-                   placeholder="{% trans 'Ingresa el nombre del nuevo modelo' %}"
+                   name="nuevo_color"
+                   id="color_nuevo"
+                   placeholder="Enter new color name"
                    class="form-control">
           </div>
         </div>
 
+        <div class="form-group">
+          <label for="{{ form.motor.id_for_label }}">Engine</label>
+          <div class="flex gap-2 items-start">
+            <div class="flex-1">{{ form.motor }}</div>
+            <button type="button" 
+                    id="btn-add-motor" 
+                    class="btn-futuristic" 
+                    style="padding: 12px 16px; margin: 0; white-space: nowrap; flex-shrink: 0;"
+                    title="Add new engine">
+              ➕ Add
+            </button>
+          </div>
+          {% if form.motor.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.motor.errors.0 }}</div>
+          {% endif %}
+          <div id="motor-nuevo-container" style="display: none;" class="mt-2">
+            <input type="text"
+                   name="nuevo_motor"
+                   id="motor_nuevo"
+                   placeholder="Enter new engine name"
+                   class="form-control">
+          </div>
+        </div>
 
-      <div class="flex flex-col sm:flex-row gap-3 sm:gap-3 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-600">
-        <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">
-          💾 {% trans "Crear Vehículo" %}
+        <div class="form-group">
+          <label for="{{ form.caja.id_for_label }}">Transmission</label>
+          <div class="flex gap-2 items-start">
+            <div class="flex-1">{{ form.caja }}</div>
+            <button type="button" 
+                    id="btn-add-caja" 
+                    class="btn-futuristic" 
+                    style="padding: 12px 16px; margin: 0; white-space: nowrap; flex-shrink: 0;"
+                    title="Add new transmission">
+              ➕ Add
+            </button>
+          </div>
+          {% if form.caja.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.caja.errors.0 }}</div>
+          {% endif %}
+          <div id="caja-nueva-container" style="display: none;" class="mt-2">
+            <input type="text"
+                   name="nuevo_caja"
+                   id="caja_nuevo"
+                   placeholder="Enter new transmission name"
+                   class="form-control">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="flex gap-3 mt-8 pt-6 border-t border-gray-600">
+        <button type="submit" class="btn-futuristic">
+          💾 Create Vehicle
         </button>
         {% country_url 'vehiculos:lista_vehiculos' as url_lista_vehiculos %}
-        <a href="{% if url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}/us/vehiculos/{% endif %}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">
-          ❌ {% trans "Cancelar" %}
+        <a href="{% if url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}/us/vehiculos/{% endif %} class="btn-futuristic btn-secondary">
+          ❌ Cancel
         </a>
       </div>
     </form>
@@ -502,203 +818,9 @@ input:focus {
 
 {% block page_extra_js %}
 
-{# form.media ya se carga en base.html (CSS en head, JS al final del body) - NO duplicar aquí #}
-
 <script>
-// Cache buster: 2024-12-19 - Versión actualizada - Inicialización mejorada de Select2/DAL
-// URLs para autocomplete cliente (DAL/fallback)
-const urlClienteAutocomplete = "{% url 'us_es:vehiculos:cliente_autocomplete' %}";
-const countryPrefix = '/us/es/';
-
-// --- INICIALIZACIÓN DE SELECT2 Y DAL ---
-window.clienteSelect2Init = { attempted: false, success: false };
-
-// Función para inicializar Select2 del campo cliente
-function initializeClienteSelect2() {
-    // Si ya está inicializado o ya intentamos, no hacer nada
-    if (window.clienteSelect2Init.success || window.clienteSelect2Init.attempted) {
-        return;
-    }
-    
-    // Marcar que intentamos inicializar (solo una vez)
-    window.clienteSelect2Init.attempted = true;
-    
-    const clienteField = $('#id_cliente');
-    if (!clienteField.length) {
-        console.warn('⚠️ Campo cliente no encontrado');
-        return;
-    }
-    
-    console.log('🔍 Verificando campo cliente:', {
-        exists: clienteField.length > 0,
-        hasSelect2: clienteField.hasClass('select2-hidden-accessible'),
-        currentUrl: clienteField.attr('data-autocomplete-light-url') || clienteField.attr('data-ajax--url'),
-        widgetType: clienteField.attr('class')
-    });
-    
-    // Si ya está inicializado, marcar como exitoso, sincronizar valor del form y salir
-    if (clienteField.hasClass('select2-hidden-accessible')) {
-        window.clienteSelect2Init.success = true;
-        console.log('✅ Select2 ya está inicializado por DAL');
-        syncClienteSelect2FromForm();
-        aplicarEstilosSelect2();
-        return;
-    }
-
-    // Corrección de URL para DAL - Asegurar que tenga el prefijo del país
-    let autocompleteUrl = clienteField.attr('data-autocomplete-light-url') || 
-                          clienteField.attr('data-ajax--url') ||
-                          clienteField.data('autocomplete-light-url') ||
-                          clienteField.data('ajax-url');
-    
-    if (autocompleteUrl) {
-        // Si la URL no tiene el prefijo del país, agregarlo
-        if (!autocompleteUrl.startsWith(countryPrefix) && !autocompleteUrl.startsWith('/us/')) {
-            // Remover cualquier prefijo existente y agregar el correcto
-            const cleanUrl = autocompleteUrl.replace(/^\/+(us|cl|mx)\//, '').replace(/^\//, '');
-            const nuevaUrl = countryPrefix + cleanUrl;
-            clienteField.attr('data-autocomplete-light-url', nuevaUrl);
-            clienteField.attr('data-ajax--url', nuevaUrl);
-            console.log('🔧 URL de autocomplete corregida:', autocompleteUrl, '→', nuevaUrl);
-        } else {
-            console.log('✅ URL de autocomplete ya tiene prefijo correcto:', autocompleteUrl);
-        }
-    } else {
-        clienteField.attr('data-autocomplete-light-url', urlClienteAutocomplete);
-        clienteField.attr('data-ajax--url', urlClienteAutocomplete);
-        console.log('🔧 URL de autocomplete establecida:', urlClienteAutocomplete);
-    }
-    
-    // Intentar inicialización solo si tenemos las dependencias
-    if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
-        // Primero, intentar disparar evento de DAL para que inicialice automáticamente
-        try {
-            $(document).trigger('autocompleteLightInitialize');
-            console.log('🔔 Evento autocompleteLightInitialize disparado');
-        } catch (e) {
-            console.warn('⚠️ Error al disparar evento DAL:', e);
-        }
-        
-        // Verificar después de un tiempo si se inicializó automáticamente
-        setTimeout(() => {
-            if (clienteField.hasClass('select2-hidden-accessible')) {
-                window.clienteSelect2Init.success = true;
-                console.log('✅ Select2 inicializado correctamente por DAL');
-                syncClienteSelect2FromForm();
-                aplicarEstilosSelect2();
-            } else {
-                console.warn('⚠️ Select2 no se inicializó automáticamente, intentando fallback manual');
-                // Fallback manual solo si DAL no funcionó
-                try {
-                    // Verificar URL antes de inicializar
-                    const finalUrl = clienteField.attr('data-autocomplete-light-url') || 
-                                    clienteField.attr('data-ajax--url') ||
-                                    urlClienteAutocomplete;
-                    console.log('🔗 URL final antes de inicializar Select2:', finalUrl);
-                    
-                    clienteField.select2({ 
-                        placeholder: 'Escribe para buscar clientes por nombre, email o teléfono...', 
-                        allowClear: true, 
-                        width: '100%',
-                        minimumInputLength: 1,
-                        language: {
-                            inputTooShort: function() {
-                                return 'Escribe al menos 1 carácter para buscar...';
-                            },
-                            noResults: function() {
-                                return 'No se encontraron clientes';
-                            },
-                            searching: function() {
-                                return 'Buscando...';
-                            }
-                        },
-                        ajax: {
-                            url: finalUrl,
-                            dataType: 'json',
-                            delay: 250,
-                            data: function (params) {
-                                return {
-                                    q: params.term, // término de búsqueda
-                                    page: params.page || 1
-                                };
-                            },
-                            processResults: function (data, params) {
-                                // DAL devuelve {results: [{id, text}, ...]}
-                                if (data.results && Array.isArray(data.results)) {
-                                    return {
-                                        results: data.results,
-                                        pagination: {
-                                            more: data.pagination && data.pagination.more || false
-                                        }
-                                    };
-                                }
-                                // Si es un array directo
-                                if (Array.isArray(data)) {
-                                    return {
-                                        results: data.map(item => ({
-                                            id: item.id || item.pk,
-                                            text: item.text || item.nombre || String(item)
-                                        }))
-                                    };
-                                }
-                                console.warn('⚠️ Formato de respuesta no reconocido:', data);
-                                return {results: []};
-                            },
-                            cache: true
-                        }
-                    });
-                    window.clienteSelect2Init.success = true;
-                    console.log('✅ Select2 inicializado manualmente');
-                    syncClienteSelect2FromForm();
-                    aplicarEstilosSelect2();
-                } catch (e) {
-                    console.error('❌ Error al inicializar Select2 manualmente:', e);
-                    console.error('Stack trace:', e.stack);
-                }
-            }
-        }, 1500); // Aumentar tiempo de espera a 1.5 segundos
-    } else {
-        console.error('❌ jQuery o Select2 no están disponibles');
-    }
-}
-
-// Función para aplicar estilos a Select2 después de inicialización
-function aplicarEstilosSelect2() {
-    // Aplicar estilos a todos los contenedores Select2
-    $('.select2-container').each(function() {
-        var $container = $(this);
-        var $selection = $container.find('.select2-selection--single, .select2-selection--multiple');
-        
-        // Asegurar que tenga el ancho correcto
-        $container.css('width', '100%');
-        
-        // Aplicar estilos al contenedor de selección
-        if ($selection.length) {
-            $selection.css({
-                'background': 'rgba(0, 0, 0, 0.4)',
-                'border': '2px solid rgba(0, 230, 208, 0.3)',
-                'border-radius': '8px',
-                'min-height': '48px',
-                'height': '48px',
-                'padding': '0'
-            });
-            
-            // Aplicar estilos al texto renderizado
-            var $rendered = $selection.find('.select2-selection__rendered');
-            if ($rendered.length) {
-                $rendered.css({
-                    'line-height': '48px',
-                    'padding-left': '16px',
-                    'padding-right': '40px',
-                    'color': '#fff',
-                    'font-family': "'Rajdhani', sans-serif",
-                    'font-weight': '500',
-                    'font-size': '15px'
-                });
-            }
-        }
-    });
-}
+// Definir countryPrefix globalmente
+const countryPrefix = '/us/';
 
 // Sincronizar el widget Select2/DAL del cliente con el valor ya seleccionado por el backend (ej. cliente_id en URL)
 function syncClienteSelect2FromForm() {
@@ -710,246 +832,344 @@ function syncClienteSelect2FromForm() {
     }
 }
 
+// Verificar inicialización de Select2 después de que form.media haya cargado
+// form.media carga los scripts de DAL que inicializan Select2 automáticamente
 $(document).ready(function() {
     // Marcar y sincronizar cliente si ya viene preseleccionado desde el backend (flujo desde documento)
     const clienteSelectEl = document.getElementById('id_cliente');
     if (clienteSelectEl && clienteSelectEl.value) {
         clienteSelectEl.dataset.source = 'form';
     }
-    // Sincronizar widget con valor preseleccionado por si DAL/Select2 ya está listo o se inicializa después
     setTimeout(syncClienteSelect2FromForm, 100);
     setTimeout(syncClienteSelect2FromForm, 800);
     setTimeout(syncClienteSelect2FromForm, 1500);
-    // Esperar a que form.media se cargue completamente antes de inicializar
-    // Usar múltiples intentos para asegurar que funcione
-    setTimeout(initializeClienteSelect2, 500);
-    setTimeout(initializeClienteSelect2, 1500);
-    setTimeout(initializeClienteSelect2, 2500);
-    
-    // Aplicar estilos después de que Select2 se inicialice
-    // Usar múltiples intentos para asegurar que se apliquen
-    setTimeout(aplicarEstilosSelect2, 2000);
-    setTimeout(aplicarEstilosSelect2, 3000);
-    setTimeout(aplicarEstilosSelect2, 4000);
-    
-    // También aplicar cuando Select2 se inicialice dinámicamente
-    $(document).on('select2:open', function() {
-        setTimeout(aplicarEstilosSelect2, 100);
-    });
-    
-    // Observar cambios en el DOM para detectar cuando Select2 se inicializa
-    const observer = new MutationObserver(function(mutations) {
-        const clienteField = $('#id_cliente');
-        if (clienteField.length && clienteField.hasClass('select2-hidden-accessible') && !window.clienteSelect2Init.success) {
-            window.clienteSelect2Init.success = true;
-            console.log('✅ Select2 detectado por MutationObserver');
-            syncClienteSelect2FromForm();
-            aplicarEstilosSelect2();
-        }
-    });
-    
-    // Observar el contenedor del formulario
-    const formContainer = document.querySelector('.form-card');
-    if (formContainer) {
-        observer.observe(formContainer, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['class']
+
+    // Función para verificar y aplicar estilos a Select2
+    function checkAndStyleSelect2() {
+        // Aplicar estilos a los contenedores de Select2
+        $('.select2-container').each(function() {
+            $(this).css('width', '100%');
         });
+        
+        // Debug: verificar que el campo cliente esté inicializado
+        const clienteField = $('#id_cliente');
+        if (clienteField.length) {
+            syncClienteSelect2FromForm();
+            const isInitialized = clienteField.hasClass('select2-hidden-accessible');
+            let autocompleteUrl = clienteField.attr('data-autocomplete-light-url');
+            
+            console.log('✅ Cliente field found');
+            console.log('Select2 initialized:', isInitialized);
+            console.log('Autocomplete URL (original):', autocompleteUrl);
+            console.log('Country prefix:', countryPrefix);
+            
+            // 🔧 FIX: asegurar que la URL del autocomplete tenga el prefijo del país (/us/, /cl/, etc.)
+            if (autocompleteUrl) {
+                const originalUrl = autocompleteUrl;
+                // Si la URL NO emrepuesto con el prefijo de país, lo agregamos
+                if (!autocompleteUrl.startsWith(countryPrefix)) {
+                    // Remover cualquier slash inicial y agregar el prefijo de país
+                    const nuevaUrl = countryPrefix + autocompleteUrl.replace(/^\/+/, '');
+                    console.log('🔧 Corrigiendo URL autocomplete cliente:', originalUrl, '→', nuevaUrl);
+                    clienteField.attr('data-autocomplete-light-url', nuevaUrl);
+                    autocompleteUrl = nuevaUrl; // Actualizar la variable para el resto del código
+                    
+                    // Si ya estaba inicializado, forzamos re-inicialización de DAL
+                    if (clienteField.hasClass('select2-hidden-accessible')) {
+                        console.log('🔄 Re-inicializando DAL para cliente field con nueva URL...');
+                        clienteField.removeClass('select2-hidden-accessible');
+                        // Disparar el evento que DAL escucha
+                        $(document).trigger('autocompleteLightInitialize');
+                    }
+                } else {
+                    console.log('✅ URL del autocomplete ya tiene el prefijo de país correcto');
+                }
+            }
+            
+            console.log('Autocomplete URL (final):', autocompleteUrl);
+            console.log('Field HTML:', clienteField[0].outerHTML.substring(0, 200));
+            
+            // Si Select2 no está inicializado, intentar inicialización manual
+            if (!isInitialized) {
+                console.warn('⚠️ Select2 not initialized for cliente field. Attempting manual initialization...');
+                
+                // Verificar que las dependencias estén disponibles
+                if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
+                    // Intentar inicialización manual si DAL no lo hizo
+                    if (autocompleteUrl && typeof yl !== 'undefined' && typeof yl.registerFunction === 'function') {
+                        // DAL debería inicializarlo, pero si no, esperar un poco más
+                        console.log('DAL y Select2 disponibles, esperando inicialización automática...');
+                    } else {
+                        console.error('⚠️ Faltan dependencias: Select2 plugin o DAL no disponibles');
+                        console.error('jQuery disponible:', typeof $ !== 'undefined');
+                        console.error('Select2 disponible:', typeof $.fn.select2 !== 'undefined');
+                        console.error('DAL (yl) disponible:', typeof yl !== 'undefined');
+                    }
+                } else {
+                    console.error('⚠️ jQuery o Select2 no están disponibles');
+                }
+            } else if (!autocompleteUrl) {
+                console.warn('⚠️ Cliente field initialized but missing data-autocomplete-light-url attribute');
+            } else {
+                console.log('✅ Cliente field properly initialized with autocomplete');
+            }
+        } else {
+            console.error('❌ Cliente field not found in DOM');
+            console.error('Buscando todos los campos con id que contengan "cliente":', $('[id*="cliente"]').length);
+            console.error('Todos los campos del formulario:', $('form input, form select').map(function() { return this.id || this.name; }).get());
+            // Verificar si el campo está oculto o tiene display:none
+            const hiddenCliente = $('[name="cliente"], [id*="cliente"]');
+            if (hiddenCliente.length) {
+                console.error('Campo cliente encontrado pero oculto:', hiddenCliente);
+                console.error('Estilos del campo:', {
+                    display: hiddenCliente.css('display'),
+                    visibility: hiddenCliente.css('visibility'),
+                    width: hiddenCliente.css('width'),
+                    height: hiddenCliente.css('height')
+                });
+            }
+        }
+        
+        // Verificar y corregir campos de motor y caja
+        const motorField = $('#id_motor');
+        const cajaField = $('#id_caja');
+        
+        // 🔧 FIX: Corregir URL del autocomplete para motor
+        if (motorField.length) {
+            let motorUrl = motorField.attr('data-autocomplete-light-url');
+            console.log('✅ Motor field found, Select2:', motorField.hasClass('select2-hidden-accessible'));
+            console.log('Motor autocomplete URL (original):', motorUrl);
+            
+            if (motorUrl && !motorUrl.startsWith(countryPrefix)) {
+                const nuevaUrlMotor = countryPrefix + motorUrl.replace(/^\/+/, '');
+                console.log('🔧 Corrigiendo URL autocomplete motor:', motorUrl, '→', nuevaUrlMotor);
+                motorField.attr('data-autocomplete-light-url', nuevaUrlMotor);
+                
+                if (motorField.hasClass('select2-hidden-accessible')) {
+                    motorField.removeClass('select2-hidden-accessible');
+                    $(document).trigger('autocompleteLightInitialize');
+                }
+            }
+        }
+        
+        // 🔧 FIX: Corregir URL del autocomplete para caja
+        if (cajaField.length) {
+            let cajaUrl = cajaField.attr('data-autocomplete-light-url');
+            console.log('✅ Caja field found, Select2:', cajaField.hasClass('select2-hidden-accessible'));
+            console.log('Caja autocomplete URL (original):', cajaUrl);
+            
+            if (cajaUrl && !cajaUrl.startsWith(countryPrefix)) {
+                const nuevaUrlCaja = countryPrefix + cajaUrl.replace(/^\/+/, '');
+                console.log('🔧 Corrigiendo URL autocomplete caja:', cajaUrl, '→', nuevaUrlCaja);
+                cajaField.attr('data-autocomplete-light-url', nuevaUrlCaja);
+                
+                if (cajaField.hasClass('select2-hidden-accessible')) {
+                    cajaField.removeClass('select2-hidden-accessible');
+                    $(document).trigger('autocompleteLightInitialize');
+                }
+            }
+        }
     }
+    
+    // Verificar inmediatamente
+    checkAndStyleSelect2();
+    
+    // Verificaciones adicionales con más tiempo para que form.media cargue
+    setTimeout(checkAndStyleSelect2, 500);
+    setTimeout(checkAndStyleSelect2, 1000);
+    setTimeout(checkAndStyleSelect2, 2000);
 });
 
-// --- LÓGICA DE CARGA DE MODELOS (AJAX) ---
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. URLs generadas por Django (Fuente de verdad)
-    const urlModelosApi = "{% url 'us_es:vehiculos:modelos_por_marca_api' %}";
-    const urlAgregarMarca = "{% url 'us_es:vehiculos:ajax_agregar_marca' %}";
-    const urlAgregarMotor = "{% url 'us_es:vehiculos:ajax_agregar_motor' %}";
-    const urlAgregarCaja = "{% url 'us_es:vehiculos:ajax_agregar_caja' %}";
-    const urlAgregarModelo = "{% url 'us_es:vehiculos:ajax_agregar_modelo' %}";
-    const urlMotoresPorModelo = "{% url 'us_es:vehiculos:ajax_motores_por_modelo' %}";
-    const urlCajasPorModelo = "{% url 'us_es:vehiculos:ajax_cajas_por_modelo' %}";
-    
-    // 2. Referencias al DOM
+    // URLs para endpoints AJAX
+    const urlAgregarMotor = "{% country_url 'vehiculos:ajax_agregar_motor' %}";
+    const urlAgregarCaja = "{% country_url 'vehiculos:ajax_agregar_caja' %}";
+    const urlModelosPorMarca = "{% country_url 'vehiculos:ajax_modelos_por_marca' %}";
+    const urlModelosPorMarcaApi = "{% country_url 'vehiculos:modelos_por_marca_api' %}";
+    const urlMotoresPorModelo = "{% country_url 'vehiculos:ajax_motores_por_modelo' %}";
+    const urlCajasPorModelo = "{% country_url 'vehiculos:ajax_cajas_por_modelo' %}";
+    const urlMarcas = "{% country_url 'vehiculos:api_marcas' %}";
+
     const marcaSelect = document.getElementById('id_marca');
     const modeloSelect = document.getElementById('id_modelo');
     const anioSelect = document.getElementById('id_anio');
-    const btnAddMarca = document.getElementById('btn-add-marca');
-    const marcaNuevoContainer = document.getElementById('marca-nuevo-container');
-    const marcaNuevoInput = document.getElementById('marca_nuevo');
-    const btnAddModelo = document.getElementById('btn-add-modelo');
-    const modeloNuevoContainer = document.getElementById('modelo-nuevo-container');
-    const modeloNuevoInput = document.getElementById('modelo_nuevo');
 
-    // 3. Función Principal: Cargar Modelos
+    // Función para cargar modelos por marca y año
     function cargarModelos(marcaId, anio = null, modeloSeleccionado = null) {
         if (!modeloSelect) return;
         
-        // Limpiar select
         modeloSelect.innerHTML = '<option value="">---------</option>';
-        modeloSelect.disabled = true; // Deshabilitar mientras carga
 
-        if (!marcaId) {
-            modeloSelect.disabled = false;
-            return;
-        }
+        if (marcaId) {
+            const loadingOption = document.createElement('option');
+            loadingOption.value = '';
+            loadingOption.textContent = 'Loading models...';
+            modeloSelect.appendChild(loadingOption);
 
-        // Opción de carga
-        const loadingOption = document.createElement('option');
-        loadingOption.text = 'Cargando modelos...';
-        modeloSelect.add(loadingOption);
-
-        // Construir URL
-        let url = `${urlModelosApi}?marca_id=${marcaId}`;
-        if (anio) url += `&anio=${anio}`;
-
-        console.log('📡 Fetching:', url);
-
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            // 👀 Para depurar, mira qué viene del backend
-            console.log('📦 Respuesta modelos API:', data);
-            console.log('📦 Tipo de datos:', typeof data, Array.isArray(data));
-            
-            // Limpiar "Cargando..."
-            modeloSelect.innerHTML = '<option value="">---------</option>';
-            modeloSelect.disabled = false;
-
-            let modelos = [];
-            
-            // Normalizar datos - soportar múltiples formatos de respuesta
-            if (Array.isArray(data)) {
-                modelos = data;
-                console.log('✅ Formato: Array directo');
-            } else if (data && data.results && Array.isArray(data.results)) {
-                modelos = data.results;
-                console.log('✅ Formato: data.results (Select2/DRF)');
-            } else if (data && data.modelos && Array.isArray(data.modelos)) {
-                modelos = data.modelos;
-                console.log('✅ Formato: data.modelos');
-            } else if (data && typeof data === 'object') {
-                // Intentar encontrar cualquier propiedad que sea un array
-                for (let key in data) {
-                    if (Array.isArray(data[key])) {
-                        modelos = data[key];
-                        console.log(`✅ Formato: data.${key}`);
-                        break;
-                    }
-                }
+            let url = `${urlModelosPorMarcaApi}?marca_id=${marcaId}`;
+            if (anio) {
+                url += `&anio=${anio}`;
             }
 
-            console.log(`📊 Modelos normalizados: ${modelos.length}`);
-
-            if (modelos.length === 0) {
-                const noOpt = document.createElement('option');
-                noOpt.text = 'Sin modelos - Agrega uno nuevo';
-                modeloSelect.add(noOpt);
-                if (btnAddModelo) btnAddModelo.classList.add('animate-pulse'); // Resaltar botón agregar
-                console.info(`ℹ️ No se encontraron modelos para marca_id=${marcaId}. Ejecuta: python manage.py cargar_modelos_usa`);
-            } else {
-                modelos.forEach(modelo => {
-                    const option = document.createElement('option');
-                    // Soportar diferentes nombres de campo para el ID
-                    option.value = modelo.id || modelo.pk || modelo.value || String(modelo);
-                    
-                    // Soportar diferentes nombres de campo para el nombre
-                    option.text = (
-                        modelo.nombre || 
-                        modelo.nombre_modelo || 
-                        modelo.text || 
-                        modelo.label || 
-                        modelo.name ||
-                        String(modelo)
-                    ) || `Modelo #${option.value}`;
-                    
-                    // Verificar si este modelo debe estar seleccionado
-                    if (modeloSeleccionado && (
-                        modelo.id == modeloSeleccionado || 
-                        modelo.pk == modeloSeleccionado ||
-                        option.value == modeloSeleccionado
-                    )) {
-                        option.selected = true;
+            console.log('Loading models for marca_id:', marcaId, 'anio:', anio);
+            console.log('URL:', url);
+            
+            fetch(url)
+                .then(response => {
+                    console.log('Response status:', response.status, response.statusText);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
-                    
-                    modeloSelect.add(option);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Models response:', data);
+                    modeloSelect.innerHTML = '<option value="">---------</option>';
+
+                    if (Array.isArray(data)) {
+                        if (data.length === 0) {
+                            console.warn('No models found for marca_id:', marcaId);
+                            modeloSelect.innerHTML = '<option value="">No models available for this brand</option>';
+                        } else {
+                            console.log(`✅ Found ${data.length} models`);
+                            data.forEach(modelo => {
+                                const option = document.createElement('option');
+                                option.value = modelo.id;
+                                option.textContent = modelo.nombre;
+
+                                if (modeloSeleccionado && modelo.id == modeloSeleccionado) {
+                                    option.selected = true;
+                                }
+
+                                modeloSelect.appendChild(option);
+                            });
+                            
+                            // Si hay un modelo seleccionado, cargar sus motores y cajas
+                            if (modeloSeleccionado) {
+                                cargarMotoresYCajas(modeloSeleccionado);
+                            }
+                        }
+                    } else {
+                        console.error('Data is not an array:', data);
+                        modeloSelect.innerHTML = '<option value="">Error: incorrect data format</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading models:', error);
+                    modeloSelect.innerHTML = '<option value="">Error loading models. Check console for details.</option>';
                 });
-                console.log(`✅ ${modelos.length} modelos agregados al select`);
-            }
-
-            // Actualizar Select2 si se está usando en el campo modelo
-            if ($(modeloSelect).hasClass('select2-hidden-accessible')) {
-                $(modeloSelect).trigger('change.select2'); 
-            }
-        })
-        .catch(error => {
-            console.error('❌ Error:', error);
-            modeloSelect.innerHTML = '<option value="">Error al cargar</option>';
-            modeloSelect.disabled = false;
-        });
+        }
     }
 
     // Función para cargar motores y cajas por modelo
-    function cargarMotoresYCajas(modeloId) {
+    // Nota: Los campos motor y caja son Select2, así que necesitamos trabajar con ellos de manera especial
+        // Función robusta para cargar motores y cajas
+    function cargarMotoresYCajas(modeloId, motorSeleccionado = null, cajaSeleccionada = null) {
+        var $motorSelect = $('#id_motor');
+        var $cajaSelect = $('#id_caja');
+
+        if (!$motorSelect.length || !$cajaSelect.length) return;
+
+        try {
+            $motorSelect.select2({ tags: true, placeholder: 'Select or type engine...', allowClear: true, width: '100%' });
+            $cajaSelect.select2({ tags: true, placeholder: 'Select or type transmission...', allowClear: true, width: '100%' });
+        } catch(e) {}
+
+        var qModelo = modeloId ? ('?modelo_id=' + encodeURIComponent(modeloId)) : '';
+
+        // Cargar motores
+        fetch(urlMotoresPorModelo + qModelo)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var lista = Array.isArray(data) ? data : (data.motores || []);
+                var actual = motorSeleccionado || $motorSelect.val();
+                
+                // // $motorSelect.empty();
+                $motorSelect.append(new Option('Select or type engine...', '', false, false));
+
+                lista.forEach(function(m) {
+                    var valId = m.id || m.nombre;
+                    var txt = m.nombre || m.text;
+                    var isSel = (String(valId) === String(actual) || String(txt) === String(actual));
+                    $motorSelect.append(new Option(txt, valId, isSel, isSel));
+                });
+                $motorSelect.trigger('change.select2');
+            })
+            .catch(function(err) { console.error('Error motores:', err); });
+
+        // Cargar cajas
+        fetch(urlCajasPorModelo + qModelo)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var lista = Array.isArray(data) ? data : (data.cajas || []);
+                var actual = cajaSeleccionada || $cajaSelect.val();
+                
+                // // $cajaSelect.empty();
+                $cajaSelect.append(new Option('Select or type transmission...', '', false, false));
+
+                lista.forEach(function(c) {
+                    var valId = c.id || c.nombre;
+                    var txt = c.nombre || c.text;
+                    var isSel = (String(valId) === String(actual) || String(txt) === String(actual));
+                    $cajaSelect.append(new Option(txt, valId, isSel, isSel));
+                });
+                $cajaSelect.trigger('change.select2');
+            })
+            .catch(function(err) { console.error('Error cajas:', err); });
+    }
+
+
+
+
+
+
+
+    function obtenerAnio() {
+        if (anioSelect && anioSelect.value) {
+            return anioSelect.value;
+        }
+        return null;
+    }
+
+    function recargarModelos() {
+        if (!marcaSelect || !modeloSelect) return;
+        
+        const marcaId = marcaSelect.value;
+        const anio = obtenerAnio();
+        const modeloActual = modeloSelect.value;
+        cargarModelos(marcaId, anio, modeloActual);
+        
+        // Limpiar campos de motor y caja (son Select2, así que usamos jQuery)
         const motorSelect = $('#id_motor');
         const cajaSelect = $('#id_caja');
-
-        if (!motorSelect.length || !cajaSelect.length) return;
-
-        // Los campos Select2 se actualizan automáticamente cuando cambia el modelo
-        if (motorSelect.hasClass('select2-hidden-accessible')) {
-            motorSelect.trigger('change');
+        if (motorSelect.length) {
+            if (motorSelect.hasClass('select2-hidden-accessible')) {
+                motorSelect.val(null).trigger('change');
+            } else {
+                motorSelect.val('');
+            }
         }
-        if (cajaSelect.hasClass('select2-hidden-accessible')) {
-            cajaSelect.trigger('change');
+        if (cajaSelect.length) {
+            if (cajaSelect.hasClass('select2-hidden-accessible')) {
+                cajaSelect.val(null).trigger('change');
+            } else {
+                cajaSelect.val('');
+            }
         }
     }
 
-    // 4. DETECTORES DE EVENTOS (LO QUE FALTABA) 🚀
     if (marcaSelect) {
-        // Evento estándar (funciona para select normal y Select2 básico)
         marcaSelect.addEventListener('change', function() {
-            const marcaId = this.value;
-            const anio = anioSelect ? anioSelect.value : null;
-            cargarModelos(marcaId, anio);
-        });
-
-        // Evento específico de jQuery para Select2 (mayor compatibilidad)
-        $(marcaSelect).on('select2:select', function(e) {
-            const marcaId = e.params.data.id;
-            const anio = anioSelect ? anioSelect.value : null;
-            cargarModelos(marcaId, anio);
+            recargarModelos();
         });
     }
 
-    // Opcional: Recargar si cambia el año
     if (anioSelect) {
         anioSelect.addEventListener('change', function() {
-            const marcaId = marcaSelect.value;
-            if (marcaId) {
-                cargarModelos(marcaId, this.value, modeloSelect.value);
+            if (marcaSelect && marcaSelect.value) {
+                recargarModelos();
             }
         });
-    }
-
-    // 5. Carga inicial (por si hay error de validación y el form se recarga con datos)
-    if (marcaSelect && marcaSelect.value) {
-        const marcaId = marcaSelect.value;
-        const anio = anioSelect ? anioSelect.value : null;
-        const modeloActual = modeloSelect.value; 
-        if (!modeloSelect.options.length || modeloSelect.options.length <= 1) {
-             cargarModelos(marcaId, anio, modeloActual);
-        }
     }
 
     if (modeloSelect) {
@@ -978,6 +1198,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    if (marcaSelect && marcaSelect.value) {
+        const anio = obtenerAnio();
+        cargarModelos(marcaSelect.value, anio, modeloSelect ? modeloSelect.value : null);
+    }
+
+    if (modeloSelect && modeloSelect.value) {
+        cargarMotoresYCajas(modeloSelect.value);
+    }
+
     // Manejar campo de color
     const colorSelect = document.getElementById('id_color');
     const colorNuevoContainer = document.getElementById('color-nuevo-container');
@@ -1002,18 +1231,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-        });
-        if (btnAddTipoCarroceria) {
-            btnAddTipoCarroceria.addEventListener('click', function() {
-                tipoCarroceriaSelect.value = '__nuevo__';
-                tipoCarroceriaSelect.dispatchEvent(new Event('change'));
-            });
-        }
-        if (tipoCarroceriaSelect.value === '__nuevo__') {
-            tipoCarroceriaNuevoContainer.style.display = 'block';
-            tipoCarroceriaNuevoInput.required = true;
-        }
-    }
 
     // Manejar campo de motor (Select2)
     const motorSelect = $('#id_motor');
@@ -1022,10 +1239,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnAddMotor = document.getElementById('btn-add-motor');
 
     if (motorSelect.length && motorNuevoContainer && motorNuevoInput) {
+        // Mostrar campo de texto cuando se hace clic en "Add"
         if (btnAddMotor) {
             btnAddMotor.addEventListener('click', function() {
                 if (!modeloSelect || !modeloSelect.value) {
-                    alert('Por favor selecciona un modelo primero');
+                    alert('Please select a model first');
                     return;
                 }
                 motorNuevoContainer.style.display = 'block';
@@ -1037,18 +1255,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function crearNuevoMotor(nombreMotor) {
             if (!modeloSelect || !modeloSelect.value) {
-                alert('Por favor selecciona un modelo primero');
+                alert('Please select a model first');
                 return;
             }
 
             const modeloId = modeloSelect.value;
             if (!nombreMotor || nombreMotor.trim() === '') {
-                alert('Por favor ingresa un nombre para el motor');
+                alert('Please enter an engine name');
                 return;
             }
 
             motorNuevoInput.disabled = true;
-            motorNuevoInput.placeholder = 'Creando motor...';
+            motorNuevoInput.placeholder = 'Creating engine...';
 
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -1066,9 +1284,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 motorNuevoInput.disabled = false;
-                motorNuevoInput.placeholder = 'Ingresa el nombre del nuevo motor';
+                motorNuevoInput.placeholder = 'Enter new engine name';
 
                 if (data.success) {
+                    // Agregar la nueva opción a Select2
                     const newOption = new Option(data.motor.nombre, data.motor.id, true, true);
                     motorSelect.append(newOption).trigger('change');
 
@@ -1076,14 +1295,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     motorNuevoInput.value = '';
                     motorNuevoInput.required = false;
                 } else {
-                    alert('Error al crear el motor: ' + (data.error || 'Error desconocido'));
+                    alert('Error creating engine: ' + (data.error || 'Unknown error'));
                 }
             })
             .catch(error => {
-                console.error('Error al crear motor:', error);
+                console.error('Error creating engine:', error);
                 motorNuevoInput.disabled = false;
-                motorNuevoInput.placeholder = 'Ingresa el nombre del nuevo motor';
-                alert('Error al crear el motor. Por favor intenta nuevamente.');
+                motorNuevoInput.placeholder = 'Enter new engine name';
+                alert('Error creating engine. Please try again.');
             });
         }
 
@@ -1108,10 +1327,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnAddCaja = document.getElementById('btn-add-caja');
 
     if (cajaSelect.length && cajaNuevaContainer && cajaNuevoInput) {
+        // Mostrar campo de texto cuando se hace clic en "Add"
         if (btnAddCaja) {
             btnAddCaja.addEventListener('click', function() {
                 if (!modeloSelect || !modeloSelect.value) {
-                    alert('Por favor selecciona un modelo primero');
+                    alert('Please select a model first');
                     return;
                 }
                 cajaNuevaContainer.style.display = 'block';
@@ -1123,18 +1343,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function crearNuevaCaja(nombreCaja) {
             if (!modeloSelect || !modeloSelect.value) {
-                alert('Por favor selecciona un modelo primero');
+                alert('Please select a model first');
                 return;
             }
 
             const modeloId = modeloSelect.value;
             if (!nombreCaja || nombreCaja.trim() === '') {
-                alert('Por favor ingresa un nombre para la transmisión');
+                alert('Please enter a transmission name');
                 return;
             }
 
             cajaNuevoInput.disabled = true;
-            cajaNuevoInput.placeholder = 'Creando transmisión...';
+            cajaNuevoInput.placeholder = 'Creating transmission...';
 
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -1152,9 +1372,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 cajaNuevoInput.disabled = false;
-                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva transmisión';
+                cajaNuevoInput.placeholder = 'Enter new transmission name';
 
                 if (data.success) {
+                    // Agregar la nueva opción a Select2
                     const newOption = new Option(data.caja.nombre, data.caja.id, true, true);
                     cajaSelect.append(newOption).trigger('change');
 
@@ -1162,14 +1383,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     cajaNuevoInput.value = '';
                     cajaNuevoInput.required = false;
                 } else {
-                    alert('Error al crear la transmisión: ' + (data.error || 'Error desconocido'));
+                    alert('Error creating transmission: ' + (data.error || 'Unknown error'));
                 }
             })
             .catch(error => {
-                console.error('Error al crear transmisión:', error);
+                console.error('Error creating transmission:', error);
                 cajaNuevoInput.disabled = false;
-                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva transmisión';
-                alert('Error al crear la transmisión. Por favor intenta nuevamente.');
+                cajaNuevoInput.placeholder = 'Enter new transmission name';
+                alert('Error creating transmission. Please try again.');
             });
         }
 
@@ -1186,216 +1407,54 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
-    // --- MANEJO DE BOTONES "AGREGAR NUEVO" ---
-    // Manejar campo de marca - Agregar nueva marca
-    if (btnAddMarca && marcaNuevoContainer && marcaNuevoInput) {
-        btnAddMarca.addEventListener('click', function() {
-            const isHidden = marcaNuevoContainer.style.display === 'none' || marcaNuevoContainer.style.display === '';
-            marcaNuevoContainer.style.display = isHidden ? 'block' : 'none';
-            if (isHidden) {
-                marcaNuevoInput.required = true;
-                marcaNuevoInput.focus();
-                marcaNuevoInput.value = '';
-            }
-        });
-
-        function crearNuevaMarca(nombreMarca) {
-            if (!nombreMarca || nombreMarca.trim() === '') {
-                alert('Por favor ingresa un nombre para la marca');
-                return;
-            }
-
-            marcaNuevoInput.disabled = true;
-            marcaNuevoInput.placeholder = 'Creando marca...';
-
-            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-            fetch(urlAgregarMarca, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken
-                },
-                body: JSON.stringify({
-                    nombre: nombreMarca.trim()
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                marcaNuevoInput.disabled = false;
-                marcaNuevoInput.placeholder = 'Ingresa el nombre de la nueva marca';
-
-                if (data.success) {
-                    // Agregar la nueva marca al select
-                    const newOption = document.createElement('option');
-                    newOption.value = data.marca.id;
-                    newOption.textContent = data.marca.nombre;
-                    newOption.selected = true;
-                    marcaSelect.appendChild(newOption);
-
-                    // Si es Select2, actualizar
-                    if ($(marcaSelect).hasClass('select2-hidden-accessible')) {
-                        $(marcaSelect).trigger('change.select2');
-                    } else {
-                        marcaSelect.dispatchEvent(new Event('change'));
-                    }
-
-                    marcaNuevoContainer.style.display = 'none';
-                    marcaNuevoInput.value = '';
-                    marcaNuevoInput.required = false;
-
-                    // Cargar modelos para la nueva marca
-                    if (data.marca.id) {
-                        const anio = anioSelect ? anioSelect.value : null;
-                        cargarModelos(data.marca.id, anio);
-                    }
-                } else {
-                    alert('Error al crear la marca: ' + (data.error || 'Error desconocido'));
-                }
-            })
-            .catch(error => {
-                console.error('Error al crear marca:', error);
-                marcaNuevoInput.disabled = false;
-                marcaNuevoInput.placeholder = 'Ingresa el nombre de la nueva marca';
-                alert('Error al crear la marca. Por favor intenta nuevamente.');
-            });
-        }
-
-        marcaNuevoInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                crearNuevaMarca(this.value);
-            }
-        });
-
-        marcaNuevoInput.addEventListener('blur', function() {
-            if (this.value.trim() !== '') {
-                crearNuevaMarca(this.value);
-            }
-        });
-    }
-
-    // Manejar campo de modelo - Agregar nuevo modelo
-    if (btnAddModelo && modeloNuevoContainer && modeloNuevoInput) {
-        btnAddModelo.addEventListener('click', function() {
-            if (!marcaSelect || !marcaSelect.value) {
-                alert('Por favor selecciona una marca primero');
-                return;
-            }
-            const isHidden = modeloNuevoContainer.style.display === 'none';
-            modeloNuevoContainer.style.display = isHidden ? 'block' : 'none';
-            if (isHidden) {
-                modeloNuevoInput.required = true;
-                modeloNuevoInput.focus();
-                modeloNuevoInput.value = '';
-            }
-        });
-
-        function crearNuevoModelo(nombreModelo) {
-            if (!marcaSelect || !marcaSelect.value) {
-                alert('Por favor selecciona una marca primero');
-                return;
-            }
-
-            const marcaId = marcaSelect.value;
-            if (!nombreModelo || nombreModelo.trim() === '') {
-                alert('Por favor ingresa un nombre para el modelo');
-                return;
-            }
-
-            modeloNuevoInput.disabled = true;
-            modeloNuevoInput.placeholder = 'Creando modelo...';
-
-            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-            fetch(urlAgregarModelo, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken
-                },
-                body: JSON.stringify({
-                    nombre: nombreModelo.trim(),
-                    marca_id: marcaId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                modeloNuevoInput.disabled = false;
-                modeloNuevoInput.placeholder = 'Ingresa el nombre del nuevo modelo';
-
-                if (data.success) {
-                    // Agregar el nuevo modelo al select
-                    const newOption = document.createElement('option');
-                    newOption.value = data.modelo.id;
-                    newOption.textContent = data.modelo.nombre;
-                    newOption.selected = true;
-                    modeloSelect.appendChild(newOption);
-
-                    // Si es Select2, actualizar
-                    if ($(modeloSelect).hasClass('select2-hidden-accessible')) {
-                        $(modeloSelect).trigger('change.select2');
-                    } else {
-                        modeloSelect.dispatchEvent(new Event('change'));
-                    }
-
-                    modeloNuevoContainer.style.display = 'none';
-                    modeloNuevoInput.value = '';
-                    modeloNuevoInput.required = false;
-
-                    // Cargar motores y cajas para el nuevo modelo
-                    if (data.modelo.id) {
-                        cargarMotoresYCajas(data.modelo.id);
-                    }
-                } else {
-                    alert('Error al crear el modelo: ' + (data.error || 'Error desconocido'));
-                }
-            })
-            .catch(error => {
-                console.error('Error al crear modelo:', error);
-                modeloNuevoInput.disabled = false;
-                modeloNuevoInput.placeholder = 'Ingresa el nombre del nuevo modelo';
-                alert('Error al crear el modelo. Por favor intenta nuevamente.');
-            });
-        }
-
-        modeloNuevoInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                crearNuevoModelo(this.value);
-            }
-        });
-
-        modeloNuevoInput.addEventListener('blur', function() {
-            if (this.value.trim() !== '') {
-                crearNuevoModelo(this.value);
-            }
-        });
-    }
 });
+
+    // Disparo inicial para poblar motores y cajas en USA sin esperar cambio de modelo
+    .ready(function() {
+        setTimeout(function() {
+            const mVal = .val() || '';
+            cargarMotoresYCajas(mVal);
+        }, 200);
+    });
+
+
+    // Disparo forzado al iniciar para llenar de inmediato motor y caja en USA
+    $(document).ready(function() {
+        setTimeout(function() {
+            var mId = $('#id_modelo').val() || '';
+            cargarMotoresYCajas(mId);
+        }, 300);
+    });
+
 </script>
 
 
-{# form.media es CRÍTICO para que DAL inicialice Select2 correctamente #}
+{# form.media ya se carga en base.html (CSS en head, JS al final del body) - NO duplicar aquí #}
+{# Solución: Prevenir doble registro pero permitir inicialización correcta #}
 <script>
 // Proteger contra doble registro ANTES de que form.media se cargue
 (function() {
+    // Esperar a que yl esté disponible
     function setupProtection() {
         if (typeof yl === 'undefined' || typeof yl.registerFunction !== 'function') {
+            // Reintentar después
             setTimeout(setupProtection, 50);
             return;
         }
         
+        // Si ya está protegido, no hacer nada
         if (yl.registerFunction._protected) {
             return;
         }
         
+        // Guardar función original
         const originalRegister = yl.registerFunction;
         const registeredFunctions = new Set();
         
+        // Función protegida que previene duplicados pero permite inicialización
         yl.registerFunction = function(name, func) {
             if (registeredFunctions.has(name)) {
+                // Ya registrado: retornar false silenciosamente
                 return false;
             }
             registeredFunctions.add(name);
@@ -1406,22 +1465,30 @@ document.addEventListener('DOMContentLoaded', function() {
         yl.registerFunction._original = originalRegister;
     }
     
+    // Iniciar protección
     setupProtection();
 })();
 </script>
+{# form.media ya se carga en base.html - NO duplicar aquí #}
 
 {# Asegurar que los botones de navegación funcionen correctamente #}
 <script>
+// Asegurar que los enlaces de navegación sean clicables
 $(document).ready(function() {
+    // Verificar que los enlaces tengan href y sean clicables
     $('.btn-futuristic[href]').each(function() {
         var $link = $(this);
         var href = $link.attr('href');
         
+        // Asegurar que el enlace tenga un href válido
         if (!href || href === '#' || href === '') {
             console.warn('⚠️ Enlace sin href válido:', $link.text().trim());
         } else {
+            // Asegurar que el clic funcione
             $link.on('click', function(e) {
+                // Si el href es válido, permitir la navegación
                 if (href && href !== '#' && href !== '') {
+                    // No prevenir el comportamiento por defecto
                     console.log('🔗 Navegando a:', href);
                 }
             });
@@ -1432,93 +1499,70 @@ $(document).ready(function() {
 
 {# Forzar inicialización de DAL después de que form.media se cargue #}
 <script>
+// Esperar a que form.media cargue y forzar inicialización de DAL si es necesario
 (function() {
-    let dalInitAttempted = false;
-    
     function initializeDAL() {
-        // Solo intentar una vez
-        if (dalInitAttempted) return;
-        
+        // Verificar que DAL y Select2 estén disponibles
         if (typeof yl === 'undefined' || typeof yl.autocomplete === 'undefined') {
-            setTimeout(initializeDAL, 200);
+            console.log('[DAL] Esperando que DAL se cargue...');
+            setTimeout(initializeDAL, 100);
             return;
         }
         
+        // Verificar que Select2 esté disponible
         if (typeof $ === 'undefined' || typeof $.fn.select2 === 'undefined') {
-            setTimeout(initializeDAL, 200);
+            console.log('[DAL] Esperando que Select2 se cargue...');
+            setTimeout(initializeDAL, 100);
             return;
         }
         
-        dalInitAttempted = true;
+        // Buscar campos con data-autocomplete-light-url que no estén inicializados
+        const fields = document.querySelectorAll('[data-autocomplete-light-url]');
+        let initialized = 0;
+        let skipped = 0;
         
-        // Disparar evento de inicialización de DAL una sola vez
-        try {
-            $(document).trigger('autocompleteLightInitialize');
-        } catch (e) {
-            // Silenciar errores
+        fields.forEach(function(field) {
+            const $field = $(field);
+            
+            // Si ya está inicializado, saltarlo
+            if ($field.hasClass('select2-hidden-accessible')) {
+                skipped++;
+                return;
+            }
+            
+            // Intentar inicialización manual
+            try {
+                // DAL debería inicializarlo automáticamente, pero si no, intentar manualmente
+                // Primero verificar si autocomplete.init ya se ejecutó
+                if (typeof yl.autocomplete.init === 'function') {
+                    console.log('[DAL] Ejecutando inicialización automática de DAL...');
+                    // Trigger evento que DAL escucha
+                    $(document).trigger('autocompleteLightInitialize');
+                }
+                
+                initialized++;
+            } catch (e) {
+                console.error('[DAL] Error al inicializar campo:', e);
+            }
+        });
+        
+        if (initialized > 0 || skipped > 0) {
+            console.log(`[DAL] Verificación completa: ${skipped} ya inicializados, ${initialized} pendientes`);
         }
-        
-        // ✅ Establecer valores iniciales de motor y caja después de que Select2 se inicialice
-        setTimeout(function() {
-            var motorSelect = $('#id_motor');
-            var cajaSelect = $('#id_caja');
-            
-            // Motor inicial
-            {% if vehiculo and vehiculo.motor_empresa_id and vehiculo.motor_empresa %}
-            var motorId = "empresa:{{ vehiculo.motor_empresa_id|escapejs }}";
-            var motorNombre = "{{ vehiculo.motor_empresa.nombre|escapejs }}";
-            {% elif vehiculo and vehiculo.motor_id and vehiculo.motor %}
-            var motorId = "{{ vehiculo.motor_id|escapejs }}";
-            var motorNombre = "{{ vehiculo.motor.nombre|escapejs }}";
-            {% endif %}
-            {% if vehiculo and vehiculo.motor_display %}
-            if (motorSelect.length && motorId) {
-                // Verificar si Select2 está inicializado
-                if (motorSelect.hasClass('select2-hidden-accessible')) {
-                    // Si el valor no está en las opciones, agregarlo
-                    if (motorSelect.find('option[value="' + motorId + '"]').length === 0) {
-                        var newOption = new Option(motorNombre, motorId, true, true);
-                        motorSelect.append(newOption);
-                    }
-                    motorSelect.val(motorId).trigger('change');
-                } else {
-                    // Si no es Select2, establecer el valor directamente
-                    motorSelect.val(motorId);
-                }
-                console.log('✅ Motor inicial establecido:', motorId, motorNombre);
-            }
-            {% endif %}
-            
-            // Caja inicial
-            {% if vehiculo and vehiculo.caja_empresa_id and vehiculo.caja_empresa %}
-            var cajaId = 'empresa:{{ vehiculo.caja_empresa_id }}';
-            var cajaNombre = '{{ vehiculo.caja_empresa.nombre|escapejs }}';
-            {% elif vehiculo and vehiculo.caja_id and vehiculo.caja %}
-            var cajaId = '{{ vehiculo.caja_id }}';
-            var cajaNombre = '{{ vehiculo.caja.nombre|escapejs }}';
-            {% endif %}
-            {% if vehiculo and vehiculo.caja_display %}
-            if (cajaSelect.length && cajaId) {
-                // Verificar si Select2 está inicializado
-                if (cajaSelect.hasClass('select2-hidden-accessible')) {
-                    // Si el valor no está en las opciones, agregarlo
-                    if (cajaSelect.find('option[value="' + cajaId + '"]').length === 0) {
-                        var newOption = new Option(cajaNombre, cajaId, true, true);
-                        cajaSelect.append(newOption);
-                    }
-                    cajaSelect.val(cajaId).trigger('change');
-                } else {
-                    // Si no es Select2, establecer el valor directamente
-                    cajaSelect.val(cajaId);
-                }
-                console.log('✅ Caja inicial establecida:', cajaId, cajaNombre);
-            }
-            {% endif %}
-        }, 1500); // Esperar un poco más para que Select2 se inicialice completamente
+    }
+    
+    // Iniciar después de que el DOM y los scripts estén listos
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initializeDAL, 500);
+        });
+    } else {
+        setTimeout(initializeDAL, 500);
     }
     
     // form.media.js se carga una sola vez en base.html (al final del body)
-    setTimeout(initializeDAL, 500);
+    setTimeout(initializeDAL, 1000);
+    setTimeout(initializeDAL, 2000);
 })();
 </script>
 {% endblock %}
