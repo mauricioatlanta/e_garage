@@ -10,7 +10,7 @@ from django.urls import include, path
 from django.views.generic import RedirectView
 
 from taller.views.country_aware_auth import country_aware_login
-from taller.views_extra.bienvenida import bienvenida_br_pt, bienvenida_br_es
+from taller.views_extra.bienvenida import bienvenida_br_es, bienvenida_br_pt
 from taller.views_extra.signup_redirects import signup_redirect
 
 app_name = "taller_brasil"
