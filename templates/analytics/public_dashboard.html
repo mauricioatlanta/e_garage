@@ -419,6 +419,45 @@
         <div class="eg-live-funnel">{% for step in funnel_real_time %}<div class="eg-live-step"><strong>{{ step.pct }}%</strong><span>{{ step.label }} · {{ step.value }}</span></div>{% endfor %}</div>
     </section>
 
+    
+    <section class="eg-luxury-card" style="margin-bottom:24px;">
+        <h3 style="margin:0 0 14px 0; font-size:14px; color:#f8fafc; font-weight:700;">
+            // Navegación de Suscriptores en la App (Privado) 👤
+        </h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+            <div style="background:#070d19; border:1px solid rgba(14,165,233,0.25); border-radius:12px; padding:14px;">
+                <h4 style="margin:0 0 10px 0; font-size:12px; color:#38bdf8; text-transform:uppercase;">Páginas por Suscriptor</h4>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    {% for item in actividad_suscriptores %}
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); font-size:12px;">
+                        <div>
+                            <strong style="color:#f8fafc;">{{ item.user__username }}</strong>
+                            <div style="color:#94a3b8; font-size:10px;">{{ item.empresa__nombre_taller|default:"Sin taller asignado" }}</div>
+                        </div>
+                        <span style="color:#00ff88; font-weight:800; font-size:13px;">{{ item.total_vistas }} pags</span>
+                    </div>
+                    {% empty %}
+                    <div style="color:#64748b; font-size:11px; text-align:center; padding:12px;">Aún no hay clics internos registrados.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div style="background:#070d19; border:1px solid rgba(14,165,233,0.25); border-radius:12px; padding:14px;">
+                <h4 style="margin:0 0 10px 0; font-size:12px; color:#38bdf8; text-transform:uppercase;">Módulos más usados</h4>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    {% for r in ultimas_rutas_privadas %}
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); font-size:11px; font-family:monospace;">
+                        <span style="color:#cbd5e1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:200px;">{{ r.path }}</span>
+                        <strong style="color:#38bdf8;">{{ r.total }}</strong>
+                    </div>
+                    {% empty %}
+                    <div style="color:#64748b; font-size:11px; text-align:center; padding:12px;">Esperando eventos de navegación.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- MAPA CARTOGRÁFICO CONTINENTAL REAL (GEOJSON POLÍGONOS) -->
     <section class="eg-luxury-card" style="margin-bottom:24px;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
@@ -445,6 +484,7 @@
                     {% elif c == 'br' %} left:68%; top:54%;
                     {% elif c == 'mx' %} left:34%; top:36%;
                     {% elif c == 'pe' %} left:40%; top:56%;
+{% elif c == 'ec' %} left:37%; top:51%;
                     {% else %} display:none; {% endif %}">
                     <span style="width:10px; height:10px; border-radius:50%; 
                         background:{% if row.semaforo == 'green' %}#00ff88; box-shadow:0 0 8px #00ff88;{% elif row.semaforo == 'yellow' %}#ffdd00; box-shadow:0 0 8px #ffdd00;{% else %}#ff3344; box-shadow:0 0 8px #ff3344;{% endif %}">
@@ -561,7 +601,14 @@
     </script>
 
 
-    <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;">
+    <section class="eg-funnel" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(120px, 1fr));gap:12px;margin-bottom:20px;">
+
+        <div class="eg-kpi" style="color:#38bdf8; text-align:center; background:rgba(15,23,42,0.6); padding:10px; border-radius:10px; border:1px solid rgba(56,189,248,0.25);">
+            <div class="eg-label" style="font-size:11px; text-transform:uppercase; font-weight:700;">Páginas / Visita</div>
+            <div class="eg-value" style="font-size:22px; font-weight:900; margin:4px 0;">{{ promedio_paginas|default:"1.0" }}</div>
+            <div class="eg-mini" style="font-size:10px; color:#94a3b8;">Profundidad promedio</div>
+        </div>
+
         <div class="eg-kpi" style="color:var(--eg-cyan);text-align:center;">
             <div class="eg-label">Sesiones landing</div>
             <div class="eg-value">{{ funnel.sesiones_landing }}</div>

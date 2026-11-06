@@ -77,6 +77,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     # 6. Autenticación
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "taller.middleware.user_activity_middleware.UserActivityMiddleware",
     "taller.middleware.force_password_change.ForcePasswordChangeMiddleware",
     # Commerce Engine — resuelve tenant desde hostname antes de las vistas
     "commerce.middleware.CommerceTenantMiddleware",

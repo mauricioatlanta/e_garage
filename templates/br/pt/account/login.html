@@ -1,103 +1,161 @@
-{% extends 'base.html' %}
-{% load static %}
-{% load widget_tweaks %}
+{% extends "base.html" %}
+{% load i18n static %}
 
-{% block title %}Entrar - eGarage Brasil
-
-
-{% endblock %}
+{% block title %}Iniciar Sesión · eGarage{% endblock %}
 
 {% block extra_head %}
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+  .eg-login-wrapper {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    position: relative;
+    z-index: 20;
+  }
+  .eg-login-card {
+    width: 100%;
+    max-width: 440px;
+    background-color: #0b1322 !important;
+    border: 2px solid #06b6d4 !important;
+    border-radius: 1.25rem;
+    padding: 2.25rem 2rem;
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.25), 0 20px 40px rgba(0, 0, 0, 0.9);
+  }
+  .eg-label {
+    display: block;
+    color: #38bdf8 !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.4rem;
+  }
+  .eg-input-control {
+    width: 100%;
+    background-color: #111827 !important;
+    border: 1.5px solid #334155 !important;
+    color: #ffffff !important;
+    font-size: 0.95rem !important;
+    font-weight: 600;
+    padding: 0.85rem 1rem !important;
+    border-radius: 0.75rem;
+    outline: none !important;
+    transition: all 0.2s ease;
+  }
+  .eg-input-control:focus {
+    border-color: #38bdf8 !important;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.4) !important;
+    background-color: #0f172a !important;
+  }
+  .eg-input-control::placeholder {
+    color: #94a3b8 !important;
+    font-weight: 400;
+  }
+  .eg-submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%) !important;
+    color: #020617 !important;
+    font-weight: 900 !important;
+    font-size: 0.95rem !important;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.9rem !important;
+    border-radius: 0.75rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
+    transition: all 0.2s ease;
+  }
+  .eg-submit-btn:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(6, 182, 212, 0.6);
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="tech-grid"></div>
-
-<div class="login-container">
-    <div class="glass-card">
-        <div class="login-content">
-            <div class="logo-section">
-                <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage Logo" class="logo">
-                <div class="flag-bar"><div class="flag-s1" style="background:#009C3B"></div><div class="flag-s2" style="background:#FFDF00"></div><div class="flag-s3" style="background:#002776"></div></div><h1 class="brand-title font-futuristic">eGarage Brasil</h1>
-                <p class="subtitle">Gestão Profissional para Oficinas</p>
-            </div>
-
-            <h2 class="login-title font-futuristic">Entrar</h2>
-
-            {% if form.non_field_errors %}
-            <div class="error-message">{{ form.non_field_errors }}</div>
-            {% endif %}
-
-            <form id="login-form-main" method="POST" action="{% url 'brasil:account_login' %}">
-                {% csrf_token %}
-                {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% elif request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
-
-                <div class="form-group">
-                    <label class="form-label">Usuário ou E-mail</label>
-                    {{ form.login|add_class:"form-input" }}
-                    {% if form.login.errors %}<div class="error-message">{{ form.login.errors }}</div>{% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Senha</label>
-                    {{ form.password|add_class:"form-input" }}
-                    {% if form.password.errors %}<div class="error-message">{{ form.password.errors }}</div>{% endif %}
-                </div>
-
-                <div class="checkbox-container">
-                    {{ form.remember_me|add_class:"form-checkbox" }}
-                    <label for="id_remember_me" class="checkbox-label">Manter sessão iniciada</label>
-                </div>
-
-                <button type="submit" class="login-button font-futuristic">🔐 Entrar</button>
-
-                <div class="forgot-password">
-                    <a href="/br/pt/accounts/password/reset/">Esqueceu sua senha?</a>
-                </div>
-            </form>
-
-            <div class="divider"><span>ou</span></div>
-
-            <div class="signup-link">
-                <span class="signup-link-text">Não tem uma conta?</span>
-                <a href="/br/pt/accounts/signup/">Cadastre-se grátis</a>
-            </div>
-        </div>
+<div class="eg-login-wrapper">
+  <div class="eg-login-card">
+    
+    <div class="text-center mb-6">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-400 text-cyan-300 text-2xl mb-3 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+        ⚙️
+      </div>
+      <h1 class="text-2xl font-black text-white tracking-tight m-0">Iniciar Sesión</h1>
+      <p class="text-xs text-slate-300 font-medium mt-1">Plataforma de Control eGarage</p>
     </div>
+
+    {% if form.errors %}
+    <div class="mb-4 p-3 rounded-xl bg-red-950/80 border border-red-500 text-red-200 text-xs font-semibold text-center">
+      Credenciales incorrectas. Verifica tu usuario y contraseña.
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'account_login' %}" class="space-y-4">
+      {% csrf_token %}
+
+      <div>
+        <label for="id_login" class="eg-label">Usuario o Correo Electrónico</label>
+        <input type="text" name="login" id="id_login" required autocomplete="username"
+               placeholder="Ingresa tu usuario o email"
+               class="eg-input-control">
+      </div>
+
+      <div>
+        <label for="id_password" class="eg-label">Contraseña</label>
+        <div class="relative">
+          <input type="password" name="password" id="id_password" required autocomplete="current-password"
+                 placeholder="••••••••••••"
+                 class="eg-input-control" style="padding-right: 2.75rem !important;">
+          <button type="button" id="btn-toggle-pw" tabindex="-1"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400 hover:text-cyan-200 text-sm p-1 transition">
+            <i class="fas fa-eye" id="pw-eye-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-1">
+        <label class="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-200 font-semibold">
+          <input type="checkbox" name="remember" id="id_remember" checked
+                 class="w-4 h-4 rounded border-slate-600 bg-slate-900 text-cyan-500 cursor-pointer">
+          <span>Mantener sesión iniciada</span>
+        </label>
+      </div>
+
+      {% if redirect_field_value %}
+      <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+      {% endif %}
+
+      <div class="pt-2">
+        <button type="submit" class="eg-submit-btn">
+          INGRESAR
+        </button>
+      </div>
+    </form>
+
+  </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const form = document.querySelector("form");
-    if (!form) return;
-    
-    // Evitar que gestores de contraseñas simulen Enter en el input de contraseña y disparen el form
-    const inputs = form.querySelectorAll("input");
-    inputs.forEach(inp => {
-        inp.addEventListener("keydown", function(e) {
-            if (e.key === "Enter") {
-                e.preventDefault();
-            }
-        });
+document.addEventListener('DOMContentLoaded', function() {
+  const toggleBtn = document.getElementById('btn-toggle-pw');
+  const passInput = document.getElementById('id_password');
+  const eyeIcon = document.getElementById('pw-eye-icon');
+
+  if (toggleBtn && passInput) {
+    toggleBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const isPassword = passInput.type === 'password';
+      passInput.type = isPassword ? 'text' : 'password';
+      if (eyeIcon) {
+        eyeIcon.className = isPassword ? 'fas fa-eye-slash text-amber-400' : 'fas fa-eye text-cyan-400';
+      }
     });
+  }
 });
 </script>
-
 {% endblock %}

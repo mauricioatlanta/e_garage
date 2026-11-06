@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from django.apps import apps
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Count, Q
+from django.db.models import Avg, Count, Q
 from django.db.models.functions import TruncDate
 from django.http import JsonResponse
 from django.template.response import TemplateResponse
@@ -452,9 +452,31 @@ def public_analytics_dashboard(request):
     # Centroides proyectados en el mismo viewport del GeoJSON (lon/lat -> SVG 500x520).
     coordenadas = {
         "CL": (343, 401, "Chile"), "AR": (366, 404, "Argentina"), "BR": (408, 321, "Brasil"),
-        "PE": (331, 321, "Perú"), "EC": (321, 290, "Ecuador"), "VE": (359, 258, "Venezuela"),
+        "PE": (331, 321, "Perú"), "EC": (305, 290, "Ecuador"), "VE": (359, 258, "Venezuela"),
         "MX": (244, 206, "México"), "US": (250, 150, "Estados Unidos"),
     }
+    
+    # Profundidad de navegación: páginas por visitante único en la ventana
+    try:
+        profundidad = (
+            qs_human.exclude(session_id__isnull=True).exclude(session_id='')
+            .values('session_id')
+            .annotate(num_pags=Count('id'))
+            .aggregate(prom=Avg('num_pags'))
+        )
+        val = profundidad.get('prom')
+        if not val or val <= 1.0:
+            prof_ip = (
+                qs_human.exclude(ip_address__isnull=True).exclude(ip_address='')
+                .values('ip_address')
+                .annotate(num_pags=Count('id'))
+                .aggregate(prom=Avg('num_pags'))
+            )
+            val = prof_ip.get('prom')
+        promedio_paginas = round(val or 1.0, 1)
+    except Exception:
+        promedio_paginas = 1.0
+
     resumen_mapa = {}
     for iso, (x, y, nombre) in coordenadas.items():
         visitas_pais = qs_human.filter(country__iexact=iso.lower()).count()
@@ -548,6 +570,24 @@ def public_analytics_dashboard(request):
         "metricas_canales": metricas_canales,
         "resumen_mapa": resumen_mapa,
     }
+
+    
+    # Inyección de actividad privada de suscriptores
+    try:
+        from taller.models.user_activity_log import UserActivityLog
+        context['actividad_suscriptores'] = list(
+            UserActivityLog.objects.values('user__username', 'empresa__nombre_taller')
+            .annotate(total_vistas=Count('id'))
+            .order_by('-total_vistas')[:10]
+        )
+        context['ultimas_rutas_privadas'] = list(
+            UserActivityLog.objects.values('path')
+            .annotate(total=Count('id'))
+            .order_by('-total')[:8]
+        )
+    except Exception:
+        context['actividad_suscriptores'] = []
+        context['ultimas_rutas_privadas'] = []
 
     return TemplateResponse(
         request,

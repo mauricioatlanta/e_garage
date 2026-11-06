@@ -265,3 +265,5 @@ except ImportError:
 from .metrica_wizard import MetricaWizard
 
 from .system_error_log import SystemErrorLog
+
+from .user_activity_log import UserActivityLog
