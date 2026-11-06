@@ -1,4 +1,5 @@
 {% load i18n %}
+{% if request.country != "BR" and request.empresa.pais != "BR" and request.path|slice:":4" != "/br/" %}
 <div class="language-switcher-cinematic flex items-center">
   <div class="lang-btn-group inline-flex items-center rounded-lg bg-black/50 border border-cyan-500/30 p-0.5">
     {# Botón INGLÉS (EN) #}
@@ -26,3 +27,4 @@
     {% endif %}
   </div>
 </div>
+{% endif %}

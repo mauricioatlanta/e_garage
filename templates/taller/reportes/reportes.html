@@ -213,6 +213,162 @@
 {% endblock %}
 
 {% block content %}
+{% if request.country == "BR" or request.path|slice:":4" == "/br/" %}
+<div class="reportes-container">
+  <div class="reportes-content">
+    <div class="reportes-header">
+      <span class="header-icon">📊</span>
+      <div>
+        <h1>
+          {% if parts_reports_mode %}Central de Relatórios de Peças
+          {% elif tire_reports_mode %}Central de Relatórios de Pneus
+          {% elif carwash_reports_mode %}Central de Relatórios de Estética Automotiva
+          {% else %}Central de Relatórios{% endif %}
+        </h1>
+        <p>Análise inteligente e visualização de dados em tempo real</p>
+      </div>
+    </div>
+
+    <div class="reportes-section">
+      <h2 class="section-title"><i class="fas fa-star" style="font-size:0.7rem"></i> Relatórios em destaque</h2>
+      <div class="reportes-grid featured-grid">
+        <a href="inteligencia/" class="reporte-card featured">
+          <div class="reporte-icon">🚀</div>
+          <div class="reporte-text">
+            <div class="reporte-title">Inteligência operacional</div>
+            <div class="reporte-desc">Indicadores, inteligência artificial preditiva e dados em tempo real</div>
+          </div>
+          <i class="fas fa-chevron-right reporte-arrow"></i>
+        </a>
+        {% if not parts_reports_mode and not tire_reports_mode %}
+        <a href="mecanicos/" class="reporte-card featured">
+          <div class="reporte-icon">🧠</div>
+          <div class="reporte-text">
+            <div class="reporte-title">Relatórios por técnico</div>
+            <div class="reporte-desc">Desempenho individual e projeções</div>
+          </div>
+          <i class="fas fa-chevron-right reporte-arrow"></i>
+        </a>
+        {% endif %}
+        {% if not parts_reports_mode and not tire_reports_mode and not carwash_reports_mode %}
+        <a href="kilometraje/recordatorios/" class="reporte-card featured">
+          <div class="reporte-icon">🚨</div>
+          <div class="reporte-text">
+            <div class="reporte-title">Lembretes de manutenção</div>
+            <div class="reporte-desc">Veículos próximos da manutenção</div>
+          </div>
+          <i class="fas fa-chevron-right reporte-arrow"></i>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="reportes-section">
+      <h2 class="section-title"><i class="fas fa-chart-bar" style="font-size:0.7rem"></i> Análises avançadas</h2>
+      <div class="reportes-grid">
+        {% if not carwash_reports_mode %}
+        <a href="repuestos/" class="reporte-card">
+          <div class="reporte-icon">🔩</div>
+          <div class="reporte-text">
+            <div class="reporte-title">{% if tire_reports_mode %}Painel de pneus{% else %}Painel de peças{% endif %}</div>
+            <div class="reporte-desc">{% if tire_reports_mode %}Medidas, marcas, vendas e estoque crítico{% else %}Mais vendidos, margens e estoque crítico{% endif %}</div>
+          </div>
+          <i class="fas fa-chevron-right reporte-arrow"></i>
+        </a>
+        {% endif %}
+        {% if request.user|is_owner %}
+        <a href="dashboard-rentabilidad/" class="reporte-card">
+          <div class="reporte-icon">📈</div>
+          <div class="reporte-text">
+            <div class="reporte-title">Painel de rentabilidade</div>
+            <div class="reporte-desc">Rentabilidade e indicadores avançados</div>
+          </div>
+          <i class="fas fa-chevron-right reporte-arrow"></i>
+        </a>
+        <a href="rentabilidad/" class="reporte-card">
+          <div class="reporte-icon">📊</div>
+          <div class="reporte-text">
+            <div class="reporte-title">Análise de rentabilidade</div>
+            <div class="reporte-desc">Comparação entre serviços internos e terceirizados</div>
+          </div>
+          <i class="fas fa-chevron-right reporte-arrow"></i>
+        </a>
+        {% if not parts_reports_mode and not carwash_reports_mode %}
+        <a href="comparativo-precios/" class="reporte-card">
+          <div class="reporte-icon">💰</div>
+          <div class="reporte-text">
+            <div class="reporte-title">Comparação de preços</div>
+            <div class="reporte-desc">Preço para o cliente e custo do fornecedor</div>
+          </div>
+          <i class="fas fa-chevron-right reporte-arrow"></i>
+        </a>
+        {% endif %}
+        {% if not parts_reports_mode and not tire_reports_mode %}
+        <a href="servicios-subcontratados/" class="reporte-card">
+          <div class="reporte-icon">🔧</div>
+          <div class="reporte-text">
+            <div class="reporte-title">Serviços terceirizados</div>
+            <div class="reporte-desc">Serviços externos frequentes e tendências</div>
+          </div>
+          <i class="fas fa-chevron-right reporte-arrow"></i>
+        </a>
+        {% endif %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="reportes-section">
+      <h2 class="section-title"><i class="fas fa-file-alt" style="font-size:0.7rem"></i> Relatórios básicos</h2>
+      <div class="reportes-grid">
+        {% if not parts_reports_mode %}
+        <a href="servicios/" class="reporte-card">
+          <div class="reporte-icon">🛠️</div>
+          <div class="reporte-text">
+            <div class="reporte-title">{% if tire_reports_mode %}Serviços de pneus{% elif carwash_reports_mode %}Serviços de estética automotiva{% else %}Serviços realizados{% endif %}</div>
+            <div class="reporte-desc">{% if tire_reports_mode %}Montagem, balanceamento, reparos e rodízio{% elif carwash_reports_mode %}Lavagens, polimentos e serviços mais solicitados{% else %}Receita, frequência e serviços mais solicitados{% endif %}</div>
+          </div>
+          <i class="fas fa-chevron-right reporte-arrow"></i>
+        </a>
+        <a href="servicios/?enfoque=vehiculos" class="reporte-card">
+          <div class="reporte-icon">🚗</div>
+          <div class="reporte-text">
+            <div class="reporte-title">Veículos atendidos</div>
+            <div class="reporte-desc">Modelos, marcas e anos mais frequentes</div>
+          </div>
+          <i class="fas fa-chevron-right reporte-arrow"></i>
+        </a>
+        {% endif %}
+        <a href="{% if parts_reports_mode or carwash_reports_mode %}../clientes/{% else %}servicios/?enfoque=clientes{% endif %}" class="reporte-card">
+          <div class="reporte-icon">👤</div>
+          <div class="reporte-text">
+            <div class="reporte-title">{% if parts_reports_mode %}Clientes e compradores{% elif carwash_reports_mode %}Clientes e recorrência{% else %}Clientes{% endif %}</div>
+            <div class="reporte-desc">{% if parts_reports_mode %}Compradores ativos e recorrência{% elif carwash_reports_mode %}Clientes novos, frequentes e inativos{% else %}Clientes ativos, novos, históricos e recorrência{% endif %}</div>
+          </div>
+          <i class="fas fa-chevron-right reporte-arrow"></i>
+        </a>
+        <a href="{% if parts_reports_mode %}../documentos/?tipo=PTS{% else %}servicios/?enfoque=facturacion_total{% endif %}" class="reporte-card">
+          <div class="reporte-icon">💸</div>
+          <div class="reporte-text">
+            <div class="reporte-title">{% if parts_reports_mode %}Vendas e faturamento{% elif carwash_reports_mode %}Caixa e faturamento{% else %}Faturamento{% endif %}</div>
+            <div class="reporte-desc">{% if parts_reports_mode %}Receita por período e venda{% elif carwash_reports_mode %}Receita por lavagem, serviço e cliente{% else %}Receita por período, serviço e cliente{% endif %}</div>
+          </div>
+          <i class="fas fa-chevron-right reporte-arrow"></i>
+        </a>
+        {% if not parts_reports_mode and not tire_reports_mode %}
+        <a href="servicios/?enfoque=agenda" class="reporte-card">
+          <div class="reporte-icon">📅</div>
+          <div class="reporte-text">
+            <div class="reporte-title">Agenda e agendamentos</div>
+            <div class="reporte-desc">Histórico, ocupação e eficiência</div>
+          </div>
+          <i class="fas fa-chevron-right reporte-arrow"></i>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
 <div class="reportes-container">
   <div class="reportes-content">
 
@@ -390,4 +546,5 @@
 
   </div>
 </div>
+{% endif %}
 {% endblock %}
