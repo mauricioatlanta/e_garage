@@ -476,6 +476,30 @@ def crear_vehiculo(request, *args, **kwargs):
                         request,
                         f"Vehículo {vehiculo.patente or 'sin patente'} creado exitosamente",
                     )
+                    next_candidate = (
+                        request.POST.get("next")
+                        or request.GET.get("next")
+                        or request.POST.get("return_to")
+                        or request.GET.get("return_to")
+                        or ""
+                    ).strip()
+                    if next_candidate:
+                        if "/documentos/form" in next_candidate:
+                            cid = (
+                                request.POST.get("cliente")
+                                or request.GET.get("cliente_id")
+                                or request.GET.get("cliente")
+                                or getattr(vehiculo, "cliente_id", None)
+                                or ""
+                            )
+                            sep = "&" if "?" in next_candidate else "?"
+                            params = []
+                            if cid:
+                                params.append(f"cliente_id={cid}")
+                            params.append(f"vehiculo_id={vehiculo.pk}")
+                            query_str = "&".join(params)
+                            next_candidate = f"{next_candidate}{sep}{query_str}"
+                        return redirect(next_candidate)
                     return_to = get_safe_context_return_url(
                         request,
                         request.POST.get("return_to") or request.GET.get("return_to")
@@ -1265,16 +1289,27 @@ def ajax_agregar_motor(request):
             status=400,
         )
 
-    motor, created = MotorVehiculo.objects.get_or_create(nombre=nombre, country=country)
-    if modelo and hasattr(motor, 'modelos'):
+    empresa = get_empresa_safe(request)
+    if empresa and modelo:
+        motor, _ = MotorVehiculoEmpresa.objects.get_or_create(
+            empresa=empresa,
+            modelo=modelo,
+            nombre=nombre,
+            country=country,
+        )
+        motor_id = f"empresa:{motor.pk}"
+    else:
+        motor, _ = MotorVehiculo.objects.get_or_create(nombre=nombre, country=country)
+        motor_id = motor.id
+    if isinstance(motor, MotorVehiculo) and modelo and hasattr(motor, 'modelos'):
         motor.modelos.add(modelo)
 
     return JsonResponse(
         {
             'success': True,
-            'id': motor.id,
+            'id': motor_id,
             'nombre': motor.nombre,
-            'motor': {'id': motor.id, 'nombre': motor.nombre},
+            'motor': {'id': motor_id, 'nombre': motor.nombre},
         }
     )
 
@@ -1308,16 +1343,27 @@ def ajax_agregar_caja(request):
             status=400,
         )
 
-    caja, created = CajaVehiculo.objects.get_or_create(nombre=nombre, country=country)
-    if modelo and hasattr(caja, 'modelos'):
+    empresa = get_empresa_safe(request)
+    if empresa and modelo:
+        caja, _ = CajaVehiculoEmpresa.objects.get_or_create(
+            empresa=empresa,
+            modelo=modelo,
+            nombre=nombre,
+            country=country,
+        )
+        caja_id = f"empresa:{caja.pk}"
+    else:
+        caja, _ = CajaVehiculo.objects.get_or_create(nombre=nombre, country=country)
+        caja_id = caja.id
+    if isinstance(caja, CajaVehiculo) and modelo and hasattr(caja, 'modelos'):
         caja.modelos.add(modelo)
 
     return JsonResponse(
         {
             'success': True,
-            'id': caja.id,
+            'id': caja_id,
             'nombre': caja.nombre,
-            'caja': {'id': caja.id, 'nombre': caja.nombre},
+            'caja': {'id': caja_id, 'nombre': caja.nombre},
         }
     )
 
@@ -1340,6 +1386,17 @@ def ajax_motores_por_modelo(request):
         qs = qs.none()
 
     data = [{'id': m.id, 'nombre': m.nombre, 'text': m.nombre} for m in qs.order_by('nombre').distinct()]
+    empresa = get_empresa_safe(request)
+    if empresa and modelo:
+        private_motors = MotorVehiculoEmpresa.objects.filter(
+            empresa=empresa,
+            modelo=modelo,
+            country=country,
+        ).order_by("nombre")
+        data.extend(
+            {"id": f"empresa:{motor.pk}", "nombre": motor.nombre, "text": motor.nombre}
+            for motor in private_motors
+        )
     return JsonResponse(data, safe=False)
 
 def ajax_cajas_por_modelo(request):
@@ -1362,4 +1419,15 @@ def ajax_cajas_por_modelo(request):
         qs = qs.none()
 
     data = [{'id': c.id, 'nombre': c.nombre, 'text': c.nombre} for c in qs.order_by('nombre').distinct()]
+    empresa = get_empresa_safe(request)
+    if empresa and modelo:
+        private_boxes = CajaVehiculoEmpresa.objects.filter(
+            empresa=empresa,
+            modelo=modelo,
+            country=country,
+        ).order_by("nombre")
+        data.extend(
+            {"id": f"empresa:{box.pk}", "nombre": box.nombre, "text": box.nombre}
+            for box in private_boxes
+        )
     return JsonResponse(data, safe=False)

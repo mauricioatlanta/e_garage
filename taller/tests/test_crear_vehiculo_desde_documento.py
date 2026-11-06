@@ -51,8 +51,8 @@ def test_crear_vehiculo_redirect_a_documento_con_cliente_y_vehiculo(
         user=user_usa_empresa
     )
 
-    doc_form_path = "/us/documentos/form/"
-    next_url = f"http://testserver{doc_form_path}"
+    doc_form_path = "/us/en/documentos/form/"
+    next_url = doc_form_path
 
     crear_url = "/us/en/vehiculos/crear/"
     get_resp = client.get(crear_url, {"next": next_url, "cliente_id": str(cliente_a.pk)})
@@ -118,7 +118,9 @@ def test_documento_crear_con_cliente_id_vehiculo_id_preselecciona(
 
     client.login(username="usa_user", password="testpass123")
 
-    doc_crear_path = f"/us/documentos/form/?cliente_id={cliente_a.pk}&vehiculo_id={vehiculo.pk}"
+    doc_crear_path = (
+        f"/us/en/documentos/form/?cliente_id={cliente_a.pk}&vehiculo_id={vehiculo.pk}"
+    )
     response = client.get(doc_crear_path)
 
     assert response.status_code == 200

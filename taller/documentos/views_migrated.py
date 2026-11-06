@@ -986,8 +986,15 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
 
         cliente_id = self.request.GET.get("cliente_id")
         if cliente_id:
-            initial["cliente"] = cliente_id
-            initial["cliente_id"] = cliente_id
+            val_cid = int(cliente_id) if str(cliente_id).isdigit() else cliente_id
+            initial["cliente"] = val_cid
+            initial["cliente_id"] = val_cid
+
+        vehiculo_id = self.request.GET.get("vehiculo_id")
+        if vehiculo_id:
+            val_vid = int(vehiculo_id) if str(vehiculo_id).isdigit() else vehiculo_id
+            initial["vehiculo"] = val_vid
+            initial["vehiculo_id"] = val_vid
 
         tipo_param = self.request.GET.get("tipo", "").strip().upper()
         if tipo_param in _VALID_TIPOS:
@@ -1053,8 +1060,16 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
                 "otros_json": line_item_payloads["otros_json"],
                 "document_form_bootstrap": form_bootstrap,
                 "has_server_line_items": has_server_line_items(line_item_payloads) or bool(form_bootstrap.get("line_items", {}).get("repuestos")),
-                "cliente_preselect_id": cliente_state["id"] or "",
-                "vehiculo_preselect_id": vehiculo_preselect_id or "",
+                "cliente_preselect_id": (
+                    int(self.request.GET.get("cliente_id"))
+                    if str(self.request.GET.get("cliente_id", "")).isdigit()
+                    else (cliente_state.get("id") or "")
+                ),
+                "vehiculo_preselect_id": (
+                    int(self.request.GET.get("vehiculo_id"))
+                    if str(self.request.GET.get("vehiculo_id", "")).isdigit()
+                    else (vehiculo_preselect_id or "")
+                ),
                 "cliente_preselect_nombre": cliente_state["nombre"] or "",
                 "cliente_preselect_email": cliente_state["email"] or "",
                 "cliente_preselect_telefono": cliente_state["telefono"] or "",
