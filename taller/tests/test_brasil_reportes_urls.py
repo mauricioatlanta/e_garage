@@ -1,3 +1,4 @@
+from django.template.loader import render_to_string
 from django.test import RequestFactory, SimpleTestCase
 from django.urls import resolve, reverse
 
@@ -20,3 +21,16 @@ class BrazilReportsUrlTests(SimpleTestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response["Location"], "/br/pt/reportes/?periodo=mes")
+
+    def test_brazil_does_not_render_language_switcher(self):
+        request = RequestFactory().get("/br/pt/reportes/")
+        request.country = "BR"
+        request.LANGUAGE_CODE = "pt-br"
+
+        html = render_to_string(
+            "taller/includes/lang_switcher_cinematic.html",
+            {"request": request, "LANGUAGE_CODE": "pt-br"},
+        )
+
+        self.assertNotIn("🇺🇸 EN", html)
+        self.assertNotIn("🇪🇸 ES", html)
