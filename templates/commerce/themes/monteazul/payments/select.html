@@ -28,6 +28,7 @@
   <!-- Opciones de pago -->
   <div class="space-y-4">
 
+    {% if webpay_enabled %}
     <!-- Webpay -->
     <form method="post" action="{% url 'commerce:payment_start' order.order_number %}">
       {% csrf_token %}
@@ -47,6 +48,8 @@
         <div class="ml-auto text-white/30 group-hover:text-white/60 transition-colors">→</div>
       </button>
     </form>
+
+    {% endif %}
 
     <!-- Transferencia bancaria -->
     <form method="post" action="{% url 'commerce:payment_start' order.order_number %}">

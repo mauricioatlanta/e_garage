@@ -28,6 +28,14 @@ logger = logging.getLogger(__name__)
 _ALLOWED_GATEWAYS = frozenset({"webpay", "bank_transfer"})
 
 
+def _allowed_gateways():
+    """Webpay solo se ofrece si Transbank está en producción."""
+    from django.conf import settings
+    if getattr(settings, "TBK_PRODUCTION", False):
+        return _ALLOWED_GATEWAYS
+    return _ALLOWED_GATEWAYS - {"webpay"}
+
+
 def _get_empresa_or_404(request):
     empresa = getattr(request, "empresa", None) or getattr(request, "commerce_empresa", None)
     if not empresa:
@@ -51,6 +59,7 @@ def payment_select(request, order_number):
     return render(request, "commerce/themes/monteazul/payments/select.html", {
         "brand": request.commerce_brand,
         "order": order,
+        "webpay_enabled": "webpay" in _allowed_gateways(),
     })
 
 
@@ -78,7 +87,7 @@ def payment_start(request, order_number):
         return redirect("commerce:order_received", order_number=order_number)
 
     gateway_key = request.POST.get("gateway_key", "").strip()
-    if gateway_key not in _ALLOWED_GATEWAYS:
+    if gateway_key not in _allowed_gateways():
         return HttpResponseBadRequest("Método de pago inválido.")
 
     return_url = request.build_absolute_uri(reverse("commerce:payment_return"))
