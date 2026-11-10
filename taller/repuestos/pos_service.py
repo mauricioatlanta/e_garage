@@ -33,10 +33,11 @@ class PartsPOSService:
             "nombre": repuesto.nombre,
             "precio_venta": str(repuesto.precio_venta),
             "stock": repuesto.cantidad_stock,
-            "ubicacion": repuesto.ubicacion or "",
-            "medida": repuesto.medida_completa,
-            "marca_neumatico": repuesto.marca_neumatico,
-            "modelo_neumatico": repuesto.modelo_neumatico,
+            "sku": getattr(repuesto, "sku", "") or "",
+            "ubicacion": getattr(repuesto, "ubicacion", "") or "",
+            "medida": getattr(repuesto, "medida_completa", "") or "",
+            "marca_neumatico": getattr(repuesto, "marca_neumatico", "") or "",
+            "modelo_neumatico": getattr(repuesto, "modelo_neumatico", "") or "",
         }
 
     @staticmethod
