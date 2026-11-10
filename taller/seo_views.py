@@ -35,6 +35,58 @@ def _canonical_public_urls():
 
 
 def sitemap_xml(request):
+    empresa = getattr(request, "empresa", None)
+    if not empresa:
+        try:
+            from taller.services.domain_resolver import DomainResolverService
+            ed = DomainResolverService.resolve(request)
+            if ed:
+                empresa = ed.empresa
+        except Exception:
+            pass
+
+    # Si la petición proviene de un tenant como Atlanta Reciclajes
+    if empresa and getattr(empresa, "id", None) == 63:
+        host = f"https://{request.get_host()}"
+        body = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+            '  <url>',
+            f'    <loc>{host}/</loc>',
+            '    <changefreq>daily</changefreq>',
+            '    <priority>1.0</priority>',
+            '  </url>',
+            '  <url>',
+            f'    <loc>{host}/reciclaje/cataliticos/</loc>',
+            '    <changefreq>daily</changefreq>',
+            '    <priority>0.9</priority>',
+            '  </url>',
+            '  <url>',
+            f'    <loc>{host}/reciclaje/consulta-catalitico/</loc>',
+            '    <changefreq>daily</changefreq>',
+            '    <priority>0.9</priority>',
+            '  </url>',
+            '  <url>',
+            f'    <loc>{host}/reciclaje/chatarra-electronica/</loc>',
+            '    <changefreq>weekly</changefreq>',
+            '    <priority>0.8</priority>',
+            '  </url>',
+        ]
+
+        from taller.models import Catalitico
+        cataliticos = Catalitico.objects.filter(empresa=empresa, activo=True).order_by('id')
+        for cat in cataliticos:
+            body.append('  <url>')
+            body.append(f'    <loc>{host}/reciclaje/catalitico/{cat.pk}/</loc>')
+            if hasattr(cat, 'updated_at') and cat.updated_at:
+                body.append(f'    <lastmod>{cat.updated_at.strftime("%Y-%m-%d")}</lastmod>')
+            body.append('    <changefreq>weekly</changefreq>')
+            body.append('    <priority>0.7</priority>')
+            body.append('  </url>')
+
+        body.append('</urlset>')
+        return HttpResponse("\n".join(body) + "\n", content_type="application/xml; charset=utf-8")
+
     urls = _canonical_public_urls()
 
     body = [
@@ -57,7 +109,19 @@ def sitemap_xml(request):
 
 
 def robots_txt(request):
-    if getattr(request, "is_custom_domain", False):
+    empresa = getattr(request, "empresa", None)
+    if not empresa:
+        try:
+            from taller.services.domain_resolver import DomainResolverService
+            ed = DomainResolverService.resolve(request)
+            if ed:
+                empresa = ed.empresa
+        except Exception:
+            pass
+
+    if empresa and getattr(empresa, "id", None) == 63:
+        sitemap_url = f"https://{request.get_host()}/sitemap.xml"
+    elif getattr(request, "is_custom_domain", False):
         sitemap_url = f"https://{request.get_host()}/commerce/sitemap.xml"
     else:
         sitemap_url = "https://egarage.cl/sitemap.xml"

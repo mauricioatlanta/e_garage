@@ -3,7 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ catalitico.codigo }} | Atlanta Reciclajes</title>
+    <title>Convertidor Catalítico {{ catalitico.codigo }}{% if catalitico.marca_vehiculo %} - {{ catalitico.marca_vehiculo }} {{ catalitico.modelo_vehiculo }}{% endif %} | Atlanta Reciclajes</title>
+    <meta name="description" content="Cotización y compra directa del convertidor catalítico código {{ catalitico.codigo }}{% if catalitico.marca_vehiculo %} ({{ catalitico.marca_vehiculo }} {{ catalitico.modelo_vehiculo }}){% endif %}. Pago inmediato garantizado por Atlanta Reciclajes.">
+    <link rel="canonical" href="https://atlantareciclajes.cl/reciclaje/catalitico/{{ catalitico.pk }}/">
+
+    <!-- Open Graph / WhatsApp / Facebook -->
+    <meta property="og:type" content="product">
+    <meta property="og:title" content="Catalítico {{ catalitico.codigo }} | Valorización Atlanta Reciclajes">
+    <meta property="og:description" content="Consulta el valor de tasación del catalítico {{ catalitico.codigo }}{% if catalitico.marca_vehiculo %} ({{ catalitico.marca_vehiculo }} {{ catalitico.modelo_vehiculo }}){% endif %}. Compra directa y pago transparente.">
+    <meta property="og:url" content="https://atlantareciclajes.cl/reciclaje/catalitico/{{ catalitico.pk }}/">
+    <meta property="og:site_name" content="Atlanta Reciclajes">
+    {% if catalitico.imagen %}
+    <meta property="og:image" content="https://atlantareciclajes.cl{{ catalitico.imagen.url }}">
+    {% else %}
+    <meta property="og:image" content="https://atlantareciclajes.cl/static/img/cataliticos-banner.jpg">
+    {% endif %}
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Catalítico {{ catalitico.codigo }} - Atlanta Reciclajes">
+    <meta name="twitter:description" content="Tasación y compra de convertidores catalíticos en Chile.">
+    {% if catalitico.imagen %}
+    <meta name="twitter:image" content="https://atlantareciclajes.cl{{ catalitico.imagen.url }}">
+    {% endif %}
+
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
       body {
