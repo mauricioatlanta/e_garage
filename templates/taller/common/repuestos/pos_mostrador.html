@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load country_url %}
 
 {% block title %}POS Mostrador{% endblock %}
 
@@ -11,7 +12,10 @@
         <h1 class="text-2xl font-bold text-cyan-200">POS Mostrador</h1>
         <p class="text-sm text-gray-400">Venta rápida de repuestos, neumáticos y servicios de mesón.</p>
       </div>
-      <a href="../" class="text-sm text-cyan-300 hover:text-cyan-100">Inventario</a>
+      <div class="flex gap-2">
+        <a href="{% country_url 'repuestos:pos_ventas_list' %}" class="rounded-lg border border-cyan-400/40 bg-cyan-600/20 px-4 py-2 text-sm font-semibold text-cyan-200 hover:bg-cyan-600/40">Ventas de repuestos</a>
+        <a href="../" class="text-sm text-cyan-300 hover:text-cyan-100 self-center">Inventario</a>
+      </div>
     </header>
 
     <section class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">

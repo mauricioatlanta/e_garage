@@ -15,6 +15,7 @@ from django.views.decorators.http import require_GET, require_POST
 
 from taller.models.empresa import Empresa
 from taller.models.clientes import Cliente
+from taller.models.documento import Documento
 from taller.models.repuesto import Repuesto
 from taller.repuestos.pos_service import PartsPOSService
 from taller.services.empresa_service import get_empresa_safe
@@ -65,6 +66,21 @@ def pos_mostrador(request):
         },
     )
 
+
+@login_required
+def pos_ventas_list(request):
+    empresa = get_empresa_safe(request)
+    ventas = (
+        Documento.objects.filter(empresa=empresa, tipo="PTS")
+        .select_related("cliente")
+        .prefetch_related("lineas_repuesto")
+        .order_by("-fecha_emision", "-id")[:200]
+    )
+    return render(
+        request,
+        "taller/common/repuestos/pos_ventas.html",
+        {"ventas": ventas, "empresa": empresa},
+    )
 
 @login_required
 def pos_documento_redirect(request, pk):
