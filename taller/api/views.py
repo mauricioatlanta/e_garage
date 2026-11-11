@@ -487,7 +487,7 @@ def buscar_repuestos_api(request, pais=None):
         return JsonResponse({"results": []})
 
     qs = Repuesto.objects.filter(empresa=empresa).filter(
-        models.Q(part_number__icontains=q)
+        models.Q(part_number__icontains=q) | models.Q(sku__icontains=q) | models.Q(codigo_oem__icontains=q)
         | models.Q(nombre__icontains=q)
         | models.Q(proveedor__icontains=q)
     )

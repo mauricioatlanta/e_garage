@@ -19,6 +19,58 @@ from taller.models.modelo import Modelo
 
 # Datos de marcas y modelos por país (desde 1970 hasta 2024)
 MARCAS_MODELOS_POR_PAIS = {
+    "UY": {
+        # Uruguay - Marcas y modelos reales comercializados (Mercosur + importados)
+        "Chevrolet": [
+            "Onix", "Prisma", "Celta", "Classic", "Sail", "Cruze", "Tracker",
+            "Montana", "S10", "Spin", "Joy", "Captiva", "Spark"
+        ],
+        "Fiat": [
+            "Uno", "Palio", "Siena", "Strada", "Mobi", "Argo", "Cronos",
+            "Pulse", "Fastback", "Fiorino", "Toro", "Ducato"
+        ],
+        "Volkswagen": [
+            "Gol", "Polo", "Virtus", "Voyage", "Saveiro", "T-Cross", "Nivus",
+            "Taos", "Amarok", "Up!", "Fox", "Suran", "Vento"
+        ],
+        "Renault": [
+            "Kwid", "Sandero", "Logan", "Stepway", "Duster", "Oroch",
+            "Kangoo", "Master", "Clio", "Captur", "Kardian"
+        ],
+        "Peugeot": [
+            "208", "2008", "301", "308", "3008", "Partner", "Expert", "Boxer"
+        ],
+        "Citroën": [
+            "C3", "C3 Aircross", "C4 Cactus", "Berlingo", "Jumpy", "Jumper"
+        ],
+        "Toyota": [
+            "Corolla", "Corolla Cross", "Hilux", "Yaris", "Etios", "RAV4", "SW4"
+        ],
+        "Nissan": [
+            "Versa", "Sentra", "Kicks", "Frontier", "March", "X-Trail"
+        ],
+        "Hyundai": [
+            "HB20", "HB20S", "Creta", "Tucson", "Santa Fe", "i10", "Accent", "H1"
+        ],
+        "Kia": [
+            "Picanto", "Rio", "Soluto", "Sportage", "Seltos", "K2500"
+        ],
+        "Suzuki": [
+            "Swift", "Celerio", "Baleno", "Alto", "Vitara", "S-Cross", "Jimny"
+        ],
+        "BYD": [
+            "Dolphin", "Seagull", "Yuan Plus", "Song Plus", "Han", "Tang", "F3", "e2"
+        ],
+        "Chery": [
+            "Tiggo 2", "Tiggo 4", "Tiggo 7", "Tiggo 8", "QQ", "Arrizo 5"
+        ],
+        "JAC": [
+            "JS2", "JS3", "JS4", "T6", "T8", "X200", "e-JS1"
+        ],
+        "Ford": [
+            "Ranger", "Maverick", "Territory", "Bronco Sport", "Ka", "EcoSport", "F-150"
+        ],
+    },
     "CL": {
         # Chile - Marcas y modelos comercializados
         "Toyota": [

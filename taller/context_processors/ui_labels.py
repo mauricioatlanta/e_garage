@@ -72,10 +72,9 @@ def ui_labels_context(request):
         str(request.GET.get("tipo", "")).strip().upper() == "PTS"
         and bool(effective_rubros.intersection({"PARTS", "DESARMADURIA", "MIXED"}))
     )
-    if rubro:
+    if rubro and active_empresa:
         module_label = get_document_module_label(rubro, language_code)
         labels["documents_menu"] = module_label
-        labels["document_center"] = module_label
         if module_label in {"Work", "Trabajos"}:
             labels["workflow_singular"] = "Work" if is_english else "Trabajo"
             labels["new_document"] = "New Work" if is_english else "Nuevo Trabajo"

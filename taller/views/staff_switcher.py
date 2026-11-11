@@ -5,43 +5,32 @@ from taller.models.empresa import Empresa
 
 @csrf_exempt
 def switch_support_environment(request):
-    if not (request.user.is_authenticated and request.user.is_superuser):
-        return redirect("/cl/es/accounts/login/")
+    import re
+    if not request.user.is_superuser:
+        return redirect("/")
 
     if request.method == "POST":
-        country = (request.POST.get("country") or request.POST.get("pais") or "us").lower().strip()
+        country = (request.POST.get("country") or request.POST.get("pais") or "cl").lower().strip()
         selected = request.POST.getlist("rubros")
-        rubro = selected[0] if selected else "TALLER"
 
-        # Asignar la empresa de USA limpia
-        if country == "us":
-            emp = Empresa.objects.filter(pais="US").first()
-        else:
-            emp = Empresa.objects.filter(pais="CL").first() or Empresa.objects.filter(id=1).first()
-
-        if emp and hasattr(request.user, "perfilusuario"):
-            p = request.user.perfilusuario
-            p.empresa = emp
-            p.save()
-
-        # Grabar variables en sesión
         request.session["support_country"] = country
-        request.session["modo_soporte_pais"] = country
-        request.session["support_rubro"] = rubro
+        request.session["support_rubro"] = selected[0] if selected else ""
         request.session["modo_soporte_rubros"] = selected
-        request.session["modo_soporte_activo"] = True
-        request.session["django_language"] = "es"
-        if emp:
-            request.session["empresa_id"] = emp.id
+        request.session["modo_soporte_pais"] = country
         request.session.modified = True
 
-        if "desarmaduria" in [r.lower() for r in selected]:
-            target = f"/{country}/es/desarme/vehiculos/"
+        referer = request.META.get("HTTP_REFERER", "")
+        if country == "us":
+            if "/cl/" in referer:
+                target = re.sub(r"/cl/(es|en)/", "/us/en/", referer)
+                target = re.sub(r"/cl/", "/us/en/", target)
+                return redirect(target)
+            return redirect("/us/en/desarme/vehiculos/")
         else:
-            target = f"/{country}/es/reportes/"
+            if "/us/" in referer:
+                target = re.sub(r"/us/(en|es)/", f"/{country}/es/", referer)
+                target = re.sub(r"/us/", f"/{country}/es/", target)
+                return redirect(target)
+            return redirect(f"/{country}/es/desarme/vehiculos/")
 
-        response = redirect(target)
-        response.set_cookie("django_language", "es", max_age=365*24*60*60, domain=".egarage.cl", path="/")
-        return response
-
-    return redirect("/us/es/reportes/")
+    return redirect("/")

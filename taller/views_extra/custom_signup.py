@@ -55,6 +55,14 @@ class CustomSignupView(SignupView):
     template_name = "account/signup.html"
 
     def get(self, request, *args, **kwargs):
+        # DEFAULT_SIGNUP_EN: /accounts/signup/ generico -> ingles por default (mercado americano)
+        # Solo si no viene pais explicito en URL, ?country= o ?from=
+        if request.path == '/accounts/signup/':
+            has_country = bool((request.GET.get('country') or '').strip() or (request.GET.get('from') or '').strip() or kwargs.get('country'))
+            if not has_country:
+                qs = request.GET.urlencode()
+                url = '/us/en/accounts/signup/' + ('?' + qs if qs else '')
+                return redirect(url)
         country_code = (kwargs.get("country") or request.GET.get("country") or "").strip().upper()
         if country_code:
             v = validate_signup_country(country_code)
