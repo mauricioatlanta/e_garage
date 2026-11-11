@@ -215,11 +215,8 @@ def _get_country(request, default="CL"):
         raw = getattr(request, "country", None)
 
     c = str(raw or default).strip().upper()
-    if c in ("US", "USA"):
-        return "US"
-    if c in ("MX", "MEX"):
-        return "MX"
-    return "CL"
+    valid_countries = {"US": "US", "USA": "US", "MX": "MX", "MEX": "MX", "CL": "CL", "PE": "PE", "EC": "EC", "UY": "UY", "CO": "CO", "BR": "BR", "VE": "VE", "AR": "AR"}
+    return valid_countries.get(c, "CL")
 
 
 def _country_namespace(country: str) -> str:

@@ -272,6 +272,20 @@ from django.views.decorators.http import require_http_methods
 
 
 @require_http_methods(["POST"])
+def _pais_desde_request(request, empresa=None):
+    """Pais desde URL primero: /ve/ -> VE, /cl/ -> CL, /us/ -> US, etc. Fallback empresa."""
+    try:
+        path = (getattr(request, 'path', '') or '').lower()
+        mapping = {'/ve/': 'VE', '/cl/': 'CL', '/mx/': 'MX', '/pe/': 'PE', '/br/': 'BR', '/us/': 'US', '/co/': 'CO', '/ec/': 'EC', '/ar/': 'AR', '/uy/': 'UY'}
+        for prefix, code in mapping.items():
+            if path.startswith(prefix):
+                return code
+    except Exception:
+        pass
+    if empresa and getattr(empresa, 'pais', None):
+        return str(empresa.pais).strip().upper()
+    return 'CL'
+
 def agregar_ciudad_usa(request):
     """
     Vista AJAX para agregar una nueva ciudad a un estado de USA
@@ -348,8 +362,8 @@ def agregar_ciudad(request):
         if not region_id:
             return JsonResponse({"success": False, "error": "Región requerida"})
 
-        # Detectar país del usuario para usar el modelo correcto
-        pais_usuario = empresa.pais if hasattr(empresa, "pais") else "CL"
+        # FIX: pais desde URL primero, no solo empresa (empresa CL + URL /ve/ -> VE)
+        pais_usuario = _pais_desde_request(request, empresa)
 
         if request.GET.get("estado_id") or pais_usuario in ["US", "BR", "VE", "PE", "MX"]:
             from taller.models.ubicacion import Ciudad, Estado
@@ -438,11 +452,12 @@ def agregar_estado(request):
         return JsonResponse({"success": False, "error": "Usuario no autenticado"}, status=401)
 
     empresa = get_empresa_safe(request)
-    pais = getattr(empresa, "pais", None) if empresa else None
+    # FIX: pais desde URL primero
+    pais = _pais_desde_request(request, empresa)
     if not empresa or not pais:
         return JsonResponse({"success": False, "error": "Empresa sin país configurado"}, status=400)
 
-    if pais not in ["US", "BR", "VE", "PE", "MX", "CO", "EC"]:
+    if pais not in ["US", "BR", "VE", "PE", "MX", "CO", "EC", "AR", "UY", "CL"]:
         return JsonResponse(
             {"success": False, "error": "El país no admite creación dinámica de estados"},
             status=400,

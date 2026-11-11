@@ -70,6 +70,120 @@ $(document).ready(function() {
 </script>
 
 
+
+<script>
+(function() {
+    function initVehiculoUI() {
+        if (typeof jQuery === 'undefined' || typeof jQuery.fn.select2 === 'undefined') {
+            setTimeout(initVehiculoUI, 120);
+            return;
+        }
+        var $ = jQuery;
+
+        // 1. Inicializar Select2 en los selectores de vehículos
+        $('#id_marca').select2({ placeholder: 'Select a brand', allowClear: true, width: '100%' });
+        $('#id_modelo').select2({ placeholder: 'Select a model', allowClear: true, width: '100%' });
+        
+        $('#id_motor').select2({
+            tags: true,
+            placeholder: 'Select or type engine...',
+            allowClear: true,
+            width: '100%',
+            createTag: function (params) {
+                var term = $.trim(params.term);
+                if (term === '') return null;
+                return { id: term, text: term, newTag: true };
+            }
+        });
+
+        $('#id_caja').select2({
+            tags: true,
+            placeholder: 'Select or type transmission...',
+            allowClear: true,
+            width: '100%',
+            createTag: function (params) {
+                var term = $.trim(params.term);
+                if (term === '') return null;
+                return { id: term, text: term, newTag: true };
+            }
+        });
+
+        // 2. Cambio en Marca -> Cargar Modelos correspondientes
+        $('#id_marca').off('change.cargarModelos').on('change.cargarModelos', function() {
+            var marcaId = $(this).val();
+            var $modelo = $('#id_modelo');
+            $modelo.empty().append(new Option('Loading models...', '', false, false)).trigger('change.select2');
+
+            if (!marcaId) {
+                $modelo.empty().append(new Option('Select a model', '', false, false)).trigger('change.select2');
+                return;
+            }
+
+            fetch('/us/en/vehiculos/api/modelos-por-marca/?marca_id=' + encodeURIComponent(marcaId))
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    $modelo.empty().append(new Option('Select a model', '', false, false));
+                    var items = Array.isArray(data) ? data : (data.modelos || []);
+                    items.forEach(function(m) {
+                        $modelo.append(new Option(m.nombre, m.id));
+                    });
+                    $modelo.trigger('change.select2');
+                })
+                .catch(function(err) {
+                    console.error('Error cargando modelos:', err);
+                    $modelo.empty().append(new Option('Select a model', '', false, false));
+                    $modelo.trigger('change.select2');
+                });
+        });
+
+        // 3. Cambio en Modelo -> Filtrar Motores y Cajas específicos del modelo seleccionado
+        $('#id_modelo').off('change.cargarMotores').on('change.cargarMotores', function() {
+            var modeloId = $(this).val();
+            var $motor = $('#id_motor');
+            var $caja = $('#id_caja');
+
+            var q = modeloId ? ('?modelo_id=' + encodeURIComponent(modeloId)) : '';
+
+            fetch('/us/en/vehiculos/ajax/motores-por-modelo/' + q)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (Array.isArray(data)) {
+                        var valAct = $motor.val();
+                        $motor.empty().append(new Option('Select or type engine...', '', false, false));
+                        data.forEach(function(m) {
+                            var sel = (String(m.id) === String(valAct) || String(m.nombre) === String(valAct));
+                            $motor.append(new Option(m.nombre, m.id, sel, sel));
+                        });
+                        $motor.trigger('change.select2');
+                    }
+                })
+                .catch(function(e) { console.error('Error motores:', e); });
+
+            fetch('/us/en/vehiculos/ajax/cajas-por-modelo/' + q)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (Array.isArray(data)) {
+                        var valAct = $caja.val();
+                        $caja.empty().append(new Option('Select or type transmission...', '', false, false));
+                        data.forEach(function(c) {
+                            var sel = (String(c.id) === String(valAct) || String(c.nombre) === String(valAct));
+                            $caja.append(new Option(c.nombre, c.id, sel, sel));
+                        });
+                        $caja.trigger('change.select2');
+                    }
+                })
+                .catch(function(e) { console.error('Error cajas:', e); });
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initVehiculoUI);
+    } else {
+        initVehiculoUI();
+    }
+})();
+</script>
+
 {% endblock %}
 {% block page_subtitle %}{% trans "Add a new vehicle to the system" %}{% endblock %}
 {% block page_icon %}🚗{% endblock %}

@@ -155,11 +155,66 @@ class ClienteForm(forms.ModelForm):
             self.pais = req.session.get("modo_soporte_pais")
         elif req and getattr(req, "path_info", "").startswith("/us/"):
             self.pais = "US"
+        elif req and getattr(req, "path_info", "").startswith("/co/"):
+            self.pais = "CO"
+        elif req and getattr(req, "path_info", "").startswith("/pe/"):
+            self.pais = "PE"
+        elif req and getattr(req, "path_info", "").startswith("/uy/"):
+            self.pais = "UY"
+        elif req and getattr(req, "path_info", "").startswith("/ec/"):
+            self.pais = "EC"
+        elif req and getattr(req, "path_info", "").startswith("/co/"):
+            self.pais = "CO"
         elif self.empresa and hasattr(self.empresa, "pais"):
             self.pais = self.empresa.pais
         else:
             self.pais = "CL"
         self.pais = str(self.pais or "CL").upper()
+
+        if self.pais == "EC":
+            self.fields["estado_usa"].label = "Provincia"
+            self.fields["estado_usa"].empty_label = "Seleccione Provincia"
+            self.fields["ciudad_usa"].label = "Cantón / Ciudad"
+            self.fields["ciudad_usa"].empty_label = "Seleccione Cantón o Ciudad"
+            self.fields["direccion"].label = "Dirección (Calle principal y secundaria)"
+            self.fields["direccion"].widget.attrs["placeholder"] = "Ej: Av. Amazonas N24-196 y Luis Cordero"
+            self.fields["telefono"].widget.attrs["placeholder"] = "+593 99 123 4567"
+
+        if self.pais == "PE":
+            self.fields["estado_usa"].label = "Departamento"
+            self.fields["estado_usa"].empty_label = "Seleccione Departamento"
+            self.fields["ciudad_usa"].label = "Provincia / Distrito"
+            self.fields["ciudad_usa"].empty_label = "Seleccione Provincia o Distrito"
+            self.fields["direccion"].label = "Dirección (Avenida, Jirón, Calle)"
+            self.fields["direccion"].widget.attrs["placeholder"] = "Ej: Av. Javier Prado Este 2465, San Borja"
+            self.fields["telefono"].widget.attrs["placeholder"] = "+51 912 345 678"
+
+        if self.pais == "UY":
+            self.fields["estado_usa"].label = "Departamento"
+            self.fields["estado_usa"].empty_label = "Seleccione Departamento"
+            self.fields["ciudad_usa"].label = "Localidad / Ciudad"
+            self.fields["ciudad_usa"].empty_label = "Seleccione Localidad o Ciudad"
+            self.fields["direccion"].label = "Dirección (Calle, número y esquina)"
+            self.fields["direccion"].widget.attrs["placeholder"] = "Ej: Av. 18 de Julio 1234 esq. Yi"
+            self.fields["telefono"].widget.attrs["placeholder"] = "+598 99 123 456"
+
+        if self.pais == "CO":
+            self.fields["estado_usa"].label = "Departamento"
+            self.fields["estado_usa"].empty_label = "Seleccione Departamento"
+            self.fields["ciudad_usa"].label = "Municipio / Ciudad"
+            self.fields["ciudad_usa"].empty_label = "Seleccione Municipio / Ciudad"
+            self.fields["direccion"].label = "Dirección (Nomenclatura vial)"
+            self.fields["direccion"].widget.attrs["placeholder"] = "Ej: Cra. 7 # 71-21, Apto 301"
+            self.fields["telefono"].widget.attrs["placeholder"] = "+57 300 123 4567"
+
+        if self.pais == "CO":
+            self.fields["estado_usa"].label = "Departamento"
+            self.fields["estado_usa"].empty_label = "Seleccione Departamento"
+            self.fields["ciudad_usa"].label = "Municipio / Ciudad"
+            self.fields["ciudad_usa"].empty_label = "Seleccione Municipio / Ciudad"
+            self.fields["direccion"].label = "Dirección (Nomenclatura vial)"
+            self.fields["direccion"].widget.attrs["placeholder"] = "Ej: Cra. 7 # 71-21, Apto 301"
+            self.fields["telefono"].widget.attrs["placeholder"] = "+57 300 123 4567"
 
         if self.pais == "US" and self.language == "en":
             english_labels = {
@@ -228,6 +283,24 @@ class ClienteForm(forms.ModelForm):
             self.fields["estado_usa"].queryset = EstadoUSA.objects.filter(pais=self.pais).order_by(
                 "nombre"
             )
+        if self.pais == "CO":
+            self.fields["estado_usa"].label = "Departamento"
+            self.fields["estado_usa"].empty_label = "Seleccione Departamento"
+            self.fields["ciudad_usa"].label = "Municipio / Ciudad"
+            self.fields["ciudad_usa"].empty_label = "Seleccione Municipio / Ciudad"
+            self.fields["direccion"].label = "Dirección (Nomenclatura vial)"
+            self.fields["direccion"].widget.attrs["placeholder"] = "Ej: Cra. 7 # 71-21, Apto 301"
+            self.fields["telefono"].widget.attrs["placeholder"] = "+57 300 123 4567"
+
+        if self.pais == "CO":
+            self.fields["estado_usa"].label = "Departamento"
+            self.fields["estado_usa"].empty_label = "Seleccione Departamento"
+            self.fields["ciudad_usa"].label = "Municipio / Ciudad"
+            self.fields["ciudad_usa"].empty_label = "Seleccione Municipio / Ciudad"
+            self.fields["direccion"].label = "Dirección (Nomenclatura vial)"
+            self.fields["direccion"].widget.attrs["placeholder"] = "Ej: Cra. 7 # 71-21, Apto 301"
+            self.fields["telefono"].widget.attrs["placeholder"] = "+57 300 123 4567"
+
             if self.pais == "US" and self.language == "en":
                 self.fields["estado_usa"].empty_label = "Select state"
                 self.fields["ciudad_usa"].empty_label = "Select city"
@@ -249,6 +322,12 @@ class ClienteForm(forms.ModelForm):
         else:
             self.fields["ciudad_usa"].queryset = CiudadUSA.objects.none()
 
+        if self.pais == "PE":
+            self.fields["ciudad_usa"].label = "Provincia / Distrito"
+        elif self.pais == "CO":
+            self.fields["ciudad_usa"].label = "Municipio / Ciudad"
+        elif self.pais == "EC":
+            self.fields["ciudad_usa"].label = "Cantón / Ciudad"
         self.fields["ciudad_usa"].widget.attrs["data-selected"] = (
             self.data.get("ciudad_usa")
             or (getattr(self.instance, "ciudad_usa_id", None) if self.instance.pk else None)
@@ -299,6 +378,24 @@ class ClienteForm(forms.ModelForm):
             self.fields["zipcode"].label = etiqueta_codigo
             self.fields["zipcode"].widget.attrs["placeholder"] = etiqueta_codigo
 
+        if self.pais == "CO":
+            self.fields["estado_usa"].label = "Departamento"
+            self.fields["estado_usa"].empty_label = "Seleccione Departamento"
+            self.fields["ciudad_usa"].label = "Municipio / Ciudad"
+            self.fields["ciudad_usa"].empty_label = "Seleccione Municipio / Ciudad"
+            self.fields["direccion"].label = "Dirección (Nomenclatura vial)"
+            self.fields["direccion"].widget.attrs["placeholder"] = "Ej: Cra. 7 # 71-21, Apto 301"
+            self.fields["telefono"].widget.attrs["placeholder"] = "+57 300 123 4567"
+
+        if self.pais == "CO":
+            self.fields["estado_usa"].label = "Departamento"
+            self.fields["estado_usa"].empty_label = "Seleccione Departamento"
+            self.fields["ciudad_usa"].label = "Municipio / Ciudad"
+            self.fields["ciudad_usa"].empty_label = "Seleccione Municipio / Ciudad"
+            self.fields["direccion"].label = "Dirección (Nomenclatura vial)"
+            self.fields["direccion"].widget.attrs["placeholder"] = "Ej: Cra. 7 # 71-21, Apto 301"
+            self.fields["telefono"].widget.attrs["placeholder"] = "+57 300 123 4567"
+
             if self.pais == "US" and self.language == "en":
                 self.fields["estado_usa"].label = "State"
                 self.fields["estado_usa"].empty_label = "Select state"
@@ -306,12 +403,23 @@ class ClienteForm(forms.ModelForm):
                 self.fields["ciudad_usa"].empty_label = "Select city"
                 self.fields["zipcode"].label = "ZIP Code"
                 self.fields["zipcode"].widget.attrs["placeholder"] = "ZIP code"
-        else:
+        elif self.pais == "CL":
             # Chile usa modelo legacy Region/Ciudad
             print("[DEBUG] [ClienteForm] Configurando campos para Chile (Region/Ciudad)")
             self.fields["estado_usa"].widget = forms.HiddenInput()
             self.fields["ciudad_usa"].widget = forms.HiddenInput()
             self.fields["zipcode"].widget = forms.HiddenInput()
+        else:
+            # Internacional (PE, CO, US, etc.): Ocultar campos de Chile
+            self.fields["region"].widget = forms.HiddenInput()
+            self.fields["ciudad"].widget = forms.HiddenInput()
+
+        # Override final localizado para Ecuador
+        if self.pais == "EC":
+            self.fields["estado_usa"].label = "Provincia"
+            self.fields["estado_usa"].empty_label = "Seleccione Provincia"
+            self.fields["ciudad_usa"].label = "Cantón / Ciudad"
+            self.fields["ciudad_usa"].empty_label = "Seleccione Cantón o Ciudad"
 
     def save(self, commit=True):
         obj = super().save(commit=False)

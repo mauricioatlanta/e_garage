@@ -30,6 +30,8 @@ def _route_country(request, fallback=None):
     path = ((getattr(request, "path_info", "") or request.path or "").strip()).lower()
     if path.startswith("/us/"):
         return "US"
+    if path.startswith("/uy/"):
+        return "UY"
     if path.startswith("/cl/"):
         return "CL"
     if path.startswith("/mx/"):
