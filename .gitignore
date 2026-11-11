@@ -183,3 +183,4 @@ seed_datos_mauricio.py
 marketing/Assets/Master/*
 !marketing/Assets/Master/.gitkeep
 .aider*
+backups_reciclaje/
