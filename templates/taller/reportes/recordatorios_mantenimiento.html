@@ -2,7 +2,7 @@
 {% load humanize %}
 {% load role_tags %}
 
-{% block title %}Recordatorios de Mantenimiento{% endblock %}
+{% block title %}{% if request.path|slice:':7' == '/br/pt/' %}Lembretes de Manutenção{% else %}Recordatorios de Mantenimiento{% endif %}{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -307,15 +307,15 @@
 <div class="recordatorios-container">
     <!-- Header -->
     <div class="header-section">
-        <h1>🚨 Recordatorios de Mantenimiento Predictivo</h1>
-        <p>Vehículos que necesitan atención pronto - Contacta proactivamente a tus clientes</p>
+        <h1>{% if request.path|slice:':7' == '/br/pt/' %}🚨 Lembretes de Manutenção Preditiva{% else %}🚨 Recordatorios de Mantenimiento Predictivo{% endif %}</h1>
+        <p>{% if request.path|slice:':7' == '/br/pt/' %}Veículos que precisam de atenção em breve - Entre em contato proativamente com seus clientes{% else %}Vehículos que necesitan atención pronto - Contacta proactivamente a tus clientes{% endif %}</p>
     </div>
 
     <!-- Estadísticas -->
     <div class="stats-grid">
         <div class="stat-card total">
             <div class="stat-value">{{ total_recordatorios }}</div>
-            <div class="stat-label">Total Recordatorios</div>
+            <div class="stat-label">{% if request.path|slice:':7' == '/br/pt/' %}Total de Lembretes{% else %}Total Recordatorios{% endif %}</div>
         </div>
         <div class="stat-card urgente">
             <div class="stat-value">{{ total_urgentes }}</div>
@@ -323,7 +323,7 @@
         </div>
         <div class="stat-card medio">
             <div class="stat-value">{{ total_medios }}</div>
-            <div class="stat-label">Medios</div>
+            <div class="stat-label">{% if request.path|slice:':7' == '/br/pt/' %}Médios{% else %}Medios{% endif %}</div>
         </div>
     </div>
 
@@ -332,7 +332,7 @@
         <form method="get" action="{% url 'reportes:recordatorios_mantenimiento' %}">
             <div class="filters-grid">
                 <div class="filter-group">
-                    <label for="tipo_servicio">Tipo de Servicio</label>
+                    <label for="tipo_servicio">{% if request.path|slice:':7' == '/br/pt/' %}Tipo de Serviço{% else %}Tipo de Servicio{% endif %}</label>
                     <select name="tipo_servicio" id="tipo_servicio">
                         {% for key, config in configuraciones_servicio.items %}
                             <option value="{{ key }}" {% if tipo_servicio_actual == key %}selected{% endif %}>
@@ -342,12 +342,12 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label for="servicio_km">Kilometraje del Servicio</label>
+                    <label for="servicio_km">{% if request.path|slice:':7' == '/br/pt/' %}Quilometragem do Serviço{% else %}Kilometraje del Servicio{% endif %}</label>
                     <input type="number" name="servicio_km" id="servicio_km" 
                            value="{{ config_actual.servicio_km }}" min="1000" step="1000">
                 </div>
                 <div class="filter-group">
-                    <label for="margen_alerta">Margen de Alerta (km)</label>
+                    <label for="margen_alerta">{% if request.path|slice:':7' == '/br/pt/' %}Margem de Alerta (km){% else %}Margen de Alerta (km){% endif %}</label>
                     <input type="number" name="margen_alerta" id="margen_alerta" 
                            value="{{ config_actual.margen_alerta }}" min="100" step="100">
                 </div>
@@ -373,7 +373,7 @@
                             </h3>
                             <p><strong>Cliente:</strong> {{ recordatorio.cliente }}</p>
                             {% if recordatorio.telefono_cliente %}
-                                <p><strong>Teléfono:</strong> {{ recordatorio.telefono_cliente }}</p>
+                                <p><strong>{% if request.path|slice:':7' == '/br/pt/' %}Telefone:{% else %}Teléfono:{% endif %}</strong> {{ recordatorio.telefono_cliente }}</p>
                             {% endif %}
                             {% if recordatorio.email_cliente %}
                                 <p><strong>Email:</strong> {{ recordatorio.email_cliente }}</p>
@@ -387,22 +387,22 @@
                             <div class="detail-value">{{ recordatorio.km_actual|intcomma }} km</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Último Servicio</div>
+                            <div class="detail-label">{% if request.path|slice:':7' == '/br/pt/' %}Último Serviço{% else %}Último Servicio{% endif %}</div>
                             <div class="detail-value">{{ recordatorio.km_ultimo_servicio|intcomma }} km</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Próximo Servicio</div>
+                            <div class="detail-label">{% if request.path|slice:':7' == '/br/pt/' %}Próximo Serviço{% else %}Próximo Servicio{% endif %}</div>
                             <div class="detail-value">{{ recordatorio.km_proximo_servicio|intcomma }} km</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Kilómetros Faltantes</div>
+                            <div class="detail-label">{% if request.path|slice:':7' == '/br/pt/' %}Quilômetros Restantes{% else %}Kilómetros Faltantes{% endif %}</div>
                             <div class="detail-value" style="color: {% if recordatorio.urgencia == 'alta' %}#ef4444{% else %}#f59e0b{% endif %};">
                                 {{ recordatorio.km_faltantes|intcomma }} km
                             </div>
                         </div>
                         {% if recordatorio.fecha_ultimo_servicio %}
                             <div class="detail-item">
-                                <div class="detail-label">Fecha Último Servicio</div>
+                                <div class="detail-label">{% if request.path|slice:':7' == '/br/pt/' %}Data do Último Serviço{% else %}Fecha Último Servicio{% endif %}</div>
                                 <div class="detail-value">{{ recordatorio.fecha_ultimo_servicio|date:"d/m/Y" }}</div>
                             </div>
                         {% endif %}
@@ -435,10 +435,10 @@
     {% else %}
         <div class="empty-state">
             <div class="empty-state-icon">✅</div>
-            <h3>¡Excelente!</h3>
-            <p>No hay vehículos que requieran atención inmediata según los filtros seleccionados.</p>
+            <h3>{% if request.path|slice:':7' == '/br/pt/' %}Excelente!{% else %}¡Excelente!{% endif %}</h3>
+            <p>{% if request.path|slice:':7' == '/br/pt/' %}Não há veículos que exijam atenção imediata de acordo com os filtros selecionados.{% else %}No hay vehículos que requieran atención inmediata según los filtros seleccionados.{% endif %}</p>
             <p style="margin-top: 1rem; color: #6b7280;">
-                <small>Intenta ajustar los filtros para ver más recordatorios.</small>
+                <small>{% if request.path|slice:':7' == '/br/pt/' %}Tente ajustar os filtros para ver mais lembretes.{% else %}Intenta ajustar los filtros para ver más recordatorios.{% endif %}</small>
             </p>
         </div>
     {% endif %}

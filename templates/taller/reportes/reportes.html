@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load role_tags %}
+{% load country_url %}
 {% block extra_head %}
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -17,7 +18,10 @@
   }
 
   /* Header compacto */
-  .reportes-header {
+  .lang-switch-reportes{display:flex;gap:0;background:rgba(0,0,0,.6);border:1px solid rgba(0,230,208,.4);border-radius:999px;padding:3px;margin-left:auto;flex-shrink:0;}
+.lang-switch-reportes a{padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800;color:#bae6fd;text-decoration:none;}
+.lang-switch-reportes a.active{background:#0284c7;color:#fff;}
+.reportes-header {
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -220,25 +224,50 @@
     <div class="reportes-header">
       <span class="header-icon">📊</span>
       <div>
-        <h1>{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Centro de Reportes de Repuestos{% elif tire_reports_mode %}Centro de Reportes de Vulcanización{% elif carwash_reports_mode %}Centro de Reportes de Car Wash{% else %}Centro de Reportes{% endif %}{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Centro de Reportes{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Reports Center{% else %}Centro de Reportes{% endif %}{% endif %}{% endif %}</h1>
-        <p>{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode or tire_reports_mode %}Ventas, servicios, inventario y rentabilidad en tiempo real{% elif carwash_reports_mode %}Servicios, caja, clientes y recurrencia en tiempo real{% else %}Análisis inteligente y visualización de datos{% endif %}{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Análisis inteligente y visualización en tiempo real{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Smart analysis and real-time data visualization{% else %}Análisis inteligente y visualización de datos en tiempo real{% endif %}{% endif %}{% endif %}</p>
+        <h1>{% if language == 'pt' %}Centro de Relatórios{% else %}{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Centro de Reportes de Repuestos{% elif tire_reports_mode %}Centro de Reportes de Vulcanización{% elif carwash_reports_mode %}Centro de Reportes de Car Wash{% else %}Centro de Reportes{% endif %}{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Centro de Reportes{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Reports Center{% else %}Centro de Reportes{% endif %}{% endif %}{% endif %}{% endif %}</h1>
+        <p>{% if language == 'pt' %}Análise inteligente e visualização de dados em tempo real{% else %}{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode or tire_reports_mode %}Ventas, servicios, inventario y rentabilidad en tiempo real{% elif carwash_reports_mode %}Servicios, caja, clientes y recurrencia en tiempo real{% else %}Análisis inteligente y visualización de datos{% endif %}{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Análisis inteligente y visualización en tiempo real{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Smart analysis and real-time data visualization{% else %}Análisis inteligente y visualización de datos en tiempo real{% endif %}{% endif %}{% endif %}{% endif %}</p>
       </div>
+      <div class="lang-switch-reportes">
+        <a href="#" data-switch-lang="en">EN</a>
+        <a href="#" data-switch-lang="es">ES</a>
+      </div>
+      <script>
+      (function(){
+        var path = window.location.pathname;
+        var qs = window.location.search;
+        function target(lang){
+          var parts = path.split('/').filter(Boolean);
+          if(parts.length>=2 && ['en','es','pt'].includes(parts[1])){
+            parts[1]=lang;
+            return '/'+parts.join('/')+'/'+qs;
+          }
+          return path+qs;
+        }
+        document.querySelectorAll('[data-switch-lang]').forEach(function(a){
+          var lang=a.getAttribute('data-switch-lang');
+          a.href=target(lang);
+          var parts=path.split('/').filter(Boolean);
+          var cur=parts.length>=2?parts[1]:'es';
+          if(lang===cur){a.classList.add('active');}
+        });
+      })();
+      </script>
     </div>
 
     <!-- Sección: Destacados -->
     <div class="reportes-section">
       <h2 class="section-title">
         <i class="fas fa-star" style="font-size:0.7rem"></i>
-        {% if request.path|slice:':3' == '/cl' %}Reportes Destacados{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Featured Reports{% else %}Reportes Destacados{% endif %}{% endif %}
+        {% if language == 'pt' %}Relatórios em Destaque{% else %}{% if request.path|slice:':3' == '/cl' %}Reportes Destacados{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Featured Reports{% else %}Reportes Destacados{% endif %}{% endif %}{% endif %}
       </h2>
       <div class="reportes-grid featured-grid">
 
-        {% if request.user|is_owner %}
+        {% if request.user|is_owner and request.path|slice:':4' != '/br/' %}
         <a href="centro-contable-chile/" class="reporte-card featured">
           <div class="reporte-icon">🧮</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Centro Contable{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Accounting Center{% else %}Centro Contable{% endif %}{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Contador virtual, cierre contable{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Virtual accountant, accounting closure{% else %}Contador virtual, cierre contable{% endif %}{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Centro Contábil{% else %}{% if request.path|slice:':3' == '/cl' %}Centro Contable{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Accounting Center{% else %}Centro Contable{% endif %}{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}Contador virtual, fechamento contábil{% else %}{% if request.path|slice:':3' == '/cl' %}Contador virtual, cierre contable{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Virtual accountant, accounting closure{% else %}Contador virtual, cierre contable{% endif %}{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>
@@ -247,8 +276,8 @@
         <a href="inteligencia/" class="reporte-card featured">
           <div class="reporte-icon">🚀</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Inteligencia Operativa{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Operational Intelligence{% else %}Inteligencia Operativa{% endif %}{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}KPIs, IA predictiva, tiempo real{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}KPIs, predictive AI, real-time{% else %}KPIs, IA predictiva, tiempo real{% endif %}{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Inteligência Operacional{% else %}{% if request.path|slice:':3' == '/cl' %}Inteligencia Operativa{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Operational Intelligence{% else %}Inteligencia Operativa{% endif %}{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}KPIs, IA preditiva, tempo real{% else %}{% if request.path|slice:':3' == '/cl' %}KPIs, IA predictiva, tiempo real{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}KPIs, predictive AI, real-time{% else %}KPIs, IA predictiva, tiempo real{% endif %}{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>
@@ -256,8 +285,8 @@
         {% if not parts_reports_mode and not tire_reports_mode %}<a href="mecanicos/" class="reporte-card featured">
           <div class="reporte-icon">🧠</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Reportes por Técnico{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Technician Reports{% else %}Reportes de Técnicos{% endif %}{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Rendimiento individual, proyecciones{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Individual metrics, projections{% else %}Métricas individuales, proyecciones{% endif %}{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Relatórios por Técnico{% else %}{% if request.path|slice:':3' == '/cl' %}Reportes por Técnico{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Technician Reports{% else %}Reportes de Técnicos{% endif %}{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}Métricas individuais, projeções{% else %}{% if request.path|slice:':3' == '/cl' %}Rendimiento individual, proyecciones{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Individual metrics, projections{% else %}Métricas individuales, proyecciones{% endif %}{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>{% endif %}
@@ -265,8 +294,8 @@
         {% if not parts_reports_mode and not tire_reports_mode and not carwash_reports_mode %}<a href="kilometraje/recordatorios/" class="reporte-card featured">
           <div class="reporte-icon">🚨</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Recordatorios{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Maintenance Reminders{% else %}Recordatorios de Mantenimiento{% endif %}{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Vehículos próximos a mantenimiento{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Vehicles due for maintenance{% else %}Vehículos próximos a mantenimiento{% endif %}{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Lembretes de Manutenção{% else %}{% if request.path|slice:':3' == '/cl' %}Recordatorios{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Maintenance Reminders{% else %}Recordatorios de Mantenimiento{% endif %}{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}Veículos próximos da manutenção{% else %}{% if request.path|slice:':3' == '/cl' %}Vehículos próximos a mantenimiento{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Vehicles due for maintenance{% else %}Vehículos próximos a mantenimiento{% endif %}{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>{% endif %}
@@ -278,15 +307,15 @@
     <div class="reportes-section">
       <h2 class="section-title">
         <i class="fas fa-chart-bar" style="font-size:0.7rem"></i>
-        {% if request.path|slice:':3' == '/cl' %}Analytics Avanzados{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Advanced Analytics{% else %}Analítica Avanzada{% endif %}{% endif %}
+        {% if language == 'pt' %}Análises Avançadas{% else %}{% if request.path|slice:':3' == '/cl' %}Analytics Avanzados{% else %}{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Advanced Analytics{% else %}Analítica Avanzada{% endif %}{% endif %}{% endif %}
       </h2>
       <div class="reportes-grid">
 
         {% if not carwash_reports_mode %}<a href="repuestos/" class="reporte-card">
           <div class="reporte-icon">🔩</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Dashboard de Neumáticos{% else %}Dashboard Repuestos{% endif %}{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Panel de Repuestos{% else %}Parts Dashboard{% endif %}{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Medidas, marcas, ventas y stock crítico{% else %}Top ventas, márgenes, stock crítico{% endif %}{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Más vendidos, márgenes, stock crítico{% else %}Top sales, margins, critical stock{% endif %}{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Painel de Peças{% else %}{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Dashboard de Neumáticos{% else %}Dashboard Repuestos{% endif %}{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Panel de Repuestos{% else %}Parts Dashboard{% endif %}{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}Mais vendidos, margens, estoque crítico{% else %}{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Medidas, marcas, ventas y stock crítico{% else %}Top ventas, márgenes, stock crítico{% endif %}{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Más vendidos, márgenes, stock crítico{% else %}Top sales, margins, critical stock{% endif %}{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>{% endif %}
@@ -295,8 +324,8 @@
         <a href="dashboard-rentabilidad/" class="reporte-card">
           <div class="reporte-icon">📈</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Dashboard Rentabilidad{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Panel de Rentabilidad{% else %}Profitability Dashboard{% endif %}{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Rentabilidad y métricas avanzadas{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Rentabilidad y métricas avanzadas{% else %}Profitability and advanced metrics{% endif %}{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Painel de Rentabilidade{% else %}{% if request.path|slice:':3' == '/cl' %}Dashboard Rentabilidad{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Panel de Rentabilidad{% else %}Profitability Dashboard{% endif %}{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}Rentabilidade e métricas avançadas{% else %}{% if request.path|slice:':3' == '/cl' %}Rentabilidad y métricas avanzadas{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Rentabilidad y métricas avanzadas{% else %}Profitability and advanced metrics{% endif %}{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>
@@ -304,8 +333,8 @@
         <a href="rentabilidad/" class="reporte-card">
           <div class="reporte-icon">📊</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Análisis Rentabilidad{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Análisis de Rentabilidad{% else %}Profitability Analysis{% endif %}{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Interno vs. externo, comparativas{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Interno vs. externo, comparaciones{% else %}Internal vs. external, comparisons{% endif %}{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Análise de Rentabilidade{% else %}{% if request.path|slice:':3' == '/cl' %}Análisis Rentabilidad{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Análisis de Rentabilidad{% else %}Profitability Analysis{% endif %}{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}Interno vs. externo, comparações{% else %}{% if request.path|slice:':3' == '/cl' %}Interno vs. externo, comparativas{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Interno vs. externo, comparaciones{% else %}Internal vs. external, comparisons{% endif %}{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>
@@ -313,8 +342,8 @@
         {% if not parts_reports_mode and not carwash_reports_mode %}<a href="comparativo-precios/" class="reporte-card">
           <div class="reporte-icon">💰</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Comparativo Precios{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Comparación de Precios{% else %}Price Comparison{% endif %}{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Precio cliente vs. costo proveedor{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Precio cliente vs. costo proveedor{% else %}Customer price vs. supplier cost{% endif %}{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Comparação de Preços{% else %}{% if request.path|slice:':3' == '/cl' %}Comparativo Precios{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Comparación de Precios{% else %}Price Comparison{% endif %}{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}Preço ao cliente vs. custo do fornecedor{% else %}{% if request.path|slice:':3' == '/cl' %}Precio cliente vs. costo proveedor{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Precio cliente vs. costo proveedor{% else %}Customer price vs. supplier cost{% endif %}{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>{% endif %}
@@ -322,8 +351,8 @@
         {% if not parts_reports_mode and not tire_reports_mode %}<a href="servicios-subcontratados/" class="reporte-card">
           <div class="reporte-icon">🔧</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Servicios Subcontratados{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Servicios Externos{% else %}Outsourced Services{% endif %}{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Externos frecuentes, tendencias{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Externos frecuentes, tendencias{% else %}Frequent external, trends{% endif %}{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Serviços Terceirizados{% else %}{% if request.path|slice:':3' == '/cl' %}Servicios Subcontratados{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Servicios Externos{% else %}Outsourced Services{% endif %}{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}Serviços externos frequentes, tendências{% else %}{% if request.path|slice:':3' == '/cl' %}Externos frecuentes, tendencias{% else %}{% if "/es/" in request.path or LANGUAGE_CODE == "es" and "/en/" not in request.path %}Externos frecuentes, tendencias{% else %}Frequent external, trends{% endif %}{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>{% endif %}
@@ -336,15 +365,15 @@
     <div class="reportes-section">
       <h2 class="section-title">
         <i class="fas fa-file-alt" style="font-size:0.7rem"></i>
-        {% if request.path|slice:':3' == '/cl' %}Reportes Básicos{% else %}Basic Reports{% endif %}
+        {% if language == 'pt' %}Relatórios Básicos{% else %}{% if request.path|slice:':3' == '/cl' %}Reportes Básicos{% else %}Basic Reports{% endif %}{% endif %}
       </h2>
       <div class="reportes-grid">
 
         {% if not parts_reports_mode %}<a href="servicios/" class="reporte-card">
           <div class="reporte-icon">🛠️</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Servicios de Vulcanización{% elif carwash_reports_mode %}Servicios de Car Wash{% else %}Servicios Realizados{% endif %}{% else %}Services Performed{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Montaje, balanceo, parches y rotación{% elif carwash_reports_mode %}Lavados, pulidos y servicios más solicitados{% else %}Ingresos, frecuencia, tipos más solicitados{% endif %}{% else %}Revenue, frequency, most requested{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Serviços Realizados{% else %}{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Servicios de Vulcanización{% elif carwash_reports_mode %}Servicios de Car Wash{% else %}Servicios Realizados{% endif %}{% else %}Services Performed{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}Receita, frequência, mais solicitados{% else %}{% if request.path|slice:':3' == '/cl' %}{% if tire_reports_mode %}Montaje, balanceo, parches y rotación{% elif carwash_reports_mode %}Lavados, pulidos y servicios más solicitados{% else %}Ingresos, frecuencia, tipos más solicitados{% endif %}{% else %}Revenue, frequency, most requested{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>{% endif %}
@@ -352,17 +381,17 @@
         {% if not parts_reports_mode %}<a href="servicios/?enfoque=vehiculos" class="reporte-card">
           <div class="reporte-icon">🚗</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Vehículos Atendidos{% else %}Vehicles Serviced{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Modelos, marcas, años frecuentes{% else %}Models, brands, frequent years{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Veículos Atendidos{% else %}{% if request.path|slice:':3' == '/cl' %}Vehículos Atendidos{% else %}Vehicles Serviced{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}Modelos, marcas, anos frequentes{% else %}{% if request.path|slice:':3' == '/cl' %}Modelos, marcas, años frecuentes{% else %}Models, brands, frequent years{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>{% endif %}
 
-        <a href="{% if parts_reports_mode or carwash_reports_mode %}../clientes/{% else %}servicios/?enfoque=clientes{% endif %}" class="reporte-card">
+        <a href="{% country_url 'clientes:lista_clientes' %}" class="reporte-card">
           <div class="reporte-icon">👤</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Clientes y compradores{% elif carwash_reports_mode %}Clientes y recurrencia{% else %}Clientes{% endif %}{% else %}Customers{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Compradores activos y recurrencia{% elif carwash_reports_mode %}Clientes nuevos, frecuentes e inactivos{% else %}Activos, nuevos, históricos, recurrencia{% endif %}{% else %}Active, new, historical, recurrence{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Clientes{% else %}{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Clientes y compradores{% elif carwash_reports_mode %}Clientes y recurrencia{% else %}Clientes{% endif %}{% else %}Customers{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}Ativos, novos, histórico, recorrência{% else %}{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Compradores activos y recurrencia{% elif carwash_reports_mode %}Clientes nuevos, frecuentes e inactivos{% else %}Activos, nuevos, históricos, recurrencia{% endif %}{% else %}Active, new, historical, recurrence{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>
@@ -370,8 +399,8 @@
         <a href="{% if parts_reports_mode %}../documentos/?tipo=PTS{% else %}servicios/?enfoque=facturacion_total{% endif %}" class="reporte-card">
           <div class="reporte-icon">💸</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Ventas y facturación{% elif carwash_reports_mode %}Caja y facturación{% else %}Facturación{% endif %}{% else %}Billing{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Ingresos por periodo y venta{% elif carwash_reports_mode %}Ingresos por lavado, servicio y cliente{% else %}Ingresos por periodo, servicio y cliente{% endif %}{% else %}Revenue by period, service, customer{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Faturamento{% else %}{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Ventas y facturación{% elif carwash_reports_mode %}Caja y facturación{% else %}Facturación{% endif %}{% else %}Billing{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}Receita por período, serviço, cliente{% else %}{% if request.path|slice:':3' == '/cl' %}{% if parts_reports_mode %}Ingresos por periodo y venta{% elif carwash_reports_mode %}Ingresos por lavado, servicio y cliente{% else %}Ingresos por periodo, servicio y cliente{% endif %}{% else %}Revenue by period, service, customer{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>
@@ -379,8 +408,8 @@
         {% if not parts_reports_mode and not tire_reports_mode %}<a href="servicios/?enfoque=agenda" class="reporte-card">
           <div class="reporte-icon">📅</div>
           <div class="reporte-text">
-            <div class="reporte-title">{% if request.path|slice:':3' == '/cl' %}Agenda y Turnos{% else %}Schedule & Appointments{% endif %}</div>
-            <div class="reporte-desc">{% if request.path|slice:':3' == '/cl' %}Historial, ocupación, eficiencia{% else %}History, occupancy, efficiency{% endif %}</div>
+            <div class="reporte-title">{% if language == 'pt' %}Agenda e Agendamentos{% else %}{% if request.path|slice:':3' == '/cl' %}Agenda y Turnos{% else %}Schedule & Appointments{% endif %}{% endif %}</div>
+            <div class="reporte-desc">{% if language == 'pt' %}Histórico, ocupação, eficiência{% else %}{% if request.path|slice:':3' == '/cl' %}Historial, ocupación, eficiencia{% else %}History, occupancy, efficiency{% endif %}{% endif %}</div>
           </div>
           <i class="fas fa-chevron-right reporte-arrow"></i>
         </a>{% endif %}

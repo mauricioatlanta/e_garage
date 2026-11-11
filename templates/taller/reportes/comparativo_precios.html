@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}Comparativo de Precios{% endblock %}
+{% block title %}{% if request.path|slice:':7' == '/br/pt/' %}Comparativo de Preços{% else %}Comparativo de Precios{% endif %}{% endblock %}
 
 {% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -16,16 +16,16 @@
     <div class="flex items-center gap-3 mb-1">
       <div class="w-1 h-8 bg-cyan-500 rounded-full"></div>
       <h1 class="text-2xl font-bold text-cyan-200" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;">
-        Comparativo de Precios
+        {% if request.path|slice:':7' == '/br/pt/' %}Comparativo de Preços{% else %}Comparativo de Precios{% endif %}
       </h1>
     </div>
-    <p class="text-gray-400 text-sm ml-4 pl-4 border-l border-gray-700">Análisis de márgenes y rentabilidad por servicio</p>
+    <p class="text-gray-400 text-sm ml-4 pl-4 border-l border-gray-700">{% if request.path|slice:':7' == '/br/pt/' %}Análise de margens e rentabilidade por serviço{% else %}Análisis de márgenes y rentabilidad por servicio{% endif %}</p>
   </div>
 
   <!-- Alerta márgenes bajos -->
   {% if margenes_bajos %}
   <div class="mb-6 p-4 bg-red-900/20 border border-red-700/40 rounded-lg">
-    <p class="text-sm font-semibold text-red-300 mb-2">Servicios con margen crítico (&lt; 20%)</p>
+    <p class="text-sm font-semibold text-red-300 mb-2">{% if request.path|slice:':7' == '/br/pt/' %}Serviços com margem crítica (&lt; 20%){% else %}Servicios con margen crítico (&lt; 20%){% endif %}</p>
     <ul class="space-y-1">
       {% for servicio in margenes_bajos %}
       <li class="text-sm text-gray-300 flex items-center gap-2">
@@ -41,7 +41,7 @@
   <!-- Gráfico evolución mensual -->
   {% if evolucion_mensual %}
   <div class="panel-card mb-6">
-    <h2 class="panel-title">Evolución Temporal de Márgenes</h2>
+    <h2 class="panel-title">{% if request.path|slice:':7' == '/br/pt/' %}Evolução Temporal das Margens{% else %}Evolución Temporal de Márgenes{% endif %}</h2>
     <div style="position: relative; height: 280px;">
       <canvas id="chartEvolucion"></canvas>
     </div>
@@ -50,7 +50,7 @@
 
   <!-- Gráfico scatter principal -->
   <div class="panel-card mb-6">
-    <h2 class="panel-title">Matriz Precio vs. Costo</h2>
+    <h2 class="panel-title">{% if request.path|slice:':7' == '/br/pt/' %}Matriz Preço vs. Custo{% else %}Matriz Precio vs. Costo{% endif %}</h2>
     <div style="position: relative; height: 340px;">
       <canvas id="chartComparativo"></canvas>
     </div>
@@ -58,18 +58,18 @@
 
   <!-- Tabla análisis detallado -->
   <div class="panel-card mb-6">
-    <h2 class="panel-title">Análisis Detallado de Servicios</h2>
+    <h2 class="panel-title">{% if request.path|slice:':7' == '/br/pt/' %}Análise Detalhada de Serviços{% else %}Análisis Detallado de Servicios{% endif %}</h2>
     <div class="overflow-x-auto">
       <table class="data-table">
         <thead>
           <tr>
-            <th>Servicio</th>
-            <th class="text-center">Cantidad</th>
-            <th class="text-right">Precio Prom.</th>
-            <th class="text-right">Costo Prom.</th>
-            <th class="text-center">Margen %</th>
-            <th class="text-right">Ganancia</th>
-            <th class="text-center">Estado</th>
+            <th>{% if request.path|slice:':7' == '/br/pt/' %}Serviço{% else %}Servicio{% endif %}</th>
+            <th class="text-center">{% if request.path|slice:':7' == '/br/pt/' %}Quantidade{% else %}Cantidad{% endif %}</th>
+            <th class="text-right">{% if request.path|slice:':7' == '/br/pt/' %}Preço Médio{% else %}Precio Prom.{% endif %}</th>
+            <th class="text-right">{% if request.path|slice:':7' == '/br/pt/' %}Custo Médio{% else %}Costo Prom.{% endif %}</th>
+            <th class="text-center">{% if request.path|slice:':7' == '/br/pt/' %}Margem %{% else %}Margen %{% endif %}</th>
+            <th class="text-right">{% if request.path|slice:':7' == '/br/pt/' %}Lucro{% else %}Ganancia{% endif %}</th>
+            <th class="text-center">{% if request.path|slice:':7' == '/br/pt/' %}Situação{% else %}Estado{% endif %}</th>
           </tr>
         </thead>
         <tbody>
@@ -102,7 +102,7 @@
             </td>
           </tr>
           {% empty %}
-          <tr><td colspan="7" class="text-center text-gray-500 py-6">No hay datos de servicios subcontratados.</td></tr>
+          <tr><td colspan="7" class="text-center text-gray-500 py-6">{% if request.path|slice:':7' == '/br/pt/' %}Não há dados de serviços terceirizados.{% else %}No hay datos de servicios subcontratados.{% endif %}</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -113,7 +113,7 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
     <div class="panel-card">
-      <h2 class="panel-title">Recomendaciones Estratégicas</h2>
+      <h2 class="panel-title">{% if request.path|slice:':7' == '/br/pt/' %}Recomendações Estratégicas{% else %}Recomendaciones Estratégicas{% endif %}</h2>
       <ul class="space-y-2 mt-2">
         <li class="flex items-start gap-2 text-sm text-gray-300">
           <span class="text-cyan-400 mt-0.5">›</span>Mantener margen mínimo del 20%
@@ -131,14 +131,14 @@
     </div>
 
     <div class="panel-card">
-      <h2 class="panel-title">Métricas Generales</h2>
+      <h2 class="panel-title">{% if request.path|slice:':7' == '/br/pt/' %}Métricas Gerais{% else %}Métricas Generales{% endif %}</h2>
       <div class="grid grid-cols-2 gap-4 mt-2">
         <div class="resumen-card border-l-4 border-cyan-600/60">
-          <p class="resumen-label">Total Servicios</p>
+          <p class="resumen-label">{% if request.path|slice:':7' == '/br/pt/' %}Total de Serviços{% else %}Total Servicios{% endif %}</p>
           <p class="resumen-value text-cyan-300">{{ analisis_servicios|length }}</p>
         </div>
         <div class="resumen-card border-l-4 border-red-600/60">
-          <p class="resumen-label">Servicios Críticos</p>
+          <p class="resumen-label">{% if request.path|slice:':7' == '/br/pt/' %}Serviços Críticos{% else %}Servicios Críticos{% endif %}</p>
           <p class="resumen-value text-red-300">{{ margenes_bajos|length }}</p>
         </div>
       </div>
@@ -238,7 +238,7 @@
     type: 'scatter',
     data: {
       datasets: [{
-        label: 'Servicios',
+        label: '{% if request.path|slice:':7' == '/br/pt/' %}Serviços{% else %}Servicios{% endif %}',
         data: [
           {% for s in analisis_servicios %}
           { x: {{ s.costo_promedio }}, y: {{ s.precio_promedio }}, label: '{{ s.nombre|truncatechars:25 }}' }{% if not forloop.last %},{% endif %}
@@ -258,7 +258,7 @@
         pointRadius: 8,
         pointHoverRadius: 11,
       }, {
-        label: 'Equilibrio (sin ganancia)',
+        label: '{% if request.path|slice:':7' == '/br/pt/' %}Equilíbrio (sem lucro){% else %}Equilibrio (sin ganancia){% endif %}',
         data: [
           {x:0,y:0},
           {x: Math.max(0, {% for s in analisis_servicios %}{{ s.precio_promedio }}{% if not forloop.last %},{% endif %}{% endfor %}, 1),
@@ -271,7 +271,7 @@
         pointRadius: 0,
         fill: false,
       }, {
-        label: 'Margen óptimo (30%)',
+        label: '{% if request.path|slice:':7' == '/br/pt/' %}Margem ótima (30%){% else %}Margen óptimo (30%){% endif %}',
         data: [
           {x:0,y:0},
           {x: Math.max(0, {% for s in analisis_servicios %}{{ s.costo_promedio }}{% if not forloop.last %},{% endif %}{% endfor %}, 1),
@@ -317,7 +317,7 @@
           border: { color: '#1e293b' }
         },
         y: {
-          title: { display: true, text: 'Precio Cliente ($)', color: tickColor, font: { size: 12 } },
+          title: { display: true, text: '{% if request.path|slice:':7' == '/br/pt/' %}Preço ao Cliente (R$){% else %}Precio Cliente ($){% endif %}', color: tickColor, font: { size: 12 } },
           ticks: { color: tickColor, font: { size: 11 }, callback: v => '$' + v.toLocaleString() },
           grid: { color: gridColor },
           border: { color: '#1e293b' }

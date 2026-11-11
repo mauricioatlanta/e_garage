@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}Dashboard de Rentabilidad{% endblock %}
+{% block title %}{% if request.path|slice:':7' == '/br/pt/' %}Painel de Rentabilidade{% else %}Dashboard de Rentabilidad{% endif %}{% endblock %}
 
 {% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -16,28 +16,28 @@
     <div class="flex items-center gap-3 mb-1">
       <div class="w-1 h-8 bg-cyan-500 rounded-full"></div>
       <h1 class="text-2xl font-bold text-cyan-200" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;">
-        Dashboard de Rentabilidad
+        {% if request.path|slice:':7' == '/br/pt/' %}Painel de Rentabilidade{% else %}Dashboard de Rentabilidad{% endif %}
       </h1>
     </div>
-    <p class="text-gray-400 text-sm ml-4 pl-4 border-l border-gray-700">Análisis completo de rentabilidad y servicios subcontratados</p>
+    <p class="text-gray-400 text-sm ml-4 pl-4 border-l border-gray-700">{% if request.path|slice:':7' == '/br/pt/' %}Análise completa de rentabilidade e serviços terceirizados{% else %}Análisis completo de rentabilidad y servicios subcontratados{% endif %}</p>
   </div>
 
   <!-- KPIs -->
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
     <div class="resumen-card border-l-4 border-cyan-600/60">
-      <p class="resumen-label">Total Facturado</p>
+      <p class="resumen-label">{% if request.path|slice:':7' == '/br/pt/' %}Total Faturado{% else %}Total Facturado{% endif %}</p>
       <p class="resumen-value text-cyan-300">{{ total_facturado|formatear_pesos_compacto }}</p>
     </div>
     <div class="resumen-card border-l-4 border-red-600/60">
-      <p class="resumen-label">Costos Externos</p>
+      <p class="resumen-label">{% if request.path|slice:':7' == '/br/pt/' %}Custos Externos{% else %}Costos Externos{% endif %}</p>
       <p class="resumen-value text-red-300">{{ costos_externos|formatear_pesos_compacto }}</p>
     </div>
     <div class="resumen-card border-l-4 border-green-600/60">
-      <p class="resumen-label">Ganancia Neta</p>
+      <p class="resumen-label">{% if request.path|slice:':7' == '/br/pt/' %}Lucro Líquido{% else %}Ganancia Neta{% endif %}</p>
       <p class="resumen-value text-green-300">{{ ganancia_neta|formatear_pesos_compacto }}</p>
     </div>
     <div class="resumen-card border-l-4 border-amber-600/60">
-      <p class="resumen-label">Margen General</p>
+      <p class="resumen-label">{% if request.path|slice:':7' == '/br/pt/' %}Margem Geral{% else %}Margen General{% endif %}</p>
       <p class="resumen-value text-amber-300">{{ margen_general }}%</p>
     </div>
   </div>
@@ -46,23 +46,23 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
     <div class="panel-card">
-      <h2 class="panel-title">Distribución de Ingresos</h2>
+      <h2 class="panel-title">{% if request.path|slice:':7' == '/br/pt/' %}Distribuição da Receita{% else %}Distribución de Ingresos{% endif %}</h2>
       <div style="position: relative; height: 280px;">
         <canvas id="chartIngresos"></canvas>
       </div>
     </div>
 
     <div class="panel-card">
-      <h2 class="panel-title">Métricas Clave</h2>
+      <h2 class="panel-title">{% if request.path|slice:':7' == '/br/pt/' %}Métricas-Chave{% else %}Métricas Clave{% endif %}</h2>
       <div class="space-y-3 mt-2">
 
         <div class="metric-row border-l-4 border-cyan-600/60">
-          <p class="text-xs text-gray-500 uppercase tracking-wider mb-0.5">Servicios Internos</p>
+          <p class="text-xs text-gray-500 uppercase tracking-wider mb-0.5">{% if request.path|slice:':7' == '/br/pt/' %}Serviços Internos{% else %}Servicios Internos{% endif %}</p>
           <p class="text-white font-semibold">{{ ingresos_internos|formatear_pesos }}</p>
         </div>
 
         <div class="metric-row border-l-4 border-blue-600/60">
-          <p class="text-xs text-gray-500 uppercase tracking-wider mb-0.5">Servicios Externos</p>
+          <p class="text-xs text-gray-500 uppercase tracking-wider mb-0.5">{% if request.path|slice:':7' == '/br/pt/' %}Serviços Externos{% else %}Servicios Externos{% endif %}</p>
           <p class="text-white font-semibold">{{ ingresos_externos|formatear_pesos }}
             <span class="text-gray-500 text-xs font-normal ml-1">Margen prom. {{ margen_general }}%</span>
           </p>
@@ -70,7 +70,7 @@
 
         {% if mejor_proveedor %}
         <div class="metric-row border-l-4 border-green-600/60">
-          <p class="text-xs text-gray-500 uppercase tracking-wider mb-0.5">Mejor Proveedor</p>
+          <p class="text-xs text-gray-500 uppercase tracking-wider mb-0.5">{% if request.path|slice:':7' == '/br/pt/' %}Melhor Fornecedor{% else %}Mejor Proveedor{% endif %}</p>
           <p class="text-green-300 font-semibold">{{ mejor_proveedor.empresa_externa }}
             <span class="text-gray-500 text-xs font-normal ml-1">{{ mejor_proveedor.margen_promedio|floatformat:1 }}% margen</span>
           </p>
@@ -79,7 +79,7 @@
 
         {% if peor_proveedor %}
         <div class="metric-row border-l-4 border-amber-600/60">
-          <p class="text-xs text-gray-500 uppercase tracking-wider mb-0.5">Revisar Proveedor</p>
+          <p class="text-xs text-gray-500 uppercase tracking-wider mb-0.5">{% if request.path|slice:':7' == '/br/pt/' %}Revisar Fornecedor{% else %}Revisar Proveedor{% endif %}</p>
           <p class="text-amber-300 font-semibold">{{ peor_proveedor.empresa_externa }}
             <span class="text-gray-500 text-xs font-normal ml-1">{{ peor_proveedor.margen_promedio|floatformat:1 }}% margen</span>
           </p>
@@ -93,31 +93,31 @@
 
   <!-- Reportes detallados -->
   <div class="panel-card">
-    <h2 class="panel-title">Reportes Detallados</h2>
+    <h2 class="panel-title">{% if request.path|slice:':7' == '/br/pt/' %}Relatórios Detalhados{% else %}Reportes Detallados{% endif %}</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
       <a href="{% url 'reportes:reportes_rentabilidad' %}"
          class="nav-report-link">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-2 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
         </svg>
-        <span class="font-semibold text-gray-200 block">Análisis de Rentabilidad</span>
-        <span class="text-xs text-gray-500 mt-1 block">Rentabilidad por tipo de servicio y proveedor</span>
+        <span class="font-semibold text-gray-200 block">{% if request.path|slice:':7' == '/br/pt/' %}Análise de Rentabilidade{% else %}Análisis de Rentabilidad{% endif %}</span>
+        <span class="text-xs text-gray-500 mt-1 block">{% if request.path|slice:':7' == '/br/pt/' %}Rentabilidade por tipo de serviço e fornecedor{% else %}Rentabilidad por tipo de servicio y proveedor{% endif %}</span>
       </a>
       <a href="{% url 'reportes:reporte_comparativo_precios' %}"
          class="nav-report-link">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-2 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
         </svg>
-        <span class="font-semibold text-gray-200 block">Comparativo de Precios</span>
-        <span class="text-xs text-gray-500 mt-1 block">Precio cliente vs. costo proveedor</span>
+        <span class="font-semibold text-gray-200 block">{% if request.path|slice:':7' == '/br/pt/' %}Comparativo de Preços{% else %}Comparativo de Precios{% endif %}</span>
+        <span class="text-xs text-gray-500 mt-1 block">{% if request.path|slice:':7' == '/br/pt/' %}Preço ao cliente vs. custo do fornecedor{% else %}Precio cliente vs. costo proveedor{% endif %}</span>
       </a>
       <a href="{% url 'reportes:reporte_servicios_subcontratados' %}"
          class="nav-report-link">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
-        <span class="font-semibold text-gray-200 block">Servicios Subcontratados</span>
-        <span class="text-xs text-gray-500 mt-1 block">Análisis de servicios externos más frecuentes</span>
+        <span class="font-semibold text-gray-200 block">{% if request.path|slice:':7' == '/br/pt/' %}Serviços Terceirizados{% else %}Servicios Subcontratados{% endif %}</span>
+        <span class="text-xs text-gray-500 mt-1 block">{% if request.path|slice:':7' == '/br/pt/' %}Análise dos serviços externos mais frequentes{% else %}Análisis de servicios externos más frecuentes{% endif %}</span>
       </a>
     </div>
   </div>

@@ -163,6 +163,18 @@ def _path_country_code(path):
 
 @login_required_default
 def reportes_dashboard(request):
+    # FIX: idioma y pais desde URL primero: /us/en/ -> US+en, /cl/es/ -> CL+es
+    # Antes no se pasaba language, por eso el template siempre caia en /cl -> español
+    try:
+        from django.utils.translation import activate as _activate
+        parts = [x for x in (request.path or '').split('/') if x]
+        country_code = parts[0].upper() if parts else 'CL'
+        language = parts[1] if len(parts) >= 2 and parts[1] in ('en','es','pt') else ('en' if country_code == 'US' else 'es')
+        _activate(language)
+        request.LANGUAGE_CODE = language
+    except Exception:
+        country_code = 'CL'
+        language = 'es'
     empresa = _active_empresa_reportes(request)
     config = getattr(empresa, "config", None) if empresa else None
     configured_rubros = []
@@ -182,6 +194,8 @@ def reportes_dashboard(request):
         request,
         "taller/reportes/reportes.html",
         {
+            "country_code": country_code,
+            "language": language,
             "parts_reports_mode": parts_reports_mode,
             "tire_reports_mode": tire_reports_mode,
             "carwash_reports_mode": carwash_reports_mode,

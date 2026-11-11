@@ -15,7 +15,7 @@
         --neural-bg: #0a0a0f;
         --matrix-green: #39ff14;
                       <select name="tecnico_id" id="tecnico_id" class="filter-input w-full">
-                        <option value="todos" {% if mecanico_seleccionado == 'todos' %}selected{% endif %}>📊 Todos los técnicos</option>
+                        <option value="todos" {% if mecanico_seleccionado == 'todos' %}selected{% endif %}>{% if request.path|slice:':7' == '/br/pt/' %}📊 Todos os técnicos{% else %}📊 Todos los técnicos{% endif %}</option>
                         {% for mecanico in todos_mecanicos %}
                             <option value="{{ mecanico.id }}" {% if mecanico_seleccionado == mecanico.id|stringformat:"s" %}selected{% endif %}>
                                 🔧 {{ mecanico.nombre }}
@@ -1299,8 +1299,8 @@
 
     <!-- Header AI-powered -->
     <div class="ai-header">
-        <h1 class="ai-title">🧠 REPORTES POR TÉCNICO</h1>
-        <p class="ai-subtitle">Análisis inteligente de rendimiento con IA predictiva</p>
+        <h1 class="ai-title">{% if request.path|slice:':7' == '/br/pt/' %}🧠 RELATÓRIOS POR TÉCNICO{% else %}🧠 REPORTES POR TÉCNICO{% endif %}</h1>
+        <p class="ai-subtitle">{% if request.path|slice:':7' == '/br/pt/' %}Análise inteligente de desempenho com IA preditiva{% else %}Análisis inteligente de rendimiento con IA predictiva{% endif %}</p>
     </div>
 
     <!-- Filtros futuristas -->
@@ -1308,25 +1308,25 @@
         <form method="GET" action=".">
             <div class="filter-group">
                 <div>
-                    <label for="fecha_desde" class="block text-sm font-medium mb-2 text-ai-glow">📅 Desde</label>
+                    <label for="fecha_desde" class="block text-sm font-medium mb-2 text-ai-glow">{% if request.path|slice:':7' == '/br/pt/' %}📅 De{% else %}📅 Desde{% endif %}</label>
                     <input type="date" id="fecha_desde" name="fecha_desde"
                            value="{{ fecha_desde }}" class="filter-input w-full">
                 </div>
                 <div>
-                    <label for="fecha_hasta" class="block text-sm font-medium mb-2 text-ai-glow">📅 Hasta</label>
+                    <label for="fecha_hasta" class="block text-sm font-medium mb-2 text-ai-glow">{% if request.path|slice:':7' == '/br/pt/' %}📅 Até{% else %}📅 Hasta{% endif %}</label>
                     <input type="date" id="fecha_hasta" name="fecha_hasta"
                            value="{{ fecha_hasta }}" class="filter-input w-full">
                 </div>
                 <div>
                     <label for="tecnico_id" class="block text-sm font-medium mb-2 text-ai-glow">🔧 Técnico</label>
                     <select name="tecnico_id" id="tecnico_id" class="filter-input w-full" style="color: black; background-color: white;">
-                        <option value="todos" {% if tecnico_seleccionado == 'todos' %}selected{% endif %}>📊 Todos los técnicos</option>
+                        <option value="todos" {% if tecnico_seleccionado == 'todos' %}selected{% endif %}>{% if request.path|slice:':7' == '/br/pt/' %}📊 Todos os técnicos{% else %}📊 Todos los técnicos{% endif %}</option>
                         {% for mecanico in todos_mecanicos %}
                             <option value="{{ mecanico.id }}" {% if tecnico_seleccionado == mecanico.id|stringformat:"s" %}selected{% endif %}>
                                 🔧 {{ mecanico.nombre }}
                             </option>
                         {% empty %}
-                            <option value="">No hay técnicos disponibles</option>
+                            <option value="">{% if request.path|slice:':7' == '/br/pt/' %}Não há técnicos disponíveis{% else %}No hay técnicos disponibles{% endif %}</option>
                         {% endfor %}
                         <!-- Debug: Agregar opciones estáticas para verificar -->
                         <option value="test1">Test Técnico 1</option>
@@ -1334,7 +1334,7 @@
                     </select>
                 </div>
                 <div>
-                    <button type="submit" class="ai-button w-full">🚀 ANALIZAR</button>
+                    <button type="submit" class="ai-button w-full">{% if request.path|slice:':7' == '/br/pt/' %}🚀 ANALISAR{% else %}🚀 ANALIZAR{% endif %}</button>
                 </div>
             </div>
         </form>
@@ -1345,29 +1345,29 @@
         <div class="metric-card floating">
             <div class="metric-icon">📋</div>
             <div class="metric-value">{{ total_documentos }}</div>
-            <div class="metric-label">Documentos Totales</div>
+            <div class="metric-label">{% if request.path|slice:':7' == '/br/pt/' %}Documentos Totais{% else %}Documentos Totales{% endif %}</div>
         </div>
         <div class="metric-card floating" style="animation-delay: 0.5s;">
             <div class="metric-icon">💰</div>
             <div class="metric-value">{{ total_generado|formatear_pesos }}</div>
-            <div class="metric-label">Total Generado</div>
+            <div class="metric-label">{% if request.path|slice:':7' == '/br/pt/' %}Total Gerado{% else %}Total Generado{% endif %}</div>
         </div>
         <div class="metric-card floating" style="animation-delay: 1s;">
             <div class="metric-icon">📊</div>
             <div class="metric-value">{{ promedio_por_documento|formatear_pesos }}</div>
-            <div class="metric-label">Promedio por Documento</div>
+            <div class="metric-label">{% if request.path|slice:':7' == '/br/pt/' %}Média por Documento{% else %}Promedio por Documento{% endif %}</div>
         </div>
         <div class="metric-card floating" style="animation-delay: 1.5s;">
             <div class="metric-icon">⚡</div>
             <div class="metric-value">{{ servicios_frecuentes|length }}</div>
-            <div class="metric-label">Servicios Activos</div>
+            <div class="metric-label">{% if request.path|slice:':7' == '/br/pt/' %}Serviços Ativos{% else %}Servicios Activos{% endif %}</div>
         </div>
     </div>
 
     <!-- IA Insights Panel -->
     {% if ia_insights %}
     <div class="ia-insights">
-        <h2 class="insights-title">🧠 ANÁLISIS INTELIGENTE</h2>
+        <h2 class="insights-title">{% if request.path|slice:':7' == '/br/pt/' %}🧠 ANÁLISE INTELIGENTE{% else %}🧠 ANÁLISIS INTELIGENTE{% endif %}</h2>
 
         {% if ia_insights.predicciones %}
         <div class="insight-category">
@@ -1419,23 +1419,23 @@
     <!-- Gráficos Inteligentes -->
     <div class="charts-grid">
         <div class="chart-container">
-            <h3 class="chart-title">📊 Rendimiento por Técnico</h3>
+            <h3 class="chart-title">{% if request.path|slice:':7' == '/br/pt/' %}📊 Desempenho por Técnico{% else %}📊 Rendimiento por Técnico{% endif %}</h3>
             <div id="noDataMecanicos" class="no-data-message" style="display: none;">
                 <div class="quantum-alert">
                     <i class="fas fa-chart-bar"></i>
-                    <p>No hay datos de técnicos en el período seleccionado</p>
-                    <small>Asigne técnicos a los documentos para ver estadísticas</small>
+                    <p>{% if request.path|slice:':7' == '/br/pt/' %}Não há dados de técnicos no período selecionado{% else %}No hay datos de técnicos en el período seleccionado{% endif %}</p>
+                    <small>{% if request.path|slice:':7' == '/br/pt/' %}Atribua técnicos aos documentos para ver estatísticas{% else %}Asigne técnicos a los documentos para ver estadísticas{% endif %}</small>
                 </div>
             </div>
             <canvas id="chartMecanicos" width="400" height="300"></canvas>
         </div>
         <div class="chart-container">
-            <h3 class="chart-title">📈 Evolución del Período</h3>
+            <h3 class="chart-title">{% if request.path|slice:':7' == '/br/pt/' %}📈 Evolução do Período{% else %}📈 Evolución del Período{% endif %}</h3>
             <div id="noDataEvolucion" class="no-data-message" style="display: none;">
                 <div class="quantum-alert">
                     <i class="fas fa-chart-line"></i>
-                    <p>Sin actividad en el período seleccionado</p>
-                    <small>Registre servicios para visualizar tendencias</small>
+                    <p>{% if request.path|slice:':7' == '/br/pt/' %}Sem atividade no período selecionado{% else %}Sin actividad en el período seleccionado{% endif %}</p>
+                    <small>{% if request.path|slice:':7' == '/br/pt/' %}Registre serviços para visualizar tendências{% else %}Registre servicios para visualizar tendencias{% endif %}</small>
                 </div>
             </div>
             <canvas id="chartEvolucion" width="400" height="300"></canvas>
@@ -1445,7 +1445,7 @@
     <!-- Tabla de técnicos -->
     <div class="mechanics-table">
         <div class="table-header">
-            <h2 class="table-title">🔧 RENDIMIENTO DETALLADO POR TÉCNICO</h2>
+            <h2 class="table-title">{% if request.path|slice:':7' == '/br/pt/' %}🔧 DESEMPENHO DETALHADO POR TÉCNICO{% else %}🔧 RENDIMIENTO DETALLADO POR TÉCNICO{% endif %}</h2>
         </div>
         <div class="overflow-x-auto">
             <table class="data-table">
@@ -1453,10 +1453,10 @@
                     <tr>
                         <th>🔧 Técnico</th>
                         <th>📋 Documentos</th>
-                        <th>⚙️ Servicios</th>
-                        <th>💰 Total Generado</th>
-                        <th>📊 Promedio/Doc</th>
-                        <th>🏆 Top Servicios</th>
+                        <th>{% if request.path|slice:':7' == '/br/pt/' %}⚙️ Serviços{% else %}⚙️ Servicios{% endif %}</th>
+                        <th>{% if request.path|slice:':7' == '/br/pt/' %}💰 Total Gerado{% else %}💰 Total Generado{% endif %}</th>
+                        <th>{% if request.path|slice:':7' == '/br/pt/' %}📊 Média/Doc{% else %}📊 Promedio/Doc{% endif %}</th>
+                        <th>{% if request.path|slice:':7' == '/br/pt/' %}🏆 Top Serviços{% else %}🏆 Top Servicios{% endif %}</th>
                         <th>📲 Acciones</th>
                     </tr>
                 </thead>
@@ -1478,7 +1478,7 @@
                         <td>
                             <div class="flex gap-1">
                                 <button onclick="generarWhatsApp({{ data.mecanico.id }})"
-                                        class="ai-button text-xs px-2 py-1" title="Enviar resumen por WhatsApp">
+                                        class="ai-button text-xs px-2 py-1" title="{% if request.path|slice:':7' == '/br/pt/' %}Enviar resumo por WhatsApp{% else %}Enviar resumen por WhatsApp{% endif %}">
                                     📲
                                 </button>
                                 <a href="pdf/{{ data.mecanico.id }}/?{{ request.GET.urlencode }}"
@@ -1508,7 +1508,7 @@
         <div class="hologram-header">
             <div class="neural-title">
                 <span class="title-icon">🤖</span>
-                <h2 class="quantum-title">ANÁLISIS NEURAL - {{ tecnico_nombre|upper }}</h2>
+                <h2 class="quantum-title">{% if request.path|slice:':7' == '/br/pt/' %}ANÁLISE NEURAL -{% else %}ANÁLISIS NEURAL -{% endif %} {{ tecnico_nombre|upper }}</h2>
                 <span class="title-icon">🔬</span>
             </div>
             <div class="quantum-metrics">
@@ -1557,8 +1557,8 @@
                         <div class="header-cell">🗓️ FECHA/HORA</div>
                         <div class="header-cell">📄 DOCUMENTO</div>
                         <div class="header-cell">👤 CLIENTE</div>
-                        <div class="header-cell">🚗 VEHÍCULO</div>
-                        <div class="header-cell">⚙️ SERVICIO</div>
+                        <div class="header-cell">{% if request.path|slice:':7' == '/br/pt/' %}🚗 VEÍCULO{% else %}🚗 VEHÍCULO{% endif %}</div>
+                        <div class="header-cell">{% if request.path|slice:':7' == '/br/pt/' %}⚙️ SERVIÇO{% else %}⚙️ SERVICIO{% endif %}</div>
                         <div class="header-cell">💰 VALOR</div>
                         <div class="header-cell">🔗 ACCESO</div>
                     </div>
@@ -1606,7 +1606,7 @@
                     </div>
                     <div class="calc-grid">
                         <div class="calc-section">
-                            <div class="calc-label">� SERVICIOS PROCESADOS</div>
+                            <div class="calc-label">� {% if request.path|slice:':7' == '/br/pt/' %}SERVIÇOS PROCESSADOS{% else %}SERVICIOS PROCESADOS{% endif %}</div>
                             <div class="calc-value big">{{ servicios_detallados|length }}</div>
                         </div>
                         <div class="calc-section">
@@ -1614,7 +1614,7 @@
                             <div class="calc-value mega">{{ total_servicios_tecnico|formatear_pesos }}</div>
                         </div>
                         <div class="calc-section">
-                            <div class="calc-label">📈 PROMEDIO/DÍA</div>
+                            <div class="calc-label">{% if request.path|slice:':7' == '/br/pt/' %}📈 MÉDIA/DIA{% else %}📈 PROMEDIO/DÍA{% endif %}</div>
                             <div class="calc-value">{{ promedio_diario_tecnico|floatformat:0|add:"0"|formatear_pesos }}</div>
                         </div>
                         <div class="calc-section">
@@ -1625,7 +1625,7 @@
 
                     <!-- Barra de progreso cuántica -->
                     <div class="quantum-progress">
-                        <div class="progress-label">PROCESAMIENTO CUÁNTICO</div>
+                        <div class="progress-label">{% if request.path|slice:':7' == '/br/pt/' %}PROCESSAMENTO QUÂNTICO{% else %}PROCESAMIENTO CUÁNTICO{% endif %}</div>
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: {{ eficiencia_tecnico|default:'95' }}%"></div>
                         </div>
@@ -1638,13 +1638,13 @@
             <div class="data-view hidden" id="analytics-view">
                 <div class="analytics-dashboard">
                     <div class="analytics-header">
-                        <h3 class="analytics-title">📈 ANÁLISIS PREDICTIVO IA</h3>
+                        <h3 class="analytics-title">{% if request.path|slice:':7' == '/br/pt/' %}📈 ANÁLISE PREDITIVA IA{% else %}📈 ANÁLISIS PREDICTIVO IA{% endif %}</h3>
                     </div>
                     <div class="analytics-grid">
                         {% if servicio_mas_frecuente %}
                         <div class="analytics-card">
                             <div class="card-icon">🎯</div>
-                            <div class="card-label">SERVICIO DOMINANTE</div>
+                            <div class="card-label">{% if request.path|slice:':7' == '/br/pt/' %}SERVIÇO DOMINANTE{% else %}SERVICIO DOMINANTE{% endif %}</div>
                             <div class="card-value">{{ servicio_mas_frecuente.nombre|truncatechars:20 }}</div>
                             <div class="card-sub">{{ servicio_mas_frecuente.count }} veces</div>
                         </div>
@@ -1652,21 +1652,21 @@
                         {% if servicio_mas_valioso %}
                         <div class="analytics-card">
                             <div class="card-icon">💎</div>
-                            <div class="card-label">MAYOR VALOR</div>
+                            <div class="card-label">{% if request.path|slice:':7' == '/br/pt/' %}MAIOR VALOR{% else %}MAYOR VALOR{% endif %}</div>
                             <div class="card-value">{{ servicio_mas_valioso.total|formatear_pesos }}</div>
-                            <div class="card-sub">Rentabilidad máxima</div>
+                            <div class="card-sub">{% if request.path|slice:':7' == '/br/pt/' %}Rentabilidade máxima{% else %}Rentabilidad máxima{% endif %}</div>
                         </div>
                         {% endif %}
                         <div class="analytics-card">
                             <div class="card-icon">⚡</div>
                             <div class="card-label">VELOCIDAD</div>
                             <div class="card-value">{% widthratio servicios_detallados|length 7 1 %}</div>
-                            <div class="card-sub">Servicios/día promedio</div>
+                            <div class="card-sub">{% if request.path|slice:':7' == '/br/pt/' %}Serviços/dia em média{% else %}Servicios/día promedio{% endif %}</div>
                         </div>
                         <div class="analytics-card">
                             <div class="card-icon">🔥</div>
                             <div class="card-label">RENDIMIENTO</div>
-                            <div class="card-value">ÓPTIMO</div>
+                            <div class="card-value">{% if request.path|slice:':7' == '/br/pt/' %}ÓTIMO{% else %}ÓPTIMO{% endif %}</div>
                             <div class="card-sub">Estado actual</div>
                         </div>
                     </div>
@@ -1680,14 +1680,14 @@
     {% if servicios_frecuentes %}
     <div class="mechanics-table">
         <div class="table-header">
-            <h2 class="table-title">🏆 SERVICIOS MÁS FRECUENTES</h2>
+            <h2 class="table-title">{% if request.path|slice:':7' == '/br/pt/' %}🏆 SERVIÇOS MAIS FREQUENTES{% else %}🏆 SERVICIOS MÁS FRECUENTES{% endif %}</h2>
         </div>
         <div class="overflow-x-auto">
             <table class="data-table">
                 <thead>
                     <tr>
                         <th>🏅 Ranking</th>
-                        <th>⚙️ Servicio</th>
+                        <th>{% if request.path|slice:':7' == '/br/pt/' %}⚙️ Serviço{% else %}⚙️ Servicio{% endif %}</th>
                         <th>🔢 Cantidad</th>
                         <th>💰 Ingresos Totales</th>
                     </tr>
@@ -1779,7 +1779,7 @@ if (typeof particlesJS !== 'undefined') particlesJS('particles-js', {
                 data: {
                     labels: data.mecanicos.map(m => m.nombre),
                     datasets: [{
-                        label: 'Total Generado',
+                        label: '{% if request.path|slice:':7' == '/br/pt/' %}Total Gerado{% else %}Total Generado{% endif %}',
                         data: data.mecanicos.map(m => m.total),
                         backgroundColor: 'rgba(0, 255, 136, 0.3)',
                         borderColor: '#00ff88',
@@ -1793,7 +1793,7 @@ if (typeof particlesJS !== 'undefined') particlesJS('particles-js', {
                         legend: { display: false },
                         title: {
                             display: true,
-                            text: 'Ingresos por Técnico (IA Analytics)',
+                            text: '{% if request.path|slice:':7' == '/br/pt/' %}Receita por Técnico (IA Analytics){% else %}Ingresos por Técnico (IA Analytics){% endif %}',
                             color: '#00ffff',
                             font: { size: 16, family: 'Orbitron' }
                         }
@@ -1861,7 +1861,7 @@ if (typeof particlesJS !== 'undefined') particlesJS('particles-js', {
                         legend: { display: false },
                         title: {
                             display: true,
-                            text: 'Evolución del Período',
+                            text: '{% if request.path|slice:':7' == '/br/pt/' %}Evolução do Período{% else %}Evolución del Período{% endif %}',
                             color: '#00ffff',
                             font: { size: 16, family: 'Orbitron' }
                         }

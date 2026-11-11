@@ -280,28 +280,28 @@
   <!-- 🎯 Header Principal -->
   <div class="text-center mb-8">
     <h1 class="text-5xl font-extrabold mb-4" style="font-family: 'Orbitron'; background: linear-gradient(45deg, #00ffff, #0080ff, #ff00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);">
-      {% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚀 Operations{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚀 Operations{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚀 Operations{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.LANGUAGE_CODE == "en" %}🚀 Operations{% else %}🚀 Centro{% endif %}{% endif %}{% endif %}{% endif %} de Inteligencia Operativa
+      {% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚀 Operations{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚀 Operations{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚀 Operations{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.LANGUAGE_CODE == "en" %}🚀 Operations{% else %}🚀 Centro{% endif %}{% endif %}{% endif %}{% endif %} de Inteligencia Operativa
     </h1>
-    <p class="text-xl text-gray-300">Dashboard Futurista 360° - Análisis Predictivo en Tiempo Real</p>
+    <p class="text-xl text-gray-300">{% if request.path|slice:':7' == '/br/pt/' %}Painel Futurista 360° - Análise Preditiva em Tempo Real{% else %}Dashboard Futurista 360° - Análisis Predictivo en Tiempo Real{% endif %}</p>
 
     <!-- 🎖️ Medallas de Achievement -->
     <div class="mt-4">
-      <span class="achievement-badge">🔥 Taller en Crecimiento</span>
-      <span class="achievement-badge">⚙️ Top Rentabilidad</span>
-      <span class="achievement-badge">🎯 Técnico Elite Nivel 5</span>
+      <span class="achievement-badge">{% if request.path|slice:':7' == '/br/pt/' %}🔥 Oficina em Crescimento{% else %}🔥 Taller en Crecimiento{% endif %}</span>
+      <span class="achievement-badge">{% if request.path|slice:':7' == '/br/pt/' %}⚙️ Top Rentabilidade{% else %}⚙️ Top Rentabilidad{% endif %}</span>
+      <span class="achievement-badge">{% if request.path|slice:':7' == '/br/pt/' %}🎯 Técnico Elite Nível 5{% else %}🎯 Técnico Elite Nivel 5{% endif %}</span>
     </div>
   </div>
 
   <!-- 🧠 KPIs Principales -->
   <div class="intelligence-hub">
-    <h2 class="chart-title mb-6">📊 Indicadores Clave de Rendimiento (KPIs)</h2>
+    <h2 class="chart-title mb-6">{% if request.path|slice:':7' == '/br/pt/' %}📊 Indicadores-Chave de Desempenho (KPIs){% else %}📊 Indicadores Clave de Rendimiento (KPIs){% endif %}</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
       <div class="kpi-card pulse-glow">
         <div class="kpi-value">${{ facturacion_total|floatformat:0|intcomma }}</div>
-        <div class="kpi-label">Facturación Total</div>
+        <div class="kpi-label">{% if request.path|slice:':7' == '/br/pt/' %}Faturamento Total{% else %}Facturación Total{% endif %}</div>
         <div class="kpi-trend trend-up">
-          <span>📈 +12% vs mes anterior</span>
+          <span>{% if request.path|slice:':7' == '/br/pt/' %}📈 +12% vs mês anterior{% else %}📈 +12% vs mes anterior{% endif %}</span>
         </div>
       </div>
 
@@ -315,51 +315,51 @@
 
       <div class="kpi-card">
         <div class="kpi-value">${{ ticket_promedio|floatformat:0|intcomma }}</div>
-        <div class="kpi-label">Ticket Promedio</div>
+        <div class="kpi-label">{% if request.path|slice:':7' == '/br/pt/' %}Ticket Médio{% else %}Ticket Promedio{% endif %}</div>
         <div class="kpi-trend trend-neutral">
-          <span>➡️ Estable</span>
+          <span>{% if request.path|slice:':7' == '/br/pt/' %}➡️ Estável{% else %}➡️ Estable{% endif %}</span>
         </div>
       </div>
 
       {% if request.user|is_owner %}
       <div class="kpi-card">
         <div class="kpi-value">${{ ingresos_por_hora|floatformat:0|intcomma }}</div>
-        <div class="kpi-label">Ingresos/Hora</div>
+        <div class="kpi-label">{% if request.path|slice:':7' == '/br/pt/' %}Receita/Hora{% else %}Ingresos/Hora{% endif %}</div>
         <div class="kpi-trend trend-up">
-          <span>📈 +8% eficiencia</span>
+          <span>{% if request.path|slice:':7' == '/br/pt/' %}📈 +8% eficiência{% else %}📈 +8% eficiencia{% endif %}</span>
         </div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-value">{{ margen_promedio }}%</div>
-        <div class="kpi-label">Margen Promedio</div>
+        <div class="kpi-label">{% if request.path|slice:':7' == '/br/pt/' %}Margem Média{% else %}Margen Promedio{% endif %}</div>
         <div class="kpi-trend trend-up">
-          <span>📈 Excelente rentabilidad</span>
+          <span>{% if request.path|slice:':7' == '/br/pt/' %}📈 Excelente rentabilidade{% else %}📈 Excelente rentabilidad{% endif %}</span>
         </div>
       </div>
       {% endif %}
 
       <div class="kpi-card">
         <div class="kpi-value">{{ vehiculos_por_semana }}</div>
-        <div class="kpi-label">Vehículos/Semana</div>
+        <div class="kpi-label">{% if request.path|slice:':7' == '/br/pt/' %}Veículos/Semana{% else %}Vehículos/Semana{% endif %}</div>
         <div class="kpi-trend trend-up">
-          <span>📈 +15% capacidad</span>
+          <span>{% if request.path|slice:':7' == '/br/pt/' %}📈 +15% capacidade{% else %}📈 +15% capacidad{% endif %}</span>
         </div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-value">{{ total_documentos }}</div>
-        <div class="kpi-label">Total Documentos</div>
+        <div class="kpi-label">{% if request.path|slice:':7' == '/br/pt/' %}Total de Documentos{% else %}Total Documentos{% endif %}</div>
         <div class="kpi-trend trend-up">
-          <span>📄 Actividad alta</span>
+          <span>{% if request.path|slice:':7' == '/br/pt/' %}📄 Atividade alta{% else %}📄 Actividad alta{% endif %}</span>
         </div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-value">{{ satisfaccion_cliente }}⭐</div>
-        <div class="kpi-label">Satisfacción Cliente</div>
+        <div class="kpi-label">{% if request.path|slice:':7' == '/br/pt/' %}Satisfação do Cliente{% else %}Satisfacción Cliente{% endif %}</div>
         <div class="kpi-trend trend-up">
-          <span>😊 Excelente servicio</span>
+          <span>{% if request.path|slice:':7' == '/br/pt/' %}😊 Excelente serviço{% else %}😊 Excelente servicio{% endif %}</span>
         </div>
       </div>
     </div>
@@ -368,7 +368,7 @@
   <!-- 🚨 WIDGET: Recordatorios Urgentes y Garantías -->
   {% if total_recordatorios_urgentes > 0 or garantias_potenciales > 0 %}
   <div class="intelligence-hub" style="border-color: rgba(255, 107, 107, 0.5); border-width: 3px;">
-    <h2 class="chart-title mb-6" style="color: #ff6b6b;">🚨 Alertas de Negocio - Acción Inmediata</h2>
+    <h2 class="chart-title mb-6" style="color: #ff6b6b;">{% if request.path|slice:':7' == '/br/pt/' %}🚨 Alertas de Negócio - Ação Imediata{% else %}🚨 Alertas de Negocio - Acción Inmediata{% endif %}</h2>
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
       <!-- Widget: Recordatorios Urgentes -->
@@ -392,9 +392,9 @@
       <!-- Widget: Garantías Potenciales -->
       <div class="kpi-card" style="border-color: #f59e0b; background: rgba(245, 158, 11, 0.1);">
         <div class="kpi-value" style="color: #f59e0b;">{{ garantias_potenciales }}</div>
-        <div class="kpi-label" style="color: rgba(255, 255, 255, 0.9);">Garantías Potenciales</div>
+        <div class="kpi-label" style="color: rgba(255, 255, 255, 0.9);">{% if request.path|slice:':7' == '/br/pt/' %}Garantias Potenciais{% else %}Garantías Potenciales{% endif %}</div>
         <div class="kpi-trend" style="color: #f59e0b; margin-top: 1rem;">
-          <span>🛡️ Documentos bajo garantía activa</span>
+          <span>{% if request.path|slice:':7' == '/br/pt/' %}🛡️ Documentos sob garantia ativa{% else %}🛡️ Documentos bajo garantía activa{% endif %}</span>
         </div>
         {% if garantias_potenciales > 0 %}
         <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(245, 158, 11, 0.3);">
@@ -411,7 +411,7 @@
     <!-- Lista de Recordatorios Urgentes (Top 3) -->
     {% if recordatorios_urgentes %}
     <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 107, 107, 0.3);">
-      <h3 class="chart-title mb-4" style="font-size: 1rem; color: #ff6b6b;">📋 Top 3 Recordatorios Urgentes</h3>
+      <h3 class="chart-title mb-4" style="font-size: 1rem; color: #ff6b6b;">{% if request.path|slice:':7' == '/br/pt/' %}📋 Top 3 Lembretes Urgentes{% else %}📋 Top 3 Recordatorios Urgentes{% endif %}</h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         {% for recordatorio in recordatorios_urgentes|slice:":3" %}
         <div style="background: rgba(255, 107, 107, 0.15); border-radius: 12px; padding: 1rem; border-left: 4px solid #ff6b6b;">
@@ -458,22 +458,22 @@
 
     <!-- Facturación Mensual -->
     <div class="chart-container">
-      <div class="chart-title">📈 Facturación Mensual Comparativa</div>
+      <div class="chart-title">{% if request.path|slice:':7' == '/br/pt/' %}📈 Faturamento Mensal Comparativo{% else %}📈 Facturación Mensual Comparativa{% endif %}</div>
       <canvas id="facturacionChart" width="400" height="250"></canvas>
     </div>
 
     <!-- Top Servicios -->
     <div class="chart-container">
-      <div class="chart-title">🔧 Top Servicios Más Demandados</div>
+      <div class="chart-title">{% if request.path|slice:':7' == '/br/pt/' %}🔧 Top Serviços Mais Demandados{% else %}🔧 Top Servicios Más Demandados{% endif %}</div>
       <canvas id="serviciosChart" width="400" height="250"></canvas>
     </div>
   </div>
 
   <!-- 🗓️ Mapa Térmico de Actividad -->
   <div class="intelligence-hub">
-    <h3 class="chart-title mb-4">🗓️ Mapa Térmico de Actividad del Taller</h3>
+    <h3 class="chart-title mb-4">{% if request.path|slice:':7' == '/br/pt/' %}🗓️ Mapa de Calor da Atividade da Oficina{% else %}🗓️ Mapa Térmico de Actividad del Taller{% endif %}</h3>
     <div class="text-center mb-4">
-      <span class="text-sm text-gray-400">Últimas 4 semanas - Intensidad de trabajo por día</span>
+      <span class="text-sm text-gray-400">{% if request.path|slice:':7' == '/br/pt/' %}Últimas 4 semanas - Intensidade de trabalho por dia{% else %}Últimas 4 semanas - Intensidad de trabajo por día{% endif %}</span>
     </div>
     <div class="heatmap-container">
       <!-- Días de la semana -->
@@ -511,9 +511,9 @@
     <div class="alert-item" style="background: rgba(255, 107, 107, 0.2); border-left-color: #ff6b6b;">
       <span class="alert-icon">🚨</span>
       <div>
-        <strong>{{ total_recordatorios_urgentes }} vehículos</strong> necesitan mantenimiento urgente (menos de 1,000 km restantes)
-        <br><span class="text-sm text-gray-400">💰 Oportunidad de ingresos proactivos - Contacta a tus clientes ahora</span>
-        <br><a href="{% url 'reportes:recordatorios_mantenimiento' %}" style="color: #ff6b6b; margin-top: 0.5rem; display: inline-block; text-decoration: underline; font-weight: 600;">Ver todos los recordatorios →</a>
+        <strong>{{ total_recordatorios_urgentes }} {% if request.path|slice:':7' == '/br/pt/' %}veículos{% else %}vehículos{% endif %}</strong> necesitan mantenimiento urgente (menos de 1,000 km restantes)
+        <br><span class="text-sm text-gray-400">{% if request.path|slice:':7' == '/br/pt/' %}💰 Oportunidade de receita proativa - Entre em contato com seus clientes agora{% else %}💰 Oportunidad de ingresos proactivos - Contacta a tus clientes ahora{% endif %}</span>
+        <br><a href="{% url 'reportes:recordatorios_mantenimiento' %}" style="color: #ff6b6b; margin-top: 0.5rem; display: inline-block; text-decoration: underline; font-weight: 600;">{% if request.path|slice:':7' == '/br/pt/' %}Ver todos os lembretes →{% else %}Ver todos los recordatorios →{% endif %}</a>
       </div>
     </div>
     {% endif %}
@@ -523,8 +523,8 @@
       <span class="alert-icon">🛡️</span>
       <div>
         <strong>{{ garantias_potenciales }} documentos</strong> están bajo garantía activa (últimos 90 días, dentro de 5,000 km)
-        <br><span class="text-sm text-gray-400">⚠️ Monitorea estos vehículos - podrían regresar por garantía</span>
-        <br><a href="{% url 'reportes:verificar_garantia' %}" style="color: #f59e0b; margin-top: 0.5rem; display: inline-block; text-decoration: underline; font-weight: 600;">Verificar garantías →</a>
+        <br><span class="text-sm text-gray-400">{% if request.path|slice:':7' == '/br/pt/' %}⚠️ Monitore estes veículos - podem retornar por garantia{% else %}⚠️ Monitorea estos vehículos - podrían regresar por garantía{% endif %}</span>
+        <br><a href="{% url 'reportes:verificar_garantia' %}" style="color: #f59e0b; margin-top: 0.5rem; display: inline-block; text-decoration: underline; font-weight: 600;">{% if request.path|slice:':7' == '/br/pt/' %}Verificar garantias →{% else %}Verificar garantías →{% endif %}</a>
       </div>
     </div>
     {% endif %}
@@ -533,14 +533,14 @@
       <span class="alert-icon">⚠️</span>
       <div>
         <strong>{{ clientes_inactivos }} clientes</strong> no han vuelto en los últimos 60 días
-        <br><span class="text-sm text-gray-400">Considera enviar una promoción de mantenimiento</span>
+        <br><span class="text-sm text-gray-400">{% if request.path|slice:':7' == '/br/pt/' %}Considere enviar uma promoção de manutenção{% else %}Considera enviar una promoción de mantenimiento{% endif %}</span>
       </div>
     </div>
 
     <div class="alert-item">
       <span class="alert-icon">💡</span>
       <div>
-        <strong>Servicios aumentaron</strong> este mes
+        <strong>{% if request.path|slice:':7' == '/br/pt/' %}Os serviços aumentaram{% else %}Servicios aumentaron{% endif %}</strong> este mes
         <br><span class="text-sm text-gray-400">Oportunidad: optimizar capacidad operativa</span>
       </div>
     </div>
@@ -548,8 +548,8 @@
     <div class="alert-item">
       <span class="alert-icon">🎯</span>
       <div>
-        <strong>Miércoles y viernes</strong> son tus días más productivos
-        <br><span class="text-sm text-gray-400">Considera programar servicios complejos estos días</span>
+        <strong>{% if request.path|slice:':7' == '/br/pt/' %}Quartas e sextas{% else %}Miércoles y viernes{% endif %}</strong> son tus días más productivos
+        <br><span class="text-sm text-gray-400">{% if request.path|slice:':7' == '/br/pt/' %}Considere agendar serviços complexos nesses dias{% else %}Considera programar servicios complejos estos días{% endif %}</span>
       </div>
     </div>
   </div>
@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', function() {
     data: {
       labels: [{% for mes in facturacion_por_mes %}'{{ mes.mes }}'{% if not forloop.last %},{% endif %}{% endfor %}],
       datasets: [{
-        label: 'Facturación 2025',
+        label: '{% if request.path|slice:':7' == '/br/pt/' %}Faturamento 2025{% else %}Facturación 2025{% endif %}',
         data: [{% for mes in facturacion_por_mes %}{{ mes.valor }}{% if not forloop.last %},{% endif %}{% endfor %}],
         borderColor: '#00ffff',
         backgroundColor: 'rgba(0, 255, 255, 0.1)',

@@ -3,7 +3,7 @@
 {% load custom_filters %}
 {% load country_url %}
 
-{% block title %}Servicios Subcontratados{% endblock %}
+{% block title %}{% if request.path|slice:':7' == '/br/pt/' %}Serviços Terceirizados{% else %}Servicios Subcontratados{% endif %}{% endblock %}
 
 {% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -17,46 +17,46 @@
     <div class="flex items-center gap-3 mb-1">
       <div class="w-1 h-8 bg-cyan-500 rounded-full"></div>
       <h1 class="text-2xl font-bold text-cyan-200" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px;">
-        Servicios Subcontratados
+        {% if request.path|slice:':7' == '/br/pt/' %}Serviços Terceirizados{% else %}Servicios Subcontratados{% endif %}
       </h1>
     </div>
-    <p class="text-gray-400 text-sm ml-4 pl-4 border-l border-gray-700">Análisis de subcontratación y costos externos</p>
+    <p class="text-gray-400 text-sm ml-4 pl-4 border-l border-gray-700">{% if request.path|slice:':7' == '/br/pt/' %}Análise de terceirização e custos externos{% else %}Análisis de subcontratación y costos externos{% endif %}</p>
   </div>
 
   <!-- KPIs -->
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
     <div class="resumen-card border-l-4 border-cyan-600/60">
-      <p class="resumen-label">Total Servicios</p>
+      <p class="resumen-label">{% if request.path|slice:':7' == '/br/pt/' %}Total de Serviços{% else %}Total Servicios{% endif %}</p>
       <p class="resumen-value text-cyan-300">{{ total_servicios_subcontratados }}</p>
-      <p class="text-xs text-gray-600 mt-1">Subcontratados</p>
+      <p class="text-xs text-gray-600 mt-1">{% if request.path|slice:':7' == '/br/pt/' %}Terceirizados{% else %}Subcontratados{% endif %}</p>
     </div>
     <div class="resumen-card border-l-4 border-blue-600/60">
-      <p class="resumen-label">Proveedores</p>
+      <p class="resumen-label">{% if request.path|slice:':7' == '/br/pt/' %}Fornecedores{% else %}Proveedores{% endif %}</p>
       <p class="resumen-value text-blue-300">{{ total_proveedores }}</p>
-      <p class="text-xs text-gray-600 mt-1">Activos</p>
+      <p class="text-xs text-gray-600 mt-1">{% if request.path|slice:':7' == '/br/pt/' %}Ativos{% else %}Activos{% endif %}</p>
     </div>
     <div class="resumen-card border-l-4 border-red-600/60">
-      <p class="resumen-label">Costo Total</p>
+      <p class="resumen-label">{% if request.path|slice:':7' == '/br/pt/' %}Custo Total{% else %}Costo Total{% endif %}</p>
       <p class="resumen-value text-red-300">${{ costo_total_subcontratados|floatformat:0 }}</p>
-      <p class="text-xs text-gray-600 mt-1">Invertido</p>
+      <p class="text-xs text-gray-600 mt-1">{% if request.path|slice:':7' == '/br/pt/' %}Investido{% else %}Invertido{% endif %}</p>
     </div>
     <div class="resumen-card border-l-4 border-amber-600/60">
-      <p class="resumen-label">Costo Promedio</p>
+      <p class="resumen-label">{% if request.path|slice:':7' == '/br/pt/' %}Custo Médio{% else %}Costo Promedio{% endif %}</p>
       <p class="resumen-value text-amber-300">${{ promedio_costo_subcontratados|floatformat:0 }}</p>
-      <p class="text-xs text-gray-600 mt-1">Por Servicio</p>
+      <p class="text-xs text-gray-600 mt-1">{% if request.path|slice:':7' == '/br/pt/' %}Por Serviço{% else %}Por Servicio{% endif %}</p>
     </div>
   </div>
 
   <!-- Gráficos -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
     <div class="panel-card">
-      <h2 class="panel-title">Distribución por Proveedor</h2>
+      <h2 class="panel-title">{% if request.path|slice:':7' == '/br/pt/' %}Distribuição por Fornecedor{% else %}Distribución por Proveedor{% endif %}</h2>
       <div style="position: relative; height: 260px;">
         <canvas id="proveedorChart"></canvas>
       </div>
     </div>
     <div class="panel-card">
-      <h2 class="panel-title">Evolución de Costos Mensuales</h2>
+      <h2 class="panel-title">{% if request.path|slice:':7' == '/br/pt/' %}Evolução dos Custos Mensais{% else %}Evolución de Costos Mensuales{% endif %}</h2>
       <div style="position: relative; height: 260px;">
         <canvas id="costosChart"></canvas>
       </div>
@@ -65,18 +65,18 @@
 
   <!-- Tabla detalle -->
   <div class="panel-card">
-    <h2 class="panel-title">Detalle de Servicios Subcontratados</h2>
+    <h2 class="panel-title">{% if request.path|slice:':7' == '/br/pt/' %}Detalhe dos Serviços Terceirizados{% else %}Detalle de Servicios Subcontratados{% endif %}</h2>
     {% if servicios_subcontratados %}
     <div class="overflow-x-auto">
       <table class="data-table">
         <thead>
           <tr>
             <th>Fecha</th>
-            <th>Vehículo</th>
-            <th>Servicio</th>
-            <th>Proveedor</th>
+            <th>{% if request.path|slice:':7' == '/br/pt/' %}Veículo{% else %}Vehículo{% endif %}</th>
+            <th>{% if request.path|slice:':7' == '/br/pt/' %}Serviço{% else %}Servicio{% endif %}</th>
+            <th>{% if request.path|slice:':7' == '/br/pt/' %}Fornecedor{% else %}Proveedor{% endif %}</th>
             <th class="text-right">Costo</th>
-            <th class="text-center">Estado</th>
+            <th class="text-center">{% if request.path|slice:':7' == '/br/pt/' %}Situação{% else %}Estado{% endif %}</th>
           </tr>
         </thead>
         <tbody>
@@ -107,7 +107,7 @@
     </div>
     {% else %}
     <div class="text-center py-12 text-gray-500">
-      <p class="text-sm">No hay servicios subcontratados registrados en el período seleccionado.</p>
+      <p class="text-sm">{% if request.path|slice:':7' == '/br/pt/' %}Não há serviços terceirizados registrados no período selecionado.{% else %}No hay servicios subcontratados registrados en el período seleccionado.{% endif %}</p>
     </div>
     {% endif %}
   </div>

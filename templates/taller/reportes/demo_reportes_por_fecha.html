@@ -297,7 +297,7 @@
 
 <div class="container mx-auto px-4 py-8">
     <div class="cyber-header">
-        <h1 class="cyber-title">{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}📊 Reports{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}📊 Reports{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.LANGUAGE_CODE == "en" %}📊 Reports{% else %}📊 Reportes{% endif %}{% endif %}{% endif %}{% endif %} por Fecha</h1>
+        <h1 class="cyber-title">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}📊 Reports{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}📊 Reports{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}📊 Reports{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.LANGUAGE_CODE == "en" %}📊 Reports{% else %}📊 Reportes{% endif %}{% endif %}{% endif %}{% endif %} por Fecha</h1>
         <p style="text-align: center; color: var(--glow-cyan); opacity: 0.8; font-size: 1.1rem;">
             Sistema de reportes unificado con análisis temporal
         </p>

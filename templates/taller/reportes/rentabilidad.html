@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}📊 Análisis de Rentabilidad{% endblock %}
+{% block title %}{% if request.path|slice:':7' == '/br/pt/' %}📊 Análise de Rentabilidade{% else %}📊 Análisis de Rentabilidad{% endif %}{% endblock %}
 
 {% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -166,8 +166,8 @@
         <!-- Header simple -->
         <div class="page-header">
             <div>
-                <h1 class="page-title">📊 Análisis de Rentabilidad</h1>
-                <p class="page-subtitle">Comparativa entre servicios internos y subcontratados</p>
+                <h1 class="page-title">{% if request.path|slice:':7' == '/br/pt/' %}📊 Análise de Rentabilidade{% else %}📊 Análisis de Rentabilidad{% endif %}</h1>
+                <p class="page-subtitle">{% if request.path|slice:':7' == '/br/pt/' %}Comparativo entre serviços internos e terceirizados{% else %}Comparativa entre servicios internos y subcontratados{% endif %}</p>
             </div>
         </div>
 
@@ -176,45 +176,45 @@
             <div class="metric-box">
                 <span class="metric-icon">🔧</span>
                 <div class="metric-number text-primary">{{ total_interno|formatear_pesos }}</div>
-                <div class="metric-text">Servicios Internos</div>
+                <div class="metric-text">{% if request.path|slice:':7' == '/br/pt/' %}Serviços Internos{% else %}Servicios Internos{% endif %}</div>
             </div>
             <div class="metric-box">
                 <span class="metric-icon">🤝</span>
                 <div class="metric-number text-success">{{ total_externo_ingresos|formatear_pesos }}</div>
-                <div class="metric-text">Servicios Externos</div>
+                <div class="metric-text">{% if request.path|slice:':7' == '/br/pt/' %}Serviços Externos{% else %}Servicios Externos{% endif %}</div>
             </div>
             <div class="metric-box">
                 <span class="metric-icon">💰</span>
                 <div class="metric-number text-info">{{ ganancia_externa|formatear_pesos }}</div>
-                <div class="metric-text">Ganancia Externa</div>
+                <div class="metric-text">{% if request.path|slice:':7' == '/br/pt/' %}Lucro Externo{% else %}Ganancia Externa{% endif %}</div>
             </div>
         </div>
 
         <!-- Gráficos -->
         <div class="charts-row">
             <div class="chart-box">
-                <div class="chart-header">📈 Servicios Internos</div>
+                <div class="chart-header">{% if request.path|slice:':7' == '/br/pt/' %}📈 Serviços Internos{% else %}📈 Servicios Internos{% endif %}</div>
                 <canvas id="chartServiciosInternos" width="400" height="250"></canvas>
             </div>
             <div class="chart-box">
-                <div class="chart-header">🤝 Servicios Externos</div>
+                <div class="chart-header">{% if request.path|slice:':7' == '/br/pt/' %}🤝 Serviços Externos{% else %}🤝 Servicios Externos{% endif %}</div>
                 <canvas id="chartServiciosExternos" width="400" height="250"></canvas>
             </div>
         </div>
 
         <!-- Tabla principal -->
         <div class="data-box">
-            <div class="data-title">🔧 Servicios Externos Detallados</div>
+            <div class="data-title">{% if request.path|slice:':7' == '/br/pt/' %}🔧 Serviços Externos Detalhados{% else %}🔧 Servicios Externos Detallados{% endif %}</div>
             <table class="simple-table">
                 <thead>
                     <tr>
-                        <th>Servicio</th>
-                        <th>Proveedor</th>
-                        <th>Cantidad</th>
-                        <th>Ingresos</th>
-                        <th>Costos</th>
-                        <th>Ganancia</th>
-                        <th>Margen %</th>
+                        <th>{% if request.path|slice:':7' == '/br/pt/' %}Serviço{% else %}Servicio{% endif %}</th>
+                        <th>{% if request.path|slice:':7' == '/br/pt/' %}Fornecedor{% else %}Proveedor{% endif %}</th>
+                        <th>{% if request.path|slice:':7' == '/br/pt/' %}Quantidade{% else %}Cantidad{% endif %}</th>
+                        <th>{% if request.path|slice:':7' == '/br/pt/' %}Receita{% else %}Ingresos{% endif %}</th>
+                        <th>{% if request.path|slice:':7' == '/br/pt/' %}Custos{% else %}Costos{% endif %}</th>
+                        <th>{% if request.path|slice:':7' == '/br/pt/' %}Lucro{% else %}Ganancia{% endif %}</th>
+                        <th>{% if request.path|slice:':7' == '/br/pt/' %}Margem %{% else %}Margen %{% endif %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -238,7 +238,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" style="text-align: center; color: #6c757d;">No hay servicios externos registrados</td>
+                        <td colspan="7" style="text-align: center; color: #6c757d;">{% if request.path|slice:':7' == '/br/pt/' %}Não há serviços externos registrados{% else %}No hay servicios externos registrados{% endif %}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -248,14 +248,14 @@
         <!-- Tablas adicionales -->
         <div class="charts-row">
             <div class="data-box">
-                <div class="data-title">🏆 Top Proveedores</div>
+                <div class="data-title">{% if request.path|slice:':7' == '/br/pt/' %}🏆 Top Fornecedores{% else %}🏆 Top Proveedores{% endif %}</div>
                 <table class="simple-table">
                     <thead>
                         <tr>
-                            <th>Proveedor</th>
+                            <th>{% if request.path|slice:':7' == '/br/pt/' %}Fornecedor{% else %}Proveedor{% endif %}</th>
                             <th>{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Services{% else %}Servicios{% endif %}</th>
                             <th>Volumen</th>
-                            <th>Ganancia</th>
+                            <th>{% if request.path|slice:':7' == '/br/pt/' %}Lucro{% else %}Ganancia{% endif %}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -272,14 +272,14 @@
             </div>
 
             <div class="data-box">
-                <div class="data-title">💎 Mayor Margen</div>
+                <div class="data-title">{% if request.path|slice:':7' == '/br/pt/' %}💎 Maior Margem{% else %}💎 Mayor Margen{% endif %}</div>
                 <table class="simple-table">
                     <thead>
                         <tr>
-                            <th>Servicio</th>
-                            <th>Proveedor</th>
-                            <th>Margen %</th>
-                            <th>Ganancia</th>
+                            <th>{% if request.path|slice:':7' == '/br/pt/' %}Serviço{% else %}Servicio{% endif %}</th>
+                            <th>{% if request.path|slice:':7' == '/br/pt/' %}Fornecedor{% else %}Proveedor{% endif %}</th>
+                            <th>{% if request.path|slice:':7' == '/br/pt/' %}Margem %{% else %}Margen %{% endif %}</th>
+                            <th>{% if request.path|slice:':7' == '/br/pt/' %}Lucro{% else %}Ganancia{% endif %}</th>
                         </tr>
                     </thead>
                     <tbody>
