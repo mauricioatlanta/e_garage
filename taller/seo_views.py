@@ -67,7 +67,7 @@ def sitemap_xml(request):
             '    <priority>0.9</priority>',
             '  </url>',
             '  <url>',
-            f'    <loc>{host}/reciclaje/chatarra-electronica/</loc>',
+            f'    <loc>{host}/reciclaje/chatarra/</loc>',
             '    <changefreq>weekly</changefreq>',
             '    <priority>0.8</priority>',
             '  </url>',
