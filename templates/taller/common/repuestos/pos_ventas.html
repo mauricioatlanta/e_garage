@@ -1,41 +1,203 @@
-{% extends 'base.html' %}
-{% load country_url %}
-{% block title %}Ventas de repuestos{% endblock %}
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Ventas POS · Casa de Repuestos · eGarage{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-gray-950 text-white">
-  <main class="mx-auto max-w-6xl px-4 py-6">
-    <header class="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <h1 class="text-2xl font-bold text-cyan-200">Ventas de repuestos</h1>
-        <p class="text-sm text-gray-400">{{ empresa }} - Ultimas 200 ventas POS</p>
+<div class="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased relative overflow-hidden p-4 md:p-6">
+  <div class="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- Cabecera -->
+  <header class="relative z-10 max-w-7xl mx-auto mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-400 text-xs font-mono mb-2">
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+        POS // CASA DE REPUESTOS
       </div>
-      <div class="flex gap-2">
-        <a href="{% country_url 'repuestos:pos_mostrador' %}" class="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-bold text-gray-950 hover:bg-cyan-300">+ Nueva venta</a>
-        <a href="{% country_url 'repuestos:pos_mostrador' %}" class="rounded-lg border border-gray-700 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">Volver al mostrador</a>
+      <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
+        Ventas de Repuestos <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">POS</span>
+      </h1>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <a href="/cl/es/repuestos/pos/" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs tracking-wide shadow-lg shadow-cyan-500/20 transition flex items-center gap-2">
+        + Nueva venta
+      </a>
+      <a href="/cl/es/repuestos/pos/" class="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500/40 text-slate-300 hover:text-white text-xs font-semibold transition">
+        Volver al mostrador
+      </a>
+    </div>
+  </header>
+
+  <!-- Filtros y Búsqueda -->
+  <div class="relative z-10 max-w-7xl mx-auto mb-6 space-y-3">
+    <div class="bg-slate-900/80 p-2.5 rounded-2xl border border-cyan-500/30 shadow-2xl backdrop-blur-md flex items-center gap-3">
+      <div class="pl-3 text-cyan-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
       </div>
-    </header>
-    <div class="overflow-hidden rounded-lg border border-cyan-400/20 bg-gray-900">
-      <table class="w-full text-left text-sm text-gray-300">
-        <thead class="bg-gray-800 text-xs uppercase text-gray-400">
-          <tr><th class="px-3 py-2">#</th><th class="px-3 py-2">Fecha</th><th class="px-3 py-2">Cliente</th><th class="px-3 py-2">Metodo pago</th><th class="px-3 py-2">Estado pago</th><th class="px-3 py-2 text-right">Total</th><th class="px-3 py-2"></th></tr>
+      <input type="text" id="posSearchInput" placeholder="Buscar venta en tiempo real por ID, cliente, método de pago o monto..." class="w-full bg-transparent border-none text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-0">
+      <span id="searchCounter" class="text-xs font-mono text-cyan-400 px-3 py-1 rounded-lg bg-cyan-950/60 border border-cyan-800/40 whitespace-nowrap">
+        Cargando...
+      </span>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <main class="relative z-10 max-w-7xl mx-auto bg-slate-900/60 border border-slate-800/80 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse" id="posVentasTable">
+        <thead>
+          <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] font-mono uppercase tracking-wider text-cyan-400">
+            <th class="py-3.5 px-4"># ID</th>
+            <th class="py-3.5 px-4">Fecha</th>
+            <th class="py-3.5 px-4">Cliente</th>
+            <th class="py-3.5 px-4">Método Pago</th>
+            <th class="py-3.5 px-4">Estado</th>
+            <th class="py-3.5 px-4 text-right">Total</th>
+            <th class="py-3.5 px-4 text-center">Acción</th>
+          </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-slate-800/60 text-xs text-slate-300">
           {% for v in ventas %}
-          <tr class="border-t border-gray-800">
-            <td class="px-3 py-2">{{ v.numero|default:v.id }}</td>
-            <td class="px-3 py-2">{{ v.fecha_emision|date:"d/m/Y" }}</td>
-            <td class="px-3 py-2">{{ v.cliente.nombre }} {{ v.cliente.apellido|default:"" }}</td>
-            <td class="px-3 py-2">{{ v.metodo_pago|default:"-" }}</td>
-            <td class="px-3 py-2">{{ v.estado_pago|default:v.payment_status|default:"-" }}</td>
-            <td class="px-3 py-2 text-right">${{ v.total }}</td>
-            <td class="px-3 py-2 text-right"><a href="{% country_url 'documentos:ver_documento' v.id %}" class="text-cyan-300 hover:underline">Ver</a></td>
+          <tr class="pos-row hover:bg-slate-800/40 transition"
+              data-total="{{ v.total|default:v.total_general|default:v.monto|default:0 }}"
+              data-cost="{{ v.costo|default:0 }}">
+            <td class="py-3.5 px-4 font-mono font-bold text-cyan-300">#{{ v.id }}</td>
+            <td class="py-3.5 px-4 font-mono text-slate-400">{{ v.fecha|default:v.fecha_creacion|default:v.created_at|default:"--" }}</td>
+            <td class="py-3.5 px-4 font-medium text-white">{{ v.cliente.nombre|default:v.cliente_nombre|default:"Cliente Mostrador" }}</td>
+            <td class="py-3.5 px-4">
+              <span class="px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 text-[11px] font-mono">{{ v.metodo_pago|default:v.forma_pago|default:"Efectivo" }}</span>
+            </td>
+            <td class="py-3.5 px-4">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold">
+                ● Pagado
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-right font-mono font-bold text-emerald-400 text-sm cell-total" data-val="{{ v.total|default:v.total_general|default:v.monto|default:0 }}">
+              ${{ v.total|default:v.total_general|default:v.monto|default:0 }}
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              <a href="/cl/es/repuestos/documentos/ver/{{ v.id }}/" class="px-3 py-1.5 rounded-lg bg-cyan-600/20 hover:bg-cyan-600 text-cyan-300 hover:text-white border border-cyan-500/40 text-xs font-medium transition">
+                Ver
+              </a>
+            </td>
           </tr>
           {% empty %}
-          <tr><td colspan="7" class="px-3 py-6 text-center text-gray-500">Aun no hay ventas de repuestos.</td></tr>
+          <tr>
+            <td colspan="7" class="py-8 text-center text-slate-500 font-mono">No hay ventas registradas en el sistema.</td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
+
+    <!-- Barra Inferior Financiera -->
+    <div class="bg-slate-950/90 border-t border-slate-800 p-4 md:px-6 flex flex-wrap items-center justify-between gap-4 font-mono text-xs">
+      <div class="flex items-center gap-2 bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-800">
+        <span class="text-slate-400">Compras / Costo:</span>
+        <span id="secretCost" class="font-bold text-amber-400 tracking-wider">••••••</span>
+        <button type="button" id="toggleCostBtn" class="text-slate-400 hover:text-cyan-400 transition ml-1.5 cursor-pointer" title="Mostrar / Ocultar compras">
+          <svg id="eyeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-6">
+        <div>
+          <span class="text-slate-400">Total Venta:</span>
+          <span id="footerTotalSales" class="font-bold text-white text-sm ml-2">$ 0</span>
+        </div>
+        <div class="pl-4 border-l border-slate-800">
+          <span class="text-slate-400">Ganancia Estimada:</span>
+          <span id="footerNetProfit" class="font-bold text-cyan-400 text-sm ml-2">$ 0</span>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('posSearchInput');
+    const rows = document.querySelectorAll('.pos-row');
+    const counter = document.getElementById('searchCounter');
+    const toggleBtn = document.getElementById('toggleCostBtn');
+    const secretCostSpan = document.getElementById('secretCost');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    let costVisible = false;
+
+    function parseNum(val) {
+      if (!val) return 0;
+      let s = String(val).replace(/[\$\s]/g, '').trim();
+      if (s.includes(',')) s = s.split(',')[0];
+      s = s.replace(/\./g, '');
+      return parseFloat(s) || 0;
+    }
+
+    // Formatear montos CLP en la tabla
+    document.querySelectorAll('.cell-total').forEach(cell => {
+      const n = parseNum(cell.dataset.val);
+      cell.textContent = '$ ' + new Intl.NumberFormat('es-CL').format(n);
+    });
+
+    function filterRows() {
+      const query = searchInput.value.toLowerCase().trim();
+      let matches = 0;
+
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (!query || text.includes(query)) {
+          row.style.display = '';
+          matches++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      counter.textContent = matches + ' ventas';
+      calculateTotals();
+    }
+
+    function calculateTotals() {
+      let totalSales = 0;
+      let totalCost = 0;
+
+      rows.forEach(row => {
+        if (row.style.display !== 'none') {
+          const s = parseNum(row.dataset.total);
+          const c = parseNum(row.dataset.cost) || Math.round(s * 0.60);
+          totalSales += s;
+          totalCost += c;
+        }
+      });
+
+      const netProfit = totalSales - totalCost;
+      document.getElementById('footerTotalSales').textContent = '$ ' + new Intl.NumberFormat('es-CL').format(totalSales);
+      document.getElementById('footerNetProfit').textContent = '$ ' + new Intl.NumberFormat('es-CL').format(netProfit);
+      secretCostSpan.dataset.realValue = '$ ' + new Intl.NumberFormat('es-CL').format(totalCost);
+
+      if (costVisible) {
+        secretCostSpan.textContent = secretCostSpan.dataset.realValue;
+      }
+    }
+
+    searchInput.addEventListener('input', filterRows);
+
+    toggleBtn.addEventListener('click', function() {
+      costVisible = !costVisible;
+      if (costVisible) {
+        secretCostSpan.textContent = secretCostSpan.dataset.realValue || '$ 0';
+        eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
+      } else {
+        secretCostSpan.textContent = '••••••';
+        eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>';
+      }
+    });
+
+    filterRows();
+  });
+</script>
 {% endblock %}

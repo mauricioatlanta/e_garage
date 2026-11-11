@@ -70,6 +70,20 @@ class ProductoCatalogo(TenantScoped):
         db_index=True,
         help_text="Part number del repuesto (debe coincidir con el part_number del Repuesto)",
     )
+    sku = models.CharField(
+        max_length=64,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="SKU o código interno de inventario",
+    )
+    codigo_oem = models.CharField(
+        max_length=64,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Número de parte original OEM",
+    )
 
     nombre = models.CharField(max_length=255, db_index=True, help_text="Nombre del producto")
 
@@ -114,6 +128,8 @@ class ProductoCatalogo(TenantScoped):
         verbose_name_plural = "Productos del Catálogo"
         indexes = [
             Index(fields=["empresa", "part_number"]),
+            Index(fields=["empresa", "sku"]),
+            Index(fields=["empresa", "codigo_oem"]),
             Index(fields=["empresa", "casa_repuestos"]),
             Index(fields=["empresa", "activo"]),
             Index(fields=["empresa", "part_number", "casa_repuestos"]),  # Para búsquedas rápidas

@@ -19,11 +19,10 @@ from taller.common.mixins.context_return import (
 from taller.forms.repuesto import RepuestoForm
 from taller.mixins import CountryLangTemplateMixin
 from taller.models.repuesto import Repuesto
-from taller.services.empresa_service import get_empresa_safe
 
 
 def _get_country(request, default="CL"):
-    empresa = get_empresa_safe(request)
+    empresa = getattr(request.user, "empresa", None)
     raw = getattr(empresa, "pais", None)
 
     if not raw:
@@ -110,14 +109,13 @@ class RepuestoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewM
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        empresa = get_empresa_safe(self.request)
-        if not empresa:
-            return Repuesto.objects.none()
-        qs = Repuesto.objects.filter(empresa=empresa).select_related("categoria")
+        qs = super().get_queryset()
         q = (self.request.GET.get("q") or "").strip()
         if q:
             qs = qs.filter(
                 models.Q(part_number__icontains=q)
+                | models.Q(sku__icontains=q)
+                | models.Q(codigo_oem__icontains=q)
                 | models.Q(nombre__icontains=q)
                 | models.Q(categoria__nombre__icontains=q)
             )
@@ -186,22 +184,13 @@ class RepuestoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewM
         logger.info(f"[REPUESTOS DEBUG] Diferencia: ${manual_total - sql_total}")
 
         context["total_value"] = sql_total
-        context["low_stock_count"] = qs.filter(
-            stock_minimo__isnull=False,
-            cantidad_stock__lte=F("stock_minimo"),
-        ).count()
+        context["low_stock_count"] = qs.filter(cantidad_stock__lt=5).count()
         return context
 
 
 class RepuestoDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
     model = Repuesto
     select_related_fields = ("categoria",)
-
-    def get_queryset(self):
-        empresa = get_empresa_safe(self.request)
-        if not empresa:
-            return Repuesto.objects.none()
-        return Repuesto.objects.filter(empresa=empresa).select_related("categoria")
 
 
 class RepuestoCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
@@ -263,24 +252,12 @@ class RepuestoCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantVie
     def get_template_names(self):
         return ["taller/common/repuestos/repuesto_form.html", "taller/repuestos/repuesto_form.html"]
 
-    def form_valid(self, form):
-        empresa = get_empresa_safe(self.request)
-        if empresa and not getattr(form.instance, "empresa_id", None):
-            form.instance.empresa = empresa
-        return super().form_valid(form)
-
 
 class RepuestoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
     model = Repuesto
     form_class = RepuestoForm
     template_name = "taller/common/repuestos/repuesto_form.html"
     success_url = reverse_lazy("taller:repuestos:lista_repuestos")
-
-    def get_queryset(self):
-        empresa = get_empresa_safe(self.request)
-        if not empresa:
-            return Repuesto.objects.none()
-        return Repuesto.objects.filter(empresa=empresa).select_related("categoria")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

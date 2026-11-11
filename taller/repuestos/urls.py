@@ -1,33 +1,18 @@
 from django.urls import path
-
 from taller.views.reabastecimiento import ReabastecimientoPanelView
 from taller.repuestos.views import (
-    buscar_repuestos_ajax,
-    buscar_repuestos_workspace,
-    crear_repuesto,
-    editar_repuesto,
-    eliminar_repuesto,
-    lista_repuestos,
-    ver_repuesto,
-    pos_buscar_repuestos,
-    pos_buscar_clientes,
-    pos_confirmar_venta,
-    pos_documento_redirect,
-    pos_mostrador,
-    pos_ventas_list,
+    buscar_repuestos_ajax, buscar_repuestos_workspace, crear_repuesto,
+    editar_repuesto, eliminar_repuesto, lista_repuestos, ver_repuesto,
+    pos_buscar_repuestos, pos_buscar_clientes, pos_confirmar_venta,
+    pos_documento_redirect, pos_mostrador, pos_ventas_list
 )
-
 from .api import api_repuesto_por_codigo
 
 app_name = "repuestos"
 
 urlpatterns = [
     path("", lista_repuestos, name="lista_repuestos"),
-    path(
-        "reabastecimiento/",
-        ReabastecimientoPanelView.as_view(),
-        name="reabastecimiento",
-    ),
+    path("reabastecimiento/", ReabastecimientoPanelView.as_view(), name="reabastecimiento"),
     path("crear/", crear_repuesto, name="crear_repuesto"),
     path("pos/", pos_mostrador, name="pos_mostrador"),
     path("pos/ventas/", pos_ventas_list, name="pos_ventas_list"),
@@ -35,14 +20,11 @@ urlpatterns = [
     path("pos/clientes/buscar/", pos_buscar_clientes, name="pos_buscar_clientes"),
     path("pos/confirmar/", pos_confirmar_venta, name="pos_confirmar"),
     path("documentos/ver/<int:pk>/", pos_documento_redirect, name="pos_documento_redirect"),
+    path("pos/documentos/ver/<int:pk>/", pos_documento_redirect, name="pos_documento_redirect_alt"),
     path("<int:pk>/", ver_repuesto, name="ver_repuesto"),
     path("editar/<int:pk>/", editar_repuesto, name="editar_repuesto"),
     path("<int:pk>/eliminar/", eliminar_repuesto, name="eliminar_repuesto"),
     path("buscar/", buscar_repuestos_workspace, name="buscar_repuestos_workspace"),
     path("ajax/buscar/", buscar_repuestos_ajax, name="buscar_repuestos_ajax"),
-    path(
-        "api/repuesto-por-codigo/",
-        api_repuesto_por_codigo,
-        name="api_repuesto_por_codigo",
-    ),
+    path("api/repuesto-por-codigo/", api_repuesto_por_codigo, name="api_repuesto_por_codigo"),
 ]
