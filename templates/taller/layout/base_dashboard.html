@@ -35,7 +35,7 @@
       {% if url_documentos %}
         <a href="{{ url_documentos }}" class="hover:text-cyan-400">ðŸ“„ Documentos</a>
       {% endif %}
-    <a href="/accounts/logout/" class="hover:text-red-400 font-bold">{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚪 Logout{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚪 Logout{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚪 Logout{% else %}🚪 Salir{% endif %}{% endif %}{% endif %}{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🚪 Logout{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚪 Logout{% else %}🚪 Salir{% endif %}{% endif %}{% endif %}</a>
+    <a href="/accounts/logout/" class="hover:text-red-400 font-bold">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚪 Logout{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚪 Logout{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚪 Logout{% else %}🚪 Salir{% endif %}{% endif %}{% endif %}{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚪 Logout{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🚪 Logout{% else %}🚪 Salir{% endif %}{% endif %}{% endif %}</a>
     </nav>
   </header>
   {% endblock %}

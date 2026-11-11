@@ -1,103 +1,132 @@
-{% extends "public/base_tienda.html" %}
-{% load static humanize %}
+{% extends "base.html" %}
+{% load i18n humanize %}
 
-{% block title %}Centro de comando — Kiosko eGarage{% endblock %}
-
-{% block extra_css %}
-<style>
-  :root { --cmd-cyan:#00f0ff; --cmd-ink:#020617; }
-  body { background:var(--cmd-ink); }
-  .cmd-shell { min-height:100vh; position:relative; overflow:hidden; background:radial-gradient(circle at 15% 0%,rgba(0,240,255,.12),transparent 32rem),radial-gradient(circle at 88% 24%,rgba(37,99,235,.14),transparent 30rem),#020617; }
-  .cmd-grid { background-image:linear-gradient(rgba(34,211,238,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.045) 1px,transparent 1px); background-size:42px 42px; }
-  .cmd-glass { background:rgba(15,23,42,.72); border:1px solid rgba(34,211,238,.24); box-shadow:0 20px 70px rgba(0,0,0,.28); backdrop-filter:blur(16px); }
-  .cmd-input { width:100%; border:1px solid rgba(71,85,105,.8); border-radius:.8rem; background:rgba(2,6,23,.78); color:#e2e8f0; padding:.72rem .9rem; outline:0; }
-  .cmd-input:focus { border-color:var(--cmd-cyan); box-shadow:0 0 0 2px rgba(0,240,255,.12); }
-  .cmd-input::placeholder { color:#64748b; }
-  .cmd-label { display:block; margin-bottom:.35rem; color:#64748b; font:600 .66rem/1.2 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.1em; text-transform:uppercase; }
-  .cmd-ping { animation:cmd-ping 1.8s cubic-bezier(0,0,.2,1) infinite; }
-  @keyframes cmd-ping { 75%,100% { transform:scale(2); opacity:0; } }
-  .cmd-stat { border-left:2px solid rgba(0,240,255,.65); }
-  .cmd-shell .card-pieza { background:rgba(15,23,42,.72); border-color:rgba(34,211,238,.18); }
-  .cmd-shell .card-pieza:hover { border-color:var(--cmd-cyan); box-shadow:0 0 30px rgba(0,240,255,.1); }
-  .chip-active { background:rgba(34,211,238,.12); border:1px solid rgba(34,211,238,.35); border-radius:999px; color:#67e8f9; font-size:.72rem; padding:.2rem .65rem; }
-  .cmd-brand { filter:drop-shadow(0 0 12px rgba(0,240,255,.42)); }
-  .cmd-kicker { color:#67e8f9; font:600 .65rem/1.2 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.22em; text-transform:uppercase; }
-  .cmd-frame { position:relative; }
-  .cmd-frame:before,.cmd-frame:after { content:""; position:absolute; width:34px; height:34px; pointer-events:none; }
-  .cmd-frame:before { top:0; left:0; border-top:1px solid #00f0ff; border-left:1px solid #00f0ff; }
-  .cmd-frame:after { right:0; bottom:0; border-right:1px solid #2563eb; border-bottom:1px solid #2563eb; }
-  .cmd-scanline { background:linear-gradient(180deg,transparent 0%,rgba(0,240,255,.04) 50%,transparent 100%); background-size:100% 8px; }
-</style>
-{% endblock %}
+{% block title %}Kiosco de Repuestos en Vivo · eGarage{% endblock %}
 
 {% block content %}
-<div class="cmd-shell cmd-grid">
-  <div class="relative z-10 max-w-7xl mx-auto px-4 pt-8 md:pt-12 pb-20">
-    <div class="flex items-center justify-between mb-10 cmd-kicker">
-      <a href="https://egarage.cl" class="inline-flex items-center gap-3" aria-label="eGarage inicio">
-        <img src="{% static 'taller/common/img/egarage-logo-1.885bfc56.svg' %}" alt="eGarage" class="cmd-brand h-8 md:h-10 w-auto">
-        <span class="hidden sm:inline border-l border-cyan-400/30 pl-3">DIGITAL PARTS NETWORK</span>
-      </a>
-      <span class="hidden sm:inline-flex items-center gap-2 text-slate-500"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> SYSTEM ONLINE // v1.0</span>
+<!-- ================================================================= -->
+<!-- KIOSKO DE REPUESTOS // eGarage High-Impact Command Interface -->
+<!-- ================================================================= -->
+<div class="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased relative overflow-hidden pb-16">
+
+  <!-- Efectos de Fondo Holográficos -->
+  <div class="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-1/3 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- Hero Section & Identidad de Marca eGarage -->
+  <header class="relative z-10 max-w-7xl mx-auto px-4 pt-10 pb-8 text-center">
+    
+    <!-- Logo / Badge de Marca -->
+    <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-cyan-950/90 border border-cyan-500/50 text-cyan-300 text-xs font-mono mb-5 shadow-lg shadow-cyan-950/60 backdrop-blur">
+      <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+      <span class="font-bold tracking-wider text-white">eGARAGE</span> // RED DE DESARMADURÍAS EN VIVO
     </div>
-    <header class="text-center">
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/70 border border-cyan-400/35 text-cyan-300 text-[10px] md:text-xs font-mono tracking-wider shadow-lg shadow-cyan-950/40">
-        <span class="relative flex h-2 w-2"><span class="cmd-ping absolute inline-flex h-full w-full rounded-full bg-cyan-300 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-300"></span></span>
-        RED DE DESARMADURÍAS CONECTADA EN VIVO
-      </div>
-      <p class="cmd-kicker mt-6">eGarage // COMMAND CENTER</p>
-      <h1 class="mt-3 text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">Controla y busca repuestos en <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-500">tiempo real</span></h1>
-      <p class="max-w-2xl mx-auto mt-4 text-sm md:text-base text-slate-400 leading-relaxed">Inventario verificado de desarmadurías conectadas. Encuentra la pieza, confirma su disponibilidad y contacta directamente desde cualquier dispositivo.</p>
-    </header>
 
-    <section class="cmd-glass cmd-frame cmd-scanline rounded-2xl p-4 md:p-5 mt-8 max-w-5xl mx-auto" aria-label="Búsqueda inteligente">
-      <form method="get" id="kiosko-search-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        <div><label class="cmd-label" for="kiosko-anio">Año</label><select id="kiosko-anio" name="anio" class="cmd-input" onchange="this.form.submit()"><option value="">Todos los años</option>{% for anio in anios_disponibles %}<option value="{{ anio }}" {% if anio_sel == anio|stringformat:"s" %}selected{% endif %}>{{ anio }}</option>{% endfor %}</select></div>
-        <div class="lg:col-span-2"><label class="cmd-label" for="kiosko-q">Pieza, marca o modelo</label><input id="kiosko-q" type="search" name="q" value="{{ q }}" placeholder="Alternador, Versa, radiador…" class="cmd-input" autocomplete="off"></div>
-        <div><label class="cmd-label" for="kiosko-region">Región</label><select id="kiosko-region" name="region" class="cmd-input" onchange="this.form.submit()"><option value="">Todas las regiones</option>{% for region in regiones_disponibles %}<option value="{{ region }}" {% if region_sel == region %}selected{% endif %}>{{ region }}</option>{% endfor %}</select></div>
-        <div class="flex items-end"><button type="submit" class="w-full min-h-[44px] rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/20 transition">⌕ Buscar pieza</button></div>
-        <div><label class="cmd-label" for="kiosko-marca">Marca</label><select id="kiosko-marca" name="marca" class="cmd-input" onchange="this.form.submit()"><option value="">Todas las marcas</option>{% for marca in marcas_disponibles %}<option value="{{ marca }}" {% if marca_sel == marca %}selected{% endif %}>{{ marca }}</option>{% endfor %}</select></div>
-        <div><label class="cmd-label" for="kiosko-modelo">Modelo</label><select id="kiosko-modelo" name="modelo" class="cmd-input" onchange="this.form.submit()"><option value="">Todos los modelos</option>{% for modelo in modelos_disponibles %}<option value="{{ modelo }}" {% if modelo_sel == modelo %}selected{% endif %}>{{ modelo }}</option>{% endfor %}</select></div>
-        <div><label class="cmd-label" for="kiosko-tipo">Condición</label><select id="kiosko-tipo" name="tipo" class="cmd-input" onchange="this.form.submit()"><option value="">Nuevo y usado</option><option value="NUEVO" {% if tipo_sel == "NUEVO" %}selected{% endif %}>Solo nuevos</option><option value="USADO" {% if tipo_sel == "USADO" %}selected{% endif %}>Solo usados</option></select></div>
-        <div class="sm:col-span-2 lg:col-span-2 flex items-end"><p id="kiosko-live-status" class="text-xs text-slate-500" role="status" aria-live="polite">Escribe para actualizar los resultados automáticamente.</p></div>
+    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">
+      Centro de control y búsqueda en <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">tiempo real</span>
+    </h1>
+    
+    <p class="max-w-2xl mx-auto text-sm md:text-base text-slate-400 mb-8 leading-relaxed">
+      Monitorea y explora el inventario verificado de piezas extraídas en patio, bodega o compras de patio directo desde tu celular, tablet o computador.
+    </p>
+
+    <!-- Barra de Búsqueda Inteligente de Alto Impacto -->
+    <div class="max-w-4xl mx-auto bg-slate-900/90 p-3.5 rounded-2xl border border-cyan-500/40 shadow-2xl backdrop-blur-md">
+      <form method="GET" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        
+        <!-- Año / Modelo -->
+        <div class="relative">
+          <input type="text" name="ano" value="{{ request.GET.ano|default:'' }}" placeholder="Año (ej. 2018)..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition font-mono">
+        </div>
+
+        <!-- Búsqueda Principal -->
+        <div class="relative sm:col-span-2 flex gap-2">
+          <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Buscar por pieza, código SKU, marca o modelo..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition">
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs tracking-wide shadow-lg shadow-cyan-500/20 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            Buscar
+          </button>
+        </div>
+
       </form>
-      {% if anio_sel or marca_sel or modelo_sel or q or tipo_sel or region_sel %}<div id="kiosko-active-filters" class="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-slate-800/80"><span class="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Filtros activos:</span>{% if anio_sel %}<span class="chip-active">{{ anio_sel }}</span>{% endif %}{% if marca_sel %}<span class="chip-active">{{ marca_sel }}</span>{% endif %}{% if modelo_sel %}<span class="chip-active">{{ modelo_sel }}</span>{% endif %}{% if q %}<span class="chip-active">«{{ q }}»</span>{% endif %}{% if tipo_sel %}<span class="chip-active">{{ tipo_sel }}</span>{% endif %}{% if region_sel %}<span class="chip-active">📍 {{ region_sel }}</span>{% endif %}<a href="/tienda/kiosko/" class="text-xs text-slate-400 hover:text-cyan-300 ml-auto">Limpiar</a></div>{% endif %}
-    </section>
+    </div>
+  </header>
 
-    <section class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6" aria-label="Telemetría de inventario">
-      <div class="cmd-glass cmd-stat rounded-xl p-4"><p class="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Piezas listas</p><p class="text-2xl font-bold text-cyan-300 mt-1">{{ red_piezas|intcomma }}</p><p class="text-[10px] text-slate-500 mt-1">disponibles para despacho</p></div>
-      <div class="cmd-glass cmd-stat rounded-xl p-4"><p class="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Vehículos indexados</p><p class="text-2xl font-bold text-white mt-1">{{ red_vehiculos|intcomma }}</p><p class="text-[10px] text-slate-500 mt-1">con inventario activo</p></div>
-      <div class="cmd-glass cmd-stat rounded-xl p-4"><p class="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Red conectada</p><p class="text-2xl font-bold text-blue-300 mt-1">{{ red_empresas|intcomma }}</p><p class="text-[10px] text-slate-500 mt-1">desarmadurías verificadas</p></div>
-      <div class="cmd-glass cmd-stat rounded-xl p-4"><p class="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Resultado actual</p><p class="text-2xl font-bold text-emerald-300 mt-1">{{ piezas.paginator.count|intcomma }}</p><p class="text-[10px] text-slate-500 mt-1">coincidencias encontradas</p></div>
-    </section>
+  <!-- Grilla de Tarjetas Modernas (Inventario en Vivo) -->
+  <main class="relative z-10 max-w-7xl mx-auto px-4">
+    <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-2">
+      <h2 class="text-xs font-mono font-bold uppercase tracking-wider text-cyan-400">
+        📦 Repuestos Disponibles y En Yarda
+      </h2>
+      <span class="text-xs font-mono text-slate-400">
+        Mostrando resultados actualizados
+      </span>
+    </div>
 
-    <main id="kiosko-results" class="mt-10">
-      <div class="flex items-center justify-between gap-3 mb-5 border-b border-slate-800/80 pb-3"><h2 class="text-xs font-mono font-bold uppercase tracking-widest text-cyan-300">// Inventario verificado en línea</h2><span class="text-[10px] text-slate-500 font-mono">Actualización bajo demanda</span></div>
-      {% if not piezas %}<div class="cmd-glass rounded-2xl text-center py-20 text-slate-500"><p class="text-4xl mb-3">⌕</p><p class="text-lg">No encontramos repuestos con esos criterios.</p><a href="/tienda/kiosko/" class="mt-4 inline-block text-cyan-300 hover:underline text-sm">Ver todo el inventario</a></div>{% else %}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">{% for pieza in piezas %}{% include "public/storefront/_card_pieza.html" %}{% endfor %}</div>
-        {% if piezas.has_other_pages %}<nav class="mt-8 flex justify-center gap-2 text-sm">{% if piezas.has_previous %}<a href="?{{ qs_base }}&page={{ piezas.previous_page_number }}" class="px-4 py-2 rounded-lg border border-slate-700 text-slate-300 hover:border-cyan-400 transition">← Anterior</a>{% endif %}<span class="px-4 py-2 text-slate-500">{{ piezas.number }} / {{ piezas.paginator.num_pages }}</span>{% if piezas.has_next %}<a href="?{{ qs_base }}&page={{ piezas.next_page_number }}" class="px-4 py-2 rounded-lg border border-slate-700 text-slate-300 hover:border-cyan-400 transition">Siguiente →</a>{% endif %}</nav>{% endif %}
-      {% endif %}
-    </main>
-  </div>
+    <!-- Contenedor de Tarjetas -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {% for pieza in piezas %}
+      <div class="bg-slate-900/70 border border-slate-800 hover:border-cyan-500/50 rounded-2xl p-4 transition duration-300 flex flex-col justify-between backdrop-blur group shadow-lg">
+        
+        <div>
+          <!-- Cabecera de Tarjeta: SKU y Estado -->
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="font-mono text-xs font-bold text-cyan-300 bg-cyan-950/80 px-2.5 py-1 rounded border border-cyan-800/60">
+              {{ pieza.codigo|default:"SKU-00" }}
+            </span>
+            {% if pieza.ubicacion_tipo == 'BODEGA' %}
+              <span class="px-2 py-0.5 rounded bg-amber-950/80 border border-amber-500/40 text-amber-300 text-[10px] font-mono">En Bodega</span>
+            {% elif pieza.estado_pieza == 'VENDIDA' %}
+              <span class="px-2 py-0.5 rounded bg-rose-950/80 border border-rose-500/40 text-rose-300 text-[10px] font-mono">Vendida</span>
+            {% else %}
+              <span class="px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-[10px] font-mono">Chasis (Patio)</span>
+            {% endif %}
+          </div>
+
+          <!-- Nombre del Repuesto -->
+          <h3 class="font-bold text-white text-sm mb-2 group-hover:text-cyan-300 transition line-clamp-2">
+            {{ pieza.nombre }}
+          </h3>
+
+          <!-- Detalles de Ubicación y Vehículo -->
+          <p class="text-xs text-slate-400 mb-4 space-y-0.5">
+            {% if pieza.vehiculo %}
+              <span class="block text-slate-300">🚗 {{ pieza.vehiculo.marca }} {{ pieza.vehiculo.modelo }} ({{ pieza.vehiculo.ano|default:"" }})</span>
+            {% endif %}
+            {% if pieza.ubicacion_fisica %}
+              <span class="block text-[11px] text-amber-400/90 font-mono">📍 {{ pieza.ubicacion_fisica }}</span>
+            {% endif %}
+          </p>
+        </div>
+
+        <!-- Pie de Tarjeta: Precio y Acción -->
+        <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between">
+          <div>
+            <span class="block text-[10px] font-mono text-slate-500 uppercase">Precio</span>
+            <span class="font-mono font-bold text-emerald-400 text-sm">
+              {% if pieza.precio_venta_sugerido %}
+                $ {{ pieza.precio_venta_sugerido|floatformat:0|intcomma }}
+              {% else %}
+                A consultar
+              {% endif %}
+            </span>
+          </div>
+
+          {% if empresa.slug %}
+          <a href="{% url 'tienda:tienda_storefront_slug' slug=empresa.slug %}" class="px-3 py-1.5 rounded-lg bg-cyan-600/20 hover:bg-cyan-600 text-cyan-300 hover:text-white border border-cyan-500/40 text-xs font-semibold transition">
+            Ver Kiosco
+          </a>
+          {% endif %}
+        </div>
+
+      </div>
+      {% empty %}
+      <div class="col-span-full py-16 text-center text-slate-500 font-mono text-xs">
+        No se encontraron repuestos con los filtros actuales en el kiosco.
+      </div>
+      {% endfor %}
+    </div>
+
+  </main>
 </div>
-{% include "public/storefront/_modal_pieza.html" %}
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/storefront_pieza_modal.js' %}?v=20260710-1"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  var form=document.getElementById('kiosko-search-form'), input=document.getElementById('kiosko-q'), results=document.getElementById('kiosko-results'), status=document.getElementById('kiosko-live-status');
-  if (!form || !input || !results || !window.fetch) return;
-  var timer, controller;
-  function search() {
-    var url=new URL(window.location.href), value=input.value.trim();
-    if (value) url.searchParams.set('q',value); else url.searchParams.delete('q'); url.searchParams.set('page','1');
-    if (controller) controller.abort(); controller=new AbortController(); if (status) status.textContent='Consultando inventario…';
-    fetch(url.toString(),{headers:{'X-Requested-With':'XMLHttpRequest','Accept':'text/html'},cache:'no-store',signal:controller.signal}).then(function(r){if(!r.ok)throw new Error(r.status);return r.text();}).then(function(html){var doc=new DOMParser().parseFromString(html,'text/html'),next=doc.getElementById('kiosko-results');if(!next)throw new Error('Resultados no encontrados');results.replaceWith(next);results=next;window.history.replaceState({},'',url.toString());if(status)status.textContent='Inventario actualizado.';}).catch(function(e){if(e.name!=='AbortError'&&status)status.textContent='No se pudo actualizar; pulsa Buscar para reintentar.';});
-  }
-  input.addEventListener('input',function(){clearTimeout(timer);timer=setTimeout(search,300);});
-  form.addEventListener('submit',function(e){e.preventDefault();clearTimeout(timer);search();});
-});
-</script>
 {% endblock %}

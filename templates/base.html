@@ -824,7 +824,7 @@
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
             <span class="nav-icon">🚪</span>
-            <span class="nav-text">{% trans "Salir" %}</span>
+            <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Sair{% else %}{% trans "Salir" %}{% endif %}</span>
           </button>
         </form>
       </div>
@@ -833,18 +833,18 @@
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
         <a href="{% country_url 'company_settings' %}" class="nav-button-standard">
           <span class="nav-icon">⚙️</span>
-          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Settings{% else %}Ajustes{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Configurações{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Settings{% else %}Ajustes{% endif %}{% endif %}</span>
         </a>
         {% if request.user|is_owner %}
         <a href="{% country_url 'team' %}" class="nav-button-standard {% if 'equipo' in request.path %}bg-gray-100 text-gray-900{% endif %}">
           <span class="nav-icon">👤</span>
-          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Team{% else %}Equipo{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Equipe{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Team{% else %}Equipo{% endif %}{% endif %}</span>
         </a>
         {% endif %}
         {% if not qa_control_is_cl_desarme %}
         <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
           <span class="nav-icon">🚀</span>
-          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Center{% else %}Centro{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Central{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Center{% else %}Centro{% endif %}{% endif %}</span>
         </a>
         <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
           <span class="nav-icon">👥</span>
@@ -857,7 +857,7 @@
         </a>
         <a href="{% country_url 'reciclaje_staff:listado_ventas' %}" class="nav-button-standard">
           <span class="nav-icon">💵</span>
-          <span class="nav-text">Ventas</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Vendas{% else %}Ventas{% endif %}</span>
         </a>
         {% else %}
         <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
@@ -878,7 +878,7 @@
         {% if 'repuestos' in business_modules %}
         <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
           <span class="nav-icon">🔧</span>
-          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Parts{% else %}Repuestos{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Peças{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Parts{% else %}Repuestos{% endif %}{% endif %}</span>
         </a>
         {% endif %}
         {% if 'reciclaje' in business_modules %}
@@ -888,18 +888,18 @@
         </a>
         <a href="{% country_url 'reciclaje_staff:reporte_fechas' %}" class="nav-button-standard">
           <span class="nav-icon">📊</span>
-          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Reports{% else %}Reportes{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Relatórios{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Reports{% else %}Reportes{% endif %}{% endif %}</span>
         </a>
         {% else %}
         <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
           <span class="nav-icon">📊</span>
-          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Reports{% else %}Reportes{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Relatórios{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Reports{% else %}Reportes{% endif %}{% endif %}</span>
         </a>
         {% endif %}
         {% if 'servicios' in business_modules %}
         <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
           <span class="nav-icon">🛠️</span>
-          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Services{% else %}Servicios{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Serviços{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Services{% else %}Servicios{% endif %}{% endif %}</span>
         </a>
         {% endif %}
         {% endif %}
@@ -907,7 +907,7 @@
         {% country_url 'desarme:index' as desarme_url %}
         <a href="{% if desarme_url %}{{ desarme_url }}{% else %}#{% endif %}" class="nav-button-standard">
           <span class="nav-icon">🧩</span>
-          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Disassembly{% else %}Desarme{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Desmontagem{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Disassembly{% else %}Desarme{% endif %}{% endif %}</span>
         </a>
         {% endif %}
         {% if not qa_control_is_cl_desarme %}
@@ -916,12 +916,12 @@
         {% if vehiculos_url %}
         <a href="{{ vehiculos_url }}" class="nav-button-standard">
           <span class="nav-icon">🚗</span>
-          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Vehicles{% else %}Vehículos{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Veículos{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Vehicles{% else %}Vehículos{% endif %}{% endif %}</span>
         </a>
         {% else %}
         <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
           <span class="nav-icon">🚗</span>
-          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Vehicles{% else %}Vehículos{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Veículos{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Vehicles{% else %}Vehículos{% endif %}{% endif %}</span>
         </a>
         {% endif %}
         {% endif %}
@@ -930,7 +930,7 @@
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
             <span class="nav-icon">🚪</span>
-            <span class="nav-text">{% trans "Salir" %}</span>
+            <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Sair{% else %}{% trans "Salir" %}{% endif %}</span>
           </button>
         </form>
       </div>
@@ -1031,20 +1031,24 @@
         </a>
         <span aria-hidden="true">•</span>
         <a href="/legal/" class="text-cyan-400 hover:underline">
-          {% if request.LANGUAGE_CODE == 'es' or LANGUAGE_CODE == 'es' %}
+          {% if request.path|slice:':7' == '/br/pt/' %}
+            Termos e Privacidade
+          {% elif request.LANGUAGE_CODE == 'es' or LANGUAGE_CODE == 'es' %}
             Términos y Privacidad
           {% else %}
             Legal
           {% endif %}
         </a>
+{% if request.path|slice:':4' != '/br/' %}
         {% if request.LANGUAGE_CODE == 'es' or LANGUAGE_CODE == 'es' %}
         <span aria-hidden="true">•</span>
         <a href="/legal/#proteccion-datos-tributarios" class="text-emerald-400 hover:underline text-xs">
           Datos Tributarios
         </a>
         {% endif %}
+        {% endif %}
         <span aria-hidden="true">•</span>
-        <span class="text-xs text-gray-500">All Rights Reserved</span>
+        <span class="text-xs text-gray-500">{% if request.path|slice:':7' == '/br/pt/' %}Todos os direitos reservados{% else %}All Rights Reserved{% endif %}</span>
       </div>
     </div>
   </footer>
@@ -1200,7 +1204,7 @@
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
               <h3 class="text-lg leading-6 font-bold text-cyan-400 glow-text mb-4" id="help-modal-title">
-                🚀 Ayuda de eGarage
+                {% if request.path|slice:':7' == '/br/pt/' %}🚀 Ajuda do eGarage{% else %}🚀 Ayuda de eGarage{% endif %}
               </h3>
               <div class="mt-2" id="help-modal-content">
                 <div class="animate-pulse flex space-y-4 flex-col">
@@ -1214,10 +1218,10 @@
         </div>
         <div class="bg-[#0a0e14] px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
           <button type="button" onclick="closeContextualHelp()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition-colors">
-            Entendido
+            {% if request.path|slice:':7' == '/br/pt/' %}Entendi{% else %}Entendido{% endif %}
           </button>
           <a href="/cl/help/" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-transparent text-base font-medium text-gray-300 hover:bg-gray-800 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
-            Ver Centro de Ayuda completo
+            {% if request.path|slice:':7' == '/br/pt/' %}Ver Central de Ajuda completa{% else %}Ver Centro de Ayuda completo{% endif %}
           </a>
         </div>
       </div>

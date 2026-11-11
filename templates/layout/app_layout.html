@@ -13,12 +13,15 @@
 
     <nav class="space-y-2">
 
-      <a href="/cl/es/dashboard/" class="nav-item">Dashboard</a>
-      <a href="/cl/es/documentos/" class="nav-item">Documentos</a>
-      <a href="/cl/es/clientes/" class="nav-item">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Clients{% else %}Clientes{% endif %}</a>
-      <a href="/cl/es/vehiculos/" class="nav-item">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Vehicles{% else %}Vehículos{% endif %}</a>
-      <a href="/cl/es/repuestos/" class="nav-item">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Parts{% else %}Repuestos{% endif %}</a>
-      <a href="/cl/es/reportes/" class="nav-item">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Reports{% else %}Reportes{% endif %}</a>
+      {% with p=request.path|slice:":7" %}
+      {% if "/co/" in p %}{% setvar "co/es" as cp %}{% elif "/us/" in p %}{% setvar "us/en" as cp %}{% else %}{% setvar "cl/es" as cp %}{% endif %}
+      {% endwith %}
+      <a href="{% if '/ec/' in request.path %}/ec/es/dashboard/{% elif '/pe/' in request.path %}/pe/es/dashboard/{% elif '/co/' in request.path %}/co/es/dashboard/{% elif '/us/' in request.path %}/us/en/dashboard/{% else %}/cl/es/dashboard/{% endif %}" class="nav-item">Dashboard</a>
+      <a href="{% if '/ec/' in request.path %}/ec/es/documentos/{% elif '/pe/' in request.path %}/pe/es/documentos/{% elif '/co/' in request.path %}/co/es/documentos/{% elif '/us/' in request.path %}/us/en/documentos/{% else %}/cl/es/documentos/{% endif %}" class="nav-item">Documentos</a>
+      <a href="{% if '/ec/' in request.path %}/ec/es/clientes/{% elif '/pe/' in request.path %}/pe/es/clientes/{% elif '/co/' in request.path %}/co/es/clientes/{% elif '/us/' in request.path %}/us/en/clientes/{% else %}/cl/es/clientes/{% endif %}" class="nav-item">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Clients{% else %}Clientes{% endif %}</a>
+      <a href="{% if '/ec/' in request.path %}/ec/es/vehiculos/{% elif '/pe/' in request.path %}/pe/es/vehiculos/{% elif '/co/' in request.path %}/co/es/vehiculos/{% elif '/us/' in request.path %}/us/en/vehiculos/{% else %}/cl/es/vehiculos/{% endif %}" class="nav-item">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Vehicles{% else %}Vehículos{% endif %}</a>
+      <a href="{% if '/ec/' in request.path %}/ec/es/repuestos/{% elif '/pe/' in request.path %}/pe/es/repuestos/{% elif '/co/' in request.path %}/co/es/repuestos/{% elif '/us/' in request.path %}/us/en/repuestos/{% else %}/cl/es/repuestos/{% endif %}" class="nav-item">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Parts{% else %}Repuestos{% endif %}</a>
+      <a href="{% if '/ec/' in request.path %}/ec/es/reportes/{% elif '/pe/' in request.path %}/pe/es/reportes/{% elif '/co/' in request.path %}/co/es/reportes/{% elif '/us/' in request.path %}/us/en/reportes/{% else %}/cl/es/reportes/{% endif %}" class="nav-item">{% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Reports{% else %}Reportes{% endif %}</a>
 
     </nav>
 

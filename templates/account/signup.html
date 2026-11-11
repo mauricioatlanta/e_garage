@@ -270,6 +270,31 @@
 </head>
 <body>
     <main class="signup-shell">
+<div class="lang-switch" style="position:absolute;top:16px;right:16px;z-index:50;display:flex;gap:0;background:rgba(0,0,0,.7);border:1px solid rgba(34,211,238,.4);border-radius:999px;padding:3px;">
+<a href="#" data-switch-lang="en" style="padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800;color:#bae6fd;text-decoration:none;">EN</a>
+<a href="#" data-switch-lang="es" style="padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800;color:#bae6fd;text-decoration:none;">ES</a>
+</div>
+<script>
+(function(){
+var qs = window.location.search;
+var path = window.location.pathname;
+function target(lang){
+if(path.indexOf('/us/')!==-1){ return '/us/'+lang+'/accounts/signup/'+qs; }
+if(path.indexOf('/cl/')!==-1){ return '/cl/'+lang+'/accounts/signup/'+qs; }
+if(lang==='en'){ return '/us/en/accounts/signup/'+qs; }
+return '/cl/es/accounts/signup/'+qs;
+}
+document.querySelectorAll('[data-switch-lang]').forEach(function(a){
+var lang = a.getAttribute('data-switch-lang');
+a.href = target(lang);
+var cur = 'es';
+if(path.indexOf('/us/en/')!==-1 || path.indexOf('/en/')!==-1) cur='en';
+if(path.indexOf('/us/es/')!==-1) cur='es';
+if(lang===cur){ a.style.background='#0284c7'; a.style.color='#fff'; }
+});
+})();
+</script>
+
         <div class="mb-8 text-center">
             <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage" class="mx-auto mb-4 h-16 w-auto">
             <h1 class="text-3xl font-extrabold tracking-tight md:text-5xl" id="signup-headline">Crea tu cuenta</h1>

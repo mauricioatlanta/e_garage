@@ -1,127 +1,221 @@
 {% extends "base.html" %}
 {% load i18n static %}
 
-{% block title %}Iniciar Sesión · eGarage{% endblock %}
+{% block title %}Acceso Corporativo · eGarage{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
-  .eg-login-wrapper {
-    min-height: 85vh;
+  .eg-auth-bg {
+    min-height: calc(100vh - 80px);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1.5rem 1rem;
+    padding: 2rem 1rem;
     position: relative;
-    z-index: 20;
   }
-  .eg-login-card {
+  
+  .eg-auth-card {
     width: 100%;
     max-width: 440px;
-    background-color: #0b1322 !important;
-    border: 2px solid #06b6d4 !important;
-    border-radius: 1.25rem;
-    padding: 2.25rem 2rem;
-    box-shadow: 0 0 30px rgba(6, 182, 212, 0.25), 0 20px 40px rgba(0, 0, 0, 0.9);
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 1rem;
+    padding: 2.5rem 2.25rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
   }
-  .eg-label {
+
+  .eg-auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #2563eb, #38bdf8, #0ea5e9);
+  }
+
+  .eg-form-label {
     display: block;
-    color: #38bdf8 !important;
-    font-size: 0.8rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 0.4rem;
-  }
-  .eg-input-control {
-    width: 100%;
-    background-color: #111827 !important;
-    border: 1.5px solid #334155 !important;
-    color: #ffffff !important;
-    font-size: 0.95rem !important;
+    color: #cbd5e1;
+    font-size: 0.8125rem;
     font-weight: 600;
-    padding: 0.85rem 1rem !important;
-    border-radius: 0.75rem;
-    outline: none !important;
-    transition: all 0.2s ease;
+    letter-spacing: 0.025em;
+    margin-bottom: 0.5rem;
   }
-  .eg-input-control:focus {
-    border-color: #38bdf8 !important;
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.4) !important;
-    background-color: #0f172a !important;
+
+  .eg-input-wrapper {
+    position: relative;
   }
-  .eg-input-control::placeholder {
-    color: #94a3b8 !important;
-    font-weight: 400;
+
+  .eg-input-wrapper i.input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 0.9rem;
+    transition: color 0.15s ease;
   }
-  .eg-submit-btn {
+
+  .eg-input {
     width: 100%;
-    background: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%) !important;
-    color: #020617 !important;
-    font-weight: 900 !important;
-    font-size: 0.95rem !important;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 0.9rem !important;
-    border-radius: 0.75rem;
+    background-color: #0b1120;
+    border: 1px solid #334155;
+    color: #f8fafc;
+    font-size: 0.9375rem;
+    padding: 0.75rem 1rem 0.75rem 2.65rem;
+    border-radius: 0.625rem;
+    outline: none;
+    transition: all 0.15s ease-in-out;
+  }
+
+  .eg-input:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    background-color: #0f172a;
+  }
+
+  .eg-input:focus + i.input-icon {
+    color: #38bdf8;
+  }
+
+  .eg-input::placeholder {
+    color: #475569;
+  }
+
+  .eg-btn-primary {
+    width: 100%;
+    background-color: #0284c7;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    letter-spacing: 0.02em;
+    padding: 0.8rem 1.25rem;
+    border-radius: 0.625rem;
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
-    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.15s ease;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
   }
-  .eg-submit-btn:hover {
-    filter: brightness(1.15);
+
+  .eg-btn-primary:hover {
+    background-color: #0369a1;
+    box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
     transform: translateY(-1px);
-    box-shadow: 0 6px 24px rgba(6, 182, 212, 0.6);
+  }
+
+  .eg-btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .country-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    background-color: #1e293b;
+    color: #94a3b8;
+    border: 1px solid #334155;
+    margin-top: 0.75rem;
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="eg-login-wrapper">
-  <div class="eg-login-card">
-    
-    <div class="text-center mb-6">
-      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-400 text-cyan-300 text-2xl mb-3 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-        ⚙️
+<div class="eg-auth-bg">
+  <div class="eg-auth-card">
+
+    <!-- Header & Brand -->
+    <div class="text-center mb-8">
+      <div class="flex items-center justify-center gap-2 mb-2">
+        <img src="{% static 'img/logo_egarage.png' %}" alt="eGarage" class="h-20 md:h-24 max-w-[260px] w-auto object-contain mx-auto filter drop-shadow"
+             onerror="this.style.display='none'; document.getElementById('eg-fallback-brand').style.display='flex';">
+        <div id="eg-fallback-brand" style="display:none;" class="items-center gap-2 text-2xl font-black text-white tracking-wider">
+          <span class="text-sky-400">e</span>Garage
+        </div>
       </div>
-      <h1 class="text-2xl font-black text-white tracking-tight m-0">Iniciar Sesión</h1>
-      <p class="text-xs text-slate-300 font-medium mt-1">Plataforma de Control eGarage</p>
+      
+      <p class="text-xs text-slate-400 font-medium tracking-wide m-0">
+        Gestión Automotriz & Centros de Servicio
+      </p>
+
+      <!-- Badge País Dinámico -->
+      {% with c=country|default:request.country|default:"" %}
+        {% if c == 'UY' or '/uy/' in request.path %}
+          <div class="country-badge-pill"><span>🇺🇾</span> URUGUAY</div>
+        {% elif c == 'PE' or '/pe/' in request.path %}
+          <div class="country-badge-pill"><span>🇵🇪</span> PERÚ</div>
+        {% elif c == 'EC' or '/ec/' in request.path %}
+          <div class="country-badge-pill"><span>🇪🇨</span> ECUADOR</div>
+        {% elif c == 'US' or '/us/' in request.path %}
+          <div class="country-badge-pill"><span>🇺🇸</span> UNITED STATES</div>
+        {% elif c == 'MX' or '/mx/' in request.path %}
+          <div class="country-badge-pill"><span>🇲🇽</span> MÉXICO</div>
+        {% elif c == 'BR' or '/br/' in request.path %}
+          <div class="country-badge-pill"><span>🇧🇷</span> BRASIL</div>
+        {% else %}
+          <div class="country-badge-pill"><span>🇨🇱</span> CHILE</div>
+        {% endif %}
+      {% endwith %}
     </div>
 
+    <!-- Error Alert -->
     {% if form.errors %}
-    <div class="mb-4 p-3 rounded-xl bg-red-950/80 border border-red-500 text-red-200 text-xs font-semibold text-center">
-      Credenciales incorrectas. Verifica tu usuario y contraseña.
+    <div class="mb-5 p-3.5 rounded-lg bg-rose-950/50 border border-rose-800 text-rose-200 text-xs font-medium flex items-center gap-2.5">
+      <i class="fas fa-circle-exclamation text-rose-400 text-sm"></i>
+      <span>Credenciales no válidas. Por favor verifique sus datos.</span>
     </div>
     {% endif %}
 
-    <form method="POST" action="{% url 'account_login' %}" class="space-y-4">
+    <!-- Form -->
+    <form method="POST" action="{% url 'account_login' %}" class="space-y-5" id="login-form-manual" onsubmit="return window.__allowLoginSubmit === true;">
       {% csrf_token %}
 
       <div>
-        <label for="id_login" class="eg-label">Usuario o Correo Electrónico</label>
-        <input type="text" name="login" id="id_login" required autocomplete="username"
-               placeholder="Ingresa tu usuario o email"
-               class="eg-input-control">
+        <label for="id_login" class="eg-form-label">Usuario o Correo Corporativo</label>
+        <div class="eg-input-wrapper">
+          <input type="text" name="login" id="id_login" required autocomplete="username"
+                 placeholder="nombre@taller.com o usuario"
+                 class="eg-input">
+          <i class="fas fa-user input-icon"></i>
+        </div>
       </div>
 
       <div>
-        <label for="id_password" class="eg-label">Contraseña</label>
-        <div class="relative">
+        <div class="flex items-center justify-between mb-2">
+          <label for="id_password" class="eg-form-label m-0">Contraseña</label>
+          <a href="{% url 'account_reset_password' %}" class="text-xs text-sky-400 hover:text-sky-300 font-medium transition">
+            ¿Olvidaste tu contraseña?
+          </a>
+        </div>
+        <div class="eg-input-wrapper relative">
           <input type="password" name="password" id="id_password" required autocomplete="current-password"
-                 placeholder="••••••••••••"
-                 class="eg-input-control" style="padding-right: 2.75rem !important;">
+                 placeholder="Ingresa tu contraseña"
+                 class="eg-input" style="padding-right: 2.75rem !important;">
+          <i class="fas fa-lock input-icon"></i>
           <button type="button" id="btn-toggle-pw" tabindex="-1"
-                  class="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-400 hover:text-cyan-200 text-sm p-1 transition">
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-sm p-1 transition"
+                  title="Mostrar/Ocultar contraseña">
             <i class="fas fa-eye" id="pw-eye-icon"></i>
           </button>
         </div>
       </div>
 
       <div class="flex items-center justify-between pt-1">
-        <label class="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-200 font-semibold">
+        <label class="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-400 hover:text-slate-300 font-medium">
           <input type="checkbox" name="remember" id="id_remember" checked
-                 class="w-4 h-4 rounded border-slate-600 bg-slate-900 text-cyan-500 cursor-pointer">
+                 class="w-4 h-4 rounded border-slate-700 bg-slate-900 text-sky-600 focus:ring-0 cursor-pointer">
           <span>Mantener sesión iniciada</span>
         </label>
       </div>
@@ -131,16 +225,28 @@
       {% endif %}
 
       <div class="pt-2">
-        <button type="submit" class="eg-submit-btn">
-          INGRESAR
+        <button type="button" id="btn-manual-submit" class="eg-btn-primary">
+          <span>Ingresar al Sistema</span>
+          <i class="fas fa-arrow-right text-xs"></i>
         </button>
       </div>
     </form>
+
+    <!-- Footer Trust & Security -->
+    <div class="mt-8 pt-5 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+      <div class="flex items-center gap-1.5 text-emerald-400/90">
+        <i class="fas fa-shield-halved text-xs"></i>
+        <span>Conexión cifrada SSL</span>
+      </div>
+      <span>eGarage Cloud v2.4</span>
+    </div>
 
   </div>
 </div>
 
 <script>
+window.__allowLoginSubmit = false;
+
 document.addEventListener('DOMContentLoaded', function() {
   const toggleBtn = document.getElementById('btn-toggle-pw');
   const passInput = document.getElementById('id_password');
@@ -149,11 +255,60 @@ document.addEventListener('DOMContentLoaded', function() {
   if (toggleBtn && passInput) {
     toggleBtn.addEventListener('click', function(e) {
       e.preventDefault();
+      e.stopPropagation();
       const isPassword = passInput.type === 'password';
       passInput.type = isPassword ? 'text' : 'password';
       if (eyeIcon) {
-        eyeIcon.className = isPassword ? 'fas fa-eye-slash text-amber-400' : 'fas fa-eye text-cyan-400';
+        eyeIcon.className = isPassword ? 'fas fa-eye-slash text-sky-400' : 'fas fa-eye text-slate-400';
       }
+    });
+  }
+
+  const form = document.getElementById('login-form-manual') || document.querySelector('form[action*="account_login"]');
+  const submitBtn = document.getElementById('btn-manual-submit') || (form ? form.querySelector('.eg-btn-primary') : null);
+  const loginInput = document.getElementById('id_login');
+
+  // Cancelar Enter no deseado desde inputs
+  [loginInput, passInput].forEach(function(inp) {
+    if (!inp) return;
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (submitBtn) submitBtn.click();
+      }
+    });
+  });
+
+  // DISPARO EXCLUSIVAMENTE POR CLICK FISICO EN EL BOTON
+  let isSending = false;
+  if (submitBtn && form) {
+    submitBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (isSending) return;
+
+      const userVal = (loginInput ? loginInput.value : '').trim();
+      const passVal = (passInput ? passInput.value : '').trim();
+
+      if (!userVal) {
+        if (loginInput) loginInput.focus();
+        return;
+      }
+      if (!passVal) {
+        if (passInput) passInput.focus();
+        return;
+      }
+
+      isSending = true;
+      window.__allowLoginSubmit = true;
+
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.7';
+      submitBtn.style.cursor = 'not-allowed';
+      submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin text-sm mr-2"></i><span>Iniciando sesión...</span>';
+
+      form.submit();
     });
   }
 });

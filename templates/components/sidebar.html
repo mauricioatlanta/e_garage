@@ -29,14 +29,48 @@
       </a>
       {% endfor %}
     {% else %}
-      {# Fallback for unauthenticated or no-config users #}
-      <a href="/cl/es/dashboard/"><i class="fas fa-home"></i> Inicio</a>
-      <a href="/cl/es/clientes/"><i class="fas fa-users"></i> {% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Clients{% else %}Clientes{% endif %}</a>
-      <a href="/cl/es/vehiculos/"><i class="fas fa-car"></i> {% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Vehicles{% else %}Vehículos{% endif %}</a>
-      <a href="/cl/es/documentos/form/"><i class="fas fa-file-invoice"></i> Documentos</a>
-      <a href="/cl/es/repuestos/"><i class="fas fa-cogs"></i> {% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Parts{% else %}Repuestos{% endif %}</a>
-      <a href="/cl/es/reportes/"><i class="fas fa-chart-bar"></i> {% if LANGUAGE_CODE == "en" or "/en/" in request.path %}Reports{% else %}Reportes{% endif %}</a>
-      <a href="/cl/es/settings/"><i class="fas fa-cog"></i> Configuración</a>
+      {# Fallback dinamico segun pais de la URL #}
+      {% if '/ec/' in request.path %}
+        <a href="/ec/es/dashboard/"><i class="fas fa-home"></i> Inicio</a>
+        <a href="/ec/es/clientes/"><i class="fas fa-users"></i> Clientes</a>
+        <a href="/ec/es/vehiculos/"><i class="fas fa-car"></i> Vehículos</a>
+        <a href="/ec/es/documentos/form/"><i class="fas fa-file-invoice"></i> Documentos</a>
+        <a href="/ec/es/repuestos/"><i class="fas fa-cogs"></i> Repuestos</a>
+        <a href="/ec/es/reportes/"><i class="fas fa-chart-bar"></i> Reportes</a>
+        <a href="/ec/es/settings/"><i class="fas fa-cog"></i> Configuración</a>
+      {% elif '/pe/' in request.path %}
+        <a href="/pe/es/dashboard/"><i class="fas fa-home"></i> Inicio</a>
+        <a href="/pe/es/clientes/"><i class="fas fa-users"></i> Clientes</a>
+        <a href="/pe/es/vehiculos/"><i class="fas fa-car"></i> Vehículos</a>
+        <a href="/pe/es/documentos/form/"><i class="fas fa-file-invoice"></i> Documentos</a>
+        <a href="/pe/es/repuestos/"><i class="fas fa-cogs"></i> Repuestos</a>
+        <a href="/pe/es/reportes/"><i class="fas fa-chart-bar"></i> Reportes</a>
+        <a href="/pe/es/settings/"><i class="fas fa-cog"></i> Configuración</a>
+      {% elif '/co/' in request.path %}
+        <a href="/co/es/dashboard/"><i class="fas fa-home"></i> Inicio</a>
+        <a href="/co/es/clientes/"><i class="fas fa-users"></i> Clientes</a>
+        <a href="/co/es/vehiculos/"><i class="fas fa-car"></i> Vehículos</a>
+        <a href="/co/es/documentos/form/"><i class="fas fa-file-invoice"></i> Documentos</a>
+        <a href="/co/es/repuestos/"><i class="fas fa-cogs"></i> Repuestos</a>
+        <a href="/co/es/reportes/"><i class="fas fa-chart-bar"></i> Reportes</a>
+        <a href="/co/es/settings/"><i class="fas fa-cog"></i> Configuración</a>
+      {% elif '/us/' in request.path %}
+        <a href="/us/en/dashboard/"><i class="fas fa-home"></i> Home</a>
+        <a href="/us/en/clientes/"><i class="fas fa-users"></i> Clients</a>
+        <a href="/us/en/vehiculos/"><i class="fas fa-car"></i> Vehicles</a>
+        <a href="/us/en/documentos/form/"><i class="fas fa-file-invoice"></i> Documents</a>
+        <a href="/us/en/repuestos/"><i class="fas fa-cogs"></i> Parts</a>
+        <a href="/us/en/reportes/"><i class="fas fa-chart-bar"></i> Reports</a>
+        <a href="/us/en/settings/"><i class="fas fa-cog"></i> Settings</a>
+      {% else %}
+        <a href="/cl/es/dashboard/"><i class="fas fa-home"></i> Inicio</a>
+        <a href="/cl/es/clientes/"><i class="fas fa-users"></i> Clientes</a>
+        <a href="/cl/es/vehiculos/"><i class="fas fa-car"></i> Vehículos</a>
+        <a href="/cl/es/documentos/form/"><i class="fas fa-file-invoice"></i> Documentos</a>
+        <a href="/cl/es/repuestos/"><i class="fas fa-cogs"></i> Repuestos</a>
+        <a href="/cl/es/reportes/"><i class="fas fa-chart-bar"></i> Reportes</a>
+        <a href="/cl/es/settings/"><i class="fas fa-cog"></i> Configuración</a>
+      {% endif %}
     {% endif %}
   </nav>
 
