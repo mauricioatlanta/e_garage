@@ -413,3 +413,11 @@ MP_ENABLED = bool(
 ACCOUNT_SESSION_REMEMBER = True
 
 SESSION_COOKIE_AGE = 2592000  # 30 dias
+
+
+import sys
+if "test" in sys.argv:
+    SECURE_SSL_REDIRECT = False
+    if "testserver" not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS = list(ALLOWED_HOSTS) + ["testserver", "localhost", "127.0.0.1"]
+
