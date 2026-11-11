@@ -61,11 +61,12 @@ urlpatterns = [
             "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
         ),
     ),
-    # Lista de clientes Venezuela
+    # Clientes Venezuela - usar modulo real igual que Chile y USA
+    # Antes era solo TemplateView, por eso country_url no encontraba
+    # venezuela:clientes:lista_clientes y mandaba a /clientes/ sin pais
     path(
         "clientes/",
-        TemplateView.as_view(template_name="ve/es/clientes/lista_clientes.html"),
-        name="lista_clientes_venezuela",
+        include(("taller.clientes.urls", "clientes"), namespace="clientes"),
     ),
     # Dashboard de suscriptor
     path("", include("taller.analytics.urls_suscriptor")),

@@ -5,7 +5,7 @@ Usa TemplateView para no depender de vistas Python especiales
 """
 
 from django.shortcuts import redirect
-from django.urls import path
+from django.urls import include, path
 from django.views.generic import RedirectView, TemplateView
 
 from taller.vehiculos import views_country_aware as views_vehiculos
@@ -62,11 +62,16 @@ urlpatterns = [
             "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
         ),
     ),
-    # *** Primera vista real de módulo: lista de clientes México ***
+    # Clientes Mexico - usar modulo real igual que Chile / USA / Venezuela
+    # Antes era solo TemplateView, por eso no tenia crear / buscar real
     path(
         "clientes/",
-        TemplateView.as_view(template_name="mx/es/clientes/lista_clientes.html"),
-        name="lista_clientes_mexico",
+        include(("taller.clientes.urls", "clientes"), namespace="clientes"),
+    ),
+    # Reportes Mexico - faltaba, por eso /mx/es/reportes/ daba Not Found
+    path(
+        "reportes/",
+        include(("taller.reportes.urls", "reportes"), namespace="reportes"),
     ),
     # =========================
     # Vehículos México

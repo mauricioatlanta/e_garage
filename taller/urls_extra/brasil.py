@@ -54,15 +54,32 @@ urlpatterns = [
     path("es/bienvenida/", bienvenida_br_es, name="bienvenida_es"),
     path(
         "es/reportes/",
-        RedirectView.as_view(
-            url="/br/pt/reportes/",
-            query_string=True,
-            permanent=False,
-        ),
-        name="reportes_es_redirect",
+        include(("taller.reportes.urls", "reportes_br_es"), namespace="reportes_br_es"),
     ),
     path(
         "pt/reportes/",
         include(("taller.reportes.urls", "reportes"), namespace="reportes"),
+    ),
+    # Brasil es SOLO pt: cualquier /br/es/<resto> -> /br/pt/<resto>
+    path(
+        "es/<path:rest>",
+        lambda r, rest: redirect(f"/br/pt/{rest}" + ("?" + r.GET.urlencode() if r.GET else "")),
+        name="br_es_catchall",
+    ),
+    # Clientes Brasil - faltaba, por eso /clientes/ daba Vista no encontrada
+    # pt es principal, es redirige a pt (igual que reportes)
+    path(
+        "pt/clientes/",
+        include(("taller.clientes.urls", "clientes"), namespace="clientes"),
+    ),
+    path(
+        "es/clientes/",
+        RedirectView.as_view(url="/br/pt/clientes/", query_string=True, permanent=False),
+        name="clientes_es_redirect",
+    ),
+    path(
+        "es/clientes/<path:rest>",
+        lambda r, rest: redirect(f"/br/pt/clientes/{rest}" + ("?" + r.GET.urlencode() if r.GET else "")),
+        name="clientes_es_rest_redirect",
     ),
 ]

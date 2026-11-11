@@ -5,7 +5,7 @@ Usa TemplateView para no depender de vistas Python especiales
 """
 
 from django.shortcuts import redirect
-from django.urls import path
+from django.urls import path, include
 from django.views.generic import RedirectView, TemplateView
 from taller.views.country_aware_auth import country_aware_login
 
@@ -64,9 +64,10 @@ urlpatterns = [
         ),
     ),
     # Lista de clientes Perú
-    path(
-        "clientes/",
-        TemplateView.as_view(template_name="pe/es/clientes/lista_clientes.html"),
-        name="lista_clientes_peru",
-    ),
+    
+    # Reportes Perú
+    path("reportes/", include(("taller.reportes.urls", "reportes"), namespace="reportes")),
+    # Clientes Perú CRUD
+    path("clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")),
+    path("vehiculos/", include(("taller.vehiculos.urls", "vehiculos"), namespace="vehiculos")),
 ]

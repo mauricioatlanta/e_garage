@@ -30,6 +30,10 @@ def _country_ns_from_path(path: str) -> str:
         return "uruguay_es"
     elif path.startswith("/uy/") or path == "/uy":
         return "uruguay"
+    elif path.startswith("/co/es/") or path == "/co/es":
+        return "colombia"
+    elif path.startswith("/co/") or path == "/co":
+        return "colombia"
     elif path.startswith("/cl/es/") or path == "/cl/es":
         return "chile"
     elif path.startswith("/cl/") or path == "/cl":
@@ -48,6 +52,8 @@ def _country_ns_from_path(path: str) -> str:
         return "venezuela"
     elif path.startswith("/pe/") or path == "/pe":
         return "peru"
+    elif path.startswith("/ec/") or path == "/ec":
+        return "ecuador"
     elif path.startswith("/br/") or path == "/br":
         return "brasil"
     return "chile"
@@ -62,6 +68,12 @@ def _country_ns_from_empresa(empresa) -> str:
         return "us_es"
     if pais == "UY" or country == "UY":
         return "uruguay"
+    if pais == "CO" or country == "CO":
+        return "colombia"
+    if pais == "EC" or country == "EC":
+        return "ecuador"
+    if pais == "PE" or country == "PE":
+        return "peru"
     if pais == "CL" or country == "CL":
         return "chile"
     if pais == "MX" or country == "MX":
@@ -102,12 +114,22 @@ def country_url(context, view_name, *args, **kwargs):
     is_support_us = (
         getattr(request, "user", None)
         and getattr(request.user, "is_superuser", False)
-        and (request.session.get("modo_soporte_pais") == "us" or request.session.get("support_country") == "us")
+        and ((request.session.get("modo_soporte_pais") == "us" or request.session.get("support_country") == "us") if hasattr(request, "session") and request.session else False)
     )
 
+    # FIX: URL manda primero para TODOS los paises, no solo USA
+    # Antes: /ve/ ignoraba la URL y usaba empresa.pais (CL) -> mandaba a /cl/es/clientes/
+    # Ahora: /ve/es/ -> venezuela, /cl/es/ -> chile, /mx/es/ -> mexico, etc.
+    # Solo si la URL no tiene pais, usar empresa como fallback
+    known_prefixes = ('/ve/', '/cl/', '/mx/', '/pe/', '/br/', '/ar/', '/uy/', '/ec/', '/co/', '/us/')
+    has_country_in_url = any(p_act.startswith(x) or p_act == x.rstrip('/') for x in known_prefixes)
     if is_us or is_support_us:
         lang_act = _extract_lang_from_path(p_act) or getattr(request, "LANGUAGE_CODE", "es")
         country_ns = "us_en" if str(lang_act).lower() == "en" else "us_es"
+    elif has_country_in_url:
+        country_ns = _country_ns_from_path(p_act)
+        # Ajustar idioma para US ya cubierto arriba, para otros mantener namespace de path
+        # Si el namespace es venezuela etc, no cambiar por idioma
     else:
         active_empresa = context_empresa or getattr(request, "empresa", None)
         if active_empresa:
