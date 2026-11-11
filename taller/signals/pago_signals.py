@@ -1,3 +1,4 @@
+from datetime import date
 """
 Signals para notificaciones automáticas en eGarage
 """
@@ -101,7 +102,8 @@ def verificar_vencimiento_suscripcion(sender, instance, **kwargs):
     from django.utils import timezone
 
     if instance.suscripcion_activa and instance.fecha_fin:
-        if instance.fecha_fin < timezone.now():
+        fecha_fin_date = instance.fecha_fin.date() if hasattr(instance.fecha_fin, "date") else instance.fecha_fin
+        if fecha_fin_date < date.today():
             # Suscripción vencida
             instance.suscripcion_activa = False
             instance.save(update_fields=["suscripcion_activa"])

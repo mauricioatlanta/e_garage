@@ -190,7 +190,16 @@ def _resolve_servicios_menu_scope(request):
     empresa = get_empresa_safe(request)
     country_code = _detectar_pais(request)
     request_lang = get_language() or getattr(request, "LANGUAGE_CODE", None) or "es"
+    # FIX: idioma desde URL primero: /us/es/ -> es, /us/en/ -> en, /cl/es/ -> es
+    # Si no hay idioma en URL, fallback al mapa por pais
     language = COUNTRY_LANGUAGE_MAP.get(country_code, (request_lang or "es")[:2])
+    try:
+        parts = [x for x in (request.path or '').split('/') if x]
+        # formato esperado: /<country>/<lang>/servicios/ -> parts[0]=us, parts[1]=es
+        if len(parts) >= 2 and parts[1] in ('en', 'es', 'pt'):
+            language = parts[1]
+    except Exception:
+        pass
 
     servicios_pais = Servicio.objects.filter(categoria__country=country_code)
     total_servicios_pais = servicios_pais.count()
@@ -361,6 +370,13 @@ def servicios_menu(request):
     )
     create_url = _safe_reverse_country_url(request, "servicios:crear_servicio", "#")
 
+    # FIX: activar idioma de la URL para que {% trans %} traduzca el shell
+    try:
+        from django.utils.translation import activate as _activate
+        _activate(language)
+        request.LANGUAGE_CODE = language
+    except Exception:
+        pass
     context = {
         "categorias": filters["categorias"],
         "subcategorias": filters["subcategorias"],
@@ -767,6 +783,21 @@ CURRENCY_SETTINGS = {
 
 
 def _detectar_pais(request):
+    # FIX: URL manda primero: /us/en/ -> US, /cl/es/ -> CL
+    # Antes la empresa (CL) ganaba siempre y /us/en/ mostraba CL
+    path = (request.path or '').lower()
+    if path.startswith("/us/"):
+        return "US"
+    if path.startswith("/br/"):
+        return "BR"
+    if path.startswith("/mx/"):
+        return "MX"
+    if path.startswith("/ve/"):
+        return "VE"
+    if path.startswith("/pe/"):
+        return "PE"
+    if path.startswith("/cl/"):
+        return "CL"
     empresa = get_empresa_safe(request)
     if empresa and getattr(empresa, "pais", None):
         return empresa.pais.strip().upper()

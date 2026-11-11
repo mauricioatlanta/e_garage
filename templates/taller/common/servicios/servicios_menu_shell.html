@@ -5,74 +5,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% trans "Servicios" %} | eGarage</title>
+  <title>{% if language == 'en' %}Services{% else %}Servicios{% endif %} | eGarage</title>
   
   <link rel="stylesheet" href="{% static 'css/servicios_menu.css' %}?v=20260508a">
 </head>
 <body>
-  <main class="page">
+  <main class="page" style="position:relative">
+<header style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 16px;background:rgba(0,0,0,.65);border:1px solid rgba(34,211,238,.3);border-radius:12px;margin-bottom:16px;flex-wrap:wrap;">
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+<a href="{{ dashboard_url }}" style="padding:7px 14px;border-radius:999px;background:#0e7490;color:#fff;font-weight:800;font-size:13px;text-decoration:none;">&#8592; {% if language == 'en' %}Back to dashboard{% else %}Volver al panel{% endif %}</a>
+<a href="{{ servicios_menu_config.menuUrl|default:request.path }}" style="padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.12);color:#e0f2fe;font-weight:800;font-size:13px;text-decoration:none;">{% if language == 'en' %}Services{% else %}Servicios{% endif %}</a>
+</div>
+<div style="display:flex;gap:0;background:rgba(0,0,0,.7);border:1px solid rgba(34,211,238,.4);border-radius:999px;padding:3px;">
+<a href="#" data-switch-lang="en" style="padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800;color:#bae6fd;text-decoration:none;">EN</a>
+<a href="#" data-switch-lang="es" style="padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800;color:#bae6fd;text-decoration:none;">ES</a>
+</div>
+</header>
+<script>
+(function(){
+var path = window.location.pathname;
+var qs = window.location.search;
+function target(lang){
+  var parts = path.split('/').filter(Boolean);
+  if(parts.length>=2 && ['en','es','pt'].includes(parts[1])){
+    parts[1]=lang;
+    return '/'+parts.join('/')+'/'+qs;
+  }
+  return path+qs;
+}
+document.querySelectorAll('[data-switch-lang]').forEach(function(a){
+  var lang=a.getAttribute('data-switch-lang');
+  a.href=target(lang);
+  var parts=path.split('/').filter(Boolean);
+  var cur=parts.length>=2?parts[1]:'es';
+  if(lang===cur){a.style.background='#0284c7';a.style.color='#fff';}
+});
+})();
+</script>
+
     <section class="hero">
       <div>
         <p class="eyebrow">{{ country_code }} · {{ language|upper }}</p>
         <h1>
           {% if is_carwash_services %}
-            {% trans "Servicios de Car Wash" %}
+            {% if language == 'en' %}Car Wash Services{% else %}Servicios de Car Wash{% endif %}
           {% else %}
-            {% trans "Servicios Mecanicos" %}
+            {% if language == 'en' %}Mechanical Services{% else %}Servicios Mecanicos{% endif %}
           {% endif %}
         </h1>
         <p>
           {% if empresa %}
-            {{ empresa.nombre_taller }} · {% trans "catalogo operativo con carga diferida para reducir el tiempo de respuesta inicial." %}
+            {{ empresa.nombre_taller }} · {% if language == 'en' %}Operational catalog with deferred loading to reduce initial response time.{% else %}catalogo operativo con carga diferida para reducir el tiempo de respuesta inicial.{% endif %}
           {% else %}
-            {% trans "Catalogo operativo con carga diferida para reducir el tiempo de respuesta inicial." %}
+            {% if language == 'en' %}Operational catalog with deferred loading to reduce initial response time.{% else %}Catalogo operativo con carga diferida para reducir el tiempo de respuesta inicial.{% endif %}
           {% endif %}
         </p>
       </div>
       <div class="hero-actions">
-        <a class="back-link" href="{{ dashboard_url }}">{% trans "Volver al panel" %}</a>
-        <a class="btn btn-primary" href="{{ create_url }}">{% trans "Agregar servicio" %}</a>
+        <a class="back-link" href="{{ dashboard_url }}">{% if language == 'en' %}Back to dashboard{% else %}Volver al panel{% endif %}</a>
+        <a class="btn btn-primary" href="{{ create_url }}">{% if language == 'en' %}Add service{% else %}Agregar servicio{% endif %}</a>
       </div>
     </section>
 
     <section class="stats">
       <article class="stat-card">
         <strong>{{ stats.total_servicios }}</strong>
-        <span>{% trans "Servicios disponibles en este alcance" %}</span>
+        <span>{% if language == 'en' %}Services available in this scope{% else %}Servicios disponibles en este alcance{% endif %}</span>
       </article>
       <article class="stat-card">
         <strong>{{ stats.total_categorias }}</strong>
-        <span>{% trans "Categorias listas para filtrar" %}</span>
+        <span>{% if language == 'en' %}Categories ready to filter{% else %}Categorias listas para filtrar{% endif %}</span>
       </article>
       <article class="stat-card">
         <strong>{{ stats.total_subcategorias }}</strong>
-        <span>{% trans "Subcategorias listas para filtrar" %}</span>
+        <span>{% if language == 'en' %}Subcategories ready to filter{% else %}Subcategorias listas para filtrar{% endif %}</span>
       </article>
     </section>
 
-    <section class="toolbar" aria-label="{% trans 'Filtros de servicios' %}">
+    <section class="toolbar" aria-label="{% if language == 'en' %}Service filters{% else %}Filtros de servicios{% endif %}">
       <div class="field">
-        <label for="searchInput">{% trans "Buscar" %}</label>
+        <label for="searchInput">{% if language == 'en' %}Search{% else %}Buscar{% endif %}</label>
         <input
           id="searchInput"
           type="search"
-          placeholder="{% trans 'Buscar por nombre, categoria o subcategoria...' %}"
+          placeholder="{% if language == 'en' %}Search by name, category or subcategory...{% else %}Buscar por nombre, categoria o subcategoria...{% endif %}"
           autocomplete="off"
         >
       </div>
       <div class="field">
-        <label for="categoriaFilter">{% trans "Categoria" %}</label>
+        <label for="categoriaFilter">{% if language == 'en' %}Category{% else %}Categoria{% endif %}</label>
         <select id="categoriaFilter">
-          <option value="">{% trans "Todas las categorias" %}</option>
+          <option value="">{% if language == 'en' %}All categories{% else %}Todas las categorias{% endif %}</option>
           {% for categoria in categorias %}
             <option value="{{ categoria.code }}">{{ categoria.label }}</option>
           {% endfor %}
         </select>
       </div>
       <div class="field">
-        <label for="subcategoriaFilter">{% trans "Subcategoria" %}</label>
+        <label for="subcategoriaFilter">{% if language == 'en' %}Subcategory{% else %}Subcategoria{% endif %}</label>
         <select id="subcategoriaFilter">
-          <option value="">{% trans "Todas las subcategorias" %}</option>
+          <option value="">{% if language == 'en' %}All subcategories{% else %}Todas las subcategorias{% endif %}</option>
           {% for subcategoria in subcategorias %}
             <option value="{{ subcategoria.code }}" data-categoria="{{ subcategoria.categoria_code }}">{{ subcategoria.label }}</option>
           {% endfor %}
@@ -83,13 +115,13 @@
     <section class="results">
       <div class="results-head">
         <div>
-          <h2>{% trans "Listado de servicios" %}</h2>
-          <p id="resultsSummary">{% blocktrans with total=stats.total_servicios %}{{ total }} servicios disponibles para carga inicial.{% endblocktrans %}</p>
+          <h2>{% if language == 'en' %}Service list{% else %}Listado de servicios{% endif %}</h2>
+          <p id="resultsSummary">{% if language == 'en' %}{{ stats.total_servicios }} services available for initial load.{% else %}{{ stats.total_servicios }} servicios disponibles para carga inicial.{% endif %}</p>
         </div>
-        <button id="reloadButton" type="button" class="btn btn-secondary">{% trans "Recargar" %}</button>
+        <button id="reloadButton" type="button" class="btn btn-secondary">{% if language == 'en' %}Reload{% else %}Recargar{% endif %}</button>
       </div>
 
-      <div id="loadingState" class="status">{% trans "Cargando servicios..." %}</div>
+      <div id="loadingState" class="status">{% if language == 'en' %}Loading services...{% else %}Cargando servicios...{% endif %}</div>
       <div id="errorState" class="error-state hidden"></div>
       <div id="emptyState" class="empty-state hidden">
         <strong>{% trans "No hay servicios para mostrar" %}</strong>

@@ -62,7 +62,7 @@ PRODUCT_PROFILES = {
         "default_rubro": "WORKSHOP",
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",          "icon": "fas fa-home"},
-            {"key": MOD_DOCUMENTOS,    "label": "Trabajos",        "icon": "fas fa-file-invoice"},
+            {"key": MOD_DOCUMENTOS,    "label": _("Presupuestos/OT"), "icon": "fas fa-file-invoice"},
             {"key": MOD_VEHICULOS,     "label": _("Vehículos"),       "icon": "fas fa-car"},
             {"key": MOD_CLIENTES,      "label": _("Clientes"),        "icon": "fas fa-users"},
             {"key": MOD_SERVICIOS,     "label": _("Servicios"),       "icon": "fas fa-tools"},
@@ -88,7 +88,7 @@ PRODUCT_PROFILES = {
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",               "icon": "fas fa-home"},
             {"key": MOD_DESARME,       "label": "Vehículos de Desarme", "icon": "fas fa-car-crash"},
-            {"key": MOD_REPUESTOS,     "label": _("Inventario de desarme"), "icon": "fas fa-boxes"},
+            {"key": MOD_REPUESTOS,     "label": "Inventario de desarme", "icon": "fas fa-boxes"},
             {"key": MOD_DOCUMENTOS,    "label": _("Ventas"),               "icon": "fas fa-shopping-cart"},
             {"key": MOD_CLIENTES,      "label": _("Clientes"),             "icon": "fas fa-users"},
             {"key": MOD_REPORTES,      "label": _("Reportes"),             "icon": "fas fa-chart-bar"},
@@ -110,7 +110,7 @@ PRODUCT_PROFILES = {
         "default_rubro": "PARTS",
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",        "icon": "fas fa-home"},
-            {"key": MOD_REPUESTOS,     "label": _("Inventario de repuestos"), "icon": "fas fa-boxes"},
+            {"key": MOD_REPUESTOS,     "label": "Inventario de repuestos", "icon": "fas fa-boxes"},
             {"key": MOD_DOCUMENTOS,    "label": _("Ventas"),        "icon": "fas fa-shopping-cart"},
             {"key": MOD_CLIENTES,      "label": _("Clientes"),      "icon": "fas fa-users"},
             {"key": MOD_REPORTES,      "label": _("Reportes"),      "icon": "fas fa-chart-bar"},
@@ -177,7 +177,7 @@ PRODUCT_PROFILES = {
         "default_rubro": "DETAILING",
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",        "icon": "fas fa-home"},
-            {"key": MOD_DOCUMENTOS,    "label": "Trabajos",       "icon": "fas fa-cash-register"},
+            {"key": MOD_DOCUMENTOS,    "label": _("Caja"),           "icon": "fas fa-cash-register"},
             {"key": MOD_CLIENTES,      "label": _("Clientes"),      "icon": "fas fa-users"},
             {"key": MOD_SERVICIOS,     "label": _("Servicios"),     "icon": "fas fa-tint"},
             {"key": MOD_REPORTES,      "label": _("Reportes"),      "icon": "fas fa-chart-bar"},

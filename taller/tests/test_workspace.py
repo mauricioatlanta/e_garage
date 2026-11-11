@@ -1976,7 +1976,7 @@ class PartsSingleRubroNavKeyTests(TestCase):
         ws = WorkspaceService.resolve(self.config, "/cl/es", "")
         docs_item = next((i for i in ws["nav"] if i["key"] == MOD_DOCUMENTOS), None)
         self.assertIsNotNone(docs_item)
-        self.assertTrue(docs_item["url"].endswith("/repuestos/pos/"))
+        self.assertTrue(docs_item["url"].endswith("/repuestos/pos/ventas/"))
 
 
 class SalesNavigationRegressionTests(TestCase):
@@ -1997,14 +1997,14 @@ class SalesNavigationRegressionTests(TestCase):
     def test_parts_sales_label_and_destination(self):
         item = self._sales_items("PARTS")[0]
         self.assertEqual(item["label"], "Ventas de repuestos")
-        self.assertEqual(item["url"], "/cl/es/repuestos/pos/")
+        self.assertEqual(item["url"], "/cl/es/repuestos/pos/ventas/")
 
     def test_mixed_desarme_and_parts_keeps_both_sales_accesses(self):
         items = self._sales_items("DESARMADURIA", ["PARTS"])
         self.assertEqual({item["nav_key"] for item in items}, {"desarm_sales", "parts_sales"})
         self.assertEqual(
             {item["url"] for item in items},
-            {"/cl/es/desarme/ventas/", "/cl/es/repuestos/pos/"},
+            {"/cl/es/desarme/ventas/", "/cl/es/repuestos/pos/ventas/"},
         )
         self.assertEqual(
             {item["label"] for item in items},

@@ -416,7 +416,7 @@ WORKSPACE_CASA_REPUESTOS = WorkspaceDef(
     nav=(
         WorkspaceNavDef(MOD_INICIO,        "workspace.parts.nav.home",      "fas fa-home",         nav_key="parts_home",      path="dashboard/"),
         WorkspaceNavDef(MOD_REPUESTOS,     "workspace.parts.nav.parts",     "fas fa-boxes",        nav_key="parts_inventory", path="repuestos/"),
-        WorkspaceNavDef(MOD_DOCUMENTOS,    "workspace.parts.nav.documents", "fas fa-shopping-cart",nav_key="parts_sales",     path="repuestos/pos/"),
+        WorkspaceNavDef(MOD_DOCUMENTOS,    "workspace.parts.nav.documents", "fas fa-shopping-cart",nav_key="parts_sales",     path="repuestos/pos/ventas/"),
         WorkspaceNavDef(MOD_CLIENTES,      "workspace.parts.nav.clients",   "fas fa-users",        nav_key="parts_clients",   path="clientes/"),
         WorkspaceNavDef(MOD_REPORTES,      "workspace.parts.nav.reports",   "fas fa-chart-bar",    nav_key="parts_reports",   path="reportes/"),
         WorkspaceNavDef(MOD_CONFIGURACION, "workspace.parts.nav.settings",  "fas fa-cog",          nav_key="parts_config",    path="settings/"),

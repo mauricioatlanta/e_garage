@@ -28,21 +28,28 @@ COUNTRY_LANGUAGE_MAP = {
     "MX": "es",
     "VE": "es",
     "PE": "es",
+    "EC": "es",
+    "UY": "es",
     "US": "en",
     "BR": "pt",
 }
 
 
 def _detectar_pais(request):
-    """Detecta el país desde la URL o request"""
-    path = request.path or ""
-    if "/us/" in path.lower():
-        return "US"
-    elif "/mx/" in path.lower():
-        return "MX"
-    elif "/br/" in path.lower():
-        return "BR"
-    return "CL"  # Default
+    """Detecta el país desde la URL o el tenant de la empresa."""
+    path = (getattr(request, "path_info", None) or getattr(request, "path", "") or "").lower()
+    for code in ("uy", "ec", "pe", "cl", "us", "mx", "br", "ve", "co", "ar"):
+        if f"/{code}/" in path or path.startswith(f"/{code}"):
+            return code.upper()
+
+    empresa = get_empresa_safe(request)
+    raw_pais = getattr(empresa, "pais", None) if empresa else None
+    if not raw_pais:
+        raw_pais = getattr(request, "country", None)
+
+    code = str(raw_pais or "CL").strip().upper()
+    valid = {"US": "US", "USA": "US", "UY": "UY", "EC": "EC", "PE": "PE", "CL": "CL", "MX": "MX", "BR": "BR", "CO": "CO", "VE": "VE", "AR": "AR"}
+    return valid.get(code, "CL")
 
 
 @login_required
