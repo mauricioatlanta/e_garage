@@ -719,3 +719,45 @@
 .dynamic-element > div { display: grid !important; }
 .rep-dropdown,.rep-codigo-dropdown{position:absolute;width:100%;min-width:300px;z-index:9999;}
 #repuestos-container{overflow:visible!important;}
+
+
+/* Responsive mobile layout para repuestos */
+@media (max-width: 768px) {
+  #doc-shell #repuestos-container .dynamic-element {
+    padding: 0.6rem !important;
+    margin-bottom: 0.6rem !important;
+    background: rgba(15, 23, 42, 0.7) !important;
+    border: 1px solid rgba(56, 189, 248, 0.25) !important;
+    border-radius: 0.5rem !important;
+  }
+  #doc-shell #repuestos-container .dynamic-element .repuesto-row-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr 44px !important;
+    gap: 8px !important;
+  }
+  #doc-shell #repuestos-container .dynamic-element .repuesto-cell-code {
+    grid-column: 1 / 2 !important;
+  }
+  #doc-shell #repuestos-container .dynamic-element .repuesto-cell-name {
+    grid-column: 2 / 5 !important;
+  }
+  #doc-shell #repuestos-container .dynamic-element .repuesto-cell-qty {
+    grid-column: 1 / 2 !important;
+  }
+  #doc-shell #repuestos-container .dynamic-element .repuesto-cell-price {
+    grid-column: 2 / 3 !important;
+  }
+  #doc-shell #repuestos-container .dynamic-element .repuesto-cell-total {
+    grid-column: 3 / 4 !important;
+  }
+  #doc-shell #repuestos-container .dynamic-element .repuesto-cell-action,
+  #doc-shell #repuestos-container .dynamic-element .rep-remove-btn {
+    grid-column: 4 / 5 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  #doc-shell .doc-pos-header-repuestos {
+    display: none !important;
+  }
+}

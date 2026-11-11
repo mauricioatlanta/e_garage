@@ -8,7 +8,6 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 
 from taller.models.repuesto import Repuesto
-from taller.services.empresa_service import get_empresa_safe
 
 
 @login_required
@@ -38,14 +37,17 @@ def buscar_repuestos_api(request):
     if len(q) < 2:
         return JsonResponse([], safe=False)
 
-    empresa = get_empresa_safe(request)
-    if not empresa:
+    try:
+        empresa = request.user.empresa
+        if not empresa:
+            return JsonResponse([], safe=False)
+    except AttributeError:
         return JsonResponse([], safe=False)
 
     qs = (
         Repuesto.objects.filter(empresa=empresa)
         .filter(
-            models.Q(part_number__icontains=q)
+            models.Q(part_number__icontains=q) | models.Q(sku__icontains=q) | models.Q(codigo_oem__icontains=q)
             | models.Q(nombre__icontains=q)
             | models.Q(proveedor__icontains=q)
         )
@@ -60,11 +62,8 @@ def buscar_repuestos_api(request):
                 "codigo": repuesto.part_number or "",
                 "nombre": repuesto.nombre or "",
                 "proveedor": repuesto.proveedor or "",
-                "precio_compra": float(repuesto.precio_compra or 0),
                 "precio": float(repuesto.precio_venta or 0),
-                "precio_venta": float(repuesto.precio_venta or 0),
                 "stock": int(repuesto.cantidad_stock or 0),
-                "stock_minimo": int(repuesto.stock_minimo or 0),
             }
         )
 

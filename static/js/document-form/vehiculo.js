@@ -100,25 +100,29 @@
             return null;
         }
 
-        var item = normalizeVehicleItem(rawItem || { id: id, label: label });
-        item.label = label || item.label;
-
         var option = els.vehiculoSelect.querySelector('option[value="' + id + '"]');
-        if (!option) {
-            option = new Option(item.label || ('Vehiculo #' + id), id, false, false);
-            els.vehiculoSelect.appendChild(option);
-        } else if (item.label) {
-            option.textContent = item.label;
+        if (option && option.dataset.marca && (!rawItem || !rawItem.marca)) {
+            return option;
         }
 
-        option.dataset.label = item.label || '';
-        option.dataset.patente = item.patente || '';
-        option.dataset.marca = item.marca || '';
-        option.dataset.modelo = item.modelo || '';
-        option.dataset.anio = item.anio || '';
-        option.dataset.vin = item.vin || '';
-        option.dataset.mileage = item.mileage || '';
-        option.dataset.meta = item.meta || '';
+        var item = normalizeVehicleItem(rawItem || { id: id, label: label });
+        var finalLabel = item.label || label || ('Vehiculo #' + id);
+
+        if (!option) {
+            option = new Option(finalLabel, id, false, false);
+            els.vehiculoSelect.appendChild(option);
+        } else {
+            option.textContent = finalLabel;
+        }
+
+        option.dataset.label = finalLabel;
+        option.dataset.patente = item.patente || option.dataset.patente || '';
+        option.dataset.marca = item.marca || option.dataset.marca || '';
+        option.dataset.modelo = item.modelo || option.dataset.modelo || '';
+        option.dataset.anio = item.anio || option.dataset.anio || '';
+        option.dataset.vin = item.vin || option.dataset.vin || '';
+        option.dataset.mileage = item.mileage || option.dataset.mileage || '';
+        option.dataset.meta = item.meta || option.dataset.meta || '';
         return option;
     }
 
@@ -137,8 +141,12 @@
         });
 
         if (selectedId) {
-            ensureVehicleOption(selectedId, preferredLabel || '', { id: selectedId, label: preferredLabel || '' });
+            var existingOpt = Array.from(els.vehiculoSelect.options).find(function(o) { return String(o.value) === String(selectedId); });
+            if (!existingOpt) {
+                ensureVehicleOption(selectedId, preferredLabel || '', { id: selectedId, label: preferredLabel || '' });
+            }
             els.vehiculoSelect.value = String(selectedId);
+            updateVehiculoCard();
         } else {
             els.vehiculoSelect.value = '';
         }
@@ -360,21 +368,23 @@
     }
 
     async function handleCreatedVehiculoFromReturn(context) {
-        var vehiculoId = context.created_vehiculo_id || context.vehiculo_id || '';
-        if (!vehiculoId) {
-            return;
-        }
+        var vehiculoId = context.created_vehiculo_id || context.vehiculo_id || "";
+        if (!vehiculoId) return;
 
-        var clienteId = context.cliente_id || (EG.cliente && EG.cliente.getSelectedClienteId ? EG.cliente.getSelectedClienteId() : '');
-        var label = context.created_vehiculo_label || '';
+        var clienteId = context.cliente_id || (EG.cliente && EG.cliente.getSelectedClienteId ? EG.cliente.getSelectedClienteId() : "");
+        var label = context.created_vehiculo_label || "";
 
         if (clienteId) {
             await cargarVehiculosPorCliente(clienteId, vehiculoId, label);
         }
 
-        preseleccionarVehiculo(vehiculoId, label);
+        // Biruken ti option tapno maipataud ti husto a label
+        var els = getElements();
+        if (els.vehiculoSelect) {
+            els.vehiculoSelect.value = String(vehiculoId);
+            updateVehiculoCard();
+        }
     }
-
     function init() {
         var els = getElements();
         if (!els.vehiculoSelect || els.vehiculoSelect.dataset.egBound) {

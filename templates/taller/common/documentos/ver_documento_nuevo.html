@@ -136,7 +136,7 @@
     {% if rep_list %}
     <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6 mb-6">
       <h3 class="text-xl font-semibold text-cyan-200 mb-4 flex items-center">
-        {% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🔧 Parts{% else %}{% if \"/en/\" in request.path or LANGUAGE_CODE == \"en\" %}🔧 Parts{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🔧 Parts{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.LANGUAGE_CODE == "en" %}🔧 Parts{% else %}🔧 Repuestos{% endif %}{% endif %}{% endif %}{% endif %}
+        {% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🔧 Parts{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🔧 Parts{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}🔧 Parts{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.LANGUAGE_CODE == "en" %}🔧 Parts{% else %}🔧 Repuestos{% endif %}{% endif %}{% endif %}{% endif %}
       </h3>
       <div class="overflow-x-auto">
         <table class="w-full text-white">

@@ -46,7 +46,7 @@
         if (tecnicoLabel) {
             tecnicoLabel.textContent = isParts
                 ? (tecnicoLabel.dataset.labelPts || 'Salesperson')
-                : (tecnicoLabel.dataset.labelDefault || '');
+                : (tecnicoLabel.dataset.labelDefault || 'Mecánico responsable');
         }
     }
 

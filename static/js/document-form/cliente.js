@@ -178,7 +178,7 @@
         }
 
         try {
-            var url = EG.config.buildEndpoint(EG.cfg.URL_CLIENT_SEARCH || '/ajax/clientes/buscar/');
+            var rawSearch = (EG.cfg.URL_CLIENT_SEARCH || "").trim(); var endpoint = (rawSearch && rawSearch !== "#") ? rawSearch.toLowerCase() : "/cl/es/ajax/clientes/buscar/"; var url = endpoint;
             var response = await EG.utils.egFetch(url + '?q=' + encodeURIComponent(q));
             if (!response.ok) {
                 throw new Error('HTTP ' + response.status);
@@ -407,17 +407,46 @@
     }
 
     async function handleCreatedClienteFromReturn(context) {
-        var id = context.created_cliente_id || context.cliente_id || '';
-        if (!id) {
-            return;
+        var id = context.created_cliente_id || context.cliente_id || "";
+        if (!id) return;
+
+        var label = (context.created_cliente_label || "").trim();
+        var resolvedClient = resolveClientDataById(id, label);
+
+        // Si no se resolvieron datos o el nombre es solo un ID numerico, consultar backend
+        if (!resolvedClient || !resolvedClient.email || String(resolvedClient.nombre).trim() === String(id)) {
+            try {
+                var searchUrl = (EG.cfg.URL_CLIENT_SEARCH && EG.cfg.URL_CLIENT_SEARCH !== "#") 
+                    ? EG.cfg.URL_CLIENT_SEARCH.toLowerCase() 
+                    : "/cl/es/ajax/clientes/buscar/";
+                var resp = await EG.utils.egFetch(searchUrl + "?q=" + encodeURIComponent(id));
+                if (resp && resp.ok) {
+                    var data = await resp.json();
+                    var list = (data && data.results) || [];
+                    var match = list.find(function(c) { return String(c.id) === String(id); }) || list[0];
+                    if (match) {
+                        resolvedClient = {
+                            id: id,
+                            nombre: match.text || match.nombre || ("Cliente #" + id),
+                            email: match.email || "",
+                            telefono: match.telefono || ""
+                        };
+                    }
+                }
+            } catch (e) {
+                console.error("Error recuperando cliente:", e);
+            }
         }
 
-        var resolvedClient = resolveClientDataById(id, context.created_cliente_label || '') || {
-            id: id,
-            nombre: context.created_cliente_label || ('Cliente #' + id),
-            email: '',
-            telefono: '',
-        };
+        if (!resolvedClient) {
+            resolvedClient = {
+                id: id,
+                nombre: label || ("Cliente #" + id),
+                email: "",
+                telefono: ""
+            };
+        }
+
         ensureClienteOption(id, resolvedClient.nombre);
 
         await seleccionarCliente({
@@ -429,7 +458,6 @@
             vehiculoId: context.created_vehiculo_id || context.vehiculo_id || null
         });
     }
-
     function init() {
         var els = getElements();
         if (!els.clienteBusqueda || els.clienteBusqueda.dataset.egBound) {

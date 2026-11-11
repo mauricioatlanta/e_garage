@@ -17,7 +17,7 @@
 {% with current_country=country_code|default:active_country|default:'CL' %}
 <form
   method="post"
-  id="document-form"
+  id="document-form" novalidate
   class="document-prototype-form"
   enctype="multipart/form-data"
   action="{% if es_edicion and documento %}{% country_url 'documentos:documento_editar' documento.pk %}{% else %}{% country_url 'documentos:documento_crear' %}{% endif %}"
@@ -27,8 +27,8 @@
   data-has-server-line-items="{% if has_server_line_items %}1{% else %}0{% endif %}"
   data-country-code="{{ current_country }}"
   data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
-  data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
-  data-url-vehiculos-by-cli="{% country_url 'documentos:api_vehiculos_por_cliente' %}"
+  data-url-client-search="/{{ current_country|default:"cl"|lower }}/es/ajax/clientes/buscar/"
+  data-url-vehiculos-by-cli="/{{ current_country|default:"cl"|lower }}/es/documentos/api/vehiculos-por-cliente/"
   data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
   data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
   data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
