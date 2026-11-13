@@ -466,7 +466,7 @@ WORKSPACE_TIRE = WorkspaceDef(
         WorkspaceNavDef(MOD_REPUESTOS,     "workspace.tire.nav.kiosko_global", "fas fa-globe",         nav_key="tire_kiosko_global", path="tires/todos/"),
         WorkspaceNavDef(MOD_DOCUMENTOS,    "workspace.tire.nav.sales",    "fas fa-cash-register", nav_key="tire_pos",       path="repuestos/pos/"),
         WorkspaceNavDef(MOD_CLIENTES,      "workspace.tire.nav.clients",  "fas fa-users",         nav_key="tire_clients",   path="clientes/"),
-        WorkspaceNavDef(MOD_REPORTES,      "workspace.tire.nav.reports",  "fas fa-chart-bar",     nav_key="tire_reports",   path="reportes/"),
+        WorkspaceNavDef(MOD_REPORTES,      "workspace.tire.nav.reports",  "fas fa-chart-bar",     nav_key="tire_reports",   path="tires/reportes/"),
         WorkspaceNavDef(MOD_CONFIGURACION, "workspace.tire.nav.settings", "fas fa-cog",           nav_key="tire_config",    path="settings/"),
     ),
     widget_keys=(
