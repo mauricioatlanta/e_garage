@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
 <div style="color:#fff; padding:12px;">
-<h1 style="color:#fff;">🛞 Neumáticos - TIRES (Solo llantas)</h1>
+<h1 style="color:#fff;">🛞 {% if LANGUAGE_CODE == "en" %}Tires - TIRES (Tires Only){% else %}Neumáticos - TIRES (Solo llantas){% endif %}</h1>
 <p style="color:#cbd5e1;">Solo neumáticos. No muestra repuestos.</p>
 <form method="GET" style="margin:12px 0;">
-  <input name="q" value="{{ q }}" placeholder="Buscar: 175/70 R14" style="padding:10px; border-radius:8px; border:1px solid #475569; background:#0f172a; color:#fff; width:220px;">
-  <button style="padding:10px 16px; border-radius:8px; background:#0ea5e9; color:#fff; border:none; font-weight:bold;">Buscar por medida</button>
+  <input name="q" value="{{ q }}" placeholder="{% if LANGUAGE_CODE == "en" %}Search:{% else %}Buscar:{% endif %} 175/70 R14" style="padding:10px; border-radius:8px; border:1px solid #475569; background:#0f172a; color:#fff; width:220px;">
+  <button style="padding:10px 16px; border-radius:8px; background:#0ea5e9; color:#fff; border:none; font-weight:bold;">{% if LANGUAGE_CODE == "en" %}Search by size{% else %}Buscar por medida{% endif %}</button>
 </form>
 <p>
-  <a href="crear/" style="display:inline-block; padding:12px 18px; background:#facc15; color:#000; font-weight:bold; border-radius:10px; text-decoration:none;">+ Agregar Neumático</a>
+  <a href="crear/" style="display:inline-block; padding:12px 18px; background:#facc15; color:#000; font-weight:bold; border-radius:10px; text-decoration:none;">{% if LANGUAGE_CODE == "en" %}+ Add Tire{% else %}+ Agregar Neumático{% endif %}</a>
   <a href="kiosko/" style="display:inline-block; padding:12px 18px; background:#14b8a6; color:#fff; font-weight:bold; border-radius:10px; text-decoration:none; margin-left:8px;">{% if LANGUAGE_CODE == "en" %}🛞 View Tire Shop{% else %}🛞 Ver Kiosko{% endif %}</a>
 </p>
 {% if messages %}{% for m in messages %}<p style="background:#14532d; padding:10px; border-radius:8px;">{{ m }}</p>{% endfor %}{% endif %}
 <table style="width:100%; border-collapse:collapse; color:#fff; margin-top:12px;">
-<tr style="background:#1e293b;"><th style="padding:10px; text-align:left;">Medida</th><th style="padding:10px; text-align:left;">Tipo</th><th style="padding:10px; text-align:left;">Marca / Modelo</th><th style="padding:10px;">Stock</th><th style="padding:10px;">Precio Compra</th><th style="padding:10px;">Precio Instalado</th><th style="padding:10px;">Acciones</th></tr>
+<tr style="background:#1e293b;"><th style="padding:10px; text-align:left;">{% if LANGUAGE_CODE == "en" %}Size{% else %}Medida{% endif %}</th><th style="padding:10px; text-align:left;">Tipo</th><th style="padding:10px; text-align:left;">Marca / Modelo</th><th style="padding:10px;">Stock</th><th style="padding:10px;">{% if LANGUAGE_CODE == "en" %}Purchase Price{% else %}Precio Compra{% endif %}</th><th style="padding:10px;">Precio Instalado</th><th style="padding:10px;">Acciones</th></tr>
 {% for t in tires %}
 <tr style="border-bottom:1px solid #334155;">
   <td style="padding:10px; font-weight:bold;">{{ t.medida }}</td>
@@ -22,11 +22,11 @@
   <td style="padding:10px; text-align:center;">{{ t.cantidad_stock }}</td>
   <td style="padding:10px; text-align:center;">${{ t.precio_compra }}</td><td style="padding:10px; text-align:center;">${{ t.precio_instalado }}</td>
   <td style="padding:10px; text-align:center;">
-    <a href="editar/{{ t.pk }}/" style="display:inline-block; padding:6px 12px; background:#0ea5e9; color:#fff; border-radius:8px; text-decoration:none; font-weight:bold;">Editar</a>
-    <a href="eliminar/{{ t.pk }}/" style="display:inline-block; padding:6px 12px; background:#ef4444; color:#fff; border-radius:8px; text-decoration:none; font-weight:bold; margin-left:4px;">Borrar</a>
+    <a href="editar/{{ t.pk }}/" style="display:inline-block; padding:6px 12px; background:#0ea5e9; color:#fff; border-radius:8px; text-decoration:none; font-weight:bold;">{% if LANGUAGE_CODE == "en" %}Edit{% else %}Editar{% endif %}</a>
+    <a href="eliminar/{{ t.pk }}/" style="display:inline-block; padding:6px 12px; background:#ef4444; color:#fff; border-radius:8px; text-decoration:none; font-weight:bold; margin-left:4px;">{% if LANGUAGE_CODE == "en" %}Delete{% else %}Borrar{% endif %}</a>
   </td>
 </tr>
-{% empty %}<tr><td colspan="7" style="padding:16px; color:#facc15; font-weight:bold;">Sin neumáticos. Pulsa + Agregar Neumático para crear el primero.</td></tr>{% endfor %}
+{% empty %}<tr><td colspan="7" style="padding:16px; color:#facc15; font-weight:bold;">Sin neumáticos. Pulsa {% if LANGUAGE_CODE == "en" %}+ Add Tire{% else %}+ Agregar Neumático{% endif %} para crear el primero.</td></tr>{% endfor %}
 </table>
 </div>
 {% endblock %}
