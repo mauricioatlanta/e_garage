@@ -1,3 +1,4 @@
+from taller.models import Empresa
 import re
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -208,7 +209,7 @@ def kiosko_mi_taller_publico(request, slug=None):
                 try:
                     for e in Empresa.objects.all()[:500]:
                         try:
-                            if slugify(getattr(e, "nombre", "") or "") == s:
+                            if slugify(getattr(e, "nombre_taller", "") or "") == s:
                                 empresa = e
                                 break
                         except Exception:
@@ -218,7 +219,7 @@ def kiosko_mi_taller_publico(request, slug=None):
                 # 2. Por nombre contiene
                 if empresa is None:
                     try:
-                        empresa = Empresa.objects.filter(nombre__icontains=s.replace("-", " ")).first()
+                        empresa = Empresa.objects.filter(nombre_taller__icontains=s.replace("-", " ")).first()
                     except Exception:
                         pass
                 # 3. Por slug field si existe
@@ -227,19 +228,34 @@ def kiosko_mi_taller_publico(request, slug=None):
                         empresa = Empresa.objects.filter(slug__iexact=s).first()
                     except Exception:
                         pass
+        # 4. Por username del dueño (mauricioatlanta)
+        if empresa is None:
+            try:
+                empresa = Empresa.objects.filter(user__username__iexact=s).first()
+            except Exception:
+                pass
+        # 5. Por slug del usuario sin guiones
+        if empresa is None:
+            try:
+                from django.contrib.auth import get_user_model
+                u = get_user_model().objects.filter(username__iexact=s).first()
+                if u:
+                    empresa = Empresa.objects.filter(user=u).first()
+            except Exception:
+                pass
         if empresa is None:
             empresa = Empresa.objects.first()
         try:
             tires = Tire.objects.filter(empresa=empresa, cantidad_stock__gt=0).order_by("ancho", "perfil", "aro", "marca") if empresa else Tire.objects.none()
         except Exception:
             tires = Tire.objects.none()
-        return _render(request, "taller/tires/kiosko_mi_taller.html", {"empresa": empresa, "tires": tires})
+        return _render(request, "taller/tires/kiosko_mi_taller.html", {"empresa": empresa, "tires": tires, "slug": slug})
     except Exception as e:
         # Si algo falla, no dar 500: mostrar página pública vacía con el error en log
         import traceback
         traceback.print_exc()
         try:
-            return _render(request, "taller/tires/kiosko_mi_taller.html", {"empresa": None, "tires": [], "error": str(e)})
+            return _render(request, "taller/tires/kiosko_mi_taller.html", {"empresa": None, "tires": [], "error": str(e), "slug": slug})
         except Exception:
             from django.http import HttpResponse
             return HttpResponse(f"<h1>{'Tire Shop' if getattr(request, 'LANGUAGE_CODE', 'es') == 'en' else 'Kiosko'}</h1><p>Error temporal: {e}</p>", status=200)
@@ -284,4 +300,3 @@ def kiosko_global_publico(request):
         traceback.print_exc()
         from django.http import HttpResponse
         return HttpResponse("<h1>{'Global Tire Shop' if getattr(request, 'LANGUAGE_CODE', 'es') == 'en' else 'Kiosko Global'}</h1><p>Error temporal: " + str(e) + "</p>", status=200)
-
