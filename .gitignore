@@ -185,3 +185,6 @@ marketing/Assets/Master/*
 .aider*
 backups_reciclaje/
 private_media/
+playwright-report/
+test-results/
+test-results.json
