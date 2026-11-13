@@ -2089,3 +2089,9 @@ msgstr ""
 #: taller/vehiculos/forms.py:425
 msgid "Tipo de carrocería / Estilo"
 msgstr ""
+
+msgid "My Tire Shop"
+msgstr "Mi Kiosko"
+
+msgid "Global Tire Shop"
+msgstr "Kiosko Global"
