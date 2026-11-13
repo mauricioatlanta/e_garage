@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="color:#fff; padding:16px;">
+<h1 style="color:#fff;">Borrar Neumático</h1>
+<p>¿Seguro que borras <b>{{ tire.medida }} {{ tire.tipo }} {{ tire.marca }} {{ tire.modelo }}</b>?</p>
+<form method="POST">{% csrf_token %}<button style="padding:12px 20px; background:#ef4444; color:#fff; border:none; border-radius:10px; font-weight:bold;">SÍ, Borrar</button></form>
+<p style="margin-top:12px;"><a href="../" style="color:#0ea5e9; font-weight:bold;">Cancelar</a></p>
+</div>
+{% endblock %}

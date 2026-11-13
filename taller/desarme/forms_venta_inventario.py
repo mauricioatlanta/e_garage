@@ -14,6 +14,13 @@ INPUT_CLASS = (
 
 
 class ConfirmarVentaDesdeInventarioForm(forms.Form):
+    es_venta_rapida = forms.BooleanField(
+        required=False,
+        label="Venta rápida / Sin cliente (Mostrador)",
+        widget=forms.CheckboxInput(attrs={"class": "w-4 h-4 accent-cyan-400"}),
+        help_text="Venta de mostrador. No pide nombre, RUT ni teléfono. Queda como 'Mostrador'.",
+    )
+
     cliente = forms.ModelChoiceField(
         queryset=Cliente.objects.none(),
         required=False,

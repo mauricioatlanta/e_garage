@@ -1,316 +1,44 @@
 {% extends "base.html" %}
 {% load i18n static %}
 
-{% block title %}Acceso Corporativo · eGarage{% endblock %}
-
-{% block extra_head %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<style>
-  .eg-auth-bg {
-    min-height: calc(100vh - 80px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 1rem;
-    position: relative;
-  }
-  
-  .eg-auth-card {
-    width: 100%;
-    max-width: 440px;
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    border-radius: 1rem;
-    padding: 2.5rem 2.25rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .eg-auth-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #2563eb, #38bdf8, #0ea5e9);
-  }
-
-  .eg-form-label {
-    display: block;
-    color: #cbd5e1;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.025em;
-    margin-bottom: 0.5rem;
-  }
-
-  .eg-input-wrapper {
-    position: relative;
-  }
-
-  .eg-input-wrapper i.input-icon {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #64748b;
-    font-size: 0.9rem;
-    transition: color 0.15s ease;
-  }
-
-  .eg-input {
-    width: 100%;
-    background-color: #0b1120;
-    border: 1px solid #334155;
-    color: #f8fafc;
-    font-size: 0.9375rem;
-    padding: 0.75rem 1rem 0.75rem 2.65rem;
-    border-radius: 0.625rem;
-    outline: none;
-    transition: all 0.15s ease-in-out;
-  }
-
-  .eg-input:focus {
-    border-color: #38bdf8;
-    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
-    background-color: #0f172a;
-  }
-
-  .eg-input:focus + i.input-icon {
-    color: #38bdf8;
-  }
-
-  .eg-input::placeholder {
-    color: #475569;
-  }
-
-  .eg-btn-primary {
-    width: 100%;
-    background-color: #0284c7;
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 0.9375rem;
-    letter-spacing: 0.02em;
-    padding: 0.8rem 1.25rem;
-    border-radius: 0.625rem;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    transition: all 0.15s ease;
-    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
-  }
-
-  .eg-btn-primary:hover {
-    background-color: #0369a1;
-    box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
-    transform: translateY(-1px);
-  }
-
-  .eg-btn-primary:active {
-    transform: translateY(0);
-  }
-
-  .country-badge-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    background-color: #1e293b;
-    color: #94a3b8;
-    border: 1px solid #334155;
-    margin-top: 0.75rem;
-  }
-</style>
-{% endblock %}
+{% block title %}Iniciar Sesión · eGarage{% endblock %}
 
 {% block content %}
-<div class="eg-auth-bg">
-  <div class="eg-auth-card">
+<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem;">
+  <div style="width: 100%; max-width: 420px; background: #0f172a; border: 1px solid rgba(0, 240, 255, 0.4); border-radius: 16px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      <h2 style="color: #ffffff; font-size: 1.5rem; font-weight: 700; margin: 0 0 0.5rem 0;">eGarage</h2>
+      <p style="color: #94a3b8; font-size: 0.875rem; margin: 0;">Plataforma de Control</p>
+    </div>
 
-    <!-- Header & Brand -->
-    <div class="text-center mb-8">
-      <div class="flex items-center justify-center gap-2 mb-2">
-        <img src="{% static 'img/logo_egarage.png' %}" alt="eGarage" class="h-20 md:h-24 max-w-[260px] w-auto object-contain mx-auto filter drop-shadow"
-             onerror="this.style.display='none'; document.getElementById('eg-fallback-brand').style.display='flex';">
-        <div id="eg-fallback-brand" style="display:none;" class="items-center gap-2 text-2xl font-black text-white tracking-wider">
-          <span class="text-sky-400">e</span>Garage
-        </div>
+    {% if error_custom %}
+      <div style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 0.75rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.85rem; text-align: center;">
+        {{ error_custom }}
       </div>
-      
-      <p class="text-xs text-slate-400 font-medium tracking-wide m-0">
-        Gestión Automotriz & Centros de Servicio
-      </p>
-
-      <!-- Badge País Dinámico -->
-      {% with c=country|default:request.country|default:"" %}
-        {% if c == 'UY' or '/uy/' in request.path %}
-          <div class="country-badge-pill"><span>🇺🇾</span> URUGUAY</div>
-        {% elif c == 'PE' or '/pe/' in request.path %}
-          <div class="country-badge-pill"><span>🇵🇪</span> PERÚ</div>
-        {% elif c == 'EC' or '/ec/' in request.path %}
-          <div class="country-badge-pill"><span>🇪🇨</span> ECUADOR</div>
-        {% elif c == 'US' or '/us/' in request.path %}
-          <div class="country-badge-pill"><span>🇺🇸</span> UNITED STATES</div>
-        {% elif c == 'MX' or '/mx/' in request.path %}
-          <div class="country-badge-pill"><span>🇲🇽</span> MÉXICO</div>
-        {% elif c == 'BR' or '/br/' in request.path %}
-          <div class="country-badge-pill"><span>🇧🇷</span> BRASIL</div>
-        {% else %}
-          <div class="country-badge-pill"><span>🇨🇱</span> CHILE</div>
-        {% endif %}
-      {% endwith %}
-    </div>
-
-    <!-- Error Alert -->
-    {% if form.errors %}
-    <div class="mb-5 p-3.5 rounded-lg bg-rose-950/50 border border-rose-800 text-rose-200 text-xs font-medium flex items-center gap-2.5">
-      <i class="fas fa-circle-exclamation text-rose-400 text-sm"></i>
-      <span>Credenciales no válidas. Por favor verifique sus datos.</span>
-    </div>
     {% endif %}
 
-    <!-- Form -->
-    <form method="POST" action="{% url 'account_login' %}" class="space-y-5" id="login-form-manual" onsubmit="return window.__allowLoginSubmit === true;">
+    <form method="POST" action="" style="display: flex; flex-direction: column; gap: 1.2rem;">
       {% csrf_token %}
 
       <div>
-        <label for="id_login" class="eg-form-label">Usuario o Correo Corporativo</label>
-        <div class="eg-input-wrapper">
-          <input type="text" name="login" id="id_login" required autocomplete="username"
-                 placeholder="nombre@taller.com o usuario"
-                 class="eg-input">
-          <i class="fas fa-user input-icon"></i>
-        </div>
+        <label for="id_login" style="display: block; color: #cbd5e1; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">Usuario o Correo Corporativo</label>
+        <input type="text" name="login" id="id_login" required value="contacto@atlantareciclajes.cl" style="width: 100%; padding: 0.8rem; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: #ffffff; font-size: 1rem; box-sizing: border-box;">
       </div>
 
       <div>
-        <div class="flex items-center justify-between mb-2">
-          <label for="id_password" class="eg-form-label m-0">Contraseña</label>
-          <a href="{% url 'account_reset_password' %}" class="text-xs text-sky-400 hover:text-sky-300 font-medium transition">
-            ¿Olvidaste tu contraseña?
-          </a>
-        </div>
-        <div class="eg-input-wrapper relative">
-          <input type="password" name="password" id="id_password" required autocomplete="current-password"
-                 placeholder="Ingresa tu contraseña"
-                 class="eg-input" style="padding-right: 2.75rem !important;">
-          <i class="fas fa-lock input-icon"></i>
-          <button type="button" id="btn-toggle-pw" tabindex="-1"
-                  class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-sm p-1 transition"
-                  title="Mostrar/Ocultar contraseña">
-            <i class="fas fa-eye" id="pw-eye-icon"></i>
-          </button>
-        </div>
+        <label for="id_password" style="display: block; color: #cbd5e1; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">Contraseña</label>
+        <input type="password" name="password" id="id_password" required placeholder="••••••••" style="width: 100%; padding: 0.8rem; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: #ffffff; font-size: 1rem; box-sizing: border-box;">
       </div>
 
-      <div class="flex items-center justify-between pt-1">
-        <label class="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-400 hover:text-slate-300 font-medium">
-          <input type="checkbox" name="remember" id="id_remember" checked
-                 class="w-4 h-4 rounded border-slate-700 bg-slate-900 text-sky-600 focus:ring-0 cursor-pointer">
+      <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+        <label style="color: #94a3b8; display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+          <input type="checkbox" name="remember" id="id_remember" checked style="accent-color: #00f0ff;">
           <span>Mantener sesión iniciada</span>
         </label>
       </div>
 
-      {% if redirect_field_value %}
-      <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-      {% endif %}
-
-      <div class="pt-2">
-        <button type="button" id="btn-manual-submit" class="eg-btn-primary">
-          <span>Ingresar al Sistema</span>
-          <i class="fas fa-arrow-right text-xs"></i>
-        </button>
-      </div>
+      <input type="submit" value="Ingresar al Sistema →" style="width: 100%; margin-top: 0.5rem; padding: 0.9rem; background: #00f0ff; color: #0b132b; font-weight: 800; font-size: 1.05rem; border: none; border-radius: 8px; cursor: pointer; text-align: center; display: block;">
     </form>
-
-    <!-- Footer Trust & Security -->
-    <div class="mt-8 pt-5 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-medium">
-      <div class="flex items-center gap-1.5 text-emerald-400/90">
-        <i class="fas fa-shield-halved text-xs"></i>
-        <span>Conexión cifrada SSL</span>
-      </div>
-      <span>eGarage Cloud v2.4</span>
-    </div>
-
   </div>
 </div>
-
-<script>
-window.__allowLoginSubmit = false;
-
-document.addEventListener('DOMContentLoaded', function() {
-  const toggleBtn = document.getElementById('btn-toggle-pw');
-  const passInput = document.getElementById('id_password');
-  const eyeIcon = document.getElementById('pw-eye-icon');
-
-  if (toggleBtn && passInput) {
-    toggleBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      const isPassword = passInput.type === 'password';
-      passInput.type = isPassword ? 'text' : 'password';
-      if (eyeIcon) {
-        eyeIcon.className = isPassword ? 'fas fa-eye-slash text-sky-400' : 'fas fa-eye text-slate-400';
-      }
-    });
-  }
-
-  const form = document.getElementById('login-form-manual') || document.querySelector('form[action*="account_login"]');
-  const submitBtn = document.getElementById('btn-manual-submit') || (form ? form.querySelector('.eg-btn-primary') : null);
-  const loginInput = document.getElementById('id_login');
-
-  // Cancelar Enter no deseado desde inputs
-  [loginInput, passInput].forEach(function(inp) {
-    if (!inp) return;
-    inp.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        if (submitBtn) submitBtn.click();
-      }
-    });
-  });
-
-  // DISPARO EXCLUSIVAMENTE POR CLICK FISICO EN EL BOTON
-  let isSending = false;
-  if (submitBtn && form) {
-    submitBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (isSending) return;
-
-      const userVal = (loginInput ? loginInput.value : '').trim();
-      const passVal = (passInput ? passInput.value : '').trim();
-
-      if (!userVal) {
-        if (loginInput) loginInput.focus();
-        return;
-      }
-      if (!passVal) {
-        if (passInput) passInput.focus();
-        return;
-      }
-
-      isSending = true;
-      window.__allowLoginSubmit = true;
-
-      submitBtn.disabled = true;
-      submitBtn.style.opacity = '0.7';
-      submitBtn.style.cursor = 'not-allowed';
-      submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin text-sm mr-2"></i><span>Iniciando sesión...</span>';
-
-      form.submit();
-    });
-  }
-});
-</script>
 {% endblock %}

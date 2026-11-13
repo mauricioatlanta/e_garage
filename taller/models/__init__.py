@@ -37,6 +37,7 @@ from .memoria_seguimiento import (
 
 # Modelos de repuestos
 from .repuesto import Repuesto
+from .tire import Tire
 from .pieza_desarme import (
     PiezaDesarme,
     PiezaDesarmeName,

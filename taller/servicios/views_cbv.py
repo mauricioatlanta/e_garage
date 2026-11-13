@@ -20,6 +20,14 @@ class ServicioListView(LoginRequiredMixin, TenantViewMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
+        # Filtra por rubro activo (misma regla que el menú): clasificados solo en su rubro, legados en todos
+        try:
+            from taller.servicios.views import _scope_services_by_rubro
+            from taller.services.empresa_service import get_empresa_safe
+            empresa = get_empresa_safe(self.request)
+            qs = _scope_services_by_rubro(qs, empresa, self.request)
+        except Exception:
+            pass
         q = (self.request.GET.get("q") or "").strip()
         if q:
             qs = qs.filter(
@@ -70,6 +78,16 @@ class ServicioCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantVie
         )
         if empresa and not getattr(form.instance, "empresa_id", None):
             form.instance.empresa = empresa
+        # Guarda rubro automáticamente: si el usuario no eligió otro, queda con el rubro activo de la empresa
+        if not getattr(form.instance, "rubro_efectivo", None) and not getattr(form.instance, "rubro_sugerido", None):
+            try:
+                from taller.servicios.views import _active_service_rubros
+                rubros_activos = sorted(_active_service_rubros(empresa, self.request))
+                if rubros_activos:
+                    form.instance.rubro_efectivo = rubros_activos[0]
+                    form.instance.rubro_sugerido = rubros_activos[0]
+            except Exception:
+                pass
 
         if not form.cleaned_data.get("categoria") and form.cleaned_data.get("subcategoria"):
             form.instance.categoria = form.cleaned_data["subcategoria"].categoria
@@ -140,7 +158,7 @@ class ServicioCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantVie
 class ServicioUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
     model = Servicio
     template_name = "taller/common/servicios/editar_servicio.html"
-    fields = ["nombre", "categoria", "subcategoria"]
+    fields = ["nombre", "categoria", "subcategoria", "rubro_efectivo", "rubro_sugerido"]
 
     def get_template_names(self):
         return ["taller/common/servicios/editar_servicio.html", "servicios/editar_servicio.html"]

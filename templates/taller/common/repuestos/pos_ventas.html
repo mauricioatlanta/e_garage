@@ -4,6 +4,17 @@
 {% block title %}Ventas POS · Casa de Repuestos · eGarage{% endblock %}
 
 {% block content %}
+<style>
+  /* Contraste forzado Ventas POS - no depende de Tailwind */
+  .pos-ventas-table td { color: #e2e8f0 !important; }
+  .pos-ventas-table td.pos-id { color: #67e8f9 !important; }
+  .pos-ventas-table td.pos-fecha { color: #94a3b8 !important; }
+  .pos-ventas-table td.pos-cliente { color: #ffffff !important; font-weight: 600 !important; }
+  .pos-ventas-table td.cell-total { color: #34d399 !important; font-weight: 800 !important; }
+  .pos-ventas-table .pos-metodo { color: #cbd5e1 !important; background: #1e293b !important; }
+  .pos-ventas-table .pos-pagado { color: #6ee7b7 !important; background: rgba(6,78,59,.6) !important; border-color: rgba(52,211,153,.4) !important; }
+  .pos-ventas-table th { color: #22d3ee !important; }
+</style>
 <div class="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased relative overflow-hidden p-4 md:p-6">
   <div class="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
   <div class="absolute bottom-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -46,7 +57,7 @@
   <!-- Tabla -->
   <main class="relative z-10 max-w-7xl mx-auto bg-slate-900/60 border border-slate-800/80 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
     <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse" id="posVentasTable">
+      <table class="pos-ventas-table w-full text-left border-collapse" id="posVentasTable">
         <thead>
           <tr class="border-b border-slate-800 bg-slate-950/60 text-[11px] font-mono uppercase tracking-wider text-cyan-400">
             <th class="py-3.5 px-4"># ID</th>
@@ -63,18 +74,18 @@
           <tr class="pos-row hover:bg-slate-800/40 transition"
               data-total="{{ v.total|default:v.total_general|default:v.monto|default:0 }}"
               data-cost="{{ v.costo|default:0 }}">
-            <td class="py-3.5 px-4 font-mono font-bold text-cyan-300">#{{ v.id }}</td>
-            <td class="py-3.5 px-4 font-mono text-slate-400">{{ v.fecha|default:v.fecha_creacion|default:v.created_at|default:"--" }}</td>
-            <td class="py-3.5 px-4 font-medium text-white">{{ v.cliente.nombre|default:v.cliente_nombre|default:"Cliente Mostrador" }}</td>
+            <td class="py-3.5 px-4 font-mono font-bold text-cyan-300 pos-id" style="color:#67e8f9 !important">#{{ v.id }}</td>
+            <td class="py-3.5 px-4 font-mono text-slate-400 pos-fecha" style="color:#94a3b8 !important">{{ v.fecha|default:v.fecha_creacion|default:v.created_at|default:"--" }}</td>
+            <td class="py-3.5 px-4 font-medium text-white pos-cliente" style="color:#ffffff !important">{{ v.cliente.nombre|default:v.cliente_nombre|default:"Cliente Mostrador" }}</td>
             <td class="py-3.5 px-4">
-              <span class="px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 text-[11px] font-mono">{{ v.metodo_pago|default:v.forma_pago|default:"Efectivo" }}</span>
+              <span class="px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 pos-metodo" style="color:#cbd5e1 !important;background:#1e293b !important" text-[11px] font-mono">{{ v.metodo_pago|default:v.forma_pago|default:"Efectivo" }}</span>
             </td>
             <td class="py-3.5 px-4">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 pos-pagado" style="color:#6ee7b7 !important" text-[10px] font-bold">
                 ● Pagado
               </span>
             </td>
-            <td class="py-3.5 px-4 text-right font-mono font-bold text-emerald-400 text-sm cell-total" data-val="{{ v.total|default:v.total_general|default:v.monto|default:0 }}">
+            <td class="py-3.5 px-4 text-right font-mono font-bold text-emerald-400 text-sm cell-total" style="color:#34d399 !important;font-weight:800" data-val="{{ v.total|default:v.total_general|default:v.monto|default:0 }}">
               ${{ v.total|default:v.total_general|default:v.monto|default:0 }}
             </td>
             <td class="py-3.5 px-4 text-center">

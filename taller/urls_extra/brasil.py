@@ -17,6 +17,12 @@ app_name = "taller_brasil"
 
 
 urlpatterns = [
+    # TIRES - Modulo separado de Repuestos (global)
+    path(
+        "tires/",
+        include(("taller.tires.urls", "tires"), namespace="tires"),
+    ),
+
     # /br/ → /br/pt/bienvenida/
     path("", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),
     # /br/pt/ → /br/pt/bienvenida/ (entrypoint del funnel BR)

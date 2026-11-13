@@ -48,12 +48,30 @@ RUBRO_TO_PRODUCT = {
     "PARTS":               PRODUCT_CASA_REPUESTOS,
     "TIRE":                PRODUCT_TIRE,
     "DETAILING":           PRODUCT_CARWASH,
+    "CARWASH":             PRODUCT_CARWASH,
     "RECYCLING":           PRODUCT_RECYCLING,
+    "RECICLAJE":           PRODUCT_RECYCLING,
     "TOWING":              PRODUCT_TOWING,
+    "GRUAS":               PRODUCT_TOWING,
     "MIXED":               PRODUCT_TALLER,  # FIX: antes caía en Desarmaduría
 }
 
 PRODUCT_PROFILES = {
+
+    'RECICLAJE': {
+        'nombre_rubro': 'Reciclaje y Chatarra',
+        'kpi_principal': 'Material Comprado / Margen de Venta',
+        'nav': [
+            {'label': 'Ajustes',      'url': 'empresa:settings',         'icon': 'fas fa-cog'},
+            {'label': 'Equipo',       'url': 'empresa:equipo',           'icon': 'fas fa-user-friends'},
+            {'label': 'Centro',       'url': 'workspace:home',           'icon': 'fas fa-rocket'},
+            {'label': 'Proveedores / Clientes', 'url': 'clientes:lista', 'icon': 'fas fa-users'},
+            {'label': 'Compras y Ventas', 'url': 'desarme:ventas_lista', 'icon': 'fas fa-cash-register'},
+            {'label': 'Precios y Materiales', 'url': 'desarme:catalogo', 'icon': 'fas fa-list-alt'},
+            {'label': 'Reportes',    'url': 'taller:reportes',          'icon': 'fas fa-chart-pie'},
+        ]
+    },
+
     PRODUCT_TALLER: {
         "name":          "eGarage Taller",
         "tagline":       "Gestión integral de tu taller",
@@ -73,6 +91,7 @@ PRODUCT_PROFILES = {
         ],
         "kpi_labels": ["OT Abiertas", "OT Terminadas", "Vehículos en espera", "Ventas del día"],
         "quick_access": [
+            {"label": "Ver Kiosko Web", "icon": "fas fa-store", "path": "kiosko/"},
             {"label": "Nueva OT",        "icon": "fas fa-file-plus",  "path": "documentos/form/"},
             {"label": "Nuevo Vehículo",  "icon": "fas fa-car",        "path": "vehiculos/crear/"},
             {"label": "Nuevo Cliente",   "icon": "fas fa-user-plus",  "path": "clientes/crear/"},
@@ -89,13 +108,15 @@ PRODUCT_PROFILES = {
             {"key": MOD_INICIO,        "label": "Inicio",               "icon": "fas fa-home"},
             {"key": MOD_DESARME,       "label": "Vehículos de Desarme", "icon": "fas fa-car-crash"},
             {"key": MOD_REPUESTOS,     "label": "Inventario de desarme", "icon": "fas fa-boxes"},
-            {"key": MOD_DOCUMENTOS,    "label": _("Ventas"),               "icon": "fas fa-shopping-cart"},
-            {"key": MOD_CLIENTES,      "label": _("Clientes"),             "icon": "fas fa-users"},
-            {"key": MOD_REPORTES,      "label": _("Reportes"),             "icon": "fas fa-chart-bar"},
-            {"key": MOD_CONFIGURACION, "label": _("Configuración"),        "icon": "fas fa-cog"},
+            {"key": MOD_REPUESTOS,     "label": "Ver kiosko",            "icon": "fas fa-store"},
+            {"key": MOD_DOCUMENTOS,    "label": "Ventas de desarme",     "icon": "fas fa-shopping-cart"},
+            {"key": MOD_CLIENTES,      "label": "Clientes",              "icon": "fas fa-users"},
+            {"key": MOD_REPORTES,      "label": "Reportes",              "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": "Configuración",         "icon": "fas fa-cog"},
         ],
         "kpi_labels": ["Vehículos disponibles", "Valor inventario", "Piezas vendidas hoy", "Vehículos sin movimiento"],
         "quick_access": [
+            {"label": "Ver Kiosko Web", "icon": "fas fa-store", "path": "kiosko/"},
             {"label": "Ingresar Vehículo", "icon": "fas fa-plus-circle",   "path": "desarme/vehiculos/crear/"},
             {"label": "Registrar Venta",   "icon": "fas fa-shopping-cart", "path": "documentos/form/"},
             {"label": "Ver Inventario de desarme", "icon": "fas fa-boxes", "path": "repuestos/"},
@@ -118,6 +139,7 @@ PRODUCT_PROFILES = {
         ],
         "kpi_labels": ["Ventas hoy", "Productos críticos", "Rotación", "Clientes frecuentes"],
         "quick_access": [
+            {"label": "Ver Kiosko Web", "icon": "fas fa-store", "path": "kiosko/"},
             {"label": "Nueva Venta",      "icon": "fas fa-shopping-cart", "path": "documentos/form/"},
             {"label": "Agregar Repuesto", "icon": "fas fa-plus",          "path": "repuestos/crear/"},
             {"label": "Ver Inventario de repuestos", "icon": "fas fa-boxes", "path": "repuestos/"},
@@ -132,18 +154,18 @@ PRODUCT_PROFILES = {
         "default_rubro": "TIRE",
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",                    "icon": "fas fa-home"},
-            {"key": MOD_REPUESTOS,     "label": "Inventario de Neumáticos",  "icon": "fas fa-circle-notch"},
-            {"key": MOD_SERVICIOS,     "label": "Servicios Vulcanización",   "icon": "fas fa-tools"},
-            {"key": MOD_DOCUMENTOS,    "label": "Ventas de Mostrador",       "icon": "fas fa-cash-register"},
-            {"key": MOD_CLIENTES,      "label": _("Clientes"),                  "icon": "fas fa-users"},
-            {"key": MOD_VEHICULOS,     "label": _("Vehículos"),                 "icon": "fas fa-car"},
-            {"key": MOD_REPORTES,      "label": _("Reportes"),                  "icon": "fas fa-chart-bar"},
-            {"key": MOD_CONFIGURACION, "label": _("Configuración"),             "icon": "fas fa-cog"},
+            {"key": MOD_SERVICIOS,     "label": "Servicios Express",         "icon": "fas fa-bolt"},
+            {"key": MOD_REPUESTOS,     "label": "Neumáticos",                "icon": "fas fa-circle-notch"},
+            {"key": MOD_DOCUMENTOS,    "label": "Ventas",                    "icon": "fas fa-cash-register"},
+            {"key": MOD_CLIENTES,      "label": _("Clientes"),                "icon": "fas fa-users"},
+            {"key": MOD_REPORTES,      "label": _("Reportes"),                "icon": "fas fa-chart-bar"},
+            {"key": MOD_CONFIGURACION, "label": _("Configuración"),           "icon": "fas fa-cog"},
         ],
         "kpi_labels": ["Ventas hoy", "Neumáticos críticos", "Servicios hoy", "Ticket promedio"],
         "quick_access": [
+            {"label": "Ver Kiosko Web", "icon": "fas fa-store", "path": "kiosko/"},
             {"label": "POS Mostrador",          "icon": "fas fa-cash-register", "path": "repuestos/pos/"},
-            {"label": "Agregar Neumático",      "icon": "fas fa-plus",          "path": "repuestos/crear/"},
+            {"label": "Agregar Neumático",      "icon": "fas fa-plus",          "path": "tires/crear/"},
             {"label": "Servicios Vulcanización", "icon": "fas fa-tools",        "path": "servicios/"},
         ],
     },
@@ -163,6 +185,7 @@ PRODUCT_PROFILES = {
         ],
         "kpi_labels": ["Compras hoy", "Catalíticos en stock", "Margen del mes", "Chatarra bajo stock mínimo"],
         "quick_access": [
+            {"label": "Ver Kiosko Web", "icon": "fas fa-store", "path": "kiosko/"},
             {"label": "Nueva Compra",     "icon": "fas fa-recycle",       "path": "reciclaje/compras/nueva/"},
             {"label": "Ver Stock",        "icon": "fas fa-boxes",         "path": "reciclaje/stock/"},
             {"label": _("Reportes"),         "icon": "fas fa-chart-bar",     "path": "reciclaje/reportes/"},
@@ -185,6 +208,7 @@ PRODUCT_PROFILES = {
         ],
         "kpi_labels": ["Servicios hoy", "Ingresos hoy", "Clientes hoy", "Servicios semana"],
         "quick_access": [
+            {"label": "Ver Kiosko Web", "icon": "fas fa-store", "path": "kiosko/"},
             {"label": "Registrar Servicio", "icon": "fas fa-tint",      "path": "documentos/form/"},
             {"label": "Nuevo Cliente",      "icon": "fas fa-user-plus", "path": "clientes/crear/"},
         ],
@@ -206,6 +230,7 @@ PRODUCT_PROFILES = {
         ],
         "kpi_labels": ["Órdenes hoy", "Pendientes de asignación", "Saldo por cobrar", "Margen registrado"],
         "quick_access": [
+            {"label": "Ver Kiosko Web", "icon": "fas fa-store", "path": "kiosko/"},
             {"label": "Nueva orden", "icon": "fas fa-plus", "path": "gruas/ordenes/nueva/"},
             {"label": "Despacho", "icon": "fas fa-route", "path": "gruas/"},
             {"label": "Conductores", "icon": "fas fa-id-card", "path": "gruas/conductores/"},

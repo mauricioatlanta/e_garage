@@ -71,8 +71,10 @@
         <label for="{{ form.subcategoria.id_for_label }}">{% if language == 'en' %}Subcategory{% else %}Subcategoría{% endif %} <span class="req">*</span></label>
         <select name="{{ form.subcategoria.name }}" id="{{ form.subcategoria.id_for_label }}" required {% if form.subcategoria.errors %}style="border-color:#f87171"{% endif %}>
           <option value="">{% if language == 'en' %}Select a subcategory...{% else %}Selecciona una subcategoría...{% endif %}</option>
-          {% for subcat in form.subcategoria.field.queryset %}
-          <option value="{{ subcat.id }}" {% if form.subcategoria.value == subcat.id %}selected{% endif %} data-categoria="{{ subcat.categoria.code }}">{{ subcat.get_label|default:subcat.code }}</option>
+          {% for value, label in form.subcategoria.field.choices %}
+          {% if value %}
+          <option value="{{ value }}" {% if form.subcategoria.value|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
+          {% endif %}
           {% endfor %}
         </select>
         {% if form.subcategoria.errors %}<p class="cs-error">{{ form.subcategoria.errors.0 }}</p>{% endif %}

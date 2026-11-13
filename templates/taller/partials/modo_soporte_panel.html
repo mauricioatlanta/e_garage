@@ -2,23 +2,35 @@
   {% csrf_token %}
   <div class="grid grid-cols-2 gap-2 text-xs">
     <label class="flex items-center gap-2 cursor-pointer text-slate-200 hover:text-cyan-300">
-      <input type="checkbox" name="rubros" value="desarmaduria" class="accent-cyan-500 rounded"> 
-      Desarmaduría
-    </label>
-    <label class="flex items-center gap-2 cursor-pointer text-slate-200 hover:text-cyan-300">
-      <input type="checkbox" name="rubros" value="repuestos" class="accent-cyan-500 rounded"> 
-      Casa de Repuestos
-    </label>
-    <label class="flex items-center gap-2 cursor-pointer text-slate-200 hover:text-cyan-300">
-      <input type="checkbox" name="rubros" value="taller" class="accent-cyan-500 rounded"> 
+      <input type="checkbox" name="rubros" value="TALLER" class="accent-cyan-500 rounded" {% if 'WORKSHOP' in support_rubros %}checked{% endif %}>
       Taller Mecánico
     </label>
     <label class="flex items-center gap-2 cursor-pointer text-slate-200 hover:text-cyan-300">
-      <input type="checkbox" name="rubros" value="gruas" class="accent-cyan-500 rounded"> 
+      <input type="checkbox" name="rubros" value="DESARMADURIA" class="accent-cyan-500 rounded" {% if 'DESARMADURIA' in support_rubros %}checked{% endif %}>
+      Desarmaduría
+    </label>
+    <label class="flex items-center gap-2 cursor-pointer text-slate-200 hover:text-cyan-300">
+      <input type="checkbox" name="rubros" value="REPUESTOS" class="accent-cyan-500 rounded" {% if 'PARTS' in support_rubros %}checked{% endif %}>
+      Casa de Repuestos
+    </label>
+    <label class="flex items-center gap-2 cursor-pointer text-slate-200 hover:text-cyan-300">
+      <input type="checkbox" name="rubros" value="VULCANIZACION" class="accent-cyan-500 rounded" {% if 'TIRE' in support_rubros %}checked{% endif %}>
+      Vulcanización
+    </label>
+    <label class="flex items-center gap-2 cursor-pointer text-slate-200 hover:text-cyan-300">
+      <input type="checkbox" name="rubros" value="CARWASH" class="accent-cyan-500 rounded" {% if 'DETAILING' in support_rubros %}checked{% endif %}>
+      Carwash
+    </label>
+    <label class="flex items-center gap-2 cursor-pointer text-slate-200 hover:text-cyan-300">
+      <input type="checkbox" name="rubros" value="GRUAS" class="accent-cyan-500 rounded" {% if 'TOWING' in support_rubros %}checked{% endif %}>
       Grúas y Asistencia
     </label>
+    <label class="flex items-center gap-2 cursor-pointer text-slate-200 hover:text-cyan-300">
+      <input type="checkbox" name="rubros" value="RECICLAJE" class="accent-cyan-500 rounded" {% if 'RECYCLING' in support_rubros or 'RECICLAJE' in support_rubros %}checked{% endif %}>
+      Reciclaje
+    </label>
   </div>
-  
+
   <div class="flex gap-2 pt-2">
     <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-1.5 rounded-lg text-xs transition">
       Aplicar Múltiples Rubros

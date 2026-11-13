@@ -890,9 +890,9 @@
 {% block main_actions %}
 <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
   {% if request.user|is_admin_or_owner %}
-  <a href="{% if parts_sales_mode %}{% country_url 'repuestos:pos_mostrador' %}{% elif request.empresa.config.rubro_principal == 'DESARMADURIA' %}{% country_url 'desarme:lista_piezas' %}{% else %}{% country_url 'documentos:crear_documento' %}{% endif %}" class="crear-documento-btn">
+  <a href="{% if 'RECICLAJE' in support_rubros or 'reciclaje' in support_rubros %}{% country_url 'desarme:crear_venta' %}{% elif parts_sales_mode %}{% country_url 'repuestos:pos_mostrador' %}{% elif request.empresa.config.rubro_principal == 'DESARMADURIA' %}{% country_url 'desarme:lista_piezas' %}{% else %}{% if 'RECICLAJE' in support_rubros or 'reciclaje' in support_rubros or 'recicla' in request.path %}{% country_url 'desarme:crear_venta' %}{% else %}{% country_url 'documentos:crear_documento' %}{% endif %}{% endif %}" class="crear-documento-btn">
     <i class="fas fa-plus-circle"></i>
-    <span>{{ ui_labels.new_document }}</span>
+    <span>{% if "RECICLAJE" in support_rubros or "reciclaje" in support_rubros or "recicla" in request.path %}+ Registrar Compra / Venta{% else %}{{ ui_labels.new_document }}{% endif %}</span>
   </a>
   {% endif %}
 </div>
@@ -901,7 +901,7 @@
 {% block page_stats %}
 <div class="kpis-grid">
   <div class="kpi-card">
-    <div class="kpi-label">📄 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Total {{ ui_labels.documents_menu }}{% else %}Total {{ ui_labels.documents_menu }}{% endif %}</div>
+    <div class="kpi-label">📄 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}{% if "RECICLAJE" in support_rubros or "reciclaje" in support_rubros or "recicla" in request.path %}Total Compras / Ventas{% else %}Total {{ ui_labels.documents_menu }}{% endif %}{% else %}{% if "RECICLAJE" in support_rubros or "reciclaje" in support_rubros or "recicla" in request.path %}Total Compras / Ventas{% else %}Total {{ ui_labels.documents_menu }}{% endif %}{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.total|default:"0" }}</div>
     <div class="kpi-subvalue">{% if estadisticas.total_monto %}{{ estadisticas.total_monto|money_by_country:country }}{% endif %}</div>
   </div>
@@ -925,7 +925,7 @@
     <div class="kpi-label">📋 {{ ui_labels.document_type_estimate }} {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Pending{% else %}Pendientes{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.presupuestos_pendientes|default:"0" }}</div>
   </div>
-  {% if parts_sales_mode %}<div class="kpi-card">
+  {% if 'RECICLAJE' in support_rubros or 'reciclaje' in support_rubros %}{% country_url 'desarme:crear_venta' %}{% elif parts_sales_mode %}<div class="kpi-card">
     <div class="kpi-label">🛒 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Parts Sales{% else %}Ventas de repuestos{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.ventas_repuestos|default:"0" }}</div>
   </div>{% else %}<div class="kpi-card">
@@ -1321,7 +1321,7 @@
         {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}No {{ ui_labels.documents_menu|lower }} records have been created yet. Create your first {{ ui_labels.workflow_singular|lower }} to start managing your business.{% elif ui_labels.workflow_singular == 'Venta' %}Aún no se han creado {{ ui_labels.documents_menu|lower }}. Crea tu primera {{ ui_labels.workflow_singular|lower }} para comenzar a gestionar tu negocio.{% else %}Aún no se han creado {{ ui_labels.documents_menu|lower }}. Crea tu primer {{ ui_labels.workflow_singular|lower }} para comenzar a gestionar tu negocio.{% endif %}
       </p>
       {% if request.user|is_admin_or_owner %}
-      <a href="{% if request.empresa.config.rubro_principal == 'DESARMADURIA' %}{% country_url 'desarme:lista_piezas' %}{% else %}{% country_url 'documentos:crear_documento' %}{% endif %}" class="crear-documento-btn">
+      <a href="{% if request.empresa.config.rubro_principal == 'DESARMADURIA' %}{% country_url 'desarme:lista_piezas' %}{% else %}{% if 'RECICLAJE' in support_rubros or 'reciclaje' in support_rubros or 'recicla' in request.path %}{% country_url 'desarme:crear_venta' %}{% else %}{% country_url 'documentos:crear_documento' %}{% endif %}{% endif %}" class="crear-documento-btn">
         <i class="fas fa-plus-circle"></i>
         <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Create First {{ ui_labels.workflow_singular }}{% elif ui_labels.workflow_singular == 'Venta' %}Crear Primera {{ ui_labels.workflow_singular }}{% else %}Crear Primer {{ ui_labels.workflow_singular }}{% endif %}</span>
       </a>

@@ -150,13 +150,19 @@ def detalle_catalitico(request, pk):
 
 def catalogo_chatarra(request):
     empresa = _empresa_publica(request)
+    # Filtro estricto: solo componentes activos de chatarra electrónica
     productos = ProductoChatarra.objects.filter(
         empresa=empresa, activo=True
+    ).exclude(
+        nombre__iregex=r'(acero|bronce|cobre|plomo|aluminio|papel|carton|9000)'
     ).order_by("nombre")
-    paginator = Paginator(productos, 12)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    
     return render(
         request,
         "taller/reciclaje/catalogo_chatarra.html",
-        {"page_obj": page_obj},
+        {
+            "page_obj": productos,
+            "productos": productos,
+            "empresa": empresa,
+        },
     )

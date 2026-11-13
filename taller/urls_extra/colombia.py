@@ -15,6 +15,12 @@ from taller.views_extra.signup_redirects import signup_redirect
 app_name = "taller_colombia"
 
 urlpatterns = [
+    # TIRES - Modulo separado de Repuestos (global)
+    path(
+        "tires/",
+        include(("taller.tires.urls", "tires"), namespace="tires"),
+    ),
+
     # Redirigir raíz a bienvenida
     path("", RedirectView.as_view(url="/co/es/bienvenida/", permanent=False), name="colombia_home"),
     # Dashboard principal de Colombia

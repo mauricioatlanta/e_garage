@@ -812,7 +812,7 @@
   {% if not eg_us_signup_slim_header|default:False and '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
   <div id="main-navigation" class="{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}flex flex-row flex-wrap items-center justify-center mt-1 gap-1{% else %}flex flex-col items-center justify-center mt-3 gap-2{% endif %}">
     {% if request.user.is_authenticated %}
-      {% if workspace.product_key == "DESARMADURIA" or workspace.product_key == "RECYCLING" or workspace.product_key == "TOWING" or workspace.product_key == "TIRE" or workspace.product_key == "CARWASH" %}
+      {% if workspace %}
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
         {% for item in workspace.nav %}
         <a href="{{ item.url }}" class="nav-button-standard{% if item.is_active %} bg-gray-100 text-gray-900{% endif %}">
@@ -833,22 +833,22 @@
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
         <a href="{% country_url 'company_settings' %}" class="nav-button-standard">
           <span class="nav-icon">⚙️</span>
-          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Configurações{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Settings{% else %}Ajustes{% endif %}{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Configurações{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}Settings{% else %}Ajustes{% endif %}{% endif %}</span>
         </a>
         {% if request.user|is_owner %}
         <a href="{% country_url 'team' %}" class="nav-button-standard {% if 'equipo' in request.path %}bg-gray-100 text-gray-900{% endif %}">
           <span class="nav-icon">👤</span>
-          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Equipe{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Team{% else %}Equipo{% endif %}{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Equipe{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}Team{% else %}Equipo{% endif %}{% endif %}</span>
         </a>
         {% endif %}
         {% if not qa_control_is_cl_desarme %}
         <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
           <span class="nav-icon">🚀</span>
-          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Central{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Center{% else %}Centro{% endif %}{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Central{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}Center{% else %}Centro{% endif %}{% endif %}</span>
         </a>
         <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
           <span class="nav-icon">👥</span>
-          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Clients{% else %}Clientes{% endif %}</span>
+          <span class="nav-text">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}Clients{% else %}Clientes{% endif %}</span>
         </a>
         {% if 'reciclaje' in business_modules %}
         <a href="{% country_url 'reciclaje_staff:dashboard' %}" class="nav-button-standard">
@@ -862,25 +862,42 @@
         {% else %}
         <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
           <span class="nav-icon">📄</span>
-          <span class="nav-text">{{ ui_labels.documents_menu|default_if_none:"Documentos" }}</span>
+          <span class="nav-text">{% if "RECICLAJE" in support_rubros or "reciclaje" in support_rubros or "recicla" in request.path %}
+    <a href="/cl/es/desarme/catalogo/" class="nav-item-btn" style="text-decoration:none; text-align:center;">
+        <i class="fas fa-boxes" style="font-size: 1.2rem; color: #00f0ff; display: block; margin: 0 auto 4px auto;"></i>
+        <span class="nav-text" style="color:#ffffff; font-size: 0.72rem; font-weight: 600; line-height: 1.1;">Precios Compra</span>
+    </a>
+{% else %}
+    <a href="/cl/es/servicios/otros-servicios/" class="nav-item-btn">
+        <i class="fas fa-star" style="font-size: 1.2rem; color: #ffc107; display: block; margin: 0 auto 4px auto;"></i>
+        <span class="nav-text">{% trans "Extra" %}</span>
+    </a>
+{% endif %}{% endif %}</span>
         </a>
         {% endif %}
-        <a href="{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}/us/{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}es{% else %}en{% endif %}/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
+{% if "RECICLAJE" in support_rubros or "reciclaje" in support_rubros or "recicla" in request.path %}
+            <a href="/cl/es/desarme/catalogo/" class="nav-item-btn"><i class="fas fa-list-alt"></i> <span class="nav-text">Materiales / Precios</span></a>
+        {% else %}
+                <a href="{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}/us/{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}es{% else %}en{% endif %}{% if 'RECICLAJE' in support_rubros or 'reciclaje' in support_rubros %}/cl/es/desarme/catalogo/{% else %}/cl/es/servicios/otros-servicios/{% endif %}{% else %}/cl/es{% if 'RECICLAJE' in support_rubros or 'reciclaje' in support_rubros %}/cl/es/desarme/catalogo/{% else %}/cl/es/servicios/otros-servicios/{% endif %}{% endif %}" class="nav-button-standard">
+
+{% endif %}
           <span class="nav-icon">⭐</span>
-          <span class="nav-text">Extra</span>
+          <span class="nav-text">{% if 'RECICLAJE' in support_rubros or 'reciclaje' in support_rubros or 'recicla' in request.path %}Materiales / Precios{% else %}Extra{% endif %}</span>
         </a>
         {% endif %}
       </div>
 
+      {% if not workspace %}
       <!-- Row 2: Parts, Reports, Services, Disassembly, Vehicles, Logout -->
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
         {% if not qa_control_is_cl_desarme %}
         {% if 'repuestos' in business_modules %}
         <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
           <span class="nav-icon">🔧</span>
-          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Peças{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Parts{% else %}Repuestos{% endif %}{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Peças{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}Parts{% else %}Repuestos{% endif %}{% endif %}</span>
         </a>
-        {% endif %}
+        {% endif %}{# fin Row 2 solo sin workspace #}
+      {% endif %}
         {% if 'reciclaje' in business_modules %}
         <a href="{% country_url 'reciclaje_staff:resumen_stock' %}" class="nav-button-standard">
           <span class="nav-icon">🏷️</span>
@@ -891,15 +908,29 @@
           <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Relatórios{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Reports{% else %}Reportes{% endif %}{% endif %}</span>
         </a>
         {% else %}
-        <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
+        {% if "RECICLAJE" in support_rubros or "reciclaje" in support_rubros or "recicla" in request.path %}
+        
+            {% if request.session.rubro_activo == 'RECICLAJE' or empresa.rubro == 'RECICLAJE' or empresa.rubro_principal == 'RECICLAJE' %}
+            <a href="/cl/es/reciclaje/" class="nav-button-standard" style="color: #00f0ff;">
+                <i class="fas fa-recycle"></i> <span>Reciclaje</span>
+            </a>
+            {% endif %}
+            
+<a href="/cl/es/desarme/reportes/" class="nav-button-standard">
           <span class="nav-icon">📊</span>
-          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Relatórios{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Reports{% else %}Reportes{% endif %}{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Relatórios{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}Reports{% else %}Reportes{% endif %}{% endif %}</span>
         </a>
+    {% else %}
+        <a {% if "RECICLAJE" in support_rubros or "reciclaje" in support_rubros %}/cl/es/desarme/reportes/{% else %}/cl/es/reportes/{% endif %} class="nav-button-standard">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Relatórios{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}Reports{% else %}Reportes{% endif %}{% endif %}</span>
+        </a>
+    {% endif %}
         {% endif %}
         {% if 'servicios' in business_modules %}
         <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
           <span class="nav-icon">🛠️</span>
-          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Serviços{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Services{% else %}Servicios{% endif %}{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Serviços{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}Services{% else %}Servicios{% endif %}{% endif %}</span>
         </a>
         {% endif %}
         {% endif %}
@@ -907,7 +938,7 @@
         {% country_url 'desarme:index' as desarme_url %}
         <a href="{% if desarme_url %}{{ desarme_url }}{% else %}#{% endif %}" class="nav-button-standard">
           <span class="nav-icon">🧩</span>
-          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Desmontagem{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Disassembly{% else %}Desarme{% endif %}{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Desmontagem{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}Disassembly{% else %}Desarme{% endif %}{% endif %}</span>
         </a>
         {% endif %}
         {% if not qa_control_is_cl_desarme %}
@@ -916,16 +947,17 @@
         {% if vehiculos_url %}
         <a href="{{ vehiculos_url }}" class="nav-button-standard">
           <span class="nav-icon">🚗</span>
-          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Veículos{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Vehicles{% else %}Vehículos{% endif %}{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Veículos{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}Vehicles{% else %}Vehículos{% endif %}{% endif %}</span>
         </a>
         {% else %}
         <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
           <span class="nav-icon">🚗</span>
-          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Veículos{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}Vehicles{% else %}Vehículos{% endif %}{% endif %}</span>
+          <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Veículos{% else %}{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}Vehicles{% else %}Vehículos{% endif %}{% endif %}</span>
         </a>
         {% endif %}
         {% endif %}
         {% endif %}
+        {% if not workspace %}
         <form action="{% url 'account_logout' %}" method="post" class="inline-block">
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
@@ -933,22 +965,23 @@
             <span class="nav-text">{% if request.path|slice:':7' == '/br/pt/' %}Sair{% else %}{% trans "Salir" %}{% endif %}</span>
           </button>
         </form>
+        {% endif %}{# fin 2º Salir solo sin workspace #}
       </div>
       {% endif %}
 
     {% else %}
       <!-- Login button for non-authenticated users -->
       <div class="flex items-center justify-center">
-        <a href="{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}{% if request.LANGUAGE_CODE == 'es' %}/us/es/accounts/login/{% else %}/us/en/accounts/login/{% endif %}{% else %}{% url 'account_login' %}{% endif %}" class="nav-button flex items-center gap-2 px-4 py-2 bg-[#0a0f1a] border border-cyan-400 rounded-lg hover:bg-[#0f172a] transition-all duration-300 text-cyan-300 hover:text-white">
+        <a href="{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}{% if request.LANGUAGE_CODE == 'es' %}/us/es/accounts/login/{% else %}/us/en/accounts/login/{% endif %}{% else %}{% url 'account_login' %}{% endif %}" class="nav-button flex items-center gap-2 px-4 py-2 bg-[#0a0f1a] border border-cyan-400 rounded-lg hover:bg-[#0f172a] transition-all duration-300 text-cyan-300 hover:text-white">
         <div class="w-4 h-4 bg-cyan-400 rounded-sm flex items-center justify-center">
           <div class="w-2 h-2 bg-white rounded-full"></div>
         </div>
-        <span class="font-medium text-sm">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or request.country == 'US' %}{% if request.LANGUAGE_CODE == 'es' %}INICIAR SESIÓN{% else %}SIGN IN{% endif %}{% else %}INICIAR SESIÓN{% endif %}</span>
+        <span class="font-medium text-sm">{% if "/en/" in request.path or LANGUAGE_CODE == "en" or '/us/' in request.pathth or '/us/' in request.pathth %}{% if request.LANGUAGE_CODE == 'es' %}INICIAR SESIÓN{% else %}SIGN IN{% endif %}{% else %}INICIAR SESIÓN{% endif %}</span>
       </a>
     {% endif %}
     </div>
   </div>
-  {% endif %}
+{# endif_corregido #}
 
   {% if request.user.is_authenticated and subscription_state != "active" %}
   <div class="px-4 mt-4" aria-live="polite">

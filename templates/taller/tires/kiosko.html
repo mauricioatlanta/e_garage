@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="color:#fff; padding:12px;">
+<h1 style="color:#fff;">🛞 Kiosko de Neumáticos - SOLO LLANTAS</h1>
+<p style="color:#cbd5e1;">Esta vitrina muestra SOLO neumáticos. No muestra repuestos.</p>
+<form method="GET" style="margin:12px 0;">
+  <input name="q" value="{{ q }}" placeholder="Buscar medida: 175/70 R14" style="padding:10px; border-radius:8px; border:1px solid #475569; background:#0f172a; color:#fff; width:200px;">
+  <select name="tipo" style="padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;">
+    <option value="">Todos: Nuevo / Usado / Recapado</option>
+    <option value="Nuevo" {% if tipo == "Nuevo" %}selected{% endif %}>Nuevo</option>
+    <option value="Usado" {% if tipo == "Usado" %}selected{% endif %}>Usado</option>
+    <option value="Recapado" {% if tipo == "Recapado" %}selected{% endif %}>Recapado</option>
+  </select>
+  <button style="padding:10px 16px; border-radius:8px; background:#0ea5e9; color:#fff; border:none; font-weight:bold;">Buscar</button>
+</form>
+<p>
+  <a href="../crear/" style="display:inline-block; padding:12px 18px; background:#facc15; color:#000; font-weight:bold; border-radius:10px; text-decoration:none;">+ Agregar Neumático</a>
+  <a href="../" style="display:inline-block; padding:12px 18px; background:#334155; color:#fff; font-weight:bold; border-radius:10px; text-decoration:none; margin-left:8px;">Mantener / Revisar Inventario</a>
+</p>
+{% if messages %}{% for m in messages %}<p style="background:#14532d; padding:10px; border-radius:8px;">{{ m }}</p>{% endfor %}{% endif %}
+<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap:16px; margin-top:16px;">
+{% for t in tires %}
+  <div style="border:1px solid #475569; padding:16px; border-radius:12px; background:#1e293b; color:#fff;">
+    <h2 style="margin:0; color:#fff;">{{ t.medida }}</h2>
+    <p style="margin:8px 0; color:#e2e8f0;"><b>{{ t.marca }} {{ t.modelo }}</b><br>{{ t.tipo }} - {{ t.uso }}<br>Índice: {{ t.indice|default:"-" }} | DOT: {{ t.dot|default:"-" }}</p>
+    <p style="font-size:22px; font-weight:bold; color:#facc15; margin:8px 0;">${{ t.precio_instalado }} instalado</p>
+    <p style="color:#cbd5e1;">Compra: ${{ t.precio_compra }} | Venta: ${{ t.precio_venta }} | Stock: {{ t.cantidad_stock }}</p>
+    <p style="margin-top:12px;">
+      <a href="../editar/{{ t.pk }}/" style="display:inline-block; padding:8px 14px; background:#0ea5e9; color:#fff; border-radius:8px; text-decoration:none; font-weight:bold;">Editar</a>
+      <a href="../eliminar/{{ t.pk }}/" style="display:inline-block; padding:8px 14px; background:#ef4444; color:#fff; border-radius:8px; text-decoration:none; font-weight:bold; margin-left:6px;">Borrar</a>
+    </p>
+  </div>
+{% empty %}
+  <p style="color:#facc15; font-weight:bold;">No hay neumáticos en el kiosko. Pulsa + Agregar Neumático para ingresar el primero.</p>
+{% endfor %}
+</div>
+</div>
+{% endblock %}

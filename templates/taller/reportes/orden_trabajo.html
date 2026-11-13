@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        {% if request.country == 'BR' %}
+        {% if country|default:"cl" == 'BR' %}
             Ordem de Serviço
-        {% elif request.country == 'US' %}
+        {% elif country|default:"cl" == 'US' %}
             Work Order
         {% else %}
             Orden de Trabajo
@@ -165,9 +165,9 @@
 <body>
     <div class="header">
         <h1>
-            {% if request.country == 'BR' %}
+            {% if country|default:"cl" == 'BR' %}
                 {% trans "ORDEM DE SERVIÇO" %}
-            {% elif request.country == 'US' %}
+            {% elif country|default:"cl" == 'US' %}
                 {% trans "WORK ORDER" %}
             {% else %}
                 {% trans "ORDEN DE TRABAJO" %}
@@ -218,7 +218,7 @@
         <div class="info-grid">
             <div class="info-item">
                 <div class="info-label">
-                    {% if request.country == 'BR' %}
+                    {% if country|default:"cl" == 'BR' %}
                         {% trans "Placa" %}
                     {% else %}
                         {% trans "Patente" %}
@@ -241,7 +241,7 @@
             {% if documento.kilometraje %}
             <div class="info-item">
                 <div class="info-label">
-                    {% if request.country == 'US' %}
+                    {% if country|default:"cl" == 'US' %}
                         {% trans "Mileage" %}
                     {% else %}
                         {% trans "Kilometraje" %}
@@ -249,7 +249,7 @@
                 </div>
                 <div class="info-value">
                     {{ documento.kilometraje|default:documento.millas }}
-                    {% if request.country == 'US' %}mi{% else %}km{% endif %}
+                    {% if country|default:"cl" == 'US' %}mi{% else %}km{% endif %}
                 </div>
             </div>
             {% endif %}
@@ -281,7 +281,7 @@
                 {% for repuesto in documento.lineas_repuesto.all %}
                 <tr>
                     <td>
-                        {% if request.country == 'BR' %}
+                        {% if country|default:"cl" == 'BR' %}
                             {% trans "Peças de Reposição" %}: {{ repuesto.repuesto.nombre|default:repuesto.descripcion }}
                         {% else %}
                             {% trans "Repuestos" %}: {{ repuesto.repuesto.nombre|default:repuesto.descripcion }}
@@ -318,9 +318,9 @@
                 </div>
                 {% endwith %}
                 <div style="font-size: 10pt; color: #6b7280;">
-                    {% if request.country == 'BR' %}
+                    {% if country|default:"cl" == 'BR' %}
                         ISS ({{ documento.tax_rate_applied }}%): {% format_currency documento.tax_amount %}
-                    {% elif request.country == 'US' %}
+                    {% elif country|default:"cl" == 'US' %}
                         Tax ({{ documento.tax_rate_applied }}%): {% format_currency documento.tax_amount %}
                     {% else %}
                         {% trans "IVA" %} ({{ documento.tax_rate_applied }}%): {% format_currency documento.tax_amount %}

@@ -74,6 +74,28 @@ class LanguagePolicyMiddleware:
                     if posible_pais in DEFAULT_BY_COUNTRY:
                         pais = posible_pais
 
+            # PRIORIDAD 0: La URL manda sobre empresa / support_country / sesion.
+            # Si la URL es /us/en/... es EN aunque la empresa sea CL.
+            # Si es /us/es/... es ES aunque la sesion diga en.
+            if request.path.startswith("/us/en/"):
+                translation.activate("en")
+                request.LANGUAGE_CODE = "en"
+                try:
+                    request.session[DJANGO_LANGUAGE_SESSION_KEY] = "en"
+                except Exception:
+                    pass
+                response = self.get_response(request)
+                return response
+            if request.path.startswith("/us/es/"):
+                translation.activate("es")
+                request.LANGUAGE_CODE = "es"
+                try:
+                    request.session[DJANGO_LANGUAGE_SESSION_KEY] = "es"
+                except Exception:
+                    pass
+                response = self.get_response(request)
+                return response
+
             # Asegurar que pais esté en mayúsculas
             pais = pais.upper() if pais else None
 

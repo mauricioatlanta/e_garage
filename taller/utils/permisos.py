@@ -1,4 +1,6 @@
 # utils/permisos.py
+import re
+import unicodedata
 from functools import wraps
 
 from django.core.exceptions import PermissionDenied
@@ -11,19 +13,38 @@ from taller.models.perfil_usuario import PerfilUsuario
 RUBRO_ALIASES = {
     "TALLER": "WORKSHOP",
     "TALLER_MECANICO": "WORKSHOP",
+    "MECANICO": "WORKSHOP",
+    "WORKSHOP": "WORKSHOP",
     "DESARME": "DESARMADURIA",
     "DESARMADURIA": "DESARMADURIA",
+    "PRODUCT_DESARME": "DESARMADURIA",
     "REPUESTOS": "PARTS",
     "CASA_REPUESTOS": "PARTS",
+    "CASA_DE_REPUESTOS": "PARTS",
+    "PARTS": "PARTS",
+    "VULCANIZACION": "TIRE",
+    "VULCANIZACIÓN": "TIRE",
+    "TIRE": "TIRE",
+    "PRODUCT_TIRE": "TIRE",
+    "CARWASH": "DETAILING",
+    "DETAILING": "DETAILING",
     "GRUAS": "TOWING",
     "GRUA": "TOWING",
+    "GRUAS_Y_ASISTENCIA_VIAL": "TOWING",
+    "TOWING": "TOWING",
+    "RECICLAJE": "RECYCLING",
+    "RECYCLING": "RECYCLING",
 }
 
 
 def normalizar_rubro(value):
     """Devuelve la clave canónica de un rubro, tolerando aliases públicos."""
-    value = str(value or "").strip().upper()
-    return RUBRO_ALIASES.get(value, value)
+    raw = str(value or "").strip().upper()
+    # Quita acentos: VULCANIZACIÓN -> VULCANIZACION, MECÁNICO -> MECANICO
+    no_accent = "".join(c for c in unicodedata.normalize("NFD", raw) if unicodedata.category(c) != "Mn")
+    # Espacios / guiones -> guión bajo: TALLER MECANICO -> TALLER_MECANICO
+    key = re.sub(r"[\s\-]+", "_", no_accent).strip("_")
+    return RUBRO_ALIASES.get(key, RUBRO_ALIASES.get(no_accent, RUBRO_ALIASES.get(raw, key)))
 
 
 def normalizar_rubros(values):

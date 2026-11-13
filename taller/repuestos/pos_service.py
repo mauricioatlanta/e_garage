@@ -3,11 +3,12 @@ from __future__ import annotations
 from decimal import Decimal, InvalidOperation
 
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.db import transaction
 
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
-from taller.models.lineas_documento import LineaRepuesto, ORIGEN_STOCK_BODEGA
+from taller.models.lineas_documento import LineaRepuesto, LineaServicio, ORIGEN_STOCK_BODEGA
 from taller.models.repuesto import Repuesto
 from taller.services.inventory_service import InventoryService
 
@@ -16,13 +17,63 @@ class PartsPOSService:
     PAYMENT_METHODS = {"efectivo", "tarjeta", "transferencia"}
 
     @staticmethod
-    def search(empresa, query: str, limit: int = 12):
-        return (
-            Repuesto.objects.filter(empresa=empresa)
-            .buscar_mostrador(query)
-            .select_related("categoria")
-            .order_by("nombre", "part_number")[:limit]
-        )
+    def search(empresa, query: str, limit: int = 12, categoria_filtro: str = ""):
+        q = (query or "").strip()
+        cat = (categoria_filtro or "").strip()
+        # Sin texto ni filtro: no mostrar todo de golpe (comportamiento actual)
+        if not q and not cat:
+            return Repuesto.objects.filter(empresa=empresa).none()
+        if q:
+            qs = Repuesto.objects.filter(empresa=empresa).buscar_mostrador(q).select_related("categoria")
+        else:
+            qs = Repuesto.objects.filter(empresa=empresa).select_related("categoria")
+        # Filtro inteligente Vulcanización: no esconder los 129 sin categoría
+        # Solo usa campos reales: nombre, part_number, sku, codigo_oem, proveedor, categoria__nombre
+        if cat == "Neumáticos":
+            qs = qs.filter(
+                Q(categoria__nombre__icontains="Neum") |
+                Q(nombre__icontains="neum") |
+                Q(nombre__icontains="205/") | Q(nombre__icontains="195/") |
+                Q(nombre__icontains="185/") | Q(nombre__icontains="175/") |
+                Q(part_number__icontains="205/") | Q(part_number__icontains="195/")
+            )
+        elif cat == "Rines":
+            qs = qs.filter(
+                Q(categoria__nombre__icontains="Rin") |
+                Q(nombre__icontains="rin") | Q(nombre__icontains="llanta") |
+                Q(nombre__icontains="aro")
+            )
+        elif cat == "Válvulas":
+            qs = qs.filter(
+                Q(categoria__nombre__icontains="Válvula") | Q(categoria__nombre__icontains="Valvula") |
+                Q(nombre__icontains="válvula") | Q(nombre__icontains="valvula")
+            )
+        elif cat == "Accesorios":
+            qs = qs.filter(
+                Q(categoria__nombre__icontains="Accesorio") |
+                Q(nombre__icontains="gata") | Q(nombre__icontains="cadena") |
+                Q(nombre__icontains="inflador") | Q(nombre__icontains="tapa")
+            )
+        elif cat:
+            # Fallback genérico Casa de Repuestos / Taller: Motor, Frenos, Suspensión, etc.
+            # Solo campo real categoria__nombre, sin inventar. Si la categoría no existe en DB, da 0, no error.
+            qs = qs.filter(Q(categoria__nombre__icontains=cat))
+        # Todos / sin cat: sin filtro extra, muestra lo buscado incluidos sin categoría
+        return qs.order_by("nombre", "part_number")[:limit]
+
+    @staticmethod
+    def search_servicios(empresa, query: str, rubro: str = "TIRE", limit: int = 12):
+        """Servicios de mesón por rubro, desde CatalogoServicio (sin precio, precio manual en POS)."""
+        from taller.servicios.models import CatalogoServicio
+        q = (query or "").strip()
+        qs = CatalogoServicio.objects.filter(rubro=rubro, activo=True).order_by("orden", "nombre")
+        if q:
+            qs = qs.filter(nombre__icontains=q)
+        return qs[:limit]
+
+    @staticmethod
+    def serialize_servicio(catalogo) -> dict:
+        return {"id": catalogo.pk, "nombre": catalogo.nombre, "tipo": "servicio", "precio": None}  # Sin precio fijo: varía por complejidad del auto, se ingresa manual en POS
 
     @staticmethod
     def serialize_part(repuesto: Repuesto) -> dict:
@@ -38,14 +89,16 @@ class PartsPOSService:
             "medida": getattr(repuesto, "medida_completa", "") or "",
             "marca_neumatico": getattr(repuesto, "marca_neumatico", "") or "",
             "modelo_neumatico": getattr(repuesto, "modelo_neumatico", "") or "",
+            "categoria": repuesto.categoria.nombre if getattr(repuesto, "categoria", None) else "",
         }
 
     @staticmethod
     @transaction.atomic
     def create_sale(empresa, user, payload: dict) -> Documento:
         items = payload.get("items") or []
-        if not items:
-            raise ValidationError("El carrito no tiene productos.")
+        servicios = payload.get("servicios") or []
+        if not items and not servicios:
+            raise ValidationError("El carrito está vacío. Agrega un repuesto o un servicio.")
 
         payment_method = (payload.get("payment_method") or "efectivo").strip().lower()
         if payment_method not in PartsPOSService.PAYMENT_METHODS:
@@ -99,6 +152,32 @@ class PartsPOSService:
                 descuento=Decimal("0.00"),
                 origen_repuesto=ORIGEN_STOCK_BODEGA,
             )
+
+        # Servicios de mesón: sin stock, precio manual en POS, sin FK obligatoria
+        for srv in servicios:
+            nombre_srv = str(srv.get("nombre") or "").strip()
+            if not nombre_srv:
+                continue
+            cantidad_srv = int(srv.get("cantidad") or 1)
+            if cantidad_srv <= 0:
+                raise ValidationError("La cantidad del servicio debe ser mayor a cero.")
+            precio_srv = PartsPOSService._decimal_or_default(srv.get("precio_unitario"), Decimal("0.00"))
+            LineaServicio.objects.create(
+                documento=documento,
+                servicio=None,
+                service=None,
+                nombre=nombre_srv,
+                cantidad=cantidad_srv,
+                precio_unitario=precio_srv,
+                descuento=Decimal("0.00"),
+            )
+
+        # Solo validar/descontar stock si hay repuestos. Si es solo servicios, no toca inventario.
+        if not items:
+            documento.recalcular_totales(save=True)
+            documento.monto_pagado = documento.total
+            documento.save(update_fields=["monto_pagado"])
+            return documento
 
         errores = InventoryService.validar_stock_disponible(documento)
         if errores:

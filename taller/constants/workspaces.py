@@ -194,10 +194,13 @@ TERMINOLOGY: dict[str, object] = {
     "workspace.tire.brand.tagline": "Inventario, servicios y ventas rápidas para llanteras",
     # -- Neumáticos / Vulcanización: nav --
     "workspace.tire.nav.home":      "Inicio",
-    "workspace.tire.nav.tires":     "Inventario de Neumáticos",
-    "workspace.tire.nav.services":  "Servicios de Vulcanización",
+    "workspace.tire.nav.tires":     "Neumáticos",
+    "workspace.tire.nav.kiosko":    "Kiosko",
+    "workspace.tire.nav.kiosko_mio":    "Mi Kiosko",
+    "workspace.tire.nav.kiosko_global": "Kiosko Global",
+    "workspace.tire.nav.services":  "Servicios Express",
     "workspace.tire.nav.extra_services": "Servicios extras",
-    "workspace.tire.nav.sales":     "Ventas de Mostrador",
+    "workspace.tire.nav.sales":     "Ventas",
     "workspace.tire.nav.clients":   "Clientes",
     "workspace.tire.nav.vehicles":  "Vehículos",
     "workspace.tire.nav.reports":   "Reportes",
@@ -457,12 +460,12 @@ WORKSPACE_TIRE = WorkspaceDef(
     ),
     nav=(
         WorkspaceNavDef(MOD_INICIO,        "workspace.tire.nav.home",     "fas fa-home",          nav_key="tire_home",      path="dashboard/"),
-        WorkspaceNavDef(MOD_REPUESTOS,     "workspace.tire.nav.tires",    "fas fa-circle-notch",  nav_key="tire_inventory", path="repuestos/"),
         WorkspaceNavDef(MOD_SERVICIOS,     "workspace.tire.nav.services", "fas fa-tools",         nav_key="tire_services",  path="servicios/"),
-        WorkspaceNavDef(MOD_SERVICIOS,     "workspace.tire.nav.extra_services", "fas fa-truck", nav_key="tire_extra_services", path="servicios/otros-servicios/"),
+        WorkspaceNavDef(MOD_REPUESTOS,     "workspace.tire.nav.tires",    "fas fa-circle-notch",  nav_key="tire_inventory", path="tires/"),
+        WorkspaceNavDef(MOD_REPUESTOS,     "workspace.tire.nav.kiosko_mio",    "fas fa-store",         nav_key="tire_kiosko_mio",    path="tires/public/mauricioatlanta/"),
+        WorkspaceNavDef(MOD_REPUESTOS,     "workspace.tire.nav.kiosko_global", "fas fa-globe",         nav_key="tire_kiosko_global", path="tires/todos/"),
         WorkspaceNavDef(MOD_DOCUMENTOS,    "workspace.tire.nav.sales",    "fas fa-cash-register", nav_key="tire_pos",       path="repuestos/pos/"),
         WorkspaceNavDef(MOD_CLIENTES,      "workspace.tire.nav.clients",  "fas fa-users",         nav_key="tire_clients",   path="clientes/"),
-        WorkspaceNavDef(MOD_VEHICULOS,     "workspace.tire.nav.vehicles", "fas fa-car",           nav_key="tire_vehicles",  path="vehiculos/"),
         WorkspaceNavDef(MOD_REPORTES,      "workspace.tire.nav.reports",  "fas fa-chart-bar",     nav_key="tire_reports",   path="reportes/"),
         WorkspaceNavDef(MOD_CONFIGURACION, "workspace.tire.nav.settings", "fas fa-cog",           nav_key="tire_config",    path="settings/"),
     ),
@@ -474,7 +477,7 @@ WORKSPACE_TIRE = WorkspaceDef(
     ),
     quick_actions=(
         WorkspaceActionDef("workspace.tire.action.pos",      "fas fa-cash-register", "repuestos/pos/"),
-        WorkspaceActionDef("workspace.tire.action.add_tire", "fas fa-plus",          "repuestos/crear/"),
+        WorkspaceActionDef("workspace.tire.action.add_tire", "fas fa-plus",          "tires/crear/"),
         WorkspaceActionDef("workspace.tire.action.services", "fas fa-tools",         "servicios/"),
     ),
     theme={"--eg-primary": "#f59e0b", "--eg-accent": "#0f766e"},
@@ -612,3 +615,25 @@ def get_workspace_def(rubro: str | None) -> WorkspaceDef:
     """Returns the WorkspaceDef for a rubro_principal value. Never None."""
     product_key = RUBRO_TO_PRODUCT.get(rubro or "WORKSHOP", DEFAULT_PRODUCT)
     return WORKSPACE_DEFINITIONS[product_key]
+
+
+# Traducción nav workspace: EN
+WORKSPACE_NAV_LABELS_EN = {
+    "Inicio": "Home",
+    "Servicios Express": "Express Services",
+    "Neumáticos": "Tires",
+    "Kiosko": "Kiosk",
+    "Ventas": "Sales",
+    "Clientes": "Customers",
+    "Reportes": "Reports",
+    "Configuración": "Settings",
+    "Servicios": "Services",
+    "Repuestos": "Parts",
+    "Flota": "Fleet",
+    "Inventario": "Inventory",
+    "Documentos": "Documents",
+    "Vehículos": "Vehicles",
+    "Desarme": "Disassembly",
+    "Reciclaje": "Recycling",
+    "Salir": "Sign out",
+}

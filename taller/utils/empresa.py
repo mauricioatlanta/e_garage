@@ -80,7 +80,8 @@ def get_active_empresa(request):
     2) GET ?empresa_id= (si pertenece al user)
     3) Fallback: primera Empresa del user
     """
-    if not request.user.is_authenticated:
+    user = getattr(request, 'user', None)
+    if not user or not getattr(user, 'is_authenticated', False):
         return None
 
     empresa_id = None or request.GET.get("empresa_id")

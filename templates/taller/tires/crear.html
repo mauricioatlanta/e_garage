@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="color:#fff; padding:12px; max-width:520px;">
+<h1 style="color:#fff;">🛞 {% if editando %}Editar Neumático{% else %}Agregar Neumático - TIRES{% endif %}</h1>
+<p style="color:#cbd5e1;">Obligatorios: <b>Medida + Tipo + Stock + Precio Venta + Precio Instalado + Proveedor</b>. Precio Compra es opcional pero queda guardado para tu margen.. Opcionales: Marca, Modelo, Índice, Uso, DOT.</p>
+{% if messages %}{% for m in messages %}<p style="background:#14532d; padding:10px; border-radius:8px;">{{ m }}</p>{% endfor %}{% endif %}
+<form method="POST" id="form-tire">{% csrf_token %}
+  <h3 style="color:#facc15;">Medida *</h3>
+  <div style="position:relative;">
+    <label style="display:block; margin:8px 0;">Ancho *<br><input id="input-ancho" type="number" name="ancho" value="{{ tire.ancho|default:'' }}" placeholder="Ej: 175" required autocomplete="off" style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;"></label>
+    <div id="sug-ancho" style="display:none; position:absolute; left:0; right:0; top:100%; background:#1e293b; border:1px solid #475569; border-radius:8px; z-index:99; max-height:180px; overflow:auto;"></div>
+  </div>
+  <div style="position:relative;">
+    <label style="display:block; margin:8px 0;">Perfil *<br><input id="input-perfil" type="number" name="perfil" value="{{ tire.perfil|default:'' }}" placeholder="Ej: 70" required autocomplete="off" style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;"></label>
+    <div id="sug-perfil" style="display:none; position:absolute; left:0; right:0; top:100%; background:#1e293b; border:1px solid #475569; border-radius:8px; z-index:99; max-height:180px; overflow:auto;"></div>
+  </div>
+  <div style="position:relative;">
+    <label style="display:block; margin:8px 0;">Aro (sin R) *<br><input id="input-aro" type="number" name="aro" value="{{ tire.aro|default:'' }}" placeholder="Ej: 14" required autocomplete="off" style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;"></label>
+    <div id="sug-aro" style="display:none; position:absolute; left:0; right:0; top:100%; background:#1e293b; border:1px solid #475569; border-radius:8px; z-index:99; max-height:180px; overflow:auto;"></div>
+  </div>
+  <div id="sug-medida" style="display:none; background:#1e293b; border:1px solid #facc15; border-radius:10px; padding:8px; margin:8px 0;">
+    <div style="color:#facc15; font-weight:bold; font-size:13px; margin-bottom:6px;">Medidas que ya tienes — pulsa para usarla:</div>
+    <div id="sug-medida-list"></div>
+  </div>
+  <h3 style="color:#facc15;">Datos del neumático</h3>
+  <label style="display:block; margin:8px 0;">Marca (opcional)<br><input id="input-marca" name="marca" value="{{ tire.marca|default:'' }}" placeholder="Opcional - si no sabes, queda Sin marca" style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;"></label>
+  <label style="display:block; margin:8px 0;">Modelo (opcional)<br><input name="modelo" value="{{ tire.modelo|default:'' }}" placeholder="Opcional" style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;"></label>
+  <label style="display:block; margin:8px 0;">Índice (opcional, ej: 88H)<br><input name="indice" value="{{ tire.indice|default:'' }}" placeholder="Opcional" style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;"></label>
+  <label style="display:block; margin:8px 0;">Tipo *<br>
+    <select name="tipo" required style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;">
+      <option value="Nuevo" {% if tire.tipo == "Nuevo" %}selected{% endif %}>Nuevo</option>
+      <option value="Usado" {% if tire.tipo == "Usado" %}selected{% endif %}>Usado</option>
+      <option value="Recapado" {% if tire.tipo == "Recapado" %}selected{% endif %}>Recapado</option>
+    </select>
+  </label>
+  <label style="display:block; margin:8px 0;">Uso (opcional)<br>
+    <select name="uso" style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;">
+      <option>Ciudad</option><option>Carretera</option><option>HT</option><option>AT</option><option>MT</option><option>All Season</option>
+    </select>
+  </label>
+  <label style="display:block; margin:8px 0;">DOT / Año (opcional)<br><input name="dot" value="{{ tire.dot|default:'' }}" placeholder="Opcional" style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;"></label>
+  <label style="display:block; margin:8px 0;">Stock *<br><input type="number" name="stock" value="{{ tire.cantidad_stock|default:'' }}" placeholder="Ej: 10" required style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;"></label>
+  <label style="display:block; margin:8px 0;">Precio Compra (cuánto te costó)<br><input type="number" step="0.01" name="precio_compra" value="{{ tire.precio_compra|default:'' }}" placeholder="Ej: 28000 - opcional, para tu margen" style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;"></label>
+  <label style="display:block; margin:8px 0;">Precio Venta *<br><input type="number" step="0.01" name="precio_venta" value="{{ tire.precio_venta|default:'' }}" placeholder="Ej: 35000" required style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;"></label>
+  <label style="display:block; margin:8px 0;">Precio Instalado *<br><input type="number" step="0.01" name="precio_instalado" value="{{ tire.precio_instalado|default:'' }}" placeholder="Ej: 45000" required style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;"></label>
+  <label style="display:block; margin:8px 0;">Proveedor *<br><input name="proveedor" value="{{ tire.proveedor|default:'' }}" placeholder="¿A quién se lo compraste?" required style="width:100%; padding:10px; border-radius:8px; background:#0f172a; color:#fff; border:1px solid #475569;"></label>
+  <button type="submit" style="width:100%; padding:14px; background:#facc15; color:#000; font-weight:bold; border:none; border-radius:10px; font-size:16px; margin-top:12px;">Guardar Neumático en TIRES</button>
+</form>
+<p style="margin-top:12px;"><a href="../" style="color:#0ea5e9; font-weight:bold;">← Volver a lista</a> | <a href="../kiosko/" style="color:#14b8a6; font-weight:bold;">Ver Kiosko</a></p>
+</div>
+<script>
+(function(){
+  var anchoEl = document.getElementById('input-ancho');
+  var perfilEl = document.getElementById('input-perfil');
+  var aroEl = document.getElementById('input-aro');
+  var sugMedida = document.getElementById('sug-medida');
+  var sugMedidaList = document.getElementById('sug-medida-list');
+  var timer = null;
+  function apiUrl(){
+    var p = window.location.pathname;
+    if(p.indexOf('/editar/') !== -1) return '../../autocomplete/';
+    return '../autocomplete/';
+  }
+  function showMedidas(items){
+    if(!items || !items.length){ sugMedida.style.display='none'; return; }
+    sugMedida.style.display='block';
+    sugMedidaList.innerHTML = items.map(function(r){
+      return '<button type="button" data-ancho="'+r.ancho+'" data-perfil="'+r.perfil+'" data-aro="'+r.aro+'" style="display:block; width:100%; text-align:left; padding:10px; background:#0f172a; color:#fff; border:1px solid #334155; border-radius:8px; margin:4px 0; cursor:pointer;">🛞 <b>'+r.medida+'</b> — '+r.label+'</button>';
+    }).join('');
+    sugMedidaList.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        anchoEl.value = b.getAttribute('data-ancho');
+        perfilEl.value = b.getAttribute('data-perfil');
+        aroEl.value = b.getAttribute('data-aro');
+        sugMedida.style.display='none';
+        document.getElementById('input-marca').focus();
+      });
+    });
+  }
+  function fetchSug(){
+    var a = anchoEl.value.trim(), pe = perfilEl.value.trim(), ar = aroEl.value.trim();
+    if(!a && !pe && !ar){ sugMedida.style.display='none'; return; }
+    var url = apiUrl() + '?ancho='+encodeURIComponent(a)+'&perfil='+encodeURIComponent(pe)+'&aro='+encodeURIComponent(ar);
+    fetch(url, {headers:{'X-Requested-With':'XMLHttpRequest'}}).then(function(r){return r.json();}).then(function(d){ showMedidas(d.results || []); }).catch(function(){});
+  }
+  [anchoEl, perfilEl, aroEl].forEach(function(el){
+    el.addEventListener('input', function(){ clearTimeout(timer); timer = setTimeout(fetchSug, 200); });
+    el.addEventListener('focus', fetchSug);
+  });
+  document.addEventListener('click', function(e){ if(!sugMedida.contains(e.target) && e.target!==anchoEl && e.target!==perfilEl && e.target!==aroEl){ sugMedida.style.display='none'; } });
+})();
+</script>
+{% endblock %}

@@ -15,6 +15,12 @@ from taller.views_extra.signup_redirects import signup_redirect
 app_name = "taller_ecuador"
 
 urlpatterns = [
+    # TIRES - Modulo separado de Repuestos (global)
+    path(
+        "tires/",
+        include(("taller.tires.urls", "tires"), namespace="tires"),
+    ),
+
     # Redirigir raíz a bienvenida
     path("", RedirectView.as_view(url="/ec/es/bienvenida/", permanent=False), name="ecuador_home"),
     # Dashboard principal de Ecuador

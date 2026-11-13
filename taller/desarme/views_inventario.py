@@ -274,6 +274,24 @@ def _default_tax_id_type(empresa):
     }.get(pais, "CL_RUT")
 
 
+def _get_cliente_mostrador(empresa):
+    """Cliente genérico para ventas rápidas / de mostrador.
+    Una sola vez por empresa. No ensucia Clientes con datos falsos.
+    Si ya existe 'Mostrador', lo reusa. Si no, lo crea.
+    """
+    from taller.models.clientes import Cliente
+    cliente, _ = Cliente.objects.get_or_create(
+        empresa=empresa,
+        nombre="Mostrador",
+        defaults={
+            "rut": "",
+            "telefono": "",
+            "email": "",
+            "direccion": "",
+        },
+    )
+    return cliente
+
 def _crear_o_reusar_cliente_rapido(empresa, form):
     """
     Crea un cliente nuevo con los datos del bloque "cliente rápido" o reutiliza uno existente
@@ -455,7 +473,10 @@ def crear_venta_operaciones(request):
         return redirect(_desarme_url(request, "piezas/"))
 
     try:
-        if form.cleaned_data.get("usar_cliente_rapido", False):
+        # Venta rápida / Mostrador tiene prioridad: no crea cliente, usa genérico
+        if form.cleaned_data.get("es_venta_rapida"):
+            cliente = _get_cliente_mostrador(empresa)
+        elif form.cleaned_data.get("usar_cliente_rapido", False):
             cliente = _crear_o_reusar_cliente_rapido(empresa, form)
         else:
             cliente = form.cleaned_data["cliente"]
@@ -627,8 +648,11 @@ def finalizar_venta_desde_inventario(request, pk):
         )
 
     usar_cliente_rapido = form.cleaned_data.get("usar_cliente_rapido", False)
+    es_venta_rapida = form.cleaned_data.get("es_venta_rapida", False)
     try:
-        if usar_cliente_rapido:
+        if es_venta_rapida:
+            cliente = _get_cliente_mostrador(empresa)
+        elif usar_cliente_rapido:
             cliente = _crear_o_reusar_cliente_rapido(empresa, form)
         else:
             cliente = form.cleaned_data["cliente"]

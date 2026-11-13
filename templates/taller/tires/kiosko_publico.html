@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="color:#fff; padding:12px; max-width:640px; margin:0 auto;">
+  <h1 style="text-align:center;">🛞 {% if empresa %}{{ empresa.nombre }}{% else %}Vulcanización{% endif %}</h1>
+  <p style="text-align:center; color:#cbd5e1;">Neumáticos disponibles — vista pública</p>
+  <div style="display:flex; gap:8px; margin:12px 0;">
+    <input id="busca-publico" placeholder="Buscar medida, ej: 175/70 R14..." style="flex:1; padding:12px; border-radius:10px; background:#0f172a; color:#fff; border:1px solid #475569;">
+  </div>
+  {% if tires %}
+  <div id="lista-publico">
+    {% for t in tires %}
+    <div class="card-publico" data-text="{{ t.ancho }}/{{ t.perfil }} R{{ t.aro }} {{ t.marca }} {{ t.modelo }} {{ t.tipo }}" style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:14px; margin:8px 0;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <b style="font-size:20px;">{{ t.ancho }}/{{ t.perfil }} R{{ t.aro }}</b>
+        <span style="background:{% if t.tipo == 'Nuevo' %}#14532d{% elif t.tipo == 'Usado' %}#92400e{% else %}#1e40af{% endif %}; padding:4px 10px; border-radius:20px; font-size:13px;">{{ t.tipo }}</span>
+      </div>
+      <div style="color:#cbd5e1; margin-top:4px;">{{ t.marca }} {{ t.modelo }} {% if t.indice %}• {{ t.indice }}{% endif %} • {{ t.uso }}</div>
+      <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+        <div><div style="color:#94a3b8; font-size:12px;">Precio Instalado</div><b style="font-size:22px; color:#facc15;">${{ t.precio_instalado }}</b><div style="color:#94a3b8; font-size:12px;">Venta: ${{ t.precio_venta }} • Stock: {{ t.cantidad_stock }}</div></div>
+        <a href="https://wa.me/?text=Hola, me interesa el neumático {{ t.ancho }}/{{ t.perfil }} R{{ t.aro }} {{ t.marca }} {{ t.modelo }} Instalado ${{ t.precio_instalado }}" style="background:#22c55e; color:#fff; padding:10px 14px; border-radius:10px; text-decoration:none; font-weight:bold;">WhatsApp</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p style="text-align:center; color:#94a3b8;">Por ahora no hay neumáticos en stock.</p>
+  {% endif %}
+</div>
+<script>
+document.getElementById('busca-publico').addEventListener('input', function(){
+  var q = this.value.toLowerCase();
+  document.querySelectorAll('.card-publico').forEach(function(c){
+    c.style.display = c.getAttribute('data-text').toLowerCase().includes(q) ? 'block' : 'none';
+  });
+});
+</script>
+{% endblock %}

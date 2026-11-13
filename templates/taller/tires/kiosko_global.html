@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiosko Global - Todos los neumáticos en eGarage</title>
+<style>body{background:#0f172a;color:#fff;font-family:system-ui;padding:12px;margin:0} .wrap{max-width:700px;margin:0 auto} .card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px;margin:8px 0} input{width:100%;box-sizing:border-box;padding:12px;border-radius:10px;background:#0f172a;color:#fff;border:1px solid #475569} .btn-wa{background:#22c55e;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:bold} a{color:#38bdf8} .chip{padding:8px 12px;border-radius:20px;text-decoration:none;background:#1e293b;color:#fff}</style></head>
+<body><div class="wrap">
+<h1 style="text-align:center;">🌎 Kiosko Global eGarage</h1>
+<p style="text-align:center;background:#1e40af;padding:10px;border-radius:10px;">Mostrando talleres de: <b style="text-transform:uppercase;">{{ pais }}</b> • Solo países que cubre eGarage</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0;">
+<a class="chip" href="/us/en/tires/todos/">🇺🇸 USA</a>
+<a class="chip" href="/cl/es/tires/todos/">🇨🇱 Chile</a>
+<a class="chip" href="/mx/es/tires/todos/">🇲🇽 México</a>
+<a class="chip" href="/co/es/tires/todos/">🇨🇴 Colombia</a>
+<a class="chip" href="/pe/es/tires/todos/">🇵🇪 Perú</a>
+<a class="chip" href="/ar/es/tires/todos/">🇦🇷 Argentina</a>
+<a class="chip" href="/br/es/tires/todos/">🇧🇷 Brasil</a>
+<a class="chip" href="/ve/es/tires/todos/">🇻🇪 Venezuela</a>
+<a class="chip" href="/ec/es/tires/todos/">🇪🇨 Ecuador</a>
+<a class="chip" href="/uy/es/tires/todos/">🇺🇾 Uruguay</a>
+</div>
+<p style="text-align:center;color:#cbd5e1;">Busca la medida que no tienes en tu taller</p>
+<form method="GET" style="display:flex;gap:8px;"><input name="q" value="{{ q }}" placeholder="Ej: 175/70 R14 o Goodyear..."><button style="background:#facc15;color:#000;font-weight:bold;border:none;border-radius:10px;padding:12px 18px;">Buscar</button></form>
+<p style="color:#94a3b8;">{{ tires|length }} neumáticos encontrados {% if q %}para "{{ q }}"{% endif %}</p>
+{% for t in tires %}
+<div class="card">
+<div style="display:flex;justify-content:space-between;"><b style="font-size:20px;">{{ t.ancho }}/{{ t.perfil }} R{{ t.aro }}</b><span>{{ t.tipo }}</span></div>
+<div style="color:#cbd5e1;">{{ t.marca }} {{ t.modelo }} • {{ t.uso }} • Stock: {{ t.cantidad_stock }}</div>
+<div style="color:#facc15;margin-top:6px;">🏪 Taller: <b>{{ t.empresa.nombre }}</b></div>
+<div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;"><div><b style="font-size:20px;">Instalado ${{ t.precio_instalado }}</b><div style="color:#94a3b8;font-size:12px;">Venta: ${{ t.precio_venta }}</div></div>
+<a class="btn-wa" href="https://wa.me/?text=Hola, vi en Kiosko Global de eGarage el neumático {{ t.ancho }}/{{ t.perfil }} R{{ t.aro }} {{ t.marca }} en {{ t.empresa.nombre }}. ¿Lo tienes?">WhatsApp taller</a></div>
+</div>
+{% empty %}<p>Ningún taller tiene esa medida en stock ahora.</p>{% endfor %}
+</div></body></html>

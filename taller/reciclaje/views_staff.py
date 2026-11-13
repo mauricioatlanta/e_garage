@@ -194,7 +194,7 @@ def _top_clientes_por_gasto(empresa, limite=5) -> list[dict]:
 def dashboard(request):
     empresa = _empresa_o_403(request)
     catalogo_disponible = Catalitico.objects.filter(
-        empresa=empresa, estado=Catalitico.ESTADO_DISPONIBLE, activo=True
+        empresa=empresa, activo=True
     )
     valor_stock = sum(
         (c.precio_venta or Decimal("0")) for c in catalogo_disponible
@@ -739,9 +739,7 @@ def resumen_stock(request):
         .order_by("nombre")
     )
     categoria_id = request.GET.get("categoria")
-    chatarra = ProductoChatarra.objects.filter(empresa=empresa, activo=True).select_related(
-        "categoria"
-    )
+    chatarra = ProductoChatarra.objects.filter(empresa=empresa, activo=True, categoria__nombre__icontains="Electrónica").select_related("categoria")
     categoria_actual = None
     if categoria_id:
         try:
@@ -751,9 +749,7 @@ def resumen_stock(request):
             categoria_actual = None
 
     context = {
-        "catalogo_disponible": Catalitico.objects.filter(
-            empresa=empresa, estado=Catalitico.ESTADO_DISPONIBLE, activo=True
-        ).order_by("codigo"),
+        "catalogo_disponible": Catalitico.objects.filter(empresa=empresa, activo=True).order_by("codigo"),
         "chatarra": chatarra.order_by("categoria__nombre", "nombre"),
         "categorias": categorias,
         "categoria_actual": categoria_actual,

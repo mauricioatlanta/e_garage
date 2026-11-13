@@ -5,6 +5,7 @@ from django.middleware.csrf import get_token
 from django.shortcuts import redirect, render
 
 from taller.templatetags.country_url import reverse_country_url
+from taller.utils.permisos import normalizar_rubros
 from taller.services.empresa_service import get_empresa_safe
 from django.utils.translation import get_language, gettext as _
 from django.views.decorators.http import require_POST
@@ -132,8 +133,7 @@ def _safe_reverse_country_url(request, view_path, fallback="#", *args, **kwargs)
 
 
 def _active_service_rubros(empresa, request=None):
-    # En Modo Soporte la selección de sesión representa el alcance efectivo
-    # de la pantalla y debe prevalecer sobre el rubro principal de la empresa.
+    # En Modo Soporte la selección de sesión prevalece sobre el rubro de la empresa.
     user = getattr(request, "user", None) if request is not None else None
     if getattr(user, "is_superuser", False):
         session = getattr(request, "session", {})
@@ -143,11 +143,7 @@ def _active_service_rubros(empresa, request=None):
         if support_values is None and session.get("support_rubro"):
             support_values = [session.get("support_rubro")]
         if support_values:
-            return {
-                _SERVICE_RUBRO_ALIASES.get(str(value or "").strip().upper(), str(value or "").strip().upper())
-                for value in support_values
-                if str(value or "").strip()
-            }
+            return set(normalizar_rubros(support_values))
     config = getattr(empresa, "config", None) if empresa else None
     if not config:
         return set()
@@ -155,36 +151,35 @@ def _active_service_rubros(empresa, request=None):
         values = config.get_effective_rubros()
     except Exception:
         values = [getattr(config, "rubro_principal", "WORKSHOP")]
-    return {
-        _SERVICE_RUBRO_ALIASES.get(str(value or "").strip().upper(), str(value or "").strip().upper())
-        for value in (values or [])
-        if str(value or "").strip()
-    }
-
+    return set(normalizar_rubros(values))
 
 def _scope_services_by_rubro(queryset, empresa, request=None):
-    """Limit the service catalog for non-workshop workspaces.
+    """Filtra servicios por rubro activo.
 
-    Workshop remains backward compatible and sees the complete company catalog.
-    For a pure Car Wash (or another specialized workspace), unclassified legacy
-    mechanic services are excluded; explicitly classified services remain visible.
+    Regla inteligente:
+    - Si el servicio tiene rubro_efectivo o rubro_sugerido, se muestra SOLO en ese rubro.
+    - Si no tiene rubro (legado, 1023 servicios con None), se muestra en TODOS
+      hasta que alguien lo clasifique. Así no ocultamos nada de golpe.
+    - Quita el bypass de WORKSHOP y el parche icontains="lavado" de DETAILING.
     """
     rubros = _active_service_rubros(empresa, request)
-    if not rubros or "WORKSHOP" in rubros:
+    if not rubros:
         return queryset
-
-    supported = rubros.intersection({"DETAILING", "TIRE", "BODYSHOP", "ELECTRIC", "GLASS"})
-    if not supported:
+    # DESARMADURIA no tiene servicios: no vende servicios, compra autos y vende piezas.
+    # Aunque haya 10 legados de alineación+balanceo, no son de este rubro. Ve 0.
+    # Sin este early return, vería los 10 legados por la regla legacy.
+    if set(rubros) == {"DESARMADURIA"}:
         return queryset.none()
-
-    query = Q(rubro_efectivo__in=supported) | Q(rubro_sugerido__in=supported)
-    if "DETAILING" in supported:
-        query |= Q(codigo_interno__in=_DETAILING_CODES)
-        query |= Q(nombre__icontains="lavado") | Q(nombre__icontains="detailing")
-        query |= Q(nombre__icontains="pulido") | Q(nombre__icontains="encerado")
-        query |= Q(nombre__icontains="tapicer")
-    return queryset.filter(query).distinct()
-
+    # DESARMADURIA no tiene servicios: no vende servicios, compra autos y vende piezas.
+    # Aunque haya 10 legados de alineación+balanceo, no son de este rubro. Ve 0.
+    # Sin este early return, vería los 10 legados por la regla legacy.
+    if set(rubros) == {"DESARMADURIA"}:
+        return queryset.none()
+    # Servicios clasificados en este rubro
+    classified = Q(rubro_efectivo__in=rubros) | Q(rubro_sugerido__in=rubros)
+    # Legados sin clasificar: ambos None o ambos vacíos -> visibles en todos
+    legacy = Q(rubro_efectivo__isnull=True, rubro_sugerido__isnull=True) | Q(rubro_efectivo="", rubro_sugerido="")
+    return queryset.filter(classified | legacy).distinct()
 
 def _resolve_servicios_menu_scope(request):
     empresa = get_empresa_safe(request)

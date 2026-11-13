@@ -4,7 +4,7 @@
   <div class="lang-btn-group inline-flex items-center rounded-lg bg-black/50 border border-cyan-500/30 p-0.5">
     {% if "/br/pt/" in request.path %}
       <span class="lang-btn lang-btn--active px-2.5 py-1 text-xs font-bold rounded bg-cyan-500 text-slate-950 cursor-default">🇧🇷 PT</span>
-      {% if "/reportes/" in request.path %}<a href="/br/es/{{ request.path|slice:'7:' }}" class="lang-btn px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-white/10 transition-colors">🇪🇸 ES</a>{% endif %}
+      {% if "/reportes/" in request.path %}<a href="/cl/es/{{ request.path|slice:'7:' }}" class="lang-btn px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-white/10 transition-colors">🇪🇸 ES</a>{% endif %}
     {% else %}
       <a href="/br/pt/{{ request.path|slice:'7:' }}" class="lang-btn px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-white/10 transition-colors">🇧🇷 PT</a>
       <span class="lang-btn lang-btn--active px-2.5 py-1 text-xs font-bold rounded bg-amber-400 text-slate-950 cursor-default">🇪🇸 ES</span>
@@ -20,7 +20,7 @@
         🇺🇸 EN
       </span>
     {% else %}
-      <a href="{% if "/es/" in request.path %}{{ request.path|slice:":4" }}en/{{ request.path|slice:"7:" }}{% else %}/us/en/workspace/{% endif %}"
+      <a href="/us/en/{{ request.path|slice:"7:" }}"
          class="lang-btn px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
         🇺🇸 EN
       </a>
@@ -32,7 +32,7 @@
         🇪🇸 ES
       </span>
     {% else %}
-      <a href="{% if "/en/" in request.path %}{{ request.path|slice:":4" }}es/{{ request.path|slice:"7:" }}{% else %}/us/es/workspace/{% endif %}"
+      <a href="{{ request.path|slice:":4" }}es/{{ request.path|slice:"7:" }}"
          class="lang-btn px-2.5 py-1 text-xs font-medium rounded text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
         🇪🇸 ES
       </a>

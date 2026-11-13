@@ -46,11 +46,13 @@ class TireWorkspaceTests(TestCase):
         self.assertEqual(workspace["product_key"], PRODUCT_TIRE)
         self.assertEqual(workspace["brand"]["product_name"], "eGarage Neumáticos & Vulcanización")
         nav = {item["nav_key"]: item for item in workspace["nav"]}
-        self.assertEqual(nav["tire_inventory"]["label"], "Inventario de Neumáticos")
-        self.assertEqual(nav["tire_services"]["label"], "Servicios de Vulcanización")
-        self.assertEqual(nav["tire_extra_services"]["label"], "Servicios extras")
-        self.assertTrue(nav["tire_extra_services"]["url"].endswith("/servicios/otros-servicios/"))
-        self.assertEqual(nav["tire_pos"]["label"], "Ventas de Mostrador")
+        self.assertEqual(nav["tire_inventory"]["label"], "Neumáticos")
+        self.assertEqual(nav["tire_services"]["label"], "Servicios Express")
+        # Vulcanizacion oficial: 7 botones, sin Servicios extras, sin Vehiculos
+        self.assertNotIn("tire_extra_services", nav)
+        self.assertNotIn("tire_vehicles", nav)
+        self.assertEqual(len(nav), 7)
+        self.assertEqual(nav["tire_pos"]["label"], "Ventas")
         self.assertTrue(nav["tire_pos"]["url"].endswith("/repuestos/pos/"))
         self.assertEqual(nav["tire_reports"]["url"], "/cl/es/reportes/")
 

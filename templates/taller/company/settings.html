@@ -1397,7 +1397,7 @@
                                 </div>
 
                             </div>
-                            {% if empresa.pais == 'CL' or empresa.pais == 'US' %}
+                            {% if empresa.pais|upper == "CL" or empresa.pais|upper == "US" or not empresa.pais or country %}
                                 <button type="button" class="btn btn-save w-100" data-open-subscription-modal>
                                     <i class="fas fa-credit-card me-2"></i>
                                     {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Renovar ahora{% else %}Renew now{% endif %}

@@ -16,7 +16,7 @@ from django.views.decorators.http import require_GET, require_POST
 from taller.models.empresa import Empresa
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
-from taller.models.repuesto import Repuesto
+from taller.models.repuesto import CategoriaRepuesto, Repuesto
 from taller.repuestos.pos_service import PartsPOSService
 from taller.services.empresa_service import get_empresa_safe
 from taller.templatetags.country_url import reverse_country_url
@@ -56,6 +56,11 @@ def editar_repuesto(request, *args, **kwargs):
 def pos_mostrador(request):
     empresa = get_empresa_safe(request)
     tax_info = get_tax_info(empresa, applies_to="parts") if empresa else {"name": "Impuesto", "rate_percentage": 0}
+    # Categorías reales de esa empresa, de CategoriaRepuesto, no inventadas.
+    # Si la empresa no tiene, fallback a las 12 globales que ya existen en DB.
+    categorias = list(CategoriaRepuesto.objects.filter(empresa=empresa).order_by("nombre").values_list("nombre", flat=True)) if empresa else []
+    if not categorias:
+        categorias = list(CategoriaRepuesto.objects.order_by("nombre").values_list("nombre", flat=True).distinct())
     return render(
         request,
         "taller/common/repuestos/pos_mostrador.html",
@@ -63,19 +68,33 @@ def pos_mostrador(request):
             "empresa": empresa,
             "tax_name": tax_info["name"],
             "tax_rate": tax_info["rate_percentage"],
+            "categorias": categorias,
         },
     )
 
 
 @login_required
 def pos_ventas_list(request):
-    empresa = getattr(request.user, 'empresa', None)
+    from taller.services.empresa_service import get_empresa_safe
+    empresa = get_empresa_safe(request)
     ventas = Documento.objects.filter(empresa=empresa, tipo='PTS').order_by('-id') if empresa else Documento.objects.none()
     for v in ventas:
-        v.total = float(getattr(v, 'total_general', None) or getattr(v, 'monto', None) or getattr(v, 'total', None) or 15000)
-        v.costo = sum(float(getattr(l, 'proveedor_compra', None) or getattr(l, 'precio_costo', None) or getattr(l, 'costo', None) or 0) * (getattr(l, 'cantidad', 1) or 1) for l in v.lineas_repuesto.all()) if hasattr(v, 'lineas_repuesto') and v.lineas_repuesto else round(v.total * 0.60)
-        if not getattr(v, 'fecha', None) and hasattr(v, 'created_at'):
-            v.fecha = v.created_at
+        # Total real: campo Documento.total (no existe monto ni total_general)
+        total = float(getattr(v, 'total', None) or 0)
+        v.total = total
+        # Alias que pide el template pos_ventas.html - sin esto tira VariableDoesNotExist 500
+        v.monto = total
+        v.total_general = total
+        v.costo = sum(float(getattr(l, 'proveedor_compra', None) or getattr(l, 'precio_costo', None) or getattr(l, 'costo', None) or 0) * (getattr(l, 'cantidad', 1) or 1) for l in v.lineas_repuesto.all()) if hasattr(v, 'lineas_repuesto') and v.lineas_repuesto else round(total * 0.60)
+        # Fecha: Documento tiene fecha_emision + created_at, no fecha ni fecha_creacion
+        v.fecha = getattr(v, 'fecha_emision', None) or getattr(v, 'created_at', None)
+        v.fecha_creacion = v.fecha
+        # Cliente: si es None, el template pide v.cliente.nombre -> dejar cliente_nombre
+        cli = getattr(v, 'cliente', None)
+        v.cliente_nombre = (f"{getattr(cli, 'nombre', '')} {getattr(cli, 'apellido', '')}".strip() if cli else "") or "Cliente Mostrador"
+        # Pago: Documento no tiene metodo_pago / forma_pago
+        v.metodo_pago = getattr(v, 'metodo_pago', None) or "Efectivo"
+        v.forma_pago = v.metodo_pago
     return render(request, 'taller/common/repuestos/pos_ventas.html', {'ventas': ventas})
 
 def pos_documento_redirect(request, pk):
@@ -91,12 +110,33 @@ def pos_buscar_repuestos(request):
         return JsonResponse({"results": []}, status=403)
 
     query = request.GET.get("q", "")
+    categoria = request.GET.get("categoria", "").strip()
     results = [
         PartsPOSService.serialize_part(repuesto)
-        for repuesto in PartsPOSService.search(empresa, query)
+        for repuesto in PartsPOSService.search(empresa, query, categoria_filtro=categoria)
     ]
     return JsonResponse({"results": results})
 
+
+@require_GET
+@login_required
+def pos_buscar_servicios(request):
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return JsonResponse({"results": []}, status=403)
+    # Rubro desde sesión / soporte, default TIRE. PARTS -> 0 servicios, no muestra tab.
+    rubro = (request.GET.get("rubro") or request.session.get("rubro_activo") or "TIRE").strip().upper()
+    # Mapear CARWASH->DETAILING, etc. via normalizar si existe
+    try:
+        from taller.utils.permisos import normalizar_rubros
+        norm = normalizar_rubros([rubro])
+        if norm:
+            rubro = norm[0]
+    except Exception:
+        pass
+    query = request.GET.get("q", "")
+    results = [PartsPOSService.serialize_servicio(s) for s in PartsPOSService.search_servicios(empresa, query, rubro=rubro)]
+    return JsonResponse({"results": results})
 
 @require_GET
 @login_required

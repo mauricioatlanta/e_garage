@@ -1,1 +1,14 @@
 {% extends "taller/common/clientes/cliente_form.html" %}
+
+{% block page_extra_css %}
+  {{ block.super }}
+  <style>
+    /* Ocultar tax_id, tax_id_type y giro en creación rápida */
+    .cliente-form-field:has(#id_tax_id),
+    .cliente-form-field:has([name="tax_id"]),
+    .cliente-form-field:has([name="tax_id_type"]),
+    .cliente-form-field:has([name="giro"]) {
+      display: none !important;
+    }
+  </style>
+{% endblock %}

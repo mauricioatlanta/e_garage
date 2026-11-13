@@ -87,7 +87,7 @@
 </style>
 <div class="eg-support-switcher" role="region" aria-label="{% trans "Entorno de soporte" %}">
   <span class="eg-support-switcher__badge">🛡️ {% trans "Modo Soporte" %}</span>
-  <form method="post" action="/staff/support-environment/"switch_support_environment' %}">
+  <form method="post" action="{% url 'switch_support_environment' %}">
     {% csrf_token %}
     <label for="support-country" class="sr-only">{% trans "País" %}</label>
     <select id="support-country" name="country" aria-label="{% trans "País" %}">
@@ -110,10 +110,11 @@
       <label><input type="checkbox" name="rubros" value="VULCANIZACION" {% if 'TIRE' in support_rubros %}checked{% endif %}> {% trans "Vulcanización" %}</label>
       <label><input type="checkbox" name="rubros" value="CARWASH" {% if 'DETAILING' in support_rubros %}checked{% endif %}> {% trans "Carwash" %}</label>
       <label><input type="checkbox" name="rubros" value="GRUAS" {% if 'TOWING' in support_rubros %}checked{% endif %}> {% trans "Grúas y asistencia vial" %}</label>
+      <label><input type="checkbox" name="rubros" value="RECICLAJE" {% if "RECICLAJE" in support_rubros or "reciclaje" in support_rubros %}checked{% endif %}> {% trans "Reciclaje" %}</label>
     </fieldset>
     <button type="submit">{% trans "Aplicar" %}</button>
   </form>
-  <form method="post" action="/staff/support-environment/"switch_support_environment' %}">
+  <form method="post" action="{% url 'switch_support_environment' %}">
     {% csrf_token %}
     <input type="hidden" name="action" value="reset">
     <button type="submit" class="eg-support-switcher__reset">{% trans "Restablecer" %}</button>

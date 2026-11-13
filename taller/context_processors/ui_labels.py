@@ -96,6 +96,14 @@ def ui_labels_context(request):
         labels["create_button"] = "Create Sale" if is_english else "Crear Venta"
         labels["edit_button"] = "Edit Sale" if is_english else "Editar Venta"
 
+    
+    # Sobrescritura para Rubro Reciclaje
+    if "RECICLAJE" in support_rubros or "reciclaje" in support_rubros:
+        labels["trabajos"] = "Compras y Ventas"
+        labels["extra"] = "Precios Materiales"
+        labels["nuevo_trabajo"] = "+ Nueva Compra / Venta"
+        labels["total_trabajos"] = "TOTAL OPERACIONES"
+
     return {
         "ui_labels": labels,
         "ui_country_code": country_code,

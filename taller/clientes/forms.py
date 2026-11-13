@@ -421,6 +421,9 @@ class ClienteForm(forms.ModelForm):
             self.fields["ciudad_usa"].label = "Cantón / Ciudad"
             self.fields["ciudad_usa"].empty_label = "Seleccione Cantón o Ciudad"
 
+        if 'telefono' in self.fields:
+            self.fields['telefono'].required = True
+
     def save(self, commit=True):
         obj = super().save(commit=False)
 

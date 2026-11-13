@@ -16,6 +16,12 @@ from taller.views.landing_views import hub_peru
 app_name = "taller_peru"
 
 urlpatterns = [
+    # TIRES - Modulo separado de Repuestos (global)
+    path(
+        "tires/",
+        include(("taller.tires.urls", "tires"), namespace="tires"),
+    ),
+
     # Redirigir raíz a bienvenida
     path("", hub_peru, name="peru_home"),
     # Dashboard principal de Perú

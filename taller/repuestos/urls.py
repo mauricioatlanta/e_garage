@@ -3,7 +3,7 @@ from taller.views.reabastecimiento import ReabastecimientoPanelView
 from taller.repuestos.views import (
     buscar_repuestos_ajax, buscar_repuestos_workspace, crear_repuesto,
     editar_repuesto, eliminar_repuesto, lista_repuestos, ver_repuesto,
-    pos_buscar_repuestos, pos_buscar_clientes, pos_confirmar_venta,
+    pos_buscar_repuestos, pos_buscar_clientes, pos_buscar_servicios, pos_confirmar_venta,
     pos_documento_redirect, pos_mostrador, pos_ventas_list
 )
 from .api import api_repuesto_por_codigo
@@ -18,6 +18,7 @@ urlpatterns = [
     path("pos/ventas/", pos_ventas_list, name="pos_ventas_list"),
     path("pos/buscar/", pos_buscar_repuestos, name="pos_buscar"),
     path("pos/clientes/buscar/", pos_buscar_clientes, name="pos_buscar_clientes"),
+    path("pos/servicios/buscar/", pos_buscar_servicios, name="pos_buscar_servicios"),
     path("pos/confirmar/", pos_confirmar_venta, name="pos_confirmar"),
     path("documentos/ver/<int:pk>/", pos_documento_redirect, name="pos_documento_redirect"),
     path("pos/documentos/ver/<int:pk>/", pos_documento_redirect, name="pos_documento_redirect_alt"),

@@ -308,12 +308,15 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # ===== FIX IDIOMA USA/CHILE EN PRODUCCION =====
 # Django LocaleMiddleware solo no interpreta /us/en/... en esta arquitectura.
 # Reinsertamos el middleware que fuerza idioma por prefijo país/idioma.
-if "taller.middleware.lang_policy.LanguagePolicyMiddleware" not in MIDDLEWARE:
-    try:
-        idx = MIDDLEWARE.index("taller.middleware.empresa_middleware.EmpresaMiddleware")
-        MIDDLEWARE.insert(idx, "taller.middleware.lang_policy.LanguagePolicyMiddleware")
-    except ValueError:
-        MIDDLEWARE.append("taller.middleware.lang_policy.LanguagePolicyMiddleware")
+# lang_policy DEBE ir DESPUES de EmpresaMiddleware: necesita request.empresa
+# y debe ser el ULTIMO en activar el idioma, para que nadie lo pise con 'es' por empresa CL.
+if "taller.middleware.lang_policy.LanguagePolicyMiddleware" in MIDDLEWARE:
+    MIDDLEWARE.remove("taller.middleware.lang_policy.LanguagePolicyMiddleware")
+try:
+    idx = MIDDLEWARE.index("taller.middleware.empresa_middleware.EmpresaMiddleware")
+    MIDDLEWARE.insert(idx + 1, "taller.middleware.lang_policy.LanguagePolicyMiddleware")
+except ValueError:
+    MIDDLEWARE.append("taller.middleware.lang_policy.LanguagePolicyMiddleware")
 
 # =============================================================================
 # Staticfiles: solo backends que existen SIEMPRE en el paquete desplegado.

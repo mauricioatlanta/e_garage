@@ -62,4 +62,15 @@ def _inject_desarm_widget_urls(widgets: list, prefix: str, docs_ns: str, today) 
 @country_login_required
 def workspace_dashboard(request, *args, **kwargs):
     from django.shortcuts import redirect
-    return redirect('/cl/es/reportes/')
+    # 1. Superusuario en Modo Soporte: la sesión manda
+    if getattr(request.user, "is_superuser", False) and request.session.get("modo_soporte_activo"):
+        sup = (request.session.get("support_country") or request.session.get("modo_soporte_pais") or "").lower()
+        if sup == "us":
+            return redirect("/us/en/reportes/")
+        if sup == "br":
+            return redirect("/br/pt/reportes/")
+        if sup:
+            return redirect(f"/{sup}/es/reportes/")
+    # 2. Normal: respetar el país de la URL que pidió (/us/ -> /us/en/, /cl/ -> /cl/es/)
+    prefix = _workspace_prefix_from_request(request)  # ej: /us/en o /cl/es
+    return redirect(f"{prefix}/reportes/")

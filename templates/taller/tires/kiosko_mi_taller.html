@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% if empresa %}{{ empresa.nombre }} - Neumáticos{% else %}Kiosko - Neumáticos{% endif %}</title>
+<style>body{background:#0f172a;color:#fff;font-family:system-ui;padding:12px;margin:0} .wrap{max-width:640px;margin:0 auto} .card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px;margin:8px 0} input{width:100%;box-sizing:border-box;padding:12px;border-radius:10px;background:#0f172a;color:#fff;border:1px solid #475569} .btn-wa{background:#22c55e;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:bold} a{color:#38bdf8}</style></head>
+<body><div class="wrap">
+<h1 style="text-align:center;">🛞 {% if empresa %}{{ empresa.nombre }}{% else %}Vulcanización{% endif %}</h1>
+<p style="text-align:center;color:#cbd5e1;">Neumáticos disponibles en este taller • Vista pública</p>
+<p style="text-align:center;"><a href="/us/en/tires/todos/">🔎 ¿No encuentras tu medida? Buscar en todos los talleres → Kiosko Global</a></p>
+<input id="busca" placeholder="Buscar medida, ej: 175/70 R14...">
+<div id="lista">
+{% for t in tires %}
+<div class="card" data-text="{{ t.ancho }}/{{ t.perfil }} R{{ t.aro }} {{ t.marca }} {{ t.modelo }} {{ t.tipo }}">
+<div style="display:flex;justify-content:space-between;"><b style="font-size:20px;">{{ t.ancho }}/{{ t.perfil }} R{{ t.aro }}</b><span style="background:#14532d;padding:4px 10px;border-radius:20px;font-size:13px;">{{ t.tipo }}</span></div>
+<div style="color:#cbd5e1;">{{ t.marca }} {{ t.modelo }} • {{ t.uso }}</div>
+<div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;"><div><div style="color:#94a3b8;font-size:12px;">Precio Instalado</div><b style="font-size:22px;color:#facc15;">${{ t.precio_instalado }}</b><div style="color:#94a3b8;font-size:12px;">Venta: ${{ t.precio_venta }} • Stock: {{ t.cantidad_stock }}</div></div>
+<a class="btn-wa" href="https://wa.me/?text=Hola, me interesa el neumático {{ t.ancho }}/{{ t.perfil }} R{{ t.aro }} {{ t.marca }}">WhatsApp</a></div>
+</div>
+{% empty %}<p style="text-align:center;color:#94a3b8;">Por ahora no hay neumáticos en stock en este taller.</p>{% endfor %}
+</div>
+</div>
+<script>document.getElementById('busca').addEventListener('input',function(){var q=this.value.toLowerCase();document.querySelectorAll('.card').forEach(function(c){c.style.display=c.getAttribute('data-text').toLowerCase().includes(q)?'block':'none';});});</script>
+</body></html>

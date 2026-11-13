@@ -186,6 +186,35 @@
 {% firstof return_to context_return_url as cliente_cancel_url %}
 <!-- CLIENTE_FORM_PANEL_MARKER_20260429 -->
 <div class="eg-card eg-card-form">
+  
+  
+
+  
+  
+
+  
+  <!-- Caja de Auto-llenado rapido Multicanal -->
+  <div style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(6, 182, 212, 0.5); border-radius: 12px; padding: 14px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+      <span style="font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px;">
+        <span>⚡</span> Llenado rápido con datos de contacto
+      </span>
+      <span style="font-size: 10px; color: #94a3b8; font-family: monospace;">
+        {% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Required: Name & Phone{% else %}Obligatorios: Nombre y Teléfono{% endif %}
+      </span>
+    </div>
+    <textarea id="raw-contact-data" rows="3" style="width: 100%; box-sizing: border-box; background: #020617; border: 1px solid #334155; border-radius: 8px; padding: 8px 10px; font-size: 12px; color: #f8fafc; font-family: monospace; outline: none; resize: vertical;" placeholder="{% if '/en/' in request.path or LANGUAGE_CODE == 'en' %}Paste client message here (e.g. John Doe, +1 555-234-5678, john@email.com, 123 Main St)...{% else %}Pega aquí el mensaje recibido (ej: Carlos Muñoz, +56987654321, carlos@gmail.com, Providencia 1234)...{% endif %}"></textarea>
+    <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
+      <button type="button" id="btn-auto-fill" style="background: #06b6d4; color: #020617; font-weight: 800; font-size: 11px; padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+        <span>📋</span> {% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Auto-fill fields{% else %}Auto-llenar campos{% endif %}
+      </button>
+      <button type="button" id="btn-clear-raw" style="background: #1e293b; color: #cbd5e1; font-weight: 600; font-size: 11px; padding: 6px 12px; border-radius: 6px; border: 1px solid #475569; cursor: pointer;">
+        {% if "/en/" in request.path or LANGUAGE_CODE == "en" %}Clear{% else %}Limpiar{% endif %}
+      </button>
+      <span id="autofill-feedback" style="font-size: 11px; font-weight: 600; margin-left: 6px;"></span>
+    </div>
+  </div>
+
   <form method="post" novalidate>
     {% csrf_token %}
     <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
@@ -310,6 +339,130 @@
 {% endblock %}
 
 {% block page_extra_js %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const btnFill = document.getElementById("btn-auto-fill");
+  const btnClear = document.getElementById("btn-clear-raw");
+  const rawInput = document.getElementById("raw-contact-data");
+  const feedback = document.getElementById("autofill-feedback");
+  const isEnglish = window.location.pathname.includes("/en/");
+
+  const labelTel = document.querySelector("label[for='id_telefono'], label[for='id_phone']");
+  if (labelTel && !labelTel.innerHTML.includes("*")) {
+    labelTel.innerHTML += ' <span style="color:#f87171;">*</span>';
+  }
+
+  if (!btnFill || !rawInput) return;
+
+  btnFill.addEventListener("click", function() {
+    const rawText = rawInput.value.trim();
+    if (!rawText) {
+      if (feedback) {
+        feedback.style.color = "#f87171";
+        feedback.textContent = isEnglish ? "Please paste a text first" : "Pega un texto primero";
+      }
+      return;
+    }
+
+    const fNombre = document.getElementById("id_nombre") || document.querySelector("input[name='nombre'], input[name='first_name']");
+    const fApellido = document.getElementById("id_apellido") || document.querySelector("input[name='apellido'], input[name='last_name']");
+    const fTelefono = document.getElementById("id_telefono") || document.querySelector("input[name='telefono'], input[name='phone']");
+    const fEmail = document.getElementById("id_email") || document.querySelector("input[name='email']");
+    const fDireccion = document.getElementById("id_direccion") || document.querySelector("input[name='direccion'], input[name='address']");
+
+    let workingText = rawText;
+
+    // 1. Teléfono (+569..., 9xxxxxxxx, internacional, etc.)
+    let telFound = false;
+    const telMatch = workingText.match(/(?:\+?\d{1,3}[\s-]?)?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}|\b\d{8,12}\b/);
+    if (telMatch && fTelefono) {
+      let tel = telMatch[0].trim();
+      if (/^9\d{8}$/.test(tel)) tel = "+56" + tel;
+      fTelefono.value = tel;
+      telFound = true;
+      workingText = workingText.replace(telMatch[0], " ");
+    }
+
+    // 2. Email
+    const emailMatch = workingText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    if (emailMatch && fEmail) {
+      fEmail.value = emailMatch[0].toLowerCase();
+      workingText = workingText.replace(emailMatch[0], " ");
+    }
+
+    // 3. Dirección (detecta 'vivo en ...', 'calle ...', 'dirección ...', 'av ...')
+    const dirMatch = workingText.match(/(?:direcci[oó]n|address|calle|street|st|avenida|avda|av\.?|domicilio|pasaje|vivo\s+en)\s*[:=-]?\s*([^,\n\r]+)/i);
+    if (dirMatch && fDireccion) {
+      fDireccion.value = dirMatch[1].trim();
+      workingText = workingText.replace(dirMatch[0], " ");
+    }
+
+    // 4. Nombre y Apellido (Remover muletillas de inicio agresivamente)
+    // Limpiamos frases como "mi nombre es", "soy", "hola", "me llamo"
+    let cleanText = workingText
+      .replace(/\b(?:hola|buenas|buenos\s+d[ií]as|buenas\s+tardes|estimad[oa]s?|hello|hi|hey)\b/gi, " ")
+      .replace(/\b(?:mi\s+nombre\s+es|nombre\s+es|mi\s+nom\s+es|my\s+name\s+is)\b/gi, " ")
+      .replace(/\b(?:soy|me\s+llamo|i\s*am|i'm)\b/gi, " ")
+      .replace(/\b(?:nombre|cliente|nom|name|client|customer)\s*[:=-]/gi, " ")
+      .replace(/\b(?:fono|tel|telefono|phone|cel|celular|mail|correo|email|rut|tax)\s*[:=-]?/gi, " ")
+      .trim();
+
+    // Buscar el primer fragmento de texto con palabras (sin números)
+    let fragments = cleanText.split(/[\r\n,]+/).map(s => s.trim()).filter(Boolean);
+    let nameCandidate = "";
+
+    for (let frag of fragments) {
+      // Limpiar puntuaciones extrañas
+      let candidate = frag.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, " ").trim();
+      let words = candidate.split(/\s+/).filter(w => w.length > 1);
+      if (words.length >= 1 && words.length <= 4) {
+        nameCandidate = words.join(" ");
+        break;
+      }
+    }
+
+    if (nameCandidate) {
+      const parts = nameCandidate.split(/\s+/);
+      if (parts.length > 2) {
+        // Ejemplo: "Juan Pablo Pérez" -> Nombre: "Juan Pablo", Apellido: "Pérez"
+        if (fNombre) fNombre.value = parts.slice(0, -1).join(" ");
+        if (fApellido) fApellido.value = parts.slice(-1).join(" ");
+      } else if (parts.length === 2) {
+        // Ejemplo: "Juan Pérez" -> Nombre: "Juan", Apellido: "Pérez"
+        if (fNombre) fNombre.value = parts[0];
+        if (fApellido) fApellido.value = parts[1];
+      } else if (parts.length === 1) {
+        if (fNombre) fNombre.value = parts[0];
+        if (fApellido) fApellido.value = "";
+      }
+    }
+
+    if (feedback) {
+      if (!fNombre || !fNombre.value) {
+        feedback.style.color = "#fbbf24";
+        feedback.textContent = isEnglish ? "✓ Contact info filled. Please enter Name" : "✓ Datos listos. Falta el nombre";
+      } else if (!telFound) {
+        feedback.style.color = "#fbbf24";
+        feedback.textContent = isEnglish ? "✓ Name filled. Phone is required" : "✓ Nombre listo. Teléfono es obligatorio";
+      } else {
+        feedback.style.color = "#34d399";
+        feedback.textContent = isEnglish ? "✓ Fields auto-filled successfully" : "✓ Campos llenados con éxito";
+      }
+      setTimeout(() => { feedback.textContent = ""; }, 4000);
+    }
+  });
+
+  btnClear.addEventListener("click", function() {
+    rawInput.value = "";
+    if (feedback) feedback.textContent = "";
+  });
+});
+</script>
+
+
+
+
 {% if form.pais == "CL" %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {

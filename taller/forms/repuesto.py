@@ -97,10 +97,27 @@ class RepuestoForm(forms.ModelForm):
 
         empresa = getattr(self.user, "empresa", None) if self.user else None
         country = (getattr(empresa, "pais", "CL") or "CL").strip().upper() if empresa else "CL"
-        lang, category_names = CATEGORY_MAP.get(country, ("es", SPANISH_CATEGORIES))
+        # En Support Mode la empresa es CL pero la URL puede ser /us/en/.
+        # El idioma activo (de la URL) manda sobre el país de la empresa.
+        from django.utils.translation import get_language
+        active = (get_language() or "es")[:2]
+        if active in ("en", "pt", "es"):
+            lang = active
+            _map_lang = {"en": ENGLISH_CATEGORIES, "pt": PORTUGUESE_CATEGORIES, "es": SPANISH_CATEGORIES}
+            category_names = _map_lang[lang]
+        else:
+            lang, category_names = CATEGORY_MAP.get(country, ("es", SPANISH_CATEGORIES))
         self.language = lang
 
         self._configure_labels(lang)
+        if lang == "en":
+            self.fields["part_number"].widget.attrs["placeholder"] = "E.g. 0986AB1234 (Bosch/Manufacturer)"
+            self.fields["sku"].widget.attrs["placeholder"] = "E.g. EST-02-B (Internal inventory)"
+            self.fields["codigo_oem"].widget.attrs["placeholder"] = "E.g. 04465-02220 (Vehicle OEM)"
+        elif lang == "pt":
+            self.fields["part_number"].widget.attrs["placeholder"] = "Ex: 0986AB1234 (Bosch/Fabricante)"
+            self.fields["sku"].widget.attrs["placeholder"] = "Ex: EST-02-B (Estoque interno)"
+            self.fields["codigo_oem"].widget.attrs["placeholder"] = "Ex: 04465-02220 (Original veiculo)" 
         self._ensure_default_categories(empresa, category_names)
         self._configure_categoria_field(empresa, lang)
 
@@ -203,6 +220,10 @@ class RepuestoForm(forms.ModelForm):
             self.fields["stock_minimo"].label = "Minimum Stock"
             self.fields["stock_minimo"].help_text = "Optional threshold for replenishment alerts"
 
+            self.fields["sku"].label = "SKU (Internal Inventory)"
+            self.fields["sku"].help_text = "Internal inventory SKU or code"
+            self.fields["codigo_oem"].label = "OEM Code (Vehicle Manufacturer)"
+            self.fields["codigo_oem"].help_text = "Original OEM part number"
             self.fields["proveedor"].label = "Supplier"
             self.fields["proveedor"].help_text = "Where you bought the part"
         elif lang == "pt":
@@ -227,6 +248,10 @@ class RepuestoForm(forms.ModelForm):
             self.fields["stock_minimo"].label = "Estoque Mínimo"
             self.fields["stock_minimo"].help_text = "Limite opcional para alertas de reposição"
 
+            self.fields["sku"].label = "SKU (Estoque interno)"
+            self.fields["sku"].help_text = "SKU ou código interno de estoque"
+            self.fields["codigo_oem"].label = "Código OEM (Fabricante do veículo)"
+            self.fields["codigo_oem"].help_text = "Número da peça original OEM"
             self.fields["proveedor"].label = "Fornecedor"
             self.fields["proveedor"].help_text = "Onde você comprou a peça"
         else:
@@ -253,6 +278,10 @@ class RepuestoForm(forms.ModelForm):
                 "Umbral opcional para alertas de reabastecimiento"
             )
 
+            self.fields["sku"].label = "SKU (Inventario interno)"
+            self.fields["sku"].help_text = "SKU o código interno de inventario"
+            self.fields["codigo_oem"].label = "Código OEM (Fabricante vehículo)"
+            self.fields["codigo_oem"].help_text = "Número de parte original OEM"
             self.fields["proveedor"].label = "Proveedor"
             self.fields["proveedor"].help_text = "Donde compraste el repuesto"
 

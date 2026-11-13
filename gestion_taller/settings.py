@@ -6,7 +6,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-recovery-key')
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://egarage.cl', 'https://www.egarage.cl', 'http://192.168.1.106:8000']
+CSRF_TRUSTED_ORIGINS = ["http://www.egarage.cl", "http://egarage.cl", 'https://egarage.cl', 'https://www.egarage.cl', 'http://192.168.1.106:8000']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Desarrollo local por HTTP: una cookie Secure no viaja por 127.0.0.1.
 # settings_prod.py sobrescribe estos valores a True detrás de HTTPS.

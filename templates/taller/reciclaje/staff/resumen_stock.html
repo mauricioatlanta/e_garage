@@ -1,114 +1,215 @@
-{% extends "layouts/base_egarage_panel.html" %}
-{% load money %}
+{% extends "base.html" %}
+{% load i18n static %}
 
-{% block page_title %}Stock de reciclaje{% endblock %}
-{% block page_icon %}📦{% endblock %}
+{% block title %}Catálogo y Stock · Atlanta Reciclajes{% endblock %}
 
-{% block page_extra_css %}
-<style>
-  .rec-card { background: rgba(0,0,0,0.7); border: 1px solid rgba(0,255,255,0.3); border-radius: 10px; padding: 20px; margin-bottom: 1.5rem; }
-  .rec-table { width: 100%; border-collapse: collapse; color: #e5e7eb; }
-  .rec-table th, .rec-table td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
-  .rec-link { color: #00fff7; text-decoration: none; margin-right: 0.75rem; }
-  .rec-warn { color: #f59e0b; }
-  .rec-toolbar { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1rem; flex-wrap:wrap; }
-  .rec-btn { background:#00fff7; color:#0f2027; font-weight:bold; border:0; border-radius:8px; padding:0.6rem 1rem; text-decoration:none; }
-  .rec-btn-secondary { background:transparent; color:#00fff7; border:1px solid rgba(0,255,255,0.5); }
-  .rec-alert { background:rgba(14,165,233,0.14); border:1px solid rgba(0,255,255,0.35); color:#e0f2fe; padding:0.75rem 1rem; border-radius:8px; margin-bottom:1rem; }
-  .rec-category-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:0.85rem; margin-bottom:1.5rem; }
-  .rec-category-card { display:block; background:linear-gradient(135deg,rgba(8,18,32,0.95),rgba(10,40,48,0.85)); border:1px solid rgba(0,255,255,0.28); border-radius:10px; padding:1rem; color:#e5e7eb; text-decoration:none; }
-  .rec-category-card.is-active { border-color:#00fff7; box-shadow:0 0 18px rgba(0,255,247,0.22); }
-  .rec-category-name { color:#fff; font-weight:800; }
-  .rec-category-meta { color:#9ca3af; font-size:0.82rem; margin-top:0.25rem; }
-  .rec-empty-panel { border:1px dashed rgba(0,255,255,0.35); border-radius:10px; padding:1.25rem; color:#9ca3af; background:rgba(0,255,255,0.05); }
-</style>
-{% endblock %}
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto; padding: 1rem; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif;">
 
-{% block panel_content %}
-{% if messages %}
-  {% for message in messages %}<div class="rec-alert">{{ message }}</div>{% endfor %}
-{% endif %}
+  <!-- Header -->
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(0, 240, 255, 0.2); padding-bottom: 1rem;">
+    <div>
+      <h1 style="font-size: 1.4rem; font-weight: 800; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+        <span style="color: #00f0ff;">♻️</span> Catálogo de Precios y Stock
+      </h1>
+      <p style="color: #94a3b8; font-size: 0.85rem; margin: 0.25rem 0 0 0;">Convertidores Catalíticos y Chatarra Electrónica</p>
+    </div>
 
-<div class="rec-toolbar">
-  <div>
-    <div style="color:#e5e7eb;font-weight:700;">Catálogo de materiales</div>
-    <div style="color:#9ca3af;font-size:0.85rem;">Organiza cada tipo de reciclaje por categorías propias de compra y venta.</div>
+    <!-- Botones Acciones y Ver en la Web -->
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+      <a href="/reciclaje/cataliticos/" target="_blank" id="btn-ver-web-cat" style="background: rgba(0, 240, 255, 0.15); border: 1px solid #00f0ff; color: #00f0ff; font-weight: 700; font-size: 0.85rem; padding: 0.6rem 1rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
+        🌐 Ver en la Web (Público) ↗
+      </a>
+      <a href="/reciclaje/chatarra/" target="_blank" id="btn-ver-web-ewaste" style="display: none; background: rgba(167, 139, 250, 0.15); border: 1px solid #a78bfa; color: #a78bfa; font-weight: 700; font-size: 0.85rem; padding: 0.6rem 1rem; border-radius: 8px; text-decoration: none; align-items: center; gap: 0.4rem;">
+        🌐 Ver Chatarra en Web ↗
+      </a>
+      <a href="/cl/es/reciclaje/compras/nueva/" style="background: #00f0ff; color: #0b132b; font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem;">
+        ➕ Nueva Compra
+      </a>
+      <a href="/cl/es/reciclaje/stock/productos/nuevo/" style="background: #1e293b; border: 1px solid #00f0ff; color: #00f0ff; font-weight: 700; font-size: 0.85rem; padding: 0.6rem 1rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem;">
+        ➕ Crear Producto
+      </a>
+    </div>
   </div>
-  <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
-    <a href="categorias/nueva/" class="rec-btn rec-btn-secondary">+ Nueva categoría</a>
-    <a href="productos/nuevo/" class="rec-btn">+ Nuevo producto</a>
-  </div>
-</div>
 
-<div class="rec-card">
-  <h3>Categorías de reciclaje</h3>
-  {% if categorias %}
-  <div class="rec-category-grid">
-    {% for categoria in categorias %}
-    <a href="?categoria={{ categoria.pk }}" class="rec-category-card {% if categoria_actual.pk == categoria.pk %}is-active{% endif %}">
-      <div class="rec-category-name">{{ categoria.nombre }}</div>
-      <div class="rec-category-meta">{{ categoria.producto_count|default:0 }} material(es)</div>
-      {% if categoria.descripcion %}<div class="rec-category-meta">{{ categoria.descripcion }}</div>{% endif %}
-    </a>
-    {% endfor %}
+  <!-- Pestañas de Alternancia -->
+  <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+    <button onclick="cambiarTab('cataliticos')" id="tab-cat" type="button" style="flex: 1; padding: 0.85rem; border-radius: 10px; font-weight: 800; font-size: 0.95rem; cursor: pointer; border: 1px solid #00f0ff; background: rgba(0, 240, 255, 0.15); color: #00f0ff;">
+      🚗 Convertidores Catalíticos
+    </button>
+    <button onclick="cambiarTab('ewaste')" id="tab-ewaste" type="button" style="flex: 1; padding: 0.85rem; border-radius: 10px; font-weight: 800; font-size: 0.95rem; cursor: pointer; border: 1px solid #334155; background: #0f172a; color: #94a3b8;">
+      ⚡ Chatarra Electrónica
+    </button>
   </div>
-  {% if categoria_actual %}
-    <a href="./" class="rec-link">Ver solo categorías</a>
-  {% else %}
-    <div class="rec-empty-panel">Selecciona una categoría para ver sus materiales sin mezclar todo el catálogo.</div>
-  {% endif %}
-  {% else %}
-  <div class="rec-empty-panel">Aún no hay categorías. Crea la primera, por ejemplo: Metales, Papel y cartón, Plásticos, Baterías o Chatarra electrónica.</div>
-  {% endif %}
-</div>
 
-{% if not categoria_actual %}
-<div class="rec-card">
-  <h3>Catalíticos disponibles</h3>
-  <table class="rec-table">
-    <thead><tr><th>Código</th><th>Nombre</th><th>Marca / Modelo</th><th>Stock</th><th>Precio venta</th><th></th></tr></thead>
-    <tbody>
-      {% for c in catalogo_disponible %}
-      <tr>
-        <td>{{ c.codigo }}</td>
-        <td>{{ c.nombre }}</td>
-        <td>{{ c.marca_vehiculo }} {{ c.modelo_vehiculo }}</td>
-        <td>{{ c.cantidad_stock }}</td>
-        <td>{{ c.precio_venta|money_clp }}</td>
-        <td>
-          <a href="../catalitico/{{ c.pk }}/editar/" class="rec-link">Editar</a>
-          <a href="../catalitico/{{ c.pk }}/eliminar/" class="rec-link">Eliminar</a>
-        </td>
-      </tr>
+  <!-- PANEL 1: CONVERTIDORES CATALÍTICOS -->
+  <div id="panel-cataliticos" style="display: block;">
+    <div style="margin-bottom: 1.25rem;">
+      <input type="text" id="filtro-catalitico" placeholder="🔍 Buscar por código (ej. GM02), marca o modelo..." onkeyup="filtrarCataliticos()" style="width: 100%; padding: 0.85rem; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: #fff; font-size: 1rem; box-sizing: border-box;">
+    </div>
+
+    <div id="grid-cataliticos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1rem;">
+      {% for item in catalogo_disponible %}
+      <div class="card-catalitico" data-texto="{{ item.codigo|lower }} {{ item.marca_vehiculo|lower }} {{ item.modelo_vehiculo|lower }}" style="background: #0f172a; border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 12px; padding: 1.1rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.85rem;">
+          <div style="width: 75px; height: 75px; border-radius: 10px; background: #1e293b; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #334155; flex-shrink: 0;">
+            {% if item.imagen %}
+              <img src="{{ item.imagen.url }}" alt="{{ item.codigo }}" style="width: 100%; height: 100%; object-fit: cover;">
+            {% else %}
+              <img src="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=150&auto=format&fit=crop&q=80" alt="Catalizador" style="width: 100%; height: 100%; object-fit: cover;">
+            {% endif %}
+          </div>
+          <div style="overflow: hidden; flex: 1;">
+            <span style="font-size: 0.72rem; color: #00f0ff; font-weight: 800; text-transform: uppercase;">{{ item.marca_vehiculo|default:"CATALIZADOR" }}</span>
+            <div style="font-size: 1.25rem; font-weight: 800; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.codigo }}</div>
+            <div style="font-size: 0.78rem; color: #94a3b8;">{{ item.modelo_vehiculo|default:item.nombre|default:"Monolito Cerámico" }}</div>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid #1e293b; padding-top: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <span style="font-size: 0.7rem; color: #94a3b8; font-weight: 700; display: block;">PRECIO DE COMPRA</span>
+            <span style="font-size: 1.25rem; font-weight: 800; color: #34d399;">${{ item.precio_compra|floatformat:0 }} CLP</span>
+          </div>
+          <div style="display: flex; gap: 0.4rem;">
+            <a href="/reciclaje/consulta-catalitico/?q={{ item.codigo }}" target="_blank" title="Ver cotización pública en la web" style="background: rgba(14, 165, 233, 0.15); border: 1px solid #0ea5e9; color: #0ea5e9; padding: 0.45rem 0.65rem; border-radius: 6px; font-size: 0.8rem; font-weight: 700; text-decoration: none;">
+              👁️ Web
+            </a>
+            <a href="/cl/es/reciclaje/catalitico/{{ item.id }}/editar/" title="Editar precio" style="background: rgba(0, 240, 255, 0.15); border: 1px solid #00f0ff; color: #00f0ff; padding: 0.45rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 700; text-decoration: none;">
+              ✏️
+            </a>
+            <a href="/cl/es/reciclaje/catalitico/{{ item.id }}/eliminar/" title="Eliminar catalítico" onclick="return confirm('¿Seguro que deseas eliminar este catalítico?');" style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444; padding: 0.45rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 700; text-decoration: none;">
+              🗑️
+            </a>
+          </div>
+        </div>
+      </div>
       {% empty %}
-      <tr><td colspan="6">Sin catalíticos en stock.</td></tr>
+      <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: #0f172a; border-radius: 12px; border: 1px dashed #334155;">
+        <p style="color: #94a3b8; font-size: 1rem;">No se encontraron catalíticos registrados.</p>
+        <a href="/reciclaje/cataliticos/" target="_blank" style="color: #00f0ff; font-weight: 700;">Explorar catálogo público en la web →</a>
+      </div>
       {% endfor %}
-    </tbody>
-  </table>
-</div>
-{% endif %}
+    </div>
+  </div>
 
-<div class="rec-card">
-  <h3>{% if categoria_actual %}Materiales · {{ categoria_actual.nombre }}{% else %}Materiales{% endif %}</h3>
-  {% if not categoria_actual %}
-  <div class="rec-empty-panel">La lista completa está oculta para mantener el catálogo ordenado. Elige una categoría arriba o crea una nueva.</div>
-  {% else %}
-  <table class="rec-table">
-    <thead><tr><th>Producto</th><th>Categoría</th><th>Stock</th><th>Precio compra</th><th>Precio venta</th></tr></thead>
-    <tbody>
-      {% for p in chatarra %}
-      <tr {% if p.stock_minimo and p.cantidad_stock < p.stock_minimo %}class="rec-warn"{% endif %}>
-        <td>{{ p.nombre }}</td>
-        <td>{{ p.categoria|default:"—" }}</td>
-        <td>{{ p.cantidad_stock }} {{ p.get_unidad_medida_display }}{% if p.stock_minimo and p.cantidad_stock < p.stock_minimo %} ⚠️ bajo mínimo{% endif %}</td>
-        <td>{{ p.precio_compra|money_clp }}</td>
-        <td>{{ p.precio_venta|money_clp }}</td>
-      </tr>
+  <!-- PANEL 2: CHATARRA ELECTRÓNICA -->
+  <div id="panel-ewaste" style="display: none;">
+    <div style="margin-bottom: 1.25rem;">
+      <input type="text" id="filtro-ewaste" placeholder="🔍 Buscar componente (ej. Placa Madre, RAM, Procesador)..." onkeyup="filtrarEwaste()" style="width: 100%; padding: 0.85rem; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: #fff; font-size: 1rem; box-sizing: border-box;">
+    </div>
+
+    <div id="grid-ewaste" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1rem;">
+      {% for prod in chatarra %}
+      <div class="card-ewaste" data-texto="{{ prod.nombre|lower }}" style="background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 1.1rem; display: flex; flex-direction: column; justify-content: space-between;">
+        
+        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.85rem;">
+          <div style="width: 75px; height: 75px; border-radius: 10px; background: #1e293b; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #334155; flex-shrink: 0;">
+            {% if prod.foto %}
+              <img src="{{ prod.foto.url }}" alt="{{ prod.nombre }}" style="width: 100%; height: 100%; object-fit: cover;">
+            {% else %}
+              {% if "procesador" in prod.nombre|lower %}
+                <img src="https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=150&auto=format&fit=crop&q=80" alt="Procesador" style="width: 100%; height: 100%; object-fit: cover;">
+              {% elif "ram" in prod.nombre|lower or "memoria" in prod.nombre|lower %}
+                <img src="https://images.unsplash.com/photo-1562976540-1502c2145186?w=150&auto=format&fit=crop&q=80" alt="Memoria RAM" style="width: 100%; height: 100%; object-fit: cover;">
+              {% elif "fuente" in prod.nombre|lower %}
+                <img src="https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=150&auto=format&fit=crop&q=80" alt="Fuente de Poder" style="width: 100%; height: 100%; object-fit: cover;">
+              {% elif "disco" in prod.nombre|lower or "hd" in prod.nombre|lower %}
+                <img src="https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=150&auto=format&fit=crop&q=80" alt="Disco Duro" style="width: 100%; height: 100%; object-fit: cover;">
+              {% elif "celular" in prod.nombre|lower or "telefon" in prod.nombre|lower %}
+                <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=150&auto=format&fit=crop&q=80" alt="Teléfono Celular" style="width: 100%; height: 100%; object-fit: cover;">
+              {% else %}
+                <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=150&auto=format&fit=crop&q=80" alt="Placa Madre / PCB" style="width: 100%; height: 100%; object-fit: cover;">
+              {% endif %}
+            {% endif %}
+          </div>
+          <div style="flex: 1; overflow: hidden;">
+            <span style="font-size: 0.72rem; color: #a78bfa; font-weight: 800; text-transform: uppercase;">Chatarra Electrónica</span>
+            <div style="font-size: 1.05rem; font-weight: 800; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ prod.nombre }}</div>
+            <div style="font-size: 0.78rem; color: #94a3b8;">Unidad: {{ prod.unidad_medida|default:"Kilogramo" }}</div>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid #1e293b; padding-top: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <span style="font-size: 0.7rem; color: #94a3b8; font-weight: 700; display: block;">PRECIO DE COMPRA</span>
+            <span style="font-size: 1.25rem; font-weight: 800; color: #34d399;">${{ prod.precio_compra_actual|default:prod.precio_compra|floatformat:0 }} CLP</span>
+            <span style="font-size: 0.72rem; color: #cbd5e1; display: block; margin-top: 0.2rem;">Stock: <strong>{{ prod.stock_actual|floatformat:2 }}</strong></span>
+          </div>
+          <div style="display: flex; gap: 0.4rem;">
+            <a href="/reciclaje/chatarra/?q={{ prod.nombre|urlencode }}" target="_blank" title="Ver cotización pública en la web" style="background: rgba(14, 165, 233, 0.15); border: 1px solid #0ea5e9; color: #0ea5e9; padding: 0.45rem 0.65rem; border-radius: 6px; font-size: 0.8rem; font-weight: 700; text-decoration: none;">
+              👁️ Web
+            </a>
+            <a href="/cl/es/reciclaje/stock/productos/{{ prod.id }}/editar/" title="Editar componente" style="background: rgba(0, 240, 255, 0.15); border: 1px solid #00f0ff; color: #00f0ff; padding: 0.45rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 700; text-decoration: none;">
+              ✏️
+            </a>
+            <a href="/cl/es/reciclaje/stock/productos/{{ prod.id }}/eliminar/" title="Eliminar componente" onclick="return confirm('¿Eliminar este componente?');" style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444; padding: 0.45rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 700; text-decoration: none;">
+              🗑️
+            </a>
+          </div>
+        </div>
+
+      </div>
       {% empty %}
-      <tr><td colspan="5">Sin productos de chatarra.</td></tr>
+      <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem; background: #0f172a; border-radius: 12px; color: #94a3b8;">
+        No hay componentes registrados en Chatarra Electrónica.
+      </div>
       {% endfor %}
-    </tbody>
-  </table>
-  {% endif %}
+    </div>
+  </div>
+
 </div>
+
+<script>
+function cambiarTab(tab) {
+  const panelCat = document.getElementById('panel-cataliticos');
+  const panelEw = document.getElementById('panel-ewaste');
+  const btnCat = document.getElementById('tab-cat');
+  const btnEw = document.getElementById('tab-ewaste');
+  const btnWebCat = document.getElementById('btn-ver-web-cat');
+  const btnWebEw = document.getElementById('btn-ver-web-ewaste');
+
+  if (tab === 'cataliticos') {
+    panelCat.style.display = 'block';
+    panelEw.style.display = 'none';
+    btnCat.style.background = 'rgba(0, 240, 255, 0.15)';
+    btnCat.style.borderColor = '#00f0ff';
+    btnCat.style.color = '#00f0ff';
+    btnEw.style.background = '#0f172a';
+    btnEw.style.borderColor = '#334155';
+    btnEw.style.color = '#94a3b8';
+    if (btnWebCat) btnWebCat.style.display = 'inline-flex';
+    if (btnWebEw) btnWebEw.style.display = 'none';
+  } else {
+    panelCat.style.display = 'none';
+    panelEw.style.display = 'block';
+    btnEw.style.background = 'rgba(167, 139, 250, 0.15)';
+    btnEw.style.borderColor = '#a78bfa';
+    btnEw.style.color = '#a78bfa';
+    btnCat.style.background = '#0f172a';
+    btnCat.style.borderColor = '#334155';
+    btnCat.style.color = '#94a3b8';
+    if (btnWebCat) btnWebCat.style.display = 'none';
+    if (btnWebEw) btnWebEw.style.display = 'inline-flex';
+  }
+}
+
+function filtrarCataliticos() {
+  const q = document.getElementById('filtro-catalitico').value.toLowerCase();
+  const cards = document.querySelectorAll('.card-catalitico');
+  cards.forEach(c => {
+    const txt = c.getAttribute('data-texto') || '';
+    c.style.display = txt.includes(q) ? 'flex' : 'none';
+  });
+}
+
+function filtrarEwaste() {
+  const q = document.getElementById('filtro-ewaste').value.toLowerCase();
+  const cards = document.querySelectorAll('.card-ewaste');
+  cards.forEach(c => {
+    const txt = c.getAttribute('data-texto') || '';
+    c.style.display = txt.includes(q) ? 'flex' : 'none';
+  });
+}
+</script>
 {% endblock %}

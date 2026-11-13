@@ -58,7 +58,7 @@ PATH_HINTS = {
 
 # Modules unlocked per rubro (added to ALWAYS_ON)
 MODULES_BY_RUBRO = {
-    "WORKSHOP":            frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS}),
+    "WORKSHOP":            frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS, MOD_FLOTA}),
     "WORKSHOP_MOTO":       frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS}),
     "WORKSHOP_HEAVY":      frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS}),
     "BODYSHOP":            frozenset({MOD_VEHICULOS, MOD_SERVICIOS}),
@@ -67,9 +67,12 @@ MODULES_BY_RUBRO = {
     "FLEET":               frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS, MOD_FLOTA}),
     "DESARMADURIA":        frozenset({MOD_DESARME, MOD_REPUESTOS}),
     "PARTS":               frozenset({MOD_REPUESTOS}),
-    "TIRE":                frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS}),
+    "TIRE":                frozenset({MOD_REPUESTOS, MOD_SERVICIOS}),  # Vulcanizacion: sin Vehiculos, sin Desarme, sin Flota
     "DETAILING":           frozenset({MOD_VEHICULOS, MOD_SERVICIOS}),
+    "CARWASH":             frozenset({MOD_VEHICULOS, MOD_SERVICIOS}),  # Carwash: alias de DETAILING, igual módulos
     "RECYCLING":           frozenset({MOD_RECICLAJE}),
+    "RECICLAJE":           frozenset({MOD_RECICLAJE}),  # Reciclaje: alias de RECYCLING
     "TOWING":              frozenset({MOD_GRUAS, MOD_CLIENTES, MOD_REPORTES}),
+    "GRUAS":               frozenset({MOD_GRUAS, MOD_CLIENTES, MOD_REPORTES}),  # Grúas: alias de TOWING
     "MIXED":               frozenset({MOD_VEHICULOS, MOD_REPUESTOS, MOD_SERVICIOS, MOD_DESARME}),
 }

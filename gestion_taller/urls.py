@@ -260,6 +260,20 @@ def country_aware_clientes_redirect(request):
 
 def country_aware_workspace_redirect(request, subpath=""):
     """Redirect /workspace/ to country workspace. USA → /us/en/workspace/, Chile → /cl/es/workspace/."""
+    # 1. Superusuario en Modo Soporte manda: la sesión manda sobre la empresa
+    try:
+        if request.user.is_authenticated and request.user.is_superuser:
+            if request.session.get("modo_soporte_activo"):
+                sup = (request.session.get("support_country") or request.session.get("modo_soporte_pais") or "").lower()
+                if sup == "us":
+                    return redirect(f"/us/en/workspace/{subpath}".rstrip("/") + "/")
+                if sup == "br":
+                    return redirect(f"/br/pt/workspace/{subpath}".rstrip("/") + "/")
+                if sup:
+                    return redirect(f"/{sup}/es/workspace/{subpath}".rstrip("/") + "/")
+    except Exception:
+        pass
+    # 2. Usuario normal: por empresa
     if request.user.is_authenticated:
         try:
             if hasattr(request.user, "empresa") and request.user.empresa:
@@ -274,6 +288,8 @@ def country_aware_workspace_redirect(request, subpath=""):
 
 
 urlpatterns = [
+    path('reciclaje/', RedirectView.as_view(url='/cl/es/reciclaje/', permanent=False), name='redirect_reciclaje_root'),
+
     path('entrar/', login_rapido, name='login_rapido'),
 
     path('entrar/', auto_login_directo, name='auto_login_directo'),

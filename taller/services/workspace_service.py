@@ -86,7 +86,16 @@ class WorkspaceService:
     def _term(key: str) -> str:
         """Resolves a terminology key to a translated string."""
         lazy = TERMINOLOGY.get(key)
-        return str(lazy) if lazy is not None else key
+        val = str(lazy) if lazy is not None else key
+        # Si el idioma activo es inglés, traducir los labels hardcodeados en español
+        try:
+            from django.utils import translation
+            if translation.get_language() == "en":
+                from taller.constants.workspaces import WORKSPACE_NAV_LABELS_EN
+                return WORKSPACE_NAV_LABELS_EN.get(val, val)
+        except Exception:
+            pass
+        return val
 
     @staticmethod
     def _active_modules(config) -> frozenset:
