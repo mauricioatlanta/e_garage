@@ -1,51 +1,130 @@
 {% extends "base.html" %}
 {% block content %}
-<div style="max-width:1100px;margin:20px auto;padding:0 16px;font-family:system-ui">
-  <h1>📊 Reportes Vulcanización - {{ empresa.nombre_taller|default:"Mi taller" }}</h1>
-  <p style="color:#666">Reportes específicos para vulcanización, no genéricos. Datos reales desde <b>Tire</b>.</p>
+<style>
+.vul-wrap{max-width:1150px;margin:18px auto;padding:0 16px;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0f172a}
+.vul-hero{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 45%,#f59e0b 100%);color:#fff;border-radius:20px;padding:22px 24px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;box-shadow:0 12px 30px rgba(15,23,42,.25)}
+.vul-hero h1{margin:0;font-size:28px;line-height:1.1;letter-spacing:-.5px}
+.vul-hero p{margin:8px 0 0;opacity:.9;font-size:14px}
+.vul-badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.vul-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.vul-tabs a{padding:11px 16px;border-radius:999px;text-decoration:none;font-weight:700;font-size:14px;border:1px solid #e2e8f0;background:#fff;color:#334155;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.vul-tabs a.act{background:#0f172a;color:#fff;border-color:#0f172a}
+.vul-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.vul-card{border-radius:18px;padding:18px;background:#fff;border:1px solid #e2e8f0;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.vul-card small{font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#64748b;font-weight:700}
+.vul-card h2{margin:8px 0 4px;font-size:30px;line-height:1}
+.vul-card p{margin:0;color:#475569;font-size:13px}
+.vul-card.blue{background:linear-gradient(135deg,#dbeafe,#eff6ff);border-color:#bfdbfe}
+.vul-card.green{background:linear-gradient(135deg,#dcfce7,#f0fdf4);border-color:#bbf7d0}
+.vul-card.amber{background:linear-gradient(135deg,#fef3c7,#fffbeb);border-color:#fde68a}
+.vul-card.rose{background:linear-gradient(135deg,#ffe4e6,#fff1f2);border-color:#fecdd3}
+.vul-panel{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;margin-top:16px;box-shadow:0 4px 16px rgba(0,0,0,.05)}
+.vul-panel h3{margin:0 0 4px;font-size:18px}
+.vul-panel p.hint{margin:0 0 14px;color:#64748b;font-size:13px}
+table.vul{width:100%;border-collapse:collapse;font-size:14px}
+table.vul th{text-align:left;padding:10px 8px;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:.6px;border-bottom:2px solid #f1f5f9}
+table.vul td{padding:12px 8px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+table.vul tr:hover td{background:#f8fafc}
+.pill{display:inline-block;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:800}
+.pill.urgente{background:#fee2e2;color:#991b1b}
+.pill.comprar{background:#dcfce7;color:#166534}
+.pill.no-comprar{background:#fef3c7;color:#92400e}
+.pill.mantener{background:#e2e8f0;color:#334155}
+.bar{height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;min-width:90px}
+.bar > div{height:100%;border-radius:999px;background:linear-gradient(90deg,#0ea5e9,#22c55e)}
+.bar.red > div{background:linear-gradient(90deg,#f59e0b,#ef4444)}
+.vul-filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.vul-filtros select,.vul-filtros button{padding:10px 12px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-weight:600}
+.vul-filtros button{background:#0f172a;color:#fff;cursor:pointer}
+.badge-barato{background:#dcfce7;color:#166534;padding:5px 9px;border-radius:999px;font-weight:800;font-size:12px}
+.badge-caro{background:#fee2e2;color:#991b1b;padding:5px 9px;border-radius:999px;font-weight:800;font-size:12px}
+.vul-alert{background:#fffbeb;border:1px solid #fde68a;padding:12px 14px;border-radius:12px;font-size:13px;margin-top:12px}
+</style>
+<div class="vul-wrap">
+  <div class="vul-hero">
+    <div>
+      <div class="vul-badge">🛞 VULCANIZACIÓN • DATOS REALES DESDE TIRE</div>
+      <h1>Reportes Vulcanización<br>{{ empresa.nombre_taller|default:"Mi taller" }}</h1>
+      <p>Qué comprar, a quién comprarle y cuánto estás ganando con tus neumáticos. Sin reportes genéricos.</p>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:12px;opacity:.85">MARGEN PROMEDIO</div>
+      <div style="font-size:36px;font-weight:900">{{ compra_venta.margen_pct }}%</div>
+      <div style="font-size:13px;opacity:.9">{% if compra_venta.alerta_margen %}⚠️ Margen bajo 20%{% else %}✅ Margen saludable{% endif %}</div>
+    </div>
+  </div>
 
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0">
-    <a href="?tab=compra-venta" style="padding:10px 14px;border-radius:999px;background:{% if tab == 'compra-venta' %}#111827;color:#fff{% else %}#eee{% endif %};text-decoration:none">Compra / Venta</a>
-    <a href="?tab=medida" style="padding:10px 14px;border-radius:999px;background:{% if tab == 'medida' %}#111827;color:#fff{% else %}#eee{% endif %};text-decoration:none">Venta por Medida - Qué comprar</a>
-    <a href="?tab=proveedores" style="padding:10px 14px;border-radius:999px;background:{% if tab == 'proveedores' %}#111827;color:#fff{% else %}#eee{% endif %};text-decoration:none">Proveedores por Medida</a>
-    <a href="?tab=mecanicos" style="padding:10px 14px;border-radius:999px;background:{% if tab == 'mecanicos' %}#111827;color:#fff{% else %}#eee{% endif %};text-decoration:none">Rendimiento Mecánicos</a>
+  <div class="vul-tabs">
+    <a href="?tab=compra-venta" class="{% if tab == 'compra-venta' %}act{% endif %}">💰 Compra / Venta</a>
+    <a href="?tab=medida" class="{% if tab == 'medida' %}act{% endif %}">📏 Venta por Medida • Qué comprar</a>
+    <a href="?tab=proveedores" class="{% if tab == 'proveedores' %}act{% endif %}">🏭 Proveedores por Medida</a>
+    <a href="?tab=mecanicos" class="{% if tab == 'mecanicos' %}act{% endif %}">👨‍🔧 Rendimiento Mecánicos</a>
   </div>
 
   {% if tab == 'compra-venta' %}
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
-    <div style="border:1px solid #ddd;border-radius:12px;padding:16px"><div>Stock total</div><h2>{{ compra_venta.total_stock }}</h2></div>
-    <div style="border:1px solid #ddd;border-radius:12px;padding:16px"><div>Valor compra stock</div><h2>${{ compra_venta.valor_compra|floatformat:0 }}</h2></div>
-    <div style="border:1px solid #ddd;border-radius:12px;padding:16px"><div>Valor venta stock</div><h2>${{ compra_venta.valor_venta|floatformat:0 }}</h2></div>
-    <div style="border:1px solid #ddd;border-radius:12px;padding:16px"><div>Utilidad potencial</div><h2>${{ compra_venta.utilidad_potencial|floatformat:0 }} ({{ compra_venta.margen_pct }}%)</h2>{% if compra_venta.alerta_margen %}<p style="color:red">⚠️ Margen bajo 20%</p>{% endif %}</div>
+  <div class="vul-grid">
+    <div class="vul-card blue"><small>Stock total</small><h2>{{ compra_venta.total_stock }} und.</h2><p>Neumáticos en bodega ahora</p></div>
+    <div class="vul-card"><small>Valor compra stock</small><h2>${{ compra_venta.valor_compra|floatformat:0 }}</h2><p>Lo que te costó lo que tienes</p></div>
+    <div class="vul-card green"><small>Valor venta stock</small><h2>${{ compra_venta.valor_venta|floatformat:0 }}</h2><p>Lo que vale si lo vendes todo</p></div>
+    <div class="vul-card amber"><small>Utilidad potencial</small><h2>${{ compra_venta.utilidad_potencial|floatformat:0 }}</h2><p>Margen {{ compra_venta.margen_pct }}% • {% if compra_venta.alerta_margen %}Revisa precios{% else %}Buen margen{% endif %}</p></div>
   </div>
-  <h3 style="margin-top:20px">Por tipo</h3>
-  <table style="width:100%;border-collapse:collapse"><tr><th align="left">Tipo</th><th>Unidades</th><th>Valor compra</th><th>Valor venta</th></tr>
-  {% for r in compra_venta.por_tipo %}<tr style="border-top:1px solid #eee"><td>{{ r.tipo }}</td><td align="center">{{ r.unidades }}</td><td align="right">${{ r.valor_compra|floatformat:0 }}</td><td align="right">${{ r.valor_venta|floatformat:0 }}</td></tr>{% empty %}<tr><td colspan="4">Sin neumáticos todavía. Crea uno en Neumáticos.</td></tr>{% endfor %}</table>
+  <div class="vul-panel">
+    <h3>Por tipo de neumático</h3>
+    <p class="hint">Dónde tienes la plata metida.</p>
+    <table class="vul"><tr><th>Tipo</th><th>Unidades</th><th>Valor compra</th><th>Valor venta</th><th>Participación</th></tr>
+    {% for r in compra_venta.por_tipo %}
+    <tr><td><b>{{ r.tipo }}</b></td><td>{{ r.unidades }}</td><td>${{ r.valor_compra|floatformat:0 }}</td><td><b>${{ r.valor_venta|floatformat:0 }}</b></td><td><div class="bar"><div style="width:{% widthratio r.valor_venta compra_venta.valor_venta 100 %}%"></div></div></td></tr>
+    {% empty %}<tr><td colspan="5">Sin neumáticos todavía. Crea uno en Neumáticos.</td></tr>{% endfor %}
+    </table>
+    {% if compra_venta.alerta_margen %}<div class="vul-alert">⚠️ <b>Alerta margen:</b> tu margen está bajo 20%. Revisa precio de compra con proveedor o sube precio de venta en las medidas más vendidas.</div>{% endif %}
+  </div>
   {% endif %}
 
   {% if tab == 'medida' %}
-  <h3>Qué comprar / no comprar - por medida</h3>
-  <table style="width:100%;border-collapse:collapse"><tr><th align="left">Medida</th><th>Stock</th><th>Modelos</th><th>Margen %</th><th align="left">Recomendación</th></tr>
-  {% for r in por_medida %}<tr style="border-top:1px solid #eee"><td><b>{{ r.medida }}</b></td><td align="center">{{ r.stock }}</td><td align="center">{{ r.modelos }}</td><td align="center">{{ r.margen_pct }}%</td><td><span style="padding:4px 8px;border-radius:999px;background:{% if r.clase == 'urgente' %}#fee2e2{% elif r.clase == 'no-comprar' %}#fef3c7{% elif r.clase == 'comprar' %}#d1fae5{% else %}#e5e7eb{% endif %}">{{ r.recomendacion }}</span></td></tr>{% empty %}<tr><td colspan="5">Sin datos</td></tr>{% endfor %}</table>
-  <p style="color:#666;margin-top:12px">Regla: Stock 0 = Comprar urgente. Stock ≤4 = Comprar. Stock ≥20 = No comprar / Liquidar. Ajustaremos con ventas reales cuando ligues Documento a Tire.</p>
+  <div class="vul-panel">
+    <h3>Qué comprar / no comprar — por medida</h3>
+    <p class="hint">Regla experto: Stock 0 = Comprar urgente • ≤4 = Comprar • ≥20 = No comprar / Liquidar</p>
+    <table class="vul"><tr><th>Medida</th><th>Stock</th><th>Modelos</th><th>Margen</th><th>Recomendación</th><th>Nivel</th></tr>
+    {% for r in por_medida %}
+    <tr>
+      <td><b style="font-size:16px">{{ r.medida }}</b></td>
+      <td><b>{{ r.stock }}</b></td>
+      <td>{{ r.modelos }}</td>
+      <td>{{ r.margen_pct }}%</td>
+      <td><span class="pill {{ r.clase }}">{{ r.recomendacion }}</span></td>
+      <td><div class="bar {% if r.clase == 'no-comprar' %}red{% endif %}"><div style="width:{% if r.stock > 20 %}100{% else %}{% widthratio r.stock 20 100 %}{% endif %}%"></div></div></td>
+    </tr>
+    {% empty %}<tr><td colspan="6">Sin datos</td></tr>{% endfor %}
+    </table>
+  </div>
   {% endif %}
 
   {% if tab == 'proveedores' %}
-  <form method="get" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-    <input type="hidden" name="tab" value="proveedores">
-    <select name="medida"><option value="">Todas las medidas</option>{% for m in medidas_unicas %}<option value="{{ m }}" {% if m == medida_filtro %}selected{% endif %}>{{ m }}</option>{% endfor %}</select>
-    <select name="proveedor"><option value="">Todos los proveedores</option>{% for p in proveedores_unicos %}<option value="{{ p }}" {% if p == proveedor_filtro %}selected{% endif %}>{{ p }}</option>{% endfor %}</select>
-    <button>Filtrar</button>
-  </form>
-  <table style="width:100%;border-collapse:collapse"><tr><th align="left">Proveedor</th><th align="left">Medida</th><th>Stock</th><th>Precio compra prom.</th><th>Margen %</th><th align="left">Evaluación</th></tr>
-  {% for r in proveedores %}<tr style="border-top:1px solid #eee"><td>{{ r.proveedor }}</td><td><b>{{ r.medida }}</b></td><td align="center">{{ r.stock }}</td><td align="right">${{ r.precio_compra_avg|floatformat:0 }}</td><td align="center">{{ r.margen_pct }}%</td><td>{% if r.badge %}<b style="color:{% if 'BARATO' in r.badge %}green{% else %}red{% endif %}">{{ r.badge }}</b>{% endif %}</td></tr>{% empty %}<tr><td colspan="6">Sin proveedores. El campo Proveedor es obligatorio al crear neumático.</td></tr>{% endfor %}</table>
+  <div class="vul-panel">
+    <h3>Proveedores por medida — ¿A quién le compro?</h3>
+    <p class="hint">Compara precio de compra por la misma medida. El más barato te deja más margen.</p>
+    <form method="get" class="vul-filtros">
+      <input type="hidden" name="tab" value="proveedores">
+      <select name="medida"><option value="">Todas las medidas</option>{% for m in medidas_unicas %}<option value="{{ m }}" {% if m == medida_filtro %}selected{% endif %}>{{ m }}</option>{% endfor %}</select>
+      <select name="proveedor"><option value="">Todos los proveedores</option>{% for p in proveedores_unicos %}<option value="{{ p }}" {% if p == proveedor_filtro %}selected{% endif %}>{{ p }}</option>{% endfor %}</select>
+      <button>Filtrar →</button>
+    </form>
+    <table class="vul"><tr><th>Proveedor</th><th>Medida</th><th>Stock</th><th>Precio compra prom.</th><th>Margen</th><th>Evaluación</th></tr>
+    {% for r in proveedores %}
+    <tr><td><b>{{ r.proveedor }}</b></td><td><b>{{ r.medida }}</b></td><td>{{ r.stock }}</td><td>${{ r.precio_compra_avg|floatformat:0 }}</td><td>{{ r.margen_pct }}%</td><td>{% if r.badge %}{% if 'BARATO' in r.badge %}<span class="badge-barato">✅ {{ r.badge }}</span>{% else %}<span class="badge-caro">⚠️ {{ r.badge }}</span>{% endif %}{% else %}—{% endif %}</td></tr>
+    {% empty %}<tr><td colspan="6">Sin proveedores. El campo Proveedor es obligatorio al crear neumático.</td></tr>{% endfor %}
+    </table>
+  </div>
   {% endif %}
 
   {% if tab == 'mecanicos' %}
-  <h3>Rendimiento mecánicos - Vulcanización</h3>
-  <table style="width:100%;border-collapse:collapse"><tr><th align="left">Mecánico</th><th>Documentos</th><th>Total</th></tr>
-  {% for r in mecanicos %}<tr style="border-top:1px solid #eee"><td>{{ r.nombre }}</td><td align="center">{{ r.total_documentos }}</td><td align="right">${{ r.total|floatformat:0 }}</td></tr>{% empty %}<tr><td colspan="3">Sin datos de Documento todavía</td></tr>{% endfor %}</table>
-  <p style="color:#666">En v2 agregamos: servicios/hora, tiempo promedio, retrabajos/garantías y ventas por mecánico cuando Documento tenga técnico + líneas de servicio vulcanización.</p>
+  <div class="vul-panel">
+    <h3>Rendimiento mecánicos — Vulcanización</h3>
+    <p class="hint">Documentos y total por técnico. En v2: servicios/hora, tiempo promedio y garantías.</p>
+    <table class="vul"><tr><th>Mecánico</th><th>Documentos</th><th>Total</th></tr>
+    {% for r in mecanicos %}<tr><td><b>{{ r.nombre }}</b></td><td>{{ r.total_documentos }}</td><td><b>${{ r.total|floatformat:0 }}</b></td></tr>{% empty %}<tr><td colspan="3">Sin datos de Documento todavía</td></tr>{% endfor %}
+    </table>
+  </div>
   {% endif %}
 </div>
 {% endblock %}
