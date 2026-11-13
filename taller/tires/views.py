@@ -242,7 +242,7 @@ def kiosko_mi_taller_publico(request, slug=None):
             return _render(request, "taller/tires/kiosko_mi_taller.html", {"empresa": None, "tires": [], "error": str(e)})
         except Exception:
             from django.http import HttpResponse
-            return HttpResponse(f"<h1>Kiosko</h1><p>Error temporal: {e}</p>", status=200)
+            return HttpResponse(f"<h1>{'Tire Shop' if getattr(request, 'LANGUAGE_CODE', 'es') == 'en' else 'Kiosko'}</h1><p>Error temporal: {e}</p>", status=200)
 
 
 def kiosko_global_publico(request):
@@ -283,5 +283,5 @@ def kiosko_global_publico(request):
         import traceback
         traceback.print_exc()
         from django.http import HttpResponse
-        return HttpResponse("<h1>Kiosko Global</h1><p>Error temporal: " + str(e) + "</p>", status=200)
+        return HttpResponse("<h1>{'Global Tire Shop' if getattr(request, 'LANGUAGE_CODE', 'es') == 'en' else 'Kiosko Global'}</h1><p>Error temporal: " + str(e) + "</p>", status=200)
 

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div style="color:#fff; padding:12px;">
-<h1 style="color:#fff;">🛞 Kiosko de Neumáticos - SOLO LLANTAS</h1>
+<h1 style="color:#fff;">{% if LANGUAGE_CODE == "en" %}🛞 Tire Shop - TIRES ONLY{% else %}🛞 Kiosko de Neumáticos - SOLO LLANTAS{% endif %}</h1>
 <p style="color:#cbd5e1;">Esta vitrina muestra SOLO neumáticos. No muestra repuestos.</p>
 <form method="GET" style="margin:12px 0;">
   <input name="q" value="{{ q }}" placeholder="Buscar medida: 175/70 R14" style="padding:10px; border-radius:8px; border:1px solid #475569; background:#0f172a; color:#fff; width:200px;">
@@ -31,7 +31,7 @@
     </p>
   </div>
 {% empty %}
-  <p style="color:#facc15; font-weight:bold;">No hay neumáticos en el kiosko. Pulsa + Agregar Neumático para ingresar el primero.</p>
+  <p style="color:#facc15; font-weight:bold;">{% if LANGUAGE_CODE == "en" %}No tires in the Tire Shop. Click + Add Tire to add the first one.{% else %}No hay neumáticos en el kiosko. Pulsa + Agregar Neumático para ingresar el primero.{% endif %}</p>
 {% endfor %}
 </div>
 </div>

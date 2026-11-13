@@ -9,7 +9,7 @@
 </form>
 <p>
   <a href="crear/" style="display:inline-block; padding:12px 18px; background:#facc15; color:#000; font-weight:bold; border-radius:10px; text-decoration:none;">+ Agregar Neumático</a>
-  <a href="kiosko/" style="display:inline-block; padding:12px 18px; background:#14b8a6; color:#fff; font-weight:bold; border-radius:10px; text-decoration:none; margin-left:8px;">🛞 Ver Kiosko</a>
+  <a href="kiosko/" style="display:inline-block; padding:12px 18px; background:#14b8a6; color:#fff; font-weight:bold; border-radius:10px; text-decoration:none; margin-left:8px;">{% if LANGUAGE_CODE == "en" %}🛞 View Tire Shop{% else %}🛞 Ver Kiosko{% endif %}</a>
 </p>
 {% if messages %}{% for m in messages %}<p style="background:#14532d; padding:10px; border-radius:8px;">{{ m }}</p>{% endfor %}{% endif %}
 <table style="width:100%; border-collapse:collapse; color:#fff; margin-top:12px;">
