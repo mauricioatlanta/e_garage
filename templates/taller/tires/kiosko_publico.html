@@ -1,37 +1,81 @@
-{% extends "base.html" %}
-{% block content %}
-<div style="color:#fff; padding:12px; max-width:640px; margin:0 auto;">
-  <h1 style="text-align:center;">🛞 {% if empresa %}{{ empresa.nombre }}{% else %}Vulcanización{% endif %}</h1>
-  <p style="text-align:center; color:#cbd5e1;">Neumáticos disponibles — vista pública</p>
-  <div style="display:flex; gap:8px; margin:12px 0;">
-    <input id="busca-publico" placeholder="Buscar medida, ej: 175/70 R14..." style="flex:1; padding:12px; border-radius:10px; background:#0f172a; color:#fff; border:1px solid #475569;">
-  </div>
-  {% if tires %}
-  <div id="lista-publico">
-    {% for t in tires %}
-    <div class="card-publico" data-text="{{ t.ancho }}/{{ t.perfil }} R{{ t.aro }} {{ t.marca }} {{ t.modelo }} {{ t.tipo }}" style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:14px; margin:8px 0;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <b style="font-size:20px;">{{ t.ancho }}/{{ t.perfil }} R{{ t.aro }}</b>
-        <span style="background:{% if t.tipo == 'Nuevo' %}#14532d{% elif t.tipo == 'Usado' %}#92400e{% else %}#1e40af{% endif %}; padding:4px 10px; border-radius:20px; font-size:13px;">{{ t.tipo }}</span>
-      </div>
-      <div style="color:#cbd5e1; margin-top:4px;">{{ t.marca }} {{ t.modelo }} {% if t.indice %}• {{ t.indice }}{% endif %} • {{ t.uso }}</div>
-      <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
-        <div><div style="color:#94a3b8; font-size:12px;">Precio Instalado</div><b style="font-size:22px; color:#facc15;">${{ t.precio_instalado }}</b><div style="color:#94a3b8; font-size:12px;">Venta: ${{ t.precio_venta }} • Stock: {{ t.cantidad_stock }}</div></div>
-        <a href="https://wa.me/?text=Hola, me interesa el neumático {{ t.ancho }}/{{ t.perfil }} R{{ t.aro }} {{ t.marca }} {{ t.modelo }} Instalado ${{ t.precio_instalado }}" style="background:#22c55e; color:#fff; padding:10px 14px; border-radius:10px; text-decoration:none; font-weight:bold;">WhatsApp</a>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-  {% else %}
-  <p style="text-align:center; color:#94a3b8;">Por ahora no hay neumáticos en stock.</p>
-  {% endif %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tire Shop - {{ username|default:'mauricioatlanta' }} | eGarage</title>
+<style>
+body{margin:0;font-family:system-ui,Arial,sans-serif;background:linear-gradient(180deg,#0f172a,#1e3a8a 45%,#facc15);min-height:100vh}
+.topbar{display:flex;justify-content:space-between;padding:14px 20px}
+.topbar a{color:#fff;text-decoration:none;font-weight:700}
+.lang{background:#fff;border-radius:999px;padding:6px;display:flex;gap:4px}
+.lang a{padding:6px 12px;border-radius:999px;color:#0f172a;text-decoration:none;font-weight:800;font-size:14px}
+.lang a.active{background:#0f172a;color:#fff}
+.hero{max-width:900px;margin:10px auto 0;padding:0 16px;text-align:center;color:#fff}
+.hero .badge{display:inline-block;background:#facc15;color:#0f172a;font-weight:800;font-size:12px;padding:6px 12px;border-radius:999px;text-transform:uppercase}
+.hero h1{font-size:40px;margin:14px 0 6px}
+.hero p{margin:4px 0;font-size:17px}
+.card{max-width:900px;margin:20px auto;background:#fff;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,.35);overflow:hidden;padding-bottom:20px}
+.search{display:flex;gap:10px;padding:20px 22px 0}
+.search input{flex:1;padding:14px;border:2px solid #e2e8f0;border-radius:12px;font-size:16px}
+.search button{background:#0f172a;color:#fff;border:0;padding:0 20px;border-radius:12px;font-weight:800}
+.global{display:block;margin:16px 22px 0;background:#fef9c3;border:1px solid #facc15;padding:12px;border-radius:12px;color:#713f12;text-decoration:none;font-weight:700;text-align:center}
+.grid{padding:18px 22px 0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tire{border:1px solid #e2e8f0;border-radius:16px;padding:16px;display:flex;gap:14px;align-items:center}
+.tire h3{margin:0;font-size:20px}
+.tire p{margin:4px 0;color:#475569;font-size:14px}
+.price{font-size:22px;font-weight:900}
+.tag{display:inline-block;font-size:11px;font-weight:800;padding:4px 8px;border-radius:999px;background:#dcfce7;color:#166534;text-transform:uppercase}
+.empty{grid-column:1/-1;text-align:center;padding:30px;color:#475569}
+.footer{max-width:900px;margin:0 auto;padding:20px;text-align:center;color:#fff;font-size:13px}
+@media(max-width:640px){.grid{grid-template-columns:1fr}.hero h1{font-size:32px}}
+</style>
+</head>
+<body>
+<div class="topbar">
+<a href="/">eGarage</a>
+<div class="lang">
+<a href="/us/en/tires/public/{{ username|default:'mauricioatlanta' }}/" class="{% if LANGUAGE_CODE == 'en' %}active{% endif %}">EN</a>
+<a href="/cl/es/tires/public/{{ username|default:'mauricioatlanta' }}/" class="{% if LANGUAGE_CODE == 'es' %}active{% endif %}">ES</a>
 </div>
-<script>
-document.getElementById('busca-publico').addEventListener('input', function(){
-  var q = this.value.toLowerCase();
-  document.querySelectorAll('.card-publico').forEach(function(c){
-    c.style.display = c.getAttribute('data-text').toLowerCase().includes(q) ? 'block' : 'none';
-  });
-});
-</script>
-{% endblock %}
+</div>
+<div class="hero">
+<span class="badge">{% if LANGUAGE_CODE == 'en' %}Tire Shop{% else %}Vulcanizacion{% endif %} - eGarage</span>
+<h1>{{ username|default:'mauricioatlanta' }}</h1>
+<p>{% if LANGUAGE_CODE == 'en' %}Tires available at this shop - Public View{% else %}Neumaticos disponibles en este taller - Vista publica{% endif %}</p>
+</div>
+<div class="card">
+<form class="search" method="get">
+<input type="text" name="q" value="{{ q|default:'' }}" placeholder="{% if LANGUAGE_CODE == 'en' %}Search size, e.g.: 175/70 R14...{% else %}Buscar medida, ej: 175/70 R14...{% endif %}">
+<button type="submit">{% if LANGUAGE_CODE == 'en' %}Search{% else %}Buscar{% endif %}</button>
+</form>
+<a class="global" href="/{% if LANGUAGE_CODE == 'en' %}us/en{% else %}cl/es{% endif %}/tires/public/"> {% if LANGUAGE_CODE == 'en' %}Can not find your size? Search all shops - Global Tire Shop{% else %}No encuentras tu medida? Busca en todos los talleres - Kiosko Global{% endif %}</a>
+<div class="grid">
+{% if tires %}
+{% for t in tires %}
+<div class="tire">
+<div style="font-size:38px">🛞</div>
+<div style="flex:1">
+<h3>{{ t.ancho }}{% if t.perfil %}/{{ t.perfil }}{% endif %} {% if t.aro %}R{{ t.aro }}{% endif %}</h3>
+<p>{{ t.marca }} {{ t.modelo }}</p>
+<span class="tag">{{ t.tipo|default:'Nuevo' }}</span>
+</div>
+<div style="text-align:right">
+<div class="price">${{ t.precio_instalado|default:t.precio }}</div>
+<div style="font-size:12px;color:#64748b">Stock: {{ t.stock }}</div>
+</div>
+</div>
+{% endfor %}
+{% else %}
+<div class="empty">
+<div style="font-size:48px">🛞</div>
+<h3>{% if LANGUAGE_CODE == 'en' %}No tires in stock at this shop yet.{% else %}Por ahora no hay neumaticos en stock en este taller.{% endif %}</h3>
+<p>{% if LANGUAGE_CODE == 'en' %}Try another size or search all shops above.{% else %}Prueba con otra medida o busca en todos los talleres arriba.{% endif %}</p>
+</div>
+{% endif %}
+</div>
+</div>
+<div class="footer">Powered by <b>eGarage</b> - {% if LANGUAGE_CODE == 'en' %}Tire Shop{% else %}Vulcanizacion{% endif %} - {{ username|default:'mauricioatlanta' }}</div>
+</body>
+</html>
